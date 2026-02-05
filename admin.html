@@ -2,19 +2,80 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>SLM Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMALLSM Archive</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div style="max-width:800px; margin: 3rem auto; padding: 0 2rem;">
-        <h2 class="cinzel" style="margin-bottom:2rem;">ADMINISTRATION</h2>
-        <input type="text" id="post-title" placeholder="문서 제목을 입력하십시오">
-        <select id="category-select"></select>
-        <textarea id="post-content" style="height:400px;" placeholder="본문 기록 (HTML 지원)"></textarea>
-        <button class="btn-brass" onclick="saveArchive()">기록 보관소에 저장</button>
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2 class="cinzel">ADULT ONLY</h2>
+            <p style="opacity:0.6; font-size:0.8rem; margin-bottom:20px;">성인 인증 후 입장이 가능합니다.</p>
+            <button class="btn-brass" onclick="goIn()">YES (ENTER)</button>
+        </div>
     </div>
+
+    <div class="container">
+        <aside id="sidebar">
+            <h1 class="cinzel" onclick="location.reload()">SLM</h1>
+            <nav id="category-nav" style="margin-top:30px;"></nav>
+        </aside>
+        <main id="main-panel">
+            <div id="content-area">카테고리를 선택하십시오.</div>
+        </main>
+    </div>
+
     <script src="config.js"></script>
-    <script src="admin.js"></script>
+    <script>
+        // 버튼 클릭 시 즉시 실행
+        function goIn() {
+            console.log("인증 버튼 클릭됨");
+            localStorage.setItem('slm_auth_ok', 'true');
+            
+            // 무엇보다 먼저 창을 숨깁니다.
+            const overlay = document.getElementById('auth-overlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+            
+            // 그 다음 데이터를 불러옵니다.
+            startApp();
+        }
+
+        let supabase;
+        async function startApp() {
+            // CONFIG 로딩 대기 안전장치
+            if (typeof CONFIG === 'undefined') {
+                await new Promise(r => setTimeout(r, 500));
+            }
+
+            if (typeof CONFIG !== 'undefined' && typeof supabase === 'undefined') {
+                supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+                
+                // 카테고리 로드
+                const { data } = await supabase.from('categories').select('*').eq('is_visible', true).order('display_order');
+                const nav = document.getElementById('category-nav');
+                if (data && nav) {
+                    nav.innerHTML = '<p style="font-size:0.7rem; color:var(--brass); opacity:0.5; margin-bottom:15px;">ARCHIVE</p>';
+                    data.forEach(c => {
+                        const div = document.createElement('div');
+                        div.style = "margin-bottom:12px; cursor:pointer; font-size:0.9rem;";
+                        div.innerHTML = `<span style="color:var(--brass)">#</span> ${c.name}`;
+                        div.onclick = () => loadPosts(c.id, c.name);
+                        nav.appendChild(div);
+                    });
+                }
+            }
+        }
+
+        // 이미 인증했다면 바로 입장
+        window.onload = () => {
+            if (localStorage.getItem('slm_auth_ok') === 'true') {
+                document.getElementById('auth-overlay').style.display = 'none';
+                startApp();
+            }
+        };
+    </script>
 </body>
 </html>
