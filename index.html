@@ -2,28 +2,61 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMALLSM Archive</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        /* 긴급 처방: 인증창을 가장 단순하고 확실한 방식으로 배치 */
-        #adult-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0F0F0E; z-index: 10000;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .disclaimer-box {
-            border: 1px solid #CEB180; padding: 2rem; background: #0F0F0E;
-            width: 85%; max-width: 350px; text-align: center;
-        }
-        .btn-yes { background: #CEB180; color: #0F0F0E; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-        .btn-no { background: transparent; color: #666; border: 1px solid #333; padding: 12px; width: 100%; cursor: pointer; }
-    </style>
 </head>
 <body>
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2 class="cinzel">ADULT ONLY</h2>
+            <p>본 기록소는 성인 인증이 필요합니다.</p>
+            <button class="btn-brass" onclick="grantAccess()">YES (ENTER)</button>
+        </div>
+    </div>
 
-    <div id="adult-overlay">
-        <div class="disclaimer-box">
-            <h2 style="font-family: 'Cinzel'; color: #CEB180; margin-bottom: 1rem;">ADULT ONLY</h2>
-            <p style="color
+    <div class="container">
+        <aside id="sidebar">
+            <h1 class="cinzel" onclick="location.reload()">SLM</h1>
+            <nav id="category-nav"></nav>
+        </aside>
+        <main id="main-panel">
+            <div id="content-area">기록을 불러오는 중...</div>
+        </main>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        function grantAccess() {
+            localStorage.setItem('slm_auth', 'true');
+            document.getElementById('auth-overlay').style.display = 'none';
+            initApp();
+        }
+
+        let supabase;
+        async function initApp() {
+            if (typeof CONFIG === 'undefined') await new Promise(r => setTimeout(r, 500));
+            if (typeof CONFIG !== 'undefined') {
+                supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+                const { data } = await supabase.from('categories').select('*').eq('is_visible', true).order('display_order');
+                const nav = document.getElementById('category-nav');
+                nav.innerHTML = '';
+                data?.forEach(c => {
+                    const d = document.createElement('div');
+                    d.innerHTML = `# ${c.name}`;
+                    d.onclick = () => loadPosts(c.id);
+                    nav.appendChild(d);
+                });
+            }
+        }
+
+        window.onload = () => {
+            if (localStorage.getItem('slm_auth') === 'true') {
+                document.getElementById('auth-overlay').style.display = 'none';
+                initApp();
+            }
+        };
+    </script>
+</body>
+</html>
