@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>SLM Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div id="login-section" class="disclaimer-box" style="margin: 10vh auto; position: static;">
+        <h2 style="font-family: var(--font-cinzel); color: var(--primary-brass); margin-bottom: 2rem;">ADMIN LOGIN</h2>
+        <input type="email" id="email" placeholder="Email" style="width:100%; padding:10px; margin-bottom:10px; background:#111; color:white; border:1px solid #333;">
+        <input type="password" id="pw" placeholder="Password" style="width:100%; padding:10px; margin-bottom:20px; background:#111; color:white; border:1px solid #333;">
+        <button class="btn-brass" onclick="handleLogin()" style="width:100%; margin:0;">ACCESS</button>
+    </div>
+
+    <div id="admin-dashboard" class="admin-wrap hidden">
+        <header style="display:flex; justify-content:space-between; border-bottom:1px solid var(--primary-brass); padding-bottom:1rem;">
+            <h1 style="font-family:var(--font-cinzel); color:var(--primary-brass);">DASHBOARD</h1>
+            <button class="btn-brass" onclick="handleLogout()" style="padding:5px 15px;">LOGOUT</button>
+        </header>
+
+        <div style="margin-top:2rem;">
+            <input type="text" id="post-title" placeholder="제목" style="width:100%; padding:15px; background:#1a1a1a; color:white; border:1px solid #333; font-size:1.2rem; margin-bottom:1rem;">
+            <div class="editor-grid">
+                <textarea id="editor-input" placeholder="HTML 내용을 작성하세요..." oninput="updatePreview()"></textarea>
+                <div id="editor-preview"></div>
+            </div>
+            <div style="margin-top:1.5rem; display:flex; gap:15px; align-items:center;">
+                <select id="cat-select" style="padding:10px; background:#1a1a1a; color:white; border:1px solid var(--primary-brass);"></select>
+                <button class="btn-brass" onclick="savePost()">PUBLISH RECORD</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
+
