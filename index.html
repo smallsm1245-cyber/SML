@@ -5,15 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMALLSM Archive</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Courier+Prime&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="is-blurred"> <div id="disclaimer" class="disclaimer-overlay">
+<body class="is-blurred">
+
+    <div id="disclaimer" class="disclaimer-overlay">
         <div class="disclaimer-card">
             <h2 class="en-font">ADULT ONLY</h2>
             <p>본 기록 보관소는 성인 전용 콘텐츠를 포함하고 있습니다.<br>당신은 만 19세 이상입니까?</p>
             <div class="disclaimer-btns">
-                <button onclick="verifyAge(true)" class="btn-yes">예 (ENTER)</button>
-                <button onclick="verifyAge(false)" class="btn-no">아니요 (EXIT)</button>
+                <button onclick="verifyAge(true)" class="btn-yes">YES (ENTER)</button>
+                <button onclick="verifyAge(false)" class="btn-no">NO (EXIT)</button>
             </div>
         </div>
     </div>
@@ -23,37 +25,31 @@
             <h1 class="logo-full en-font">SMALLSM</h1>
             <span class="logo-short en-font">SLM</span>
         </div>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="기록 검색...">
-        </div>
         <nav class="category-nav">
             <ul id="categoryList">
-                <li class="loading">연결 중...</li>
+                <li class="loading">CONNECTING...</li>
             </ul>
         </nav>
-        <div class="sidebar-footer">
-            <button id="themeToggle"><span class="mode-icon">🌙</span></button>
-        </div>
     </aside>
 
     <main class="main-panel">
-        <article id="contentArea" class="glass-panel">
+        <article class="glass-panel">
             <div class="content-header">
-                <h2 id="postTitle">SMALLSM Archive</h2>
-                <div id="postMeta" class="post-meta"></div>
+                <h2 id="postTitle" class="kr-font">ARCHIVE</h2>
             </div>
             <hr class="divider">
             <div id="postContent" class="post-body">
                 왼쪽 메뉴에서 카테고리를 선택하여 기록을 열람하십시오.
             </div>
         </article>
+        
         <footer class="main-footer">
             <p>© 2026 - PRESENT <span class="author">SMALLSM</span>. All Rights Reserved.</p>
         </footer>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script src="./config.js"></script>
-    <script src="./app.js"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
