@@ -1,4 +1,4 @@
-/* [3.1] 성인 인증 제어 */
+// 성인 인증 및 데이터 연동 로직
 function verifyAge(isAdult) {
     if (isAdult) {
         localStorage.setItem('slm_verified', 'true');
@@ -6,18 +6,22 @@ function verifyAge(isAdult) {
         document.getElementById('disclaimer').style.display = 'none';
         initArchive();
     } else {
-        alert("접근 권한이 없습니다.");
+        alert("성인 인증이 필요합니다.");
         window.location.href = "https://www.google.com";
     }
 }
 
-/* 초기화 및 데이터 로드 */
 async function initArchive() {
-    if (typeof CONFIG === 'undefined') return;
+    // config.js가 로드되지 않았을 경우 방어
+    if (typeof CONFIG === 'undefined') {
+        console.error("Config not found");
+        return;
+    }
     
-    const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    const { createClient } = supabase;
+    const supabaseClient = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-    // 카테고리 불러오기 (2.1 반영)
+    // [2.1] 카테고리 데이터 호출
     const { data, error } = await supabaseClient
         .from('categories')
         .select('*')
@@ -25,14 +29,15 @@ async function initArchive() {
         .order('display_order', { ascending: true });
 
     const categoryList = document.getElementById('categoryList');
-    if (data) {
+    if (data && data.length > 0) {
         categoryList.innerHTML = data.map(cat => 
-            `<li onclick="loadPosts('${cat.id}')">${cat.name}</li>`
+            `<li onclick="console.log('${cat.id}')">${cat.name}</li>`
         ).join('');
+    } else {
+        categoryList.innerHTML = '<li>기록된 카테고리가 없습니다.</li>';
     }
 }
 
-/* 페이지 로드 시 상태 확인 */
 window.onload = () => {
     if (localStorage.getItem('slm_verified') === 'true') {
         document.body.classList.remove('is-blurred');
