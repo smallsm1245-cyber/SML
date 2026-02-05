@@ -1,0 +1,27 @@
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [ main ]
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create config.js
+        run: |
+          echo "const CONFIG = {
+            SUPABASE_URL: '${{ secrets.SUPABASE_URL }}',
+            SUPABASE_ANON_KEY: '${{ secrets.SUPABASE_ANON_KEY }}',
+            ADMIN_EMAIL: '${{ secrets.ADMIN_EMAIL }}'
+          };" > config.js
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          publish_branch: gh-pages
+
