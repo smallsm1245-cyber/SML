@@ -5,13 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMALLSM Archive</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Courier+Prime&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
+<body class="is-blurred"> <div id="disclaimer" class="disclaimer-overlay">
+        <div class="disclaimer-card">
+            <h2 class="en-font">ADULT ONLY</h2>
+            <p>본 기록 보관소는 성인 전용 콘텐츠를 포함하고 있습니다.<br>당신은 만 19세 이상입니까?</p>
+            <div class="disclaimer-btns">
+                <button onclick="verifyAge(true)" class="btn-yes">예 (ENTER)</button>
+                <button onclick="verifyAge(false)" class="btn-no">아니요 (EXIT)</button>
+            </div>
+        </div>
+    </div>
+
     <aside class="sidebar">
         <div class="logo-area">
-            <h1 class="logo-full">SMALLSM</h1>
-            <span class="logo-short">SLM</span>
+            <h1 class="logo-full en-font">SMALLSM</h1>
+            <span class="logo-short en-font">SLM</span>
         </div>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="기록 검색...">
@@ -43,7 +53,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script src="config.js"></script>
-    <script src="app.js"></script>
+    <script src="./config.js"></script>
+    <script src="./app.js"></script>
 </body>
 </html>
