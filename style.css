@@ -1,52 +1,44 @@
-/* 기획서 5.1 시네마틱 디자인 정의 */
+/* CSS 변수 정의 */
 :root {
     --brass: #CEB180; /* 황동색 */
-    --bg: #0F0F0E;    /* 심해색 배경 */
-    --text: #eee;
+    --bg: #0F0F0E;    /* 심해 배경색 */
+    --glass: rgba(255, 255, 255, 0.03);
+    --font-main: 'Source Han Serif', serif;
 }
 
 body, html {
-    margin: 0; padding: 0;
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: 'serif';
-    height: 100%;
+    margin: 0; padding: 0; height: 100%;
+    background-color: var(--bg); color: #eee;
+    font-family: var(--font-main);
 }
 
-.cinzel { font-family: 'Cinzel', serif; letter-spacing: 1px; color: var(--brass); }
+/* 타이포그래피 */
+.cinzel { font-family: 'Cinzel', serif; letter-spacing: 2px; color: var(--brass); }
 
-/* 성인 인증 레이어 (화면 전체 덮기) */
+/* 성인 인증 레이어 */
 #auth-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: var(--bg); z-index: 9999;
-    display: flex; justify-content: center; align-items: center;
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; justify-content: center; align-items: center; z-index: 9999;
 }
-
 .auth-card {
-    border: 1px solid var(--brass);
-    padding: 40px 20px; text-align: center;
-    width: 80%; max-width: 300px;
+    border: 1px solid var(--brass); padding: 3rem; text-align: center;
+    background: var(--bg); width: 80%; max-width: 350px;
 }
 
-/* 버튼 디자인 */
-.btn-brass {
-    background: var(--brass); color: var(--bg);
-    border: none; padding: 12px 0; width: 100%;
-    font-weight: bold; cursor: pointer; margin-top: 20px;
-}
-
-/* 레이아웃 구조 */
-.container { display: flex; height: 100vh; overflow: hidden; }
+/* 레이아웃 */
+.container { display: flex; height: 100vh; }
 #sidebar {
-    width: 200px; border-right: 1px solid rgba(206, 177, 128, 0.2);
-    padding: 20px;
+    width: 250px; border-right: 1px solid rgba(206, 177, 128, 0.1);
+    padding: 2rem; display: flex; flex-direction: column;
 }
-#main-panel { flex: 1; padding: 40px; overflow-y: auto; }
+#main-panel { flex: 1; padding: 3rem; overflow-y: auto; background: var(--glass); }
 
-/* 관리자 에디터 스타일 */
-.admin-wrap { max-width: 600px; margin: 40px auto; padding: 20px; }
+/* 에디터 및 공통 버튼 */
+.btn-brass {
+    background: var(--brass); color: var(--bg); border: none;
+    padding: 12px; width: 100%; font-weight: bold; cursor: pointer;
+}
 input, select, textarea {
     width: 100%; background: #1a1a18; border: 1px solid #333;
-    color: var(--text); padding: 10px; margin-bottom: 10px; box-sizing: border-box;
+    color: #eee; padding: 12px; margin-bottom: 1rem; box-sizing: border-box;
 }
-textarea { height: 300px; }
