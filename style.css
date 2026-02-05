@@ -1,97 +1,35 @@
-:root {
-    --bg-color: #0F0F0E;
-    --panel-bg: rgba(25, 25, 23, 0.9);
-    --point-color: #CEB180;
-    --text-main: #E0DED7;
-    --font-kr: 'Noto Serif KR', serif;
-    --font-en: 'Cinzel', serif;
-    --font-data: 'Courier Prime', monospace;
+/* [Ver 1.1] 게시글 목록 스타일 */
+.post-list {
+    list-style: none;
+    margin-top: 20px;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-.en-font { font-family: var(--font-en); }
-.kr-font { font-family: var(--font-kr); }
-
-body {
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    font-family: var(--font-kr);
+.post-list li {
+    padding: 15px 10px;
+    border-bottom: 1px solid rgba(206, 177, 128, 0.1);
+    cursor: pointer;
     display: flex;
-    min-height: 100vh;
+    gap: 20px;
+    transition: 0.3s;
 }
 
-body.is-blurred .main-panel, 
-body.is-blurred .sidebar {
-    filter: blur(20px);
-    pointer-events: none;
+.post-list li:hover {
+    background: rgba(206, 177, 128, 0.05);
+    padding-left: 20px;
 }
 
-.disclaimer-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.95);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 9999;
+.post-date {
+    font-family: var(--font-data);
+    color: #555;
+    font-size: 0.85rem;
 }
 
-.disclaimer-card {
-    border: 1px solid var(--point-color);
-    padding: 50px; text-align: center; background: #151514;
-    box-shadow: 0 0 50px rgba(206, 177, 128, 0.1);
+.post-item-title {
+    color: var(--text-main);
 }
 
-.disclaimer-card h2 { color: var(--point-color); margin-bottom: 20px; font-size: 2rem; }
-
-.disclaimer-btns button {
-    background: transparent; border: 1px solid var(--point-color);
-    color: var(--point-color); padding: 12px 25px; cursor: pointer;
-    margin: 0 10px; transition: 0.3s; font-family: var(--font-kr);
-}
-
-.disclaimer-btns button:hover { background: var(--point-color); color: #000; }
-
-.sidebar {
-    width: 280px; height: 100vh;
-    border-right: 1px solid rgba(206, 177, 128, 0.2);
-    padding: 40px 25px; position: fixed;
-    background: var(--bg-color);
-}
-
-.logo-full { color: var(--point-color); font-size: 1.8rem; margin-bottom: 50px; letter-spacing: 2px; }
-
-.category-nav li {
-    list-style: none; padding: 15px 0; color: #777;
-    cursor: pointer; font-family: var(--font-en); transition: 0.3s;
-    border-bottom: 1px solid rgba(206, 177, 128, 0.05);
-}
-
-.category-nav li:hover { color: var(--point-color); padding-left: 10px; }
-
-.main-panel {
-    margin-left: 280px; flex-grow: 1; padding: 60px;
-    display: flex; flex-direction: column; align-items: center;
-    background: radial-gradient(circle at center, #1a1a18 0%, #0f0f0e 100%);
-}
-
-.glass-panel {
-    width: 100%; max-width: 850px; min-height: 80vh;
-    background: var(--panel-bg); padding: 60px;
-    border: 1px solid rgba(206, 177, 128, 0.1);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-}
-
-.divider {
-    border: 0; height: 1px; margin: 40px 0;
-    background: linear-gradient(to right, transparent, var(--point-color), transparent);
-}
-
-.main-footer {
-    margin-top: 50px; font-family: var(--font-data);
-    font-size: 0.8rem; color: #444;
-}
-
-@media (max-width: 768px) {
-    .sidebar { width: 100%; height: auto; position: relative; border-right: none; }
-    .main-panel { margin-left: 0; padding: 20px; }
-    .logo-full { margin-bottom: 20px; }
+.no-data {
+    color: #555;
+    text-align: center;
+    margin-top: 50px;
 }
