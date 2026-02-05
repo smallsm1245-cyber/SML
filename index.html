@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO & Open Graph -->
+    <title>SMALLSM Archive - 기록의 서재</title>
+    <meta name="description" content="BDSM 성향 아카이브 - 안전하고 진중한 기록의 공간">
+    <meta property="og:title" content="SMALLSM Archive">
+    <meta property="og:description" content="기록의 서재 - 성향 지식 아카이브">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="./assets/og-image.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         성인 인증 디스크레이머 (Age Verification)
+         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <div id="ageVerificationModal" class="modal-overlay">
+        <div class="modal-content glass-panel">
+            <h2>🔞 성인 인증 필수</h2>
+            <p style="margin: 1.5rem 0; line-height: 1.8;">
+                본 사이트는 <strong>만 19세 이상</strong>의 성인만 열람할 수 있는<br>
+                <strong>BDSM 성향 관련 기록물</strong>을 포함하고 있습니다.
+            </p>
+            <p style="font-size: 0.9rem; color: rgba(206, 177, 128, 0.7); margin-bottom: 2rem;">
+                ⚠️ SSC(Safe, Sane, Consensual) 원칙을 준수하며,<br>
+                모든 콘텐츠는 교육 및 정보 제공 목적으로 작성되었습니다.
+            </p>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="btn btn-primary" onclick="agreeAndEnter()">
+                    만 19세 이상입니다
+                </button>
+                <button class="btn" onclick="declineAndExit()">
+                    아니요
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         메인 레이아웃
+         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <div id="mainContent" class="blur-content">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="glass-panel">
+            <div class="sidebar-header">
+                <h1 class="site-logo">SLM</h1>
+                <p class="site-subtitle">Archive</p>
+            </div>
+            
+            <!-- 검색창 -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="기록 검색..." />
+            </div>
+            
+            <!-- 카테고리 네비게이션 -->
+            <nav id="categoryNav" class="category-nav">
+                <!-- JavaScript로 동적 생성 -->
+            </nav>
+            
+            <!-- Night Mode Toggle -->
+            <div class="sidebar-footer">
+                <button class="btn" id="nightModeToggle" onclick="toggleNightMode()">
+                    🌙 Night Library
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main id="contentArea">
+            <article class="glass-panel content-panel fade-in">
+                <header class="article-header">
+                    <h1>환영합니다</h1>
+                    <div class="article-meta">
+                        <span class="monospace">ESTABLISHED 2026</span>
+                    </div>
+                </header>
+                
+                <section class="article-body">
+                    <p>
+                        이곳은 <strong>SMALLSM</strong>의 개인 아카이브입니다.<br>
+                        BDSM 성향에 대한 진중한 기록과 고찰을 담고 있습니다.
+                    </p>
+                    
+                    <p>
+                        좌측 메뉴에서 카테고리를 선택하여 탐색하실 수 있습니다.
+                    </p>
+                </section>
+            </article>
+        </main>
+
+    </div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         Footer
+         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <footer id="siteFooter">
+        <p class="monospace">
+            © 2026 - PRESENT <strong>SMALLSM</strong>. All Rights Reserved.
+        </p>
+        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem;">
+            Attribution Required · No Derivatives · Non-Commercial
+        </p>
+    </footer>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         Scripts
+         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Configuration (실제 사용 시 config.js로 교체) -->
+    <script src="./js/config.example.js"></script>
+    
+    <!-- Main App Script -->
+    <script src="./js/main.js"></script>
+
+</body>
+</html>
