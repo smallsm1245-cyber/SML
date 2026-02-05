@@ -1,16 +1,17 @@
-/* 기본 변수 설정 */
+/* [0.2] CSS 중앙 제어 변수 설정 */
 :root {
     --bg-color: #0F0F0E;
     --panel-bg: rgba(25, 25, 23, 0.85);
     --point-color: #CEB180;
     --text-main: #E0DED7;
-    --text-dim: #999;
     --font-kr: 'Noto Serif KR', serif;
     --font-en: 'Cinzel', serif;
+    --font-data: 'Courier Prime', monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 .en-font { font-family: var(--font-en); }
+.kr-font { font-family: var(--font-kr); }
 
 body {
     background-color: var(--bg-color);
@@ -20,51 +21,63 @@ body {
     min-height: 100vh;
 }
 
-/* [3.1] 블러 및 팝업 스타일 */
+/* [3.1] 블러 효과 */
 body.is-blurred .main-panel, 
 body.is-blurred .sidebar {
-    filter: blur(15px);
+    filter: blur(20px);
     pointer-events: none;
 }
 
+/* 성인 인증 팝업 */
 .disclaimer-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex; justify-content: center; align-items: center;
     z-index: 9999;
 }
-
 .disclaimer-card {
-    background: #1a1a18;
     border: 1px solid var(--point-color);
-    padding: 40px;
-    text-align: center;
-    max-width: 400px;
-    box-shadow: 0 0 30px rgba(206, 177, 128, 0.2);
+    padding: 50px; text-align: center; background: #151514;
 }
-
-.disclaimer-card h2 { color: var(--point-color); margin-bottom: 20px; letter-spacing: 3px; }
-.disclaimer-card p { margin-bottom: 30px; line-height: 1.6; font-size: 0.9rem; }
-
-.disclaimer-btns { display: flex; gap: 15px; justify-content: center; }
+.disclaimer-card h2 { color: var(--point-color); margin-bottom: 20px; }
 .disclaimer-btns button {
-    padding: 10px 25px;
-    cursor: pointer;
-    background: transparent;
-    border: 1px solid var(--point-color);
-    color: var(--point-color);
-    font-family: var(--font-kr);
-    transition: 0.3s;
+    background: transparent; border: 1px solid var(--point-color);
+    color: var(--point-color); padding: 10px 20px; cursor: pointer;
+    margin: 0 10px; transition: 0.3s;
 }
+.disclaimer-btns button:hover { background: var(--point-color); color: #000; }
 
-.btn-yes:hover { background: var(--point-color); color: #000; }
-.btn-no { border-color: #666 !important; color: #666 !important; }
+/* 사이드바 레이아웃 */
+.sidebar {
+    width: 280px; height: 100vh;
+    border-right: 1px solid rgba(206, 177, 128, 0.2);
+    padding: 40px 25px; position: fixed;
+    background: var(--bg-color);
+}
+.logo-full { color: var(--point-color); font-size: 1.8rem; margin-bottom: 50px; }
+.category-nav li {
+    list-style: none; padding: 15px 0; color: #888;
+    cursor: pointer; font-family: var(--font-en); transition: 0.3s;
+}
+.category-nav li:hover { color: var(--point-color); }
 
-/* (이하 기존 사이드바 및 메인 패널 스타일 유지) */
-.sidebar { width: 280px; height: 100vh; border-right: 1px solid rgba(206, 177, 128, 0.2); padding: 40px 25px; position: fixed; }
-.logo-full { color: var(--point-color); font-size: 1.8rem; margin-bottom: 40px; }
-.main-panel { margin-left: 280px; flex-grow: 1; padding: 60px; display: flex; flex-direction: column; align-items: center; }
-.glass-panel { width: 100%; max-width: 900px; background: var(--panel-bg); padding: 60px; border: 1px solid rgba(206, 177, 128, 0.1); }
+/* 메인 기록 패널 */
+.main-panel {
+    margin-left: 280px; flex-grow: 1; padding: 60px;
+    display: flex; flex-direction: column; align-items: center;
+    position: relative;
+}
+.glass-panel {
+    width: 100%; max-width: 900px; min-height: 80vh;
+    background: var(--panel-bg); padding: 60px;
+    border: 1px solid rgba(206, 177, 128, 0.1);
+    backdrop-filter: blur(10px);
+}
+.divider {
+    border: 0; height: 1px; margin: 40px 0;
+    background: linear-gradient(to right, transparent, var(--point-color), transparent);
+}
+.main-footer {
+    margin-top: 50px; font-family: var(--font-data);
+    font-size: 0.8rem; color: #555;
+}
