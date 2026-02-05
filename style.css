@@ -1,44 +1,130 @@
-/* CSS 변수 정의 */
+/* 0.2 CSS 중앙 제어 및 0.5 시각 규칙 반영 */
 :root {
-    --brass: #CEB180; /* 황동색 */
-    --bg: #0F0F0E;    /* 심해 배경색 */
-    --glass: rgba(255, 255, 255, 0.03);
-    --font-main: 'Source Han Serif', serif;
+    --bg-color: #0F0F0E;           /* 깊은 어둠 */
+    --panel-bg: rgba(25, 25, 23, 0.7); /* 유리 질감 배경 */
+    --point-color: #CEB180;        /* 황동색 */
+    --text-main: #E0DED7;          /* 연한 상아색 */
+    --text-dim: #999;
+    --font-kr: 'Noto Serif KR', serif;
+    --font-en: 'Cinzel', serif;
+    --font-code: 'Courier Prime', monospace;
+    --transition: all 0.4s ease;
 }
 
-body, html {
-    margin: 0; padding: 0; height: 100%;
-    background-color: var(--bg); color: #eee;
-    font-family: var(--font-main);
+* { margin: 0; padding: 0; box-box: border-box; }
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-kr);
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-/* 타이포그래피 */
-.cinzel { font-family: 'Cinzel', serif; letter-spacing: 2px; color: var(--brass); }
+/* 사이드바 스타일 */
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    background: rgba(15, 15, 14, 0.95);
+    border-right: 1px solid rgba(206, 177, 128, 0.2);
+    padding: 40px 25px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    z-index: 100;
+}
 
-/* 성인 인증 레이어 */
-#auth-overlay {
-    position: fixed; inset: 0; background: var(--bg);
-    display: flex; justify-content: center; align-items: center; z-index: 9999;
+.logo-area { margin-bottom: 40px; }
+.logo-full { 
+    font-family: var(--font-en); 
+    font-size: 1.8rem; 
+    color: var(--point-color);
+    letter-spacing: 2px;
 }
-.auth-card {
-    border: 1px solid var(--brass); padding: 3rem; text-align: center;
-    background: var(--bg); width: 80%; max-width: 350px;
+.logo-short { display: none; }
+
+.search-container input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(206, 177, 128, 0.3);
+    padding: 10px;
+    color: var(--text-main);
+    font-family: var(--font-kr);
+    outline: none;
+    transition: var(--transition);
 }
 
-/* 레이아웃 */
-.container { display: flex; height: 100vh; }
-#sidebar {
-    width: 250px; border-right: 1px solid rgba(206, 177, 128, 0.1);
-    padding: 2rem; display: flex; flex-direction: column;
+.search-container input:focus {
+    border-color: var(--point-color);
+    box-shadow: 0 0 8px rgba(206, 177, 128, 0.4);
 }
-#main-panel { flex: 1; padding: 3rem; overflow-y: auto; background: var(--glass); }
 
-/* 에디터 및 공통 버튼 */
-.btn-brass {
-    background: var(--brass); color: var(--bg); border: none;
-    padding: 12px; width: 100%; font-weight: bold; cursor: pointer;
+.category-nav { margin-top: 30px; flex-grow: 1; }
+.category-nav ul { list-style: none; }
+.category-nav li {
+    padding: 12px 0;
+    cursor: pointer;
+    font-family: var(--font-en);
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    transition: var(--transition);
 }
-input, select, textarea {
-    width: 100%; background: #1a1a18; border: 1px solid #333;
-    color: #eee; padding: 12px; margin-bottom: 1rem; box-sizing: border-box;
+.category-nav li:hover { color: var(--point-color); padding-left: 5px; }
+
+/* 메인 패널 스타일 */
+.main-panel {
+    margin-left: 280px;
+    flex-grow: 1;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.glass-panel {
+    width: 100%;
+    max-width: 900px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(206, 177, 128, 0.1);
+    padding: 60px;
+    min-height: 80vh;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+.content-header h2 {
+    font-family: var(--font-kr);
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--point-color), transparent);
+    margin: 30px 0;
+    opacity: 0.5;
+}
+
+.post-body {
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+/* 푸터 스타일 */
+.main-footer {
+    margin-top: 40px;
+    font-family: var(--font-code);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+/* 반응형 처리 */
+@media (max-width: 768px) {
+    .sidebar { width: 60px; padding: 20px 10px; }
+    .logo-full, .search-container, .category-nav li { display: none; }
+    .logo-short { display: block; font-family: var(--font-en); color: var(--point-color); }
+    .main-panel { margin-left: 60px; padding: 30px; }
 }
