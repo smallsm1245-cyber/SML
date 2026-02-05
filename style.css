@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Courier+Prime&family=Noto+Serif+KR:wght@400;700&display=swap');
+
+:root {
+    --primary-brass: #CEB180;
+    --bg-deep-dark: #0F0F0E;
+    --panel-glass: rgba(255, 255, 255, 0.05);
+    --text-main: #E0E0E0;
+    --font-serif: 'Noto Serif KR', serif;
+    --font-cinzel: 'Cinzel', serif;
+    --font-data: 'Courier Prime', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-deep-dark);
+    background-image: radial-gradient(circle at center, #1a1a1a 0%, #0f0f0e 100%);
+    color: var(--text-main);
+    font-family: var(--font-serif);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* 성인 인증 팝업 */
+#blur-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px);
+    z-index: 9999; display: flex; justify-content: center; align-items: center;
+}
+
+.disclaimer-box {
+    background: var(--panel-glass); border: 1px solid var(--primary-brass);
+    padding: 3rem; text-align: center; max-width: 500px; border-radius: 4px;
+}
+
+.btn-brass {
+    background: transparent; border: 1px solid var(--primary-brass);
+    color: var(--primary-brass); padding: 0.8rem 2rem; cursor: pointer;
+    font-family: var(--font-cinzel); transition: 0.3s; margin: 10px;
+}
+
+.btn-brass:hover {
+    background: var(--primary-brass); color: var(--bg-deep-dark);
+    box-shadow: 0 0 15px var(--primary-brass);
+}
+
+/* 레이아웃 */
+.container { display: flex; min-height: 100vh; }
+
+#sidebar {
+    width: 280px; background: rgba(255, 255, 255, 0.02);
+    border-right: 1px solid rgba(206, 177, 128, 0.1); padding: 2.5rem;
+}
+
+#main-panel { flex: 1; padding: 4rem; max-width: 1000px; margin: 0 auto; transition: opacity 0.5s; }
+
+footer {
+    position: fixed; bottom: 20px; right: 20px;
+    font-family: var(--font-data); font-size: 0.75rem; color: rgba(206, 177, 128, 0.4);
+}
+
+/* 관리자 전용 스타일 */
+.admin-wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; }
+.editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; height: 65vh; }
+#editor-input { background: #1a1a1a; color: white; border: 1px solid #333; padding: 20px; resize: none; }
+#editor-preview { background: #fdfdfd; color: #111; padding: 20px; overflow-y: auto; border-radius: 4px; }
+.hidden { display: none !important; }
+
