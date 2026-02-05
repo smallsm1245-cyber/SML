@@ -7,103 +7,23 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* 긴급 스타일: 팝업이 항상 최상단에 오도록 보장 */
-        #blur-overlay {
+        /* 긴급 처방: 인증창을 가장 단순하고 확실한 방식으로 배치 */
+        #adult-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 15, 14, 0.95);
-            backdrop-filter: blur(15px);
-            z-index: 99999; /* 어떤 요소보다 위에 */
+            background: #0F0F0E; z-index: 10000;
             display: flex; justify-content: center; align-items: center;
         }
+        .disclaimer-box {
+            border: 1px solid #CEB180; padding: 2rem; background: #0F0F0E;
+            width: 85%; max-width: 350px; text-align: center;
+        }
+        .btn-yes { background: #CEB180; color: #0F0F0E; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        .btn-no { background: transparent; color: #666; border: 1px solid #333; padding: 12px; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="blur-overlay">
-        <div class="disclaimer-box" style="text-align: center; border: 1px solid #CEB180; padding: 2.5rem; background: #0F0F0E; width: 80%; max-width: 400px;">
-            <h2 style="font-family: 'Cinzel', serif; color: #CEB180; margin-bottom: 1.5rem; letter-spacing: 2px;">ADULT ONLY</h2>
-            <p style="color: #eee; font-size: 0.9rem; line-height: 1.6; margin-bottom: 2.5rem; opacity: 0.8;">
-                본 기록소는 성인 전용 콘텐츠를 포함합니다.<br>당신은 성인입니까?
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <button type="button" class="btn-brass" onclick="verifyAge(true)" style="padding: 15px; background: #CEB180; color: #0F0F0E; border: none; cursor: pointer; font-weight: bold;">YES (ENTER)</button>
-                <button type="button" class="btn-brass" onclick="verifyAge(false)" style="padding: 15px; background: transparent; border: 1px solid #333; color: #666; cursor: pointer;">NO (EXIT)</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <aside id="sidebar">
-            <h1 style="font-family: 'Cinzel'; color: #CEB180; cursor: pointer;" onclick="location.reload()">SLM</h1>
-            <nav id="category-nav" style="margin-top: 3rem;">
-                <p style="font-size: 0.7rem; color: #CEB180; opacity: 0.4; letter-spacing: 2px;">LOADING...</p>
-            </nav>
-        </aside>
-
-        <main id="main-panel">
-            <div id="content-area">
-                <h2 style="font-family: 'Cinzel'; border-bottom: 1px solid #CEB180; padding-bottom: 1rem;">WELCOME</h2>
-                <p style="margin-top: 2rem; opacity: 0.6;">기록을 열람하려면 카테고리를 선택하십시오.</p>
-            </div>
-        </main>
-    </div>
-
-    <script src="config.js"></script>
-
-    <script>
-        // [1] 성인 인증 함수 (최상단 배치로 즉시 실행 보장)
-        function verifyAge(isAdult) {
-            console.log("버튼 클릭됨:", isAdult);
-            if (isAdult) {
-                localStorage.setItem('adult_verified', 'true');
-                document.getElementById('blur-overlay').style.display = 'none';
-                // 인증 성공 후 DB 연결 시도
-                startApp();
-            } else {
-                alert("성인만 입장 가능합니다.");
-                window.location.href = "https://www.google.com";
-            }
-        }
-
-        // [2] 앱 시작 로직
-        let supabase;
-        async function startApp() {
-            // CONFIG 파일이 로드될 때까지 잠시 대기 (최대 3초)
-            let retry = 0;
-            while (typeof CONFIG === 'undefined' && retry < 30) {
-                await new Promise(res => setTimeout(res, 100));
-                retry++;
-            }
-
-            if (typeof CONFIG !== 'undefined') {
-                supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
-                loadCategories();
-            } else {
-                console.error("환경 설정 파일을 찾을 수 없습니다.");
-            }
-        }
-
-        // [3] 카테고리 불러오기
-        async function loadCategories() {
-            if (!supabase) return;
-            const { data, error } = await supabase.from('categories').select('*').eq('is_visible', true).order('display_order');
-            
-            const nav = document.getElementById('category-nav');
-            if (data) {
-                nav.innerHTML = '<p style="font-size: 0.7rem; color: #CEB180; opacity: 0.4; margin-bottom: 1.5rem; letter-spacing: 2px;">CATEGORIES</p>';
-                data.forEach(cat => {
-                    const item = document.createElement('div');
-                    item.style = "cursor:pointer; margin-bottom: 18px; font-family: 'Cinzel'; font-size: 0.85rem; color: #eee;";
-                    item.innerHTML = `<span style="color:#CEB180; margin-right: 10px;">▶</span> ${cat.name}`;
-                    item.onclick = () => loadPosts(cat.id, cat.name);
-                    nav.appendChild(item);
-                });
-            }
-        }
-
-        // [4] 게시글 목록 및 상세 (기존 로직 유지)
-        async function loadPosts(cid, cname) {
-            const { data } = await supabase.from('archive_posts').select('id, title').eq('category_id', cid).eq('is_private', false);
-            let html = `<h2 style="font-family: 'Cinzel'; color: #CEB180; border-bottom: 1px solid #CEB180; padding-bottom: 10px;">${cname}</h2>`;
-            data?.forEach(p => {
-                html += `<div onclick="loadDetail('${p.id}')" style="padding: 15px
+    <div id="adult-overlay">
+        <div class="disclaimer-box">
+            <h2 style="font-family: 'Cinzel'; color: #CEB180; margin-bottom: 1rem;">ADULT ONLY</h2>
+            <p style="color
