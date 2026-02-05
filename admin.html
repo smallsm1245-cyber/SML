@@ -6,15 +6,13 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="admin-body">
-    <div class="admin-container">
-        <h2 class="cinzel">ARCHIVE MANAGEMENT</h2>
-        <div class="editor-wrap">
-            <input type="text" id="post-title" placeholder="제목을 입력하세요">
-            <select id="category-select"></select>
-            <textarea id="post-content" placeholder="본문을 작성하세요 (HTML 가능)"></textarea>
-            <button class="btn-brass" onclick="savePost()">기록 저장</button>
-        </div>
+<body>
+    <div class="admin-wrap">
+        <h2 class="cinzel">ARCHIVE EDITOR</h2>
+        <input type="text" id="post-title" placeholder="제목">
+        <select id="category-select"></select>
+        <textarea id="post-content" placeholder="본문 (HTML 가능)"></textarea>
+        <button class="btn-brass" onclick="savePost()">저장하기</button>
     </div>
     <script src="config.js"></script>
     <script src="admin.js"></script>
