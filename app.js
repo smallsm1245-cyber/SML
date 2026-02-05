@@ -1,39 +1,28 @@
-// 초기화
-const supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-
-// 페이지 로드 시 실행
-document.addEventListener('DOMContentLoaded', () => {
-    fetchCategories();
-});
-
-// 1. 카테고리 불러오기 (기획서 2.1 반영)
-async function fetchCategories() {
-    const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('is_visible', true) // 공개된 것만
-        .order('display_order', { ascending: true });
-
-    if (error) {
-        console.error('Error fetching categories:', error);
-        return;
+// [3.1] 성인 인증 로직
+function verifyAge(isAdult) {
+    if (isAdult) {
+        localStorage.setItem('adult_verified', 'true');
+        document.body.classList.remove('is-blurred');
+        document.getElementById('disclaimer').style.display = 'none';
+    } else {
+        alert("미성년자는 입장할 수 없습니다.");
+        window.location.href = "https://www.google.com";
     }
-
-    renderCategories(data);
 }
 
-// 2. 카테고리 화면 출력
-function renderCategories(categories) {
-    const listElement = document.getElementById('categoryList');
-    listElement.innerHTML = ''; // 로딩 문구 제거
+// 페이지 로드 시 인증 여부 확인
+window.onload = () => {
+    if (localStorage.getItem('adult_verified') === 'true') {
+        document.body.classList.remove('is-blurred');
+        document.getElementById('disclaimer').style.display = 'none';
+    }
+    // Supabase 연결 및 카테고리 로드 실행
+    if (typeof initSupabase === "function") initSupabase();
+};
 
-    categories.forEach(cat => {
-        const li = document.createElement('li');
-        li.textContent = cat.name;
-        li.onclick = () => {
-            console.log(`${cat.name} 클릭됨`);
-            // 추후 게시글 목록 불러오기 함수 연결
-        };
-        listElement.appendChild(li);
-    });
+// Supabase 초기화 (config.js 로드 후 실행)
+function initSupabase() {
+    if (typeof CONFIG === 'undefined') return;
+    const supabase = idb.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    // 이후 카테고리 fetch 로직...
 }
