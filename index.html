@@ -4,78 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMALLSM Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Courier+Prime&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div id="auth-overlay">
-        <div class="auth-card">
-            <h2 class="cinzel">ADULT ONLY</h2>
-            <p style="opacity:0.6; font-size:0.8rem; margin-bottom:2rem;">성인 인증 후 입장이 가능합니다.</p>
-            <button class="btn-brass" onclick="grantAccess()">YES (ENTER)</button>
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h1 class="logo-full">SMALLSM</h1>
+            <span class="logo-short">SLM</span>
         </div>
-    </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="기록 검색...">
+        </div>
+        <nav class="category-nav">
+            <ul id="categoryList">
+                <li class="loading">연결 중...</li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="themeToggle"><span class="mode-icon">🌙</span></button>
+        </div>
+    </aside>
 
-    <div class="container">
-        <aside id="sidebar">
-            <h1 class="cinzel" onclick="location.reload()">SLM</h1>
-            <nav id="category-nav" style="margin-top:3rem;"></nav>
-        </aside>
-        <main id="main-panel">
-            <div id="content-area">카테고리를 선택하십시오.</div>
-        </main>
-    </div>
+    <main class="main-panel">
+        <article id="contentArea" class="glass-panel">
+            <div class="content-header">
+                <h2 id="postTitle">SMALLSM Archive</h2>
+                <div id="postMeta" class="post-meta"></div>
+            </div>
+            <hr class="divider">
+            <div id="postContent" class="post-body">
+                왼쪽 메뉴에서 카테고리를 선택하여 기록을 열람하십시오.
+            </div>
+        </article>
+        <footer class="main-footer">
+            <p>© 2026 - PRESENT <span class="author">SMALLSM</span>. All Rights Reserved.</p>
+        </footer>
+    </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="config.js"></script>
-    <script>
-        // 버튼 클릭 시 즉시 화면에서 제거
-        function grantAccess() {
-            localStorage.setItem('slm_verified', 'true');
-            const overlay = document.getElementById('auth-overlay');
-            if (overlay) overlay.style.display = 'none';
-            initSupabase(); 
-        }
-
-        let supabase;
-        async function initSupabase() {
-            // CONFIG가 로드될 때까지 최대 2초간 대기하는 안전 장치
-            let retry = 0;
-            while (typeof CONFIG === 'undefined' && retry < 20) {
-                await new Promise(r => setTimeout(r, 100));
-                retry++;
-            }
-
-            if (typeof CONFIG !== 'undefined') {
-                supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
-                loadCategories();
-            } else {
-                console.error("Config missing");
-                document.getElementById('content-area').innerHTML = "설정 정보를 불러오지 못했습니다.";
-            }
-        }
-
-        async function loadCategories() {
-            const { data } = await supabase.from('categories').select('*').eq('is_visible', true).order('display_order');
-            const nav = document.getElementById('category-nav');
-            if (data) {
-                nav.innerHTML = '<p style="font-size:0.7rem; color:var(--brass); opacity:0.5; margin-bottom:1.5rem;">ARCHIVE</p>';
-                data.forEach(c => {
-                    const div = document.createElement('div');
-                    div.style = "margin-bottom:1.2rem; cursor:pointer; font-size:0.9rem;";
-                    div.innerHTML = `<span style="color:var(--brass)">#</span> ${c.name}`;
-                    div.onclick = () => loadPosts(c.id, c.name);
-                    nav.appendChild(div);
-                });
-            }
-        }
-
-        // 페이지 로드 시 기존 인증 여부 확인
-        window.onload = () => {
-            if (localStorage.getItem('slm_verified') === 'true') {
-                document.getElementById('auth-overlay').style.display = 'none';
-                initSupabase();
-            }
-        };
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
