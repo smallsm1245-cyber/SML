@@ -1,43 +1,49 @@
-const supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+let supabase;
 
-async function handleLogin() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('pw').value;
-    if(email !== CONFIG.ADMIN_EMAIL) return alert("접근 권한이 없습니다.");
-    
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) alert("로그인 실패: " + error.message);
-    else checkUser();
-}
-
-async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user && user.email === CONFIG.ADMIN_EMAIL) {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('admin-dashboard').classList.remove('hidden');
-        loadCats();
+// 초기화 및 자동 저장된 글 불러오기
+window.onload = async () => {
+    if (typeof CONFIG !== 'undefined') {
+        supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+        loadCategories();
     }
-}
+    
+    // 4.3 자동 저장 복구
+    const saved = localStorage.getItem('tmp_content');
+    if (saved) {
+        if(confirm("작성 중이던 글이 있습니다. 불러올까요?")) {
+            document.getElementById('post-content').value = saved;
+        }
+    }
+};
 
-function updatePreview() {
-    document.getElementById('editor-preview').innerHTML = document.getElementById('editor-input').value;
-}
+// 실시간 자동 저장 스크립트
+document.getElementById('post-content')?.addEventListener('input', (e) => {
+    localStorage.setItem('tmp_content', e.target.value);
+});
 
-async function loadCats() {
+async function loadCategories() {
     const { data } = await supabase.from('categories').select('*');
-    document.getElementById('cat-select').innerHTML = data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    const select = document.getElementById('category-select');
+    data?.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.innerText = c.name;
+        select.appendChild(opt);
+    });
 }
 
 async function savePost() {
     const title = document.getElementById('post-title').value;
-    const content = document.getElementById('editor-input').value;
-    const category_id = document.getElementById('cat-select').value;
+    const content = document.getElementById('post-content').value;
+    const catId = document.getElementById('category-select').value;
 
-    const { error } = await supabase.from('archive_posts').insert([{ title, content, category_id }]);
-    if (error) alert("오류: " + error.message);
-    else { alert("보관 완료"); location.reload(); }
+    const { error } = await supabase.from('archive_posts').insert([
+        { title, content, category_id: catId, is_private: false }
+    ]);
+
+    if (!error) {
+        alert("기록 완료");
+        localStorage.removeItem('tmp_content'); // 저장 후 임시데이터 삭제
+        location.reload();
+    }
 }
-
-async function handleLogout() { await supabase.auth.signOut(); location.reload(); }
-window.onload = checkUser;
-
