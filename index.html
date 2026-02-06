@@ -42,15 +42,11 @@
             </div>
 
             <div class="search-box">
-                <input type="text" 
-                       class="search-input" 
-                       id="searchInput"
-                       placeholder="검색어를 입력하세요...">
+                <input type="text" class="search-input" id="searchInput" placeholder="검색어를 입력하세요...">
             </div>
 
             <nav>
-                <ul class="category-nav" id="categoryNav">
-                    </ul>
+                <ul class="category-nav" id="categoryNav"></ul>
             </nav>
 
             <div class="sidebar-footer">
@@ -72,7 +68,6 @@
                     <p>이곳은 성향과 실천, 그리고 깊이 있는 사색이 담긴 공간입니다.</p>
                 </div>
             </div>
-
             <footer class="site-footer">
                 <p>© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
             </footer>
@@ -80,20 +75,15 @@
     </div>
 
     <script>
-        /**
-         * 1. 전역 설정 주입
-         * config.js 파일을 깃허브에 올리지 않으므로, 여기서 설정을 직접 정의합니다.
-         * 이 값들은 배포된 사이트에서 자바스크립트가 멈추지 않게 하는 안전장치입니다.
-         */
+        // 1. 배포 환경을 위한 설정값 직접 주입 (config.js 파일이 없을 때 사용됨)
         window.SUPABASE_CONFIG = {
             url: 'https://ztheweqgzmtmazvyuzpa.supabase.co',
-            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0aGV3ZXFnem10bWF6dnl1enBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjQ0NTIsImV4cCI6MjA4NTgwMDQ1Mn0.CJaWqWJzozfcBafsGykSk0Z_eOXUIVAkMhTw3WZr8Ts'
+            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0aGV3ZXFnem10bWF6vnl1enBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjQ0NTIsImV4cCI6MjA4NTgwMDQ1Mn0.CJaWqWJzozfcBafsGykSk0Z_eOXUIVAkMhTw3WZr8Ts'
         };
-        // 관리자 확인용 이메일
-        window.ADMIN_EMAIL = 'smallsm@naver.com'; 
+        window.ADMIN_EMAIL = 'smallsm@naver.com';
     </script>
 
-    <script src="js/config.js" onerror="console.log('Production mode: config.js skipped.')"></script>
+    <script src="js/config.js" onerror="console.log('Using inline settings')"></script>
     
     <script src="js/main.js"></script>
 </body>
