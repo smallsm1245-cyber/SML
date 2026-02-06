@@ -11,7 +11,7 @@ export default function handler(req, res) {
             url: '${process.env.SUPABASE_URL || ''}',
             anonKey: '${process.env.SUPABASE_ANON_KEY || ''}'
         };
-        window.ADMIN_EMAIL = '${process.env.ADMIN_EMAIL || ''}';
+        window.ADMIN_EMAIL = 'smallsml@naver.com';
         console.log('✅ 환경 변수 로드 완료');
     `;
     
