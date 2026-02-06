@@ -323,24 +323,46 @@ document.addEventListener('copy', async (e) => {
 // ═══════════════════════════════════════════════════
 // 8. INITIALIZATION
 // ═══════════════════════════════════════════════════
+
+// 환경 변수 로드를 기다립니다
+function waitForConfig(callback, maxWait = 5000) {
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+        if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
+            clearInterval(interval);
+            callback();
+        } else if (Date.now() - startTime > maxWait) {
+            clearInterval(interval);
+            console.error('⏱️ 환경 변수 로드 타임아웃');
+        }
+    }, 100);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('📱 DOM 로드 완료');
+    
     // Age verification button handlers - 항상 먼저 등록
     const btnYes = document.getElementById('btnYes');
     const btnNo = document.getElementById('btnNo');
     
     if (btnYes) {
         btnYes.addEventListener('click', () => {
+            console.log('✅ 예 버튼 클릭됨');
             localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
             hideDisclaimer();
             
-            // Initialize Supabase after verification
-            initializeSupabase();
-            loadCategories();
+            // 환경 변수 로드 후 초기화
+            waitForConfig(() => {
+                console.log('🔧 Supabase 초기화 시작');
+                initializeSupabase();
+                loadCategories();
+            });
         });
     }
 
     if (btnNo) {
         btnNo.addEventListener('click', () => {
+            console.log('❌ 아니오 버튼 클릭됨');
             window.location.href = 'https://www.google.com';
         });
     }
@@ -352,9 +374,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = Date.now();
         
         if (now - timestamp < VERIFICATION_DURATION) {
+            console.log('✅ 인증 상태 유효');
             // Already verified, initialize normally
-            initializeSupabase();
-            loadCategories();
+            waitForConfig(() => {
+                initializeSupabase();
+                loadCategories();
+            });
         }
     }
     
