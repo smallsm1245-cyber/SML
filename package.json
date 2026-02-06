@@ -2,9 +2,7 @@
   "name": "smallsm-archive",
   "version": "1.0.0",
   "description": "SMALLSM Cinematic Archive System",
-  "scripts": {
-    "build": "node build.js"
-  },
+  "scripts": {},
   "author": "SMALLSM",
   "license": "SEE LICENSE IN README.md"
 }
