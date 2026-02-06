@@ -94,37 +94,66 @@
 
     <!-- Scripts -->
     <script>
-        // 환경 변수 로드: Vercel API 또는 로컬 config
-        (async function loadConfig() {
+        // 환경 변수 로드 후 메인 스크립트 실행
+        (async function init() {
+            console.log('🚀 초기화 시작...');
+            
+            // 1. 환경 변수 로드
             try {
-                // Vercel 배포 환경에서는 API로부터 환경 변수 로드
+                // Vercel 배포 환경
                 const response = await fetch('/api/config');
                 if (response.ok) {
                     const configScript = await response.text();
                     eval(configScript);
                     console.log('✅ Vercel 환경 변수 로드 완료');
-                    return;
+                } else {
+                    throw new Error('API 응답 실패');
                 }
             } catch (e) {
-                console.log('📦 로컬 환경 - config.local.js 시도');
+                console.log('📦 로컬 환경 - 기본값 설정');
+                // 로컬 개발 환경
+                window.SUPABASE_CONFIG = { url: '', anonKey: '' };
+                window.ADMIN_EMAIL = '';
+                
+                // config.local.js 시도
+                await new Promise((resolve) => {
+                    const script = document.createElement('script');
+                    script.src = 'js/config.local.js';
+                    script.onload = () => {
+                        console.log('✅ config.local.js 로드 완료');
+                        resolve();
+                    };
+                    script.onerror = () => {
+                        console.warn('⚠️ config.local.js를 찾을 수 없습니다');
+                        resolve();
+                    };
+                    document.head.appendChild(script);
+                });
             }
             
-            // 로컬 개발 환경에서는 config.local.js 로드
-            try {
+            // 2. Supabase 라이브러리 로드 대기
+            if (typeof window.supabase === 'undefined') {
+                console.error('❌ Supabase 라이브러리가 로드되지 않았습니다');
+                return;
+            }
+            
+            // 3. main.js 로드
+            await new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                script.src = 'js/config.local.js';
+                script.src = 'js/main.js';
+                script.onload = () => {
+                    console.log('✅ main.js 로드 완료');
+                    resolve();
+                };
                 script.onerror = () => {
-                    console.warn('⚠️ config.local.js가 없습니다. 환경 변수를 설정하세요.');
-                    // 기본값 설정 (빈 객체)
-                    window.SUPABASE_CONFIG = { url: '', anonKey: '' };
-                    window.ADMIN_EMAIL = '';
+                    console.error('❌ main.js 로드 실패');
+                    reject();
                 };
                 document.head.appendChild(script);
-            } catch (e) {
-                console.error('설정 로드 실패:', e);
-            }
+            });
+            
+            console.log('🎉 초기화 완료!');
         })();
     </script>
-    <script src="js/main.js"></script>
 </body>
 </html>
