@@ -801,3 +801,28 @@ p {
     content: '\A\A━━━━━━━━━━━━━━━━━━━━━━━━\A본 기록은 SMALLSM Archive의 자산입니다.\A출처: [사이트 주소]\A⚠️ 무단 수정 및 상업적 이용을 금합니다.\A━━━━━━━━━━━━━━━━━━━━━━━━';
     white-space: pre;
 }
+
+/* ═══════════════════════════════════════════════════
+   12. ADMIN LINK - 푸터 관리자 링크
+   ═══════════════════════════════════════════════════ */
+.admin-link {
+    position: absolute;
+    right: 2rem;
+    bottom: 1rem;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    opacity: 0.3;
+    transition: all 0.3s ease;
+}
+
+.admin-link:hover {
+    opacity: 1;
+    color: var(--primary-brass);
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 8px rgba(206, 177, 128, 0.5));
+}
+
+.site-footer {
+    position: relative;
+}

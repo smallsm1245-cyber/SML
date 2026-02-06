@@ -19,8 +19,33 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <!-- Login Screen -->
+    <div id="loginScreen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-deep);">
+        <div style="background: var(--bg-panel); padding: 3rem; border-radius: 8px; border: 1px solid var(--glass-border); max-width: 400px; width: 90%;">
+            <h2 style="color: var(--primary-brass); margin-bottom: 2rem; text-align: center;">관리자 로그인</h2>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">이메일</label>
+                <input type="email" id="loginEmail" placeholder="smallsml@naver.com" 
+                       style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 4px; color: var(--text-primary); font-size: 1rem;">
+            </div>
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">비밀번호</label>
+                <input type="password" id="loginPassword" placeholder="비밀번호" 
+                       style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 4px; color: var(--text-primary); font-size: 1rem;">
+            </div>
+            <button id="loginBtn" 
+                    style="width: 100%; padding: 1rem; background: var(--primary-brass); color: var(--bg-deep); border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                로그인
+            </button>
+            <p id="loginError" style="color: #ff6b6b; margin-top: 1rem; text-align: center; display: none;"></p>
+            <p style="color: var(--text-secondary); margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+                <a href="index.html" style="color: var(--primary-brass); text-decoration: none;">← 메인으로 돌아가기</a>
+            </p>
+        </div>
+    </div>
+
     <!-- Admin Container -->
-    <div class="admin-container">
+    <div class="admin-container" id="adminPanel" style="display: none;">
         <!-- Header -->
         <header class="admin-header">
             <div>
@@ -174,5 +199,9 @@
             }
         });
     </script>
+    
+    <!-- Admin Script -->
+    <script src="/api/config" async></script>
+    <script src="js/admin.js"></script>
 </body>
 </html>

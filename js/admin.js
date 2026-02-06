@@ -2,41 +2,130 @@
 // 🎬 SMALLSM ARCHIVE - ADMIN SCRIPT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+// Wait for config to load
+function waitForConfig(callback) {
+    const interval = setInterval(() => {
+        if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
+            clearInterval(interval);
+            callback();
+        }
+    }, 100);
+}
+
+let supabase = null;
+
 // ═══════════════════════════════════════════════════
 // 1. SUPABASE INITIALIZATION
 // ═══════════════════════════════════════════════════
-const supabase = window.supabase.createClient(
-    SUPABASE_CONFIG.url,
-    SUPABASE_CONFIG.anonKey
-);
+waitForConfig(() => {
+    supabase = window.supabase.createClient(
+        window.SUPABASE_CONFIG.url,
+        window.SUPABASE_CONFIG.anonKey
+    );
+    
+    console.log('✅ Supabase initialized for admin');
+    checkAuth();
+});
 
 // ═══════════════════════════════════════════════════
-// 2. AUTHENTICATION CHECK
+// 2. LOGIN HANDLER
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    const loginBtn = document.getElementById('loginBtn');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginError = document.getElementById('loginError');
+    
+    // Enter key listener
+    [loginEmail, loginPassword].forEach(input => {
+        input?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginBtn?.click();
+        });
+    });
+    
+    loginBtn?.addEventListener('click', async () => {
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value.trim();
+        
+        if (!email || !password) {
+            showError('이메일과 비밀번호를 입력하세요');
+            return;
+        }
+        
+        // Check if email is authorized
+        if (email !== window.ADMIN_EMAIL) {
+            showError('관리자 권한이 없습니다');
+            return;
+        }
+        
+        loginBtn.disabled = true;
+        loginBtn.textContent = '로그인 중...';
+        
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) throw error;
+            
+            console.log('✅ Login successful');
+            showAdminPanel();
+            
+        } catch (error) {
+            console.error('❌ Login failed:', error);
+            showError(error.message || '로그인 실패');
+            loginBtn.disabled = false;
+            loginBtn.textContent = '로그인';
+        }
+    });
+    
+    function showError(message) {
+        loginError.textContent = message;
+        loginError.style.display = 'block';
+        setTimeout(() => {
+            loginError.style.display = 'none';
+        }, 3000);
+    }
+});
+
+function showAdminPanel() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════
+// 3. AUTHENTICATION CHECK
 // ═══════════════════════════════════════════════════
 async function checkAuth() {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
-    if (error || !user) {
-        alert('로그인이 필요합니다.');
-        window.location.href = 'login.html';
+    if (!supabase) {
+        console.warn('⚠️ Supabase not ready');
         return;
     }
     
+    const { data: { user }, error } = await supabase.auth.getUser();
+    
+    if (error || !user) {
+        console.log('❌ Not authenticated');
+        return; // Show login screen
+    }
+    
     // Whitelist verification
-    if (user.email !== ADMIN_EMAIL) {
+    if (user.email !== window.ADMIN_EMAIL) {
         alert('관리자 권한이 없습니다.');
         await supabase.auth.signOut();
         window.location.href = 'index.html';
         return;
     }
     
-    console.log('관리자 인증 완료:', user.email);
+    console.log('✅ Admin authenticated:', user.email);
+    showAdminPanel();
 }
 
 // ═══════════════════════════════════════════════════
-// 3. LOGOUT HANDLER
+// 4. LOGOUT HANDLER
 // ═══════════════════════════════════════════════════
-document.getElementById('logoutBtn').addEventListener('click', async () => {
+document.getElementById('logoutBtn')?.addEventListener('click', async () => {
     if (!confirm('로그아웃하시겠습니까?')) return;
     
     try {
