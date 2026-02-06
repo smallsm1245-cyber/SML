@@ -5,14 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     
-    <!-- SEO & Open Graph -->
-    <title>SMALLSM Archive - Cinematic Records</title>
-    <meta name="description" content="SMALLSM의 시네마틱 아카이브. 성향과 실천에 관한 깊이 있는 기록.">
-    
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="SMALLSM Archive">
-    <meta property="og:description" content="시네마틱 아카이브 - 성향과 실천의 기록">
-    <meta property="og:image" content="/assets/og-image.jpg">
+    <title id="pageTitle">게시물 - SMALLSM Archive</title>
+    <meta name="description" content="SMALLSM Archive의 기록">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -75,13 +69,12 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="content-panel">
-                <h1 class="post-title" id="welcomeTitle">환영합니다</h1>
-                <div class="post-meta">
-                    <span>SMALLSM Archive에 오신 것을 환영합니다</span>
+                <h1 class="post-title" id="postTitle">로딩 중...</h1>
+                <div class="post-meta" id="postMeta">
+                    <span id="postCategory"></span> • <span id="postDate"></span>
                 </div>
-                <div class="post-content" id="mainContent">
-                    <p>좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.</p>
-                    <p>이곳은 성향과 실천, 그리고 깊이 있는 사색이 담긴 공간입니다.</p>
+                <div class="post-content" id="postContent">
+                    <p>게시물을 불러오는 중입니다...</p>
                 </div>
             </div>
 
@@ -94,6 +87,6 @@
 
     <!-- Scripts -->
     <script src="js/config.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/post.js"></script>
 </body>
 </html>
