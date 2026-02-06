@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     
+    <!-- SEO & Open Graph -->
     <title>SMALLSM Archive - Cinematic Records</title>
     <meta name="description" content="SMALLSM의 시네마틱 아카이브. 성향과 실천에 관한 깊이 있는 기록.">
     
@@ -13,15 +14,19 @@
     <meta property="og:description" content="시네마틱 아카이브 - 성향과 실천의 기록">
     <meta property="og:image" content="/assets/og-image.jpg">
     
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <!-- Age Verification Disclaimer -->
     <div id="disclaimerOverlay" class="disclaimer-overlay">
         <div class="disclaimer-content">
             <h2>성인 인증</h2>
@@ -34,22 +39,31 @@
         </div>
     </div>
 
+    <!-- Main App Container -->
     <div class="app-container content-blur" id="appContainer">
+        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h1 class="site-title">SMALLSM</h1>
                 <p class="site-subtitle">CINEMATIC ARCHIVE</p>
             </div>
 
+            <!-- Search -->
             <div class="search-box">
-                <input type="text" class="search-input" id="searchInput" placeholder="검색어를 입력하세요...">
+                <input type="text" 
+                       class="search-input" 
+                       id="searchInput"
+                       placeholder="검색어를 입력하세요...">
             </div>
 
+            <!-- Categories -->
             <nav>
                 <ul class="category-nav" id="categoryNav">
-                    </ul>
+                    <!-- Dynamically loaded -->
+                </ul>
             </nav>
 
+            <!-- Sidebar Footer -->
             <div class="sidebar-footer">
                 <button class="mode-toggle" id="modeToggle">
                     <span>🌙</span>
@@ -58,6 +72,7 @@
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="main-content">
             <div class="content-panel">
                 <h1 class="post-title" id="welcomeTitle">환영합니다</h1>
@@ -70,25 +85,15 @@
                 </div>
             </div>
 
+            <!-- Footer -->
             <footer class="site-footer">
                 <p>© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
             </footer>
         </main>
     </div>
 
-    <script>
-        // 1. 보안을 유지하면서 배포 환경에서 작동하도록 키 주입
-        window.SUPABASE_CONFIG = {
-            url: 'https://ztheweqgzmtmazvyuzpa.supabase.co',
-            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0aGV3ZXFnem10bWF6vnl1enBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjQ0NTIsImV4cCI6MjA4NTgwMDQ1Mn0.CJaWqWJzozfcBafsGykSk0Z_eOXUIVAkMhTw3WZr8Ts'
-        };
-        
-        // 2. 관리자 이메일 설정
-        window.ADMIN_EMAIL = 'smallsm@naver.com';
-    </script>
-
-    <script src="js/config.js" onerror="console.log('Production: config.js ignored.')"></script>
-    
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
