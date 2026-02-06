@@ -1,99 +1,71 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🎬 SMALLSM ARCHIVE - MAIN SCRIPT (FINAL)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const supabase = window.supabase.createClient(
+    SUPABASE_CONFIG.url,
+    SUPABASE_CONFIG.anonKey
+);
+
+const VERIFICATION_KEY = 'age_verified';
+const VERIFICATION_DURATION = 24 * 60 * 60 * 1000; // 24시간
+
+// 1. 인증 상태 확인 및 UI 제어
+function checkAgeVerification() {
+    const verified = localStorage.getItem(VERIFICATION_KEY);
+    const overlay = document.getElementById('disclaimerOverlay');
+    const container = document.getElementById('appContainer');
     
-    <!-- SEO & Open Graph -->
-    <title>SMALLSM Archive - Cinematic Records</title>
-    <meta name="description" content="SMALLSM의 시네마틱 아카이브. 성향과 실천에 관한 깊이 있는 기록.">
+    if (verified) {
+        const timestamp = parseInt(verified);
+        const now = Date.now();
+        
+        if (now - timestamp < VERIFICATION_DURATION) {
+            if (overlay) overlay.style.display = 'none';
+            if (container) container.classList.remove('content-blur');
+            return;
+        }
+    }
+    showDisclaimer();
+}
+
+function showDisclaimer() {
+    const overlay = document.getElementById('disclaimerOverlay');
+    const container = document.getElementById('appContainer');
+    if (overlay) overlay.style.display = 'flex';
+    if (container) container.classList.add('content-blur');
+}
+
+// 2. [핵심] '예' 버튼 클릭 시 실행될 함수
+function handleVerifySuccess() {
+    localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
+    const overlay = document.getElementById('disclaimerOverlay');
+    const container = document.getElementById('appContainer');
     
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="SMALLSM Archive">
-    <meta property="og:description" content="시네마틱 아카이브 - 성향과 실천의 기록">
-    <meta property="og:image" content="/assets/og-image.jpg">
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/style.css">
-    
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-    <!-- Age Verification Disclaimer -->
-    <div id="disclaimerOverlay" class="disclaimer-overlay">
-        <div class="disclaimer-content">
-            <h2>성인 인증</h2>
-            <p>본 사이트는 성인 지향 콘텐츠를 포함하고 있습니다.<br>
-            귀하는 만 19세 이상이십니까?</p>
-            <div class="disclaimer-buttons">
-                <button class="btn btn-primary" id="btnYes">예 (19세 이상)</button>
-                <button class="btn btn-secondary" id="btnNo">아니요</button>
-            </div>
-        </div>
-    </div>
+    if (overlay) overlay.style.display = 'none';
+    if (container) container.classList.remove('content-blur');
+    console.log("성인 인증 완료");
+}
 
-    <!-- Main App Container -->
-    <div class="app-container content-blur" id="appContainer">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1 class="site-title">SMALLSM</h1>
-                <p class="site-subtitle">CINEMATIC ARCHIVE</p>
-            </div>
+// 3. 페이지 로드 시 초기화 및 이벤트 연결
+document.addEventListener('DOMContentLoaded', () => {
+    checkAgeVerification();
 
-            <!-- Search -->
-            <div class="search-box">
-                <input type="text" 
-                       class="search-input" 
-                       id="searchInput"
-                       placeholder="검색어를 입력하세요...">
-            </div>
+    const btnYes = document.getElementById('btnYes');
+    const btnNo = document.getElementById('btnNo');
 
-            <!-- Categories -->
-            <nav>
-                <ul class="category-nav" id="categoryNav">
-                    <!-- Dynamically loaded -->
-                </ul>
-            </nav>
+    if (btnYes) {
+        btnYes.addEventListener('click', handleVerifySuccess);
+    }
 
-            <!-- Sidebar Footer -->
-            <div class="sidebar-footer">
-                <button class="mode-toggle" id="modeToggle">
-                    <span>🌙</span>
-                    <span>Night Library</span>
-                </button>
-            </div>
-        </aside>
+    if (btnNo) {
+        btnNo.addEventListener('click', () => {
+            alert('성인 인증이 필요한 서비스입니다.');
+            window.location.href = 'https://www.google.com';
+        });
+    }
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="content-panel">
-                <h1 class="post-title" id="welcomeTitle">환영합니다</h1>
-                <div class="post-meta">
-                    <span>SMALLSM Archive에 오신 것을 환영합니다</span>
-                </div>
-                <div class="post-content" id="mainContent">
-                    <p>좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.</p>
-                    <p>이곳은 성향과 실천, 그리고 깊이 있는 사색이 담긴 공간입니다.</p>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <footer class="site-footer">
-                <p>© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
-            </footer>
-        </main>
-    </div>
-
-    <!-- Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/main.js"></script>
-</body>
-</html>
+    // 기존 초기화 로직 (카테고리 로드 등) 실행
+    if (typeof loadCategories === 'function') loadCategories();
+    if (typeof loadLatestPosts === 'function') loadLatestPosts();
+});
