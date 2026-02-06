@@ -94,17 +94,37 @@
 
     <!-- Scripts -->
     <script>
-        // Try to load local config if exists (for local development)
-        try {
-            const script = document.createElement('script');
-            script.src = 'js/config.local.js';
-            script.onerror = () => console.log('No local config found - using environment variables');
-            document.head.appendChild(script);
-        } catch (e) {
-            console.log('Using environment variables');
-        }
+        // 환경 변수 로드: Vercel API 또는 로컬 config
+        (async function loadConfig() {
+            try {
+                // Vercel 배포 환경에서는 API로부터 환경 변수 로드
+                const response = await fetch('/api/config');
+                if (response.ok) {
+                    const configScript = await response.text();
+                    eval(configScript);
+                    console.log('✅ Vercel 환경 변수 로드 완료');
+                    return;
+                }
+            } catch (e) {
+                console.log('📦 로컬 환경 - config.local.js 시도');
+            }
+            
+            // 로컬 개발 환경에서는 config.local.js 로드
+            try {
+                const script = document.createElement('script');
+                script.src = 'js/config.local.js';
+                script.onerror = () => {
+                    console.warn('⚠️ config.local.js가 없습니다. 환경 변수를 설정하세요.');
+                    // 기본값 설정 (빈 객체)
+                    window.SUPABASE_CONFIG = { url: '', anonKey: '' };
+                    window.ADMIN_EMAIL = '';
+                };
+                document.head.appendChild(script);
+            } catch (e) {
+                console.error('설정 로드 실패:', e);
+            }
+        })();
     </script>
-    <script src="js/config.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

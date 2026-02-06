@@ -5,10 +5,31 @@
 // ═══════════════════════════════════════════════════
 // 1. SUPABASE INITIALIZATION
 // ═══════════════════════════════════════════════════
-const supabase = window.supabase.createClient(
-    SUPABASE_CONFIG.url,
-    SUPABASE_CONFIG.anonKey
-);
+let supabase = null;
+
+function initializeSupabase() {
+    try {
+        if (typeof window.supabase === 'undefined') {
+            console.error('Supabase 라이브러리가 로드되지 않았습니다.');
+            return false;
+        }
+        
+        if (!window.SUPABASE_CONFIG || !window.SUPABASE_CONFIG.url || !window.SUPABASE_CONFIG.anonKey) {
+            console.error('Supabase 설정이 올바르지 않습니다.');
+            return false;
+        }
+        
+        supabase = window.supabase.createClient(
+            window.SUPABASE_CONFIG.url,
+            window.SUPABASE_CONFIG.anonKey
+        );
+        
+        return true;
+    } catch (error) {
+        console.error('Supabase 초기화 실패:', error);
+        return false;
+    }
+}
 
 // ═══════════════════════════════════════════════════
 // 2. AGE VERIFICATION SYSTEM
@@ -62,6 +83,11 @@ function hideDisclaimer() {
 // 3. CATEGORY LOADING
 // ═══════════════════════════════════════════════════
 async function loadCategories() {
+    if (!supabase) {
+        console.warn('Supabase가 초기화되지 않았습니다.');
+        return;
+    }
+    
     try {
         const { data: categories, error } = await supabase
             .from('categories')
@@ -111,7 +137,7 @@ async function loadPostsByCategory(categoryId) {
     try {
         // Check if user is admin
         const { data: { user } } = await supabase.auth.getUser();
-        const isAdmin = user && user.email === ADMIN_EMAIL;
+        const isAdmin = user && user.email === window.ADMIN_EMAIL;
         
         let query = supabase
             .from('archive_posts')
@@ -183,7 +209,7 @@ searchInput.addEventListener('input', (e) => {
         
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            const isAdmin = user && user.email === ADMIN_EMAIL;
+            const isAdmin = user && user.email === window.ADMIN_EMAIL;
             
             let searchQuery = supabase
                 .from('archive_posts')
@@ -298,17 +324,40 @@ document.addEventListener('copy', async (e) => {
 // 8. INITIALIZATION
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-    // Age verification button handlers
-    document.getElementById('btnYes').addEventListener('click', () => {
-        localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
-        hideDisclaimer();
-    });
+    // Age verification button handlers - 항상 먼저 등록
+    const btnYes = document.getElementById('btnYes');
+    const btnNo = document.getElementById('btnNo');
+    
+    if (btnYes) {
+        btnYes.addEventListener('click', () => {
+            localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
+            hideDisclaimer();
+            
+            // Initialize Supabase after verification
+            initializeSupabase();
+            loadCategories();
+        });
+    }
 
-    document.getElementById('btnNo').addEventListener('click', () => {
-        window.location.href = 'https://www.google.com';
-    });
+    if (btnNo) {
+        btnNo.addEventListener('click', () => {
+            window.location.href = 'https://www.google.com';
+        });
+    }
+    
+    // Check verification and load content
+    const verified = localStorage.getItem(VERIFICATION_KEY);
+    if (verified) {
+        const timestamp = parseInt(verified);
+        const now = Date.now();
+        
+        if (now - timestamp < VERIFICATION_DURATION) {
+            // Already verified, initialize normally
+            initializeSupabase();
+            loadCategories();
+        }
+    }
     
     checkAgeVerification();
-    loadCategories();
     loadNightMode();
 });
