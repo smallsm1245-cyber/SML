@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     
-    <!-- SEO & Open Graph -->
     <title>SMALLSM Archive - Cinematic Records</title>
     <meta name="description" content="SMALLSM의 시네마틱 아카이브. 성향과 실천에 관한 깊이 있는 기록.">
     
@@ -14,19 +13,15 @@
     <meta property="og:description" content="시네마틱 아카이브 - 성향과 실천의 기록">
     <meta property="og:image" content="/assets/og-image.jpg">
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!-- Age Verification Disclaimer -->
     <div id="disclaimerOverlay" class="disclaimer-overlay">
         <div class="disclaimer-content">
             <h2>성인 인증</h2>
@@ -39,16 +34,13 @@
         </div>
     </div>
 
-    <!-- Main App Container -->
     <div class="app-container content-blur" id="appContainer">
-        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h1 class="site-title">SMALLSM</h1>
                 <p class="site-subtitle">CINEMATIC ARCHIVE</p>
             </div>
 
-            <!-- Search -->
             <div class="search-box">
                 <input type="text" 
                        class="search-input" 
@@ -56,14 +48,11 @@
                        placeholder="검색어를 입력하세요...">
             </div>
 
-            <!-- Categories -->
             <nav>
                 <ul class="category-nav" id="categoryNav">
-                    <!-- Dynamically loaded -->
-                </ul>
+                    </ul>
             </nav>
 
-            <!-- Sidebar Footer -->
             <div class="sidebar-footer">
                 <button class="mode-toggle" id="modeToggle">
                     <span>🌙</span>
@@ -72,7 +61,6 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <div class="content-panel">
                 <h1 class="post-title" id="welcomeTitle">환영합니다</h1>
@@ -85,15 +73,20 @@
                 </div>
             </div>
 
-            <!-- Footer -->
             <footer class="site-footer">
                 <p>© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
             </footer>
         </main>
     </div>
 
-    <!-- Scripts -->
-    <script src="js/config.js"></script>
+    <script>
+        // [보안 핵심] config.js 파일이 없어도 브라우저가 멈추지 않게 빈 상자를 미리 만들어둡니다.
+        window.SUPABASE_CONFIG = window.SUPABASE_CONFIG || { url: '', anonKey: '' };
+        window.ADMIN_EMAIL = window.ADMIN_EMAIL || '';
+    </script>
+
+    <script src="js/config.js" onerror="console.warn('config.js를 불러올 수 없습니다. 로컬 설정 혹은 배포 환경변수를 확인하세요.')"></script>
+    
     <script src="js/main.js"></script>
 </body>
 </html>
