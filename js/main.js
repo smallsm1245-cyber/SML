@@ -1,14 +1,25 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎬 SMALLSM ARCHIVE - MAIN SCRIPT
+// 🎬 SMALLSM ARCHIVE - MAIN SCRIPT (FINAL VERSION)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 // ═══════════════════════════════════════════════════
-// 1. SUPABASE INITIALIZATION
+// 1. SUPABASE INITIALIZATION (Error-Resistant)
 // ═══════════════════════════════════════════════════
-const supabase = window.supabase.createClient(
-    SUPABASE_CONFIG.url,
-    SUPABASE_CONFIG.anonKey
-);
+let supabase;
+
+try {
+    // SUPABASE_CONFIG 존재 여부 및 유효성 확인
+    if (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+        supabase = window.supabase.createClient(
+            SUPABASE_CONFIG.url,
+            SUPABASE_CONFIG.anonKey
+        );
+    } else {
+        console.warn("⚠️ Supabase 설정이 감지되지 않았습니다. DB 연동 기능이 제한됩니다.");
+    }
+} catch (error) {
+    console.error("🚨 Supabase 초기화 중 치명적 에러 발생:", error);
+}
 
 // ═══════════════════════════════════════════════════
 // 2. AGE VERIFICATION SYSTEM
@@ -23,53 +34,61 @@ function checkAgeVerification() {
         const timestamp = parseInt(verified);
         const now = Date.now();
         
-        // Check if verification is still valid
         if (now - timestamp < VERIFICATION_DURATION) {
             hideDisclaimer();
             return;
         }
     }
-    
-    // Show disclaimer
     showDisclaimer();
 }
 
 function showDisclaimer() {
     const overlay = document.getElementById('disclaimerOverlay');
     const container = document.getElementById('appContainer');
-    
+    if (!overlay || !container) return;
+
     overlay.style.display = 'flex';
     container.classList.add('content-blur');
     
     // Block search engines when disclaimer is active
-    const metaRobots = document.createElement('meta');
-    metaRobots.name = 'robots';
-    metaRobots.content = 'noindex, nofollow';
-    document.head.appendChild(metaRobots);
+    if (!document.querySelector('meta[name="robots"]')) {
+        const metaRobots = document.createElement('meta');
+        metaRobots.name = 'robots';
+        metaRobots.content = 'noindex, nofollow';
+        document.head.appendChild(metaRobots);
+    }
 }
 
 function hideDisclaimer() {
     const overlay = document.getElementById('disclaimerOverlay');
     const container = document.getElementById('appContainer');
-    
-    overlay.style.display = 'none';
-    container.classList.remove('content-blur');
+    if (overlay) overlay.style.display = 'none';
+    if (container) container.classList.remove('content-blur');
 }
 
 // Button Handlers
-document.getElementById('btnYes').addEventListener('click', () => {
-    localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
-    hideDisclaimer();
-});
+const btnYes = document.getElementById('btnYes');
+const btnNo = document.getElementById('btnNo');
 
-document.getElementById('btnNo').addEventListener('click', () => {
-    window.location.href = 'https://www.google.com';
-});
+if (btnYes) {
+    btnYes.addEventListener('click', () => {
+        localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
+        hideDisclaimer();
+    });
+}
+
+if (btnNo) {
+    btnNo.addEventListener('click', () => {
+        window.location.href = 'https://www.google.com';
+    });
+}
 
 // ═══════════════════════════════════════════════════
 // 3. CATEGORY LOADING
 // ═══════════════════════════════════════════════════
 async function loadCategories() {
+    if (!supabase) return; // Supabase 미설정 시 중단
+
     try {
         const { data: categories, error } = await supabase
             .from('categories')
@@ -80,6 +99,7 @@ async function loadCategories() {
         if (error) throw error;
         
         const nav = document.getElementById('categoryNav');
+        if (!nav) return;
         nav.innerHTML = '';
         
         categories.forEach(category => {
@@ -96,7 +116,6 @@ async function loadCategories() {
                 e.preventDefault();
                 loadPostsByCategory(category.id);
                 
-                // Update active state
                 document.querySelectorAll('.category-link').forEach(l => {
                     l.classList.remove('active');
                 });
@@ -116,10 +135,17 @@ async function loadCategories() {
 // 4. POST LOADING BY CATEGORY
 // ═══════════════════════════════════════════════════
 async function loadPostsByCategory(categoryId) {
+    if (!supabase) return;
+
     try {
-        // Check if user is admin
-        const { data: { user } } = await supabase.auth.getUser();
-        const isAdmin = user && user.email === ADMIN_EMAIL;
+        // 관리자 여부 확인
+        let isAdmin = false;
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            isAdmin = user && typeof ADMIN_EMAIL !== 'undefined' && user.email === ADMIN_EMAIL;
+        } catch (e) {
+            isAdmin = false;
+        }
         
         let query = supabase
             .from('archive_posts')
@@ -127,16 +153,13 @@ async function loadPostsByCategory(categoryId) {
             .eq('category_id', categoryId)
             .order('created_at', { ascending: false });
         
-        // Non-admin users can only see public posts
         if (!isAdmin) {
             query = query.eq('is_private', false);
         }
         
         const { data: posts, error } = await query;
-        
         if (error) throw error;
         
-        // Display posts in main content
         const content = document.getElementById('mainContent');
         const title = document.getElementById('welcomeTitle');
         
@@ -146,16 +169,14 @@ async function loadPostsByCategory(categoryId) {
             return;
         }
         
-        // Get category name
         const { data: category } = await supabase
             .from('categories')
             .select('name')
             .eq('id', categoryId)
             .single();
         
-        title.textContent = category.name;
+        title.textContent = category ? category.name : '기록 목록';
         
-        // Display post list
         content.innerHTML = posts.map(post => `
             <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
                 <h3>
@@ -181,45 +202,49 @@ async function loadPostsByCategory(categoryId) {
 let searchTimeout;
 const searchInput = document.getElementById('searchInput');
 
-searchInput.addEventListener('input', (e) => {
-    clearTimeout(searchTimeout);
-    
-    searchTimeout = setTimeout(async () => {
-        const query = e.target.value.trim();
-        
-        if (query.length < 2) return;
-        
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            const isAdmin = user && user.email === ADMIN_EMAIL;
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        if (!supabase) return;
+
+        searchTimeout = setTimeout(async () => {
+            const query = e.target.value.trim();
+            if (query.length < 2) return;
             
-            let searchQuery = supabase
-                .from('archive_posts')
-                .select('id, title, created_at, category_id')
-                .ilike('title', `%${query}%`)
-                .order('created_at', { ascending: false })
-                .limit(10);
-            
-            if (!isAdmin) {
-                searchQuery = searchQuery.eq('is_private', false);
+            try {
+                let isAdmin = false;
+                try {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    isAdmin = user && typeof ADMIN_EMAIL !== 'undefined' && user.email === ADMIN_EMAIL;
+                } catch (e) {}
+
+                let searchQuery = supabase
+                    .from('archive_posts')
+                    .select('id, title, created_at, category_id')
+                    .ilike('title', `%${query}%`)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+                
+                if (!isAdmin) {
+                    searchQuery = searchQuery.eq('is_private', false);
+                }
+                
+                const { data: results, error } = await searchQuery;
+                if (error) throw error;
+                displaySearchResults(results);
+                
+            } catch (error) {
+                console.error('검색 실패:', error);
             }
-            
-            const { data: results, error } = await searchQuery;
-            
-            if (error) throw error;
-            
-            displaySearchResults(results);
-            
-        } catch (error) {
-            console.error('검색 실패:', error);
-        }
-    }, 300);
-});
+        }, 300);
+    });
+}
 
 function displaySearchResults(results) {
     const content = document.getElementById('mainContent');
     const title = document.getElementById('welcomeTitle');
-    
+    if (!content || !title) return;
+
     title.textContent = '검색 결과';
     
     if (results.length === 0) {
@@ -249,37 +274,36 @@ const NIGHT_MODE_KEY = 'night_mode';
 
 function loadNightMode() {
     const isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === 'true';
-    
     if (isNightMode) {
         document.body.classList.add('night-mode');
-        modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
+        if (modeToggle) modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
     }
 }
 
-modeToggle.addEventListener('click', () => {
-    const isNightMode = document.body.classList.toggle('night-mode');
-    localStorage.setItem(NIGHT_MODE_KEY, isNightMode);
-    
-    if (isNightMode) {
-        modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
-    } else {
-        modeToggle.innerHTML = '<span>🌙</span><span>Night Library</span>';
-    }
-});
+if (modeToggle) {
+    modeToggle.addEventListener('click', () => {
+        const isNightMode = document.body.classList.toggle('night-mode');
+        localStorage.setItem(NIGHT_MODE_KEY, isNightMode);
+        
+        if (isNightMode) {
+            modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
+        } else {
+            modeToggle.innerHTML = '<span>🌙</span><span>Night Library</span>';
+        }
+    });
+}
 
 // ═══════════════════════════════════════════════════
 // 7. COPY PROTECTION SYSTEM
 // ═══════════════════════════════════════════════════
 document.addEventListener('copy', async (e) => {
     const selection = window.getSelection().toString();
-    
     if (!selection) return;
     
-    // Check if current post has origin_free enabled
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
     
-    if (postId) {
+    if (postId && supabase) {
         try {
             const { data: post } = await supabase
                 .from('archive_posts')
@@ -287,15 +311,12 @@ document.addEventListener('copy', async (e) => {
                 .eq('id', postId)
                 .single();
             
-            if (post && post.origin_free) {
-                return; // Don't add attribution
-            }
+            if (post && post.origin_free) return;
         } catch (error) {
             console.error('복사 보호 확인 실패:', error);
         }
     }
     
-    // Add attribution
     const attribution = `\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n본 기록은 SMALLSM Archive의 자산입니다.\n출처: ${window.location.origin}\n⚠️ 무단 수정 및 상업적 이용을 금합니다.\n━━━━━━━━━━━━━━━━━━━━━━━━`;
     
     e.clipboardData.setData('text/plain', selection + attribution);
