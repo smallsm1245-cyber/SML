@@ -1,4 +1,4 @@
-// 1. 초기 설정 (Vercel 환경변수 대응)
+// 1. 초기 설정 (Vercel 및 Supabase 연결)
 const getSupabaseConfig = () => {
     const isVercel = typeof process !== 'undefined' && process.env;
     return {
@@ -9,55 +9,56 @@ const getSupabaseConfig = () => {
 
 const config = getSupabaseConfig();
 
-// 2. [중요] 중복 선언 에러 방지 로직
-// const 대신 window 객체를 사용하여 중복 선언 에러를 원천 차단합니다.
-if (!window.mySupabase) {
-    window.mySupabase = window.supabase.createClient(config.url, config.anonKey);
+// 2. 중복 선언 에러 방지 (window 객체 사용)
+if (!window.mySupabaseInstance) {
+    window.mySupabaseInstance = window.supabase.createClient(config.url, config.anonKey);
 }
-const sb = window.mySupabase; 
+const sb = window.mySupabaseInstance;
 
-// 3. 성인 인증 시스템
-const VERIFICATION_KEY = 'age_verified';
-
+// 3. 인증 및 화면 제어
 document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('disclaimerOverlay');
     const container = document.getElementById('appContainer');
+    const VERIFICATION_KEY = 'age_verified';
 
     const hideOverlay = () => {
         if (overlay) overlay.style.display = 'none';
         if (container) container.classList.remove('content-blur');
     };
 
-    // 이미 인증된 경우
+    // 기존 인증 확인
     if (localStorage.getItem(VERIFICATION_KEY)) {
         hideOverlay();
         loadCategories();
     }
 
-    // "예" 버튼 클릭 시
+    // 버튼 이벤트 연결
     document.getElementById('btnYes')?.addEventListener('click', () => {
         localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
         hideOverlay();
-        loadCategories(); // 버튼 누르면 카테고리 로드 시작
+        loadCategories();
     });
 
-    // "아니요" 버튼 클릭 시
     document.getElementById('btnNo')?.addEventListener('click', () => {
         window.location.href = 'https://www.google.com';
     });
 });
 
-// 4. 카테고리 불러오기 함수
+// 4. 데이터 로드 함수
 async function loadCategories() {
     try {
         const { data, error } = await sb.from('categories').select('*').eq('is_visible', true);
         if (error) throw error;
         
         const nav = document.getElementById('categoryNav');
-        if (nav) {
-            nav.innerHTML = data.map(cat => `<li><a href="#">${cat.name}</a></li>`).join('');
+        if (nav && data) {
+            nav.innerHTML = data.map(cat => `
+                <li class="category-item">
+                    <a href="#" onclick="alert('${cat.name} 준비 중')">${cat.name}</a>
+                </li>
+            `).join('');
         }
     } catch (e) {
-        console.error("데이터 로딩 실패:", e);
+        console.error("데이터 로드 에러:", e.message);
     }
 }
