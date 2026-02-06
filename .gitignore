@@ -1,5 +1,8 @@
 # API Keys and Sensitive Data
-js/config.js
+js/config.local.js
+
+# Build Output
+public/
 
 # OS Files
 .DS_Store

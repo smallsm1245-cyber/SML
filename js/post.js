@@ -48,14 +48,7 @@ function hideDisclaimer() {
     container.classList.remove('content-blur');
 }
 
-document.getElementById('btnYes').addEventListener('click', () => {
-    localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
-    hideDisclaimer();
-});
-
-document.getElementById('btnNo').addEventListener('click', () => {
-    window.location.href = 'https://www.google.com';
-});
+// Button Handlers - Will be attached in DOMContentLoaded
 
 // ═══════════════════════════════════════════════════
 // 3. LOAD CATEGORIES (Same as main.js)
@@ -223,6 +216,16 @@ document.addEventListener('copy', async (e) => {
 // 7. INITIALIZATION
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+    // Age verification button handlers
+    document.getElementById('btnYes').addEventListener('click', () => {
+        localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
+        hideDisclaimer();
+    });
+
+    document.getElementById('btnNo').addEventListener('click', () => {
+        window.location.href = 'https://www.google.com';
+    });
+    
     checkAgeVerification();
     loadCategories();
     loadPost();

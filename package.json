@@ -1,0 +1,10 @@
+{
+  "name": "smallsm-archive",
+  "version": "1.0.0",
+  "description": "SMALLSM Cinematic Archive System",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "author": "SMALLSM",
+  "license": "SEE LICENSE IN README.md"
+}

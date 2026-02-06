@@ -86,6 +86,17 @@
     </div>
 
     <!-- Scripts -->
+    <script>
+        // Try to load local config if exists (for local development)
+        try {
+            const script = document.createElement('script');
+            script.src = 'js/config.local.js';
+            script.onerror = () => console.log('No local config found - using environment variables');
+            document.head.appendChild(script);
+        } catch (e) {
+            console.log('Using environment variables');
+        }
+    </script>
     <script src="js/config.js"></script>
     <script src="js/post.js"></script>
 </body>
