@@ -3,149 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SML 관리자 모드 - 통합본</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .sidebar-item:hover { background-color: #f1f5f9; color: #2563eb; }
-        .active-menu { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
-    </style>
+    <meta name="robots" content="noindex, nofollow">
+    
+    <title>Admin Panel - SMALLSM Archive</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="flex min-h-screen">
-
-    <aside class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col">
-        <div class="p-6">
-            <h1 class="text-2xl font-bold text-blue-600 flex items-center gap-2">
-                <i data-lucide="layout-dashboard"></i> SML Admin
-            </h1>
-        </div>
-        <nav class="flex-1 px-4 space-y-2">
-            <a href="admin.html" class="sidebar-item active-menu flex items-center gap-3 p-3 rounded-lg transition-all">
-                <i data-lucide="home"></i> <span>대시보드</span>
-            </a>
-            <a href="#" class="sidebar-item flex items-center gap-3 p-3 rounded-lg text-slate-600 transition-all">
-                <i data-lucide="file-text"></i> <span>게시글 관리</span>
-            </a>
-            <a href="/" class="sidebar-item flex items-center gap-3 p-3 rounded-lg text-slate-600 transition-all">
-                <i data-lucide="external-link"></i> <span>사이트 바로가기</span>
-            </a>
-        </nav>
-        <div class="p-4 border-t border-slate-200">
-            <button onclick="logout()" class="flex items-center gap-3 w-full p-3 text-red-500 hover:bg-red-50 rounded-lg transition-all">
-                <i data-lucide="log-out"></i> <span>로그아웃</span>
-            </button>
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col">
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
-            <h2 class="text-lg font-semibold text-slate-800">관리 시스템</h2>
-            <div class="flex items-center gap-4">
-                <span id="admin-name" class="text-sm text-slate-500">관리자님 환영합니다</span>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-deep);">
+        <div style="background: var(--bg-panel); padding: 3rem; border-radius: 8px; border: 1px solid var(--glass-border); max-width: 400px; width: 90%;">
+            <h2 style="color: var(--primary-brass); margin-bottom: 2rem; text-align: center;">관리자 로그인</h2>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">이메일</label>
+                <input type="email" id="loginEmail" placeholder="이메일" 
+                       style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 4px; color: var(--text-primary); font-size: 1rem;">
             </div>
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">비밀번호</label>
+                <input type="password" id="loginPassword" placeholder="비밀번호" 
+                       style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 4px; color: var(--text-primary); font-size: 1rem;">
+            </div>
+            <button id="loginBtn" 
+                    style="width: 100%; padding: 1rem; background: var(--primary-brass); color: var(--bg-deep); border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                로그인
+            </button>
+            <p id="loginError" style="color: #ff6b6b; margin-top: 1rem; text-align: center; display: none;"></p>
+            <p style="color: var(--text-secondary); margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+                <a href="index.html" style="color: var(--primary-brass); text-decoration: none;">← 메인으로 돌아가기</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Admin Container -->
+    <div class="admin-container" id="adminPanel" style="display: none;">
+        <!-- Header -->
+        <header class="admin-header">
+            <div>
+                <h1 class="admin-title">관리자 패널</h1>
+                <p class="site-subtitle">SMALLSM Archive Administration</p>
+            </div>
+            <button class="logout-btn" id="logoutBtn">로그아웃</button>
         </header>
 
-        <div class="p-8 space-y-8">
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-slate-500 mb-1">총 게시글</p>
-                        <h3 class="text-3xl font-bold" id="total-count">0</h3>
-                    </div>
-                    <div class="p-4 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="files"></i></div>
-                </div>
-                </section>
+        <!-- Editor Section -->
+        <section class="editor-container">
+            <h2 class="form-label">새 게시물 작성</h2>
+            
+            <!-- Post Info -->
+            <div class="form-group">
+                <label class="form-label" for="postTitle">제목</label>
+                <input type="text" 
+                       id="postTitle" 
+                       class="form-input" 
+                       placeholder="게시물 제목을 입력하세요">
+            </div>
 
-            <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-slate-200 flex justify-between items-center">
-                    <h3 class="font-bold text-lg text-slate-800">게시글 목록</h3>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2" onclick="location.href='post.html'">
-                        <i data-lucide="plus-circle" class="w-4 h-4"></i> 새 글 작성
-                    </button>
+            <div class="form-group">
+                <label class="form-label" for="postCategory">카테고리</label>
+                <select id="postCategory" class="form-select">
+                    <option value="">카테고리 선택</option>
+                    <!-- Dynamically loaded -->
+                </select>
+            </div>
+
+            <!-- Privacy & Copy Protection -->
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="isPrivate" class="form-checkbox">
+                    <label for="isPrivate">비밀글로 설정</label>
                 </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-50">
-                            <tr>
-                                <th class="p-4 text-sm font-semibold text-slate-600 border-b">ID</th>
-                                <th class="p-4 text-sm font-semibold text-slate-600 border-b">제목</th>
-                                <th class="p-4 text-sm font-semibold text-slate-600 border-b">작성일</th>
-                                <th class="p-4 text-sm font-semibold text-slate-600 border-b text-center">관리</th>
-                            </tr>
-                        </thead>
-                        <tbody id="posts-list">
-                            </tbody>
-                    </table>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="originFree" class="form-checkbox">
+                    <label for="originFree">복사 시 출처 표기 비활성화</label>
                 </div>
-            </section>
-        </div>
-    </main>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="editor-toolbar">
+                <button class="editor-btn" onclick="formatText('bold')"><strong>B</strong></button>
+                <button class="editor-btn" onclick="formatText('italic')"><em>I</em></button>
+                <button class="editor-btn" onclick="formatText('underline')"><u>U</u></button>
+                <button class="editor-btn" onclick="insertLink()">🔗 링크</button>
+            </div>
+
+            <!-- Split Editor -->
+            <div class="split-editor">
+                <div class="editor-pane">
+                    <label class="form-label">편집</label>
+                    <textarea id="contentEditor" 
+                              class="editor-input" 
+                              placeholder="내용을 입력하세요..."></textarea>
+                </div>
+                <div class="editor-pane">
+                    <label class="form-label">미리보기</label>
+                    <div id="contentPreview" class="preview-pane post-content">
+                        <p style="color: var(--text-secondary);">미리보기 영역</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn-save" id="savePostBtn">게시물 저장</button>
+            </div>
+        </section>
+        </section>
+
+        <!-- Home Screen Editor -->
+        <section class="editor-container">
+            <h2 class="form-label" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleSection('homeEditor')">
+                🏠 홈화면 편집
+                <span id="homeEditorToggle">▼</span>
+            </h2>
+            
+            <div id="homeEditorContent" style="display: none; margin-top: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label" for="homeTitle">메인 제목</label>
+                    <input type="text" 
+                           id="homeTitle" 
+                           class="form-input" 
+                           placeholder="환영합니다">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="homeSubtitle">부제목</label>
+                    <input type="text" 
+                           id="homeSubtitle" 
+                           class="form-input" 
+                           placeholder="SMALLSM Archive에 오신 것을 환영합니다">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="homeContent">본문</label>
+                    <textarea id="homeContent" 
+                              class="editor-input" 
+                              rows="6"
+                              placeholder="좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="showRecentPosts" class="form-checkbox">
+                        <label for="showRecentPosts">최신 게시물 표시</label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="recentPostsCountGroup" style="display: none;">
+                    <label class="form-label" for="recentPostsCount">표시할 게시물 개수</label>
+                    <input type="number" 
+                           id="recentPostsCount" 
+                           class="form-input" 
+                           value="3" 
+                           min="1" 
+                           max="10">
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-save" id="saveHomeBtn">홈화면 저장</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Management -->
+        <section class="editor-container">
+            <h2 class="form-label" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleSection('categoryManagement')">
+                📂 카테고리 관리
+                <span id="categoryManagementToggle">▼</span>
+            </h2>
+            
+            <div id="categoryManagementContent" style="display: none; margin-top: 1.5rem;">
+                <!-- Add New Category -->
+                <div style="background: rgba(206, 177, 128, 0.05); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid var(--glass-border);">
+                    <h3 style="color: var(--primary-brass); margin-bottom: 1rem; font-size: 1rem;">➕ 새 카테고리 추가</h3>
+                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                        <div style="flex: 1;">
+                            <input type="text" 
+                                   id="newCategoryName" 
+                                   class="form-input" 
+                                   placeholder="카테고리 이름 (예: REVIEW)">
+                        </div>
+                        <button class="editor-btn" id="addCategoryBtn" style="padding: 0.8rem 1.5rem; white-space: nowrap;">
+                            추가하기
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category List -->
+                <div id="categoryList">
+                    <!-- Dynamically loaded -->
+                </div>
+            </div>
+        <!-- Category Management -->
+        <section class="editor-container">
+            <h2 class="form-label">카테고리 관리</h2>
+            
+            <div id="categoryList">
+                <!-- Dynamically loaded -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
 
     <script>
-        lucide.createIcons();
+        // Toolbar Functions
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            updatePreview();
+        }
 
-        // 기존에 사용하시던 API 호출 및 렌더링 로직 통합
-        async function loadAdminData() {
-            try {
-                const response = await fetch('/api/posts'); // 기존 API 경로
-                const posts = await response.json();
-                
-                const listBody = document.getElementById('posts-list');
-                const totalCountEl = document.getElementById('total-count');
-                
-                listBody.innerHTML = '';
-                totalCountEl.innerText = posts.length;
-
-                posts.forEach(post => {
-                    const row = `
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 text-sm text-slate-500 border-b">${post.id || post._id}</td>
-                            <td class="p-4 text-sm font-medium text-slate-800 border-b">${post.title}</td>
-                            <td class="p-4 text-sm text-slate-500 border-b">${new Date(post.createdAt).toLocaleDateString()}</td>
-                            <td class="p-4 border-b text-center">
-                                <button onclick="editPost('${post.id || post._id}')" class="text-blue-600 hover:text-blue-800 font-medium mr-3 text-sm">수정</button>
-                                <button onclick="deletePost('${post.id || post._id}')" class="text-red-500 hover:text-red-700 font-medium text-sm">삭제</button>
-                            </td>
-                        </tr>
-                    `;
-                    listBody.insertAdjacentHTML('beforeend', row);
-                });
-            } catch (error) {
-                console.error("데이터 로드 실패:", error);
-                alert("게시글을 불러오는 중 오류가 발생했습니다.");
+        function insertLink() {
+            const url = prompt('링크 URL을 입력하세요:');
+            if (url) {
+                document.execCommand('createLink', false, url);
+                updatePreview();
             }
         }
 
-        // 기존 삭제 기능 유지
-        async function deletePost(id) {
-            if (!confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+        // Real-time Preview
+        const editor = document.getElementById('contentEditor');
+        const preview = document.getElementById('contentPreview');
+
+        editor.addEventListener('input', updatePreview);
+
+        function updatePreview() {
+            preview.innerHTML = editor.value
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/_(.*?)_/g, '<u>$1</u>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // Auto-save to localStorage
+        let autoSaveTimer;
+        editor.addEventListener('input', () => {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                localStorage.setItem('draft_content', editor.value);
+                localStorage.setItem('draft_title', document.getElementById('postTitle').value);
+            }, 1000);
+        });
+
+        // Restore draft on load
+        window.addEventListener('load', () => {
+            const savedContent = localStorage.getItem('draft_content');
+            const savedTitle = localStorage.getItem('draft_title');
             
-            try {
-                const response = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    alert("삭제되었습니다.");
-                    loadAdminData(); // 목록 새로고침
+            if (savedContent) {
+                if (confirm('저장된 임시 글이 있습니다. 불러오시겠습니까?')) {
+                    editor.value = savedContent;
+                    document.getElementById('postTitle').value = savedTitle || '';
+                    updatePreview();
                 }
-            } catch (error) {
-                alert("삭제 실패");
             }
-        }
-
-        // 수정 페이지 이동
-        function editPost(id) {
-            location.href = `post.html?id=${id}`;
-        }
-
-        function logout() {
-            // 기존 로그아웃 로직 (예: 세션 삭제 등)
-            location.href = '/';
-        }
-
-        // 초기 실행
-        window.onload = loadAdminData;
+        });
     </script>
+    
+    <!-- Admin Script -->
+    <script src="/api/config"></script>
+    <script src="js/admin-new.js"></script>
 </body>
 </html>
