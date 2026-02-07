@@ -1,207 +1,213 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    
-    <title>Admin Panel - SMALLSM Archive</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/style.css">
-    
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-    <!-- Login Screen -->
-    <div id="loginScreen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-deep);">
-        <div style="background: var(--bg-panel); padding: 3rem; border-radius: 8px; border: 1px solid var(--glass-border); max-width: 400px; width: 90%;">
-            <h2 style="color: var(--primary-brass); margin-bottom: 2rem; text-align: center;">관리자 로그인</h2>
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">이메일</label>
-                <input type="email" id="loginEmail" placeholder="smallsml@naver.com" 
-                       style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 4px; color: var(--text-primary); font-size: 1rem;">
-            </div>
-            <div style="margin-bottom: 2rem;">
-                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">비밀번호</label>
-                <input type="password" id="loginPassword" placeholder="비밀번호" 
-                       style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 4px; color: var(--text-primary); font-size: 1rem;">
-            </div>
-            <button id="loginBtn" 
-                    style="width: 100%; padding: 1rem; background: var(--primary-brass); color: var(--bg-deep); border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                로그인
-            </button>
-            <p id="loginError" style="color: #ff6b6b; margin-top: 1rem; text-align: center; display: none;"></p>
-            <p style="color: var(--text-secondary); margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
-                <a href="index.html" style="color: var(--primary-brass); text-decoration: none;">← 메인으로 돌아가기</a>
-            </p>
-        </div>
-    </div>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🎬 SMALLSM ARCHIVE - UNIFIED ADMIN SCRIPT (Final)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-    <!-- Admin Container -->
-    <div class="admin-container" id="adminPanel" style="display: none;">
-        <!-- Header -->
-        <header class="admin-header">
-            <div>
-                <h1 class="admin-title">관리자 패널</h1>
-                <p class="site-subtitle">SMALLSM Archive Administration</p>
-            </div>
-            <button class="logout-btn" id="logoutBtn">로그아웃</button>
-        </header>
+console.log('📱 Admin system initializing...');
 
-        <!-- Editor Section -->
-        <section class="editor-container">
-            <h2 class="form-label">새 게시물 작성</h2>
-            
-            <!-- Post Info -->
-            <div class="form-group">
-                <label class="form-label" for="postTitle">제목</label>
-                <input type="text" 
-                       id="postTitle" 
-                       class="form-input" 
-                       placeholder="게시물 제목을 입력하세요">
-            </div>
+let supabase = null;
+let isConfigReady = false;
 
-            <div class="form-group">
-                <label class="form-label" for="postCategory">카테고리</label>
-                <select id="postCategory" class="form-select">
-                    <option value="">카테고리 선택</option>
-                    <!-- Dynamically loaded -->
-                </select>
-            </div>
-
-            <!-- Privacy & Copy Protection -->
-            <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="isPrivate" class="form-checkbox">
-                    <label for="isPrivate">비밀글로 설정</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="originFree" class="form-checkbox">
-                    <label for="originFree">복사 시 출처 표기 비활성화</label>
-                </div>
-            </div>
-
-            <!-- Toolbar -->
-            <div class="editor-toolbar">
-                <button class="editor-btn" onclick="formatText('bold')"><strong>B</strong></button>
-                <button class="editor-btn" onclick="formatText('italic')"><em>I</em></button>
-                <button class="editor-btn" onclick="formatText('underline')"><u>U</u></button>
-                <button class="editor-btn" onclick="insertLink()">🔗 링크</button>
-            </div>
-
-            <!-- Split Editor -->
-            <div class="split-editor">
-                <div class="editor-pane">
-                    <label class="form-label">편집</label>
-                    <textarea id="contentEditor" 
-                              class="editor-input" 
-                              placeholder="내용을 입력하세요..."></textarea>
-                </div>
-                <div class="editor-pane">
-                    <label class="form-label">미리보기</label>
-                    <div id="contentPreview" class="preview-pane post-content">
-                        <p style="color: var(--text-secondary);">미리보기 영역</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button class="btn-save" id="savePostBtn">게시물 저장</button>
-            </div>
-        </section>
-
-        <!-- Category Management -->
-        <section class="editor-container">
-            <h2 class="form-label">카테고리 관리</h2>
-            
-            <div id="categoryList">
-                <!-- Dynamically loaded -->
-            </div>
-        </section>
-    </div>
-
-    <!-- Scripts -->
-    <script>
-        // Try to load local config if exists (for local development)
-        try {
-            const script = document.createElement('script');
-            script.src = 'js/config.local.js';
-            script.onerror = () => console.log('No local config found - using environment variables');
-            document.head.appendChild(script);
-        } catch (e) {
-            console.log('Using environment variables');
-        }
-    </script>
-    <script src="js/config.js"></script>
-    <script src="js/admin.js"></script>
-
-    <script>
-        // Toolbar Functions
-        function formatText(command) {
-            document.execCommand(command, false, null);
-            updatePreview();
-        }
-
-        function insertLink() {
-            const url = prompt('링크 URL을 입력하세요:');
-            if (url) {
-                document.execCommand('createLink', false, url);
-                updatePreview();
+// 1. 설정 로드 대기
+function waitForConfig() {
+    return new Promise((resolve) => {
+        const interval = setInterval(() => {
+            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
+                clearInterval(interval);
+                resolve();
             }
-        }
+        }, 100);
+    });
+}
 
-        // Real-time Preview
-        const editor = document.getElementById('contentEditor');
-        const preview = document.getElementById('contentPreview');
+// 2. UI 표시 제어
+function showAdminPanel() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+}
 
-        editor.addEventListener('input', updatePreview);
+function showError(message) {
+    const loginError = document.getElementById('loginError');
+    if (loginError) {
+        loginError.textContent = message;
+        loginError.style.display = 'block';
+        setTimeout(() => { loginError.style.display = 'none'; }, 3000);
+    }
+}
 
-        function updatePreview() {
-            preview.innerHTML = editor.value
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/_(.*?)_/g, '<u>$1</u>')
-                .replace(/\n/g, '<br>');
-        }
+// 3. 텍스트 포맷팅 (B, I, U) - 텍스트 입력 방식에 맞춰 개선
+function insertFormat(type) {
+    const editor = document.getElementById('contentEditor');
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const text = editor.value;
+    const selectedText = text.substring(start, end);
+    
+    let formatted = "";
+    if (type === 'bold') formatted = `**${selectedText}**`;
+    else if (type === 'italic') formatted = `*${selectedText}*`;
+    else if (type === 'underline') formatted = `_${selectedText}_`;
+    
+    editor.value = text.substring(0, start) + formatted + text.substring(end);
+    updatePreview();
+    editor.focus();
+}
 
-        // Auto-save to localStorage
-        let autoSaveTimer;
-        editor.addEventListener('input', () => {
-            clearTimeout(autoSaveTimer);
-            autoSaveTimer = setTimeout(() => {
-                localStorage.setItem('draft_content', editor.value);
-                localStorage.setItem('draft_title', document.getElementById('postTitle').value);
-            }, 1000);
+// 4. 실시간 미리보기 (Markdown-like 처리)
+function updatePreview() {
+    const editor = document.getElementById('contentEditor');
+    const preview = document.getElementById('contentPreview');
+    if (!editor || !preview) return;
+
+    preview.innerHTML = editor.value
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/_(.*?)_/g, '<u>$1</u>')
+        .replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" style="max-width: 100%; border-radius: 4px; margin: 10px 0;">')
+        .replace(/\n/g, '<br>');
+    
+    // 자동 저장 (Local Storage)
+    localStorage.setItem('draft_content', editor.value);
+    localStorage.setItem('draft_title', document.getElementById('postTitle').value);
+}
+
+// 5. 이미지 업로드 함수
+async function uploadImage(file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const filePath = `images/${fileName}`;
+    
+    const { data, error } = await supabase.storage.from('archive-images').upload(filePath, file);
+    if (error) throw error;
+    
+    const { data: urlData } = supabase.storage.from('archive-images').getPublicUrl(filePath);
+    return urlData.publicUrl;
+}
+
+// 6. 데이터 로드 (카테고리)
+async function loadAdminData() {
+    // 카테고리 선택 옵션 로드
+    const { data: categories } = await supabase.from('categories').select('*').order('display_order');
+    const select = document.getElementById('postCategory');
+    const listContainer = document.getElementById('categoryList');
+
+    if (select && categories) {
+        select.innerHTML = '<option value="">카테고리 선택</option>';
+        categories.forEach(cat => {
+            select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
         });
+    }
 
-        // Restore draft on load
-        window.addEventListener('load', () => {
-            const savedContent = localStorage.getItem('draft_content');
-            const savedTitle = localStorage.getItem('draft_title');
-            
-            if (savedContent) {
-                if (confirm('저장된 임시 글이 있습니다. 불러오시겠습니까?')) {
-                    editor.value = savedContent;
-                    document.getElementById('postTitle').value = savedTitle || '';
+    if (listContainer && categories) {
+        listContainer.innerHTML = categories.map(cat => `
+            <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(206, 177, 128, 0.1); border: 1px solid var(--glass-border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <div><strong>${cat.name}</strong> <span style="font-size:0.8rem; color: var(--text-secondary); margin-left:10px;">${cat.is_visible ? '공개' : '비공개'}</span></div>
+                <button class="editor-btn" onclick="window.toggleCategoryVisibility('${cat.id}', ${cat.is_visible})">상태 변경</button>
+            </div>
+        `).join('');
+    }
+}
+
+// 7. 메인 초기화
+document.addEventListener('DOMContentLoaded', async () => {
+    await waitForConfig();
+    
+    supabase = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+    isConfigReady = true;
+
+    // 로그인 여부 확인
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user && user.email === window.ADMIN_EMAIL) {
+        showAdminPanel();
+        await loadAdminData();
+    }
+
+    // [이벤트] 로그인
+    document.getElementById('loginBtn')?.addEventListener('click', async () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+
+        if (email !== window.ADMIN_EMAIL) return showError('관리자 권한이 없습니다.');
+
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) showError('로그인 실패: ' + error.message);
+        else location.reload();
+    });
+
+    // [이벤트] 에디터 실시간 입력
+    const editor = document.getElementById('contentEditor');
+    editor?.addEventListener('input', updatePreview);
+    document.getElementById('postTitle')?.addEventListener('input', updatePreview);
+
+    // [이벤트] 드래프트 복원
+    const savedContent = localStorage.getItem('draft_content');
+    if (savedContent && confirm('작성 중이던 임시 글이 있습니다. 불러오시겠습니까?')) {
+        editor.value = savedContent;
+        document.getElementById('postTitle').value = localStorage.getItem('draft_title') || '';
+        updatePreview();
+    }
+
+    // [이벤트] 게시물 저장
+    document.getElementById('savePostBtn')?.addEventListener('click', async () => {
+        const title = document.getElementById('postTitle').value.trim();
+        const content = editor.value.trim();
+        const category_id = document.getElementById('postCategory').value;
+
+        if (!title || !content || !category_id) return alert('모든 필드를 입력해주세요.');
+
+        const { error } = await supabase.from('archive_posts').insert([{
+            title, content, category_id,
+            is_private: document.getElementById('isPrivate').checked,
+            origin_free: document.getElementById('originFree').checked
+        }]);
+
+        if (error) alert('저장 실패: ' + error.message);
+        else {
+            alert('성공적으로 저장되었습니다!');
+            localStorage.removeItem('draft_content');
+            localStorage.removeItem('draft_title');
+            location.reload();
+        }
+    });
+
+    // [이벤트] 이미지 업로드 버튼 동적 추가
+    const toolbar = document.querySelector('.editor-toolbar');
+    if (toolbar) {
+        const imgBtn = document.createElement('button');
+        imgBtn.className = 'editor-btn';
+        imgBtn.textContent = '🖼️ 이미지';
+        imgBtn.onclick = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    imgBtn.textContent = '⌛...';
+                    const url = await uploadImage(file);
+                    editor.value += `\n![이미지](${url})\n`;
                     updatePreview();
-                }
-            }
-        });
-    </script>
-    
-    <!-- Admin Script -->
-    <script src="/api/config"></script>
-    <script src="js/admin-new.js"></script>
-</body>
-</html>
+                } catch (err) { alert('업로드 실패'); }
+                finally { imgBtn.textContent = '🖼️ 이미지'; }
+            };
+            input.click();
+        };
+        toolbar.appendChild(imgBtn);
+    }
+
+    // [이벤트] 로그아웃
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        if (confirm('로그아웃하시겠습니까?')) {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+    });
+});
+
+// 전역 함수 등록
+window.toggleCategoryVisibility = async (id, current) => {
+    await supabase.from('categories').update({ is_visible: !current }).eq('id', id);
+    loadAdminData();
+};
+
+window.formatText = (cmd) => insertFormat(cmd); // HTML 내 onclick과 연결
