@@ -7,15 +7,19 @@
     
     <title>Admin Panel - SMALLSM Archive</title>
     
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <!-- Login Screen -->
     <div id="loginScreen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-deep);">
         <div style="background: var(--bg-panel); padding: 3rem; border-radius: 8px; border: 1px solid var(--glass-border); max-width: 400px; width: 90%;">
             <h2 style="color: var(--primary-brass); margin-bottom: 2rem; text-align: center;">관리자 로그인</h2>
@@ -40,7 +44,9 @@
         </div>
     </div>
 
+    <!-- Admin Container -->
     <div class="admin-container" id="adminPanel" style="display: none;">
+        <!-- Header -->
         <header class="admin-header">
             <div>
                 <h1 class="admin-title">관리자 패널</h1>
@@ -49,9 +55,11 @@
             <button class="logout-btn" id="logoutBtn">로그아웃</button>
         </header>
 
+        <!-- Editor Section -->
         <section class="editor-container">
             <h2 class="form-label">새 게시물 작성</h2>
             
+            <!-- Post Info -->
             <div class="form-group">
                 <label class="form-label" for="postTitle">제목</label>
                 <input type="text" 
@@ -64,9 +72,11 @@
                 <label class="form-label" for="postCategory">카테고리</label>
                 <select id="postCategory" class="form-select">
                     <option value="">카테고리 선택</option>
-                    </select>
+                    <!-- Dynamically loaded -->
+                </select>
             </div>
 
+            <!-- Privacy & Copy Protection -->
             <div class="form-group">
                 <div class="checkbox-group">
                     <input type="checkbox" id="isPrivate" class="form-checkbox">
@@ -81,12 +91,15 @@
                 </div>
             </div>
 
+            <!-- Toolbar -->
             <div class="editor-toolbar">
                 <button class="editor-btn" onclick="formatText('bold')"><strong>B</strong></button>
                 <button class="editor-btn" onclick="formatText('italic')"><em>I</em></button>
                 <button class="editor-btn" onclick="formatText('underline')"><u>U</u></button>
-                </div>
+                <button class="editor-btn" onclick="insertLink()">🔗 링크</button>
+            </div>
 
+            <!-- Split Editor -->
             <div class="split-editor">
                 <div class="editor-pane">
                     <label class="form-label">편집</label>
@@ -102,19 +115,92 @@
                 </div>
             </div>
 
+            <!-- Action Buttons -->
             <div class="action-buttons">
                 <button class="btn-save" id="savePostBtn">게시물 저장</button>
             </div>
         </section>
 
+        <!-- Category Management -->
         <section class="editor-container">
             <h2 class="form-label">카테고리 관리</h2>
             
             <div id="categoryList">
-                </div>
+                <!-- Dynamically loaded -->
+            </div>
         </section>
     </div>
 
+    <!-- Scripts -->
+    <script>
+        // Try to load local config if exists (for local development)
+        try {
+            const script = document.createElement('script');
+            script.src = 'js/config.local.js';
+            script.onerror = () => console.log('No local config found - using environment variables');
+            document.head.appendChild(script);
+        } catch (e) {
+            console.log('Using environment variables');
+        }
+    </script>
+    <script src="js/config.js"></script>
+    <script src="js/admin.js"></script>
+
+    <script>
+        // Toolbar Functions
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            updatePreview();
+        }
+
+        function insertLink() {
+            const url = prompt('링크 URL을 입력하세요:');
+            if (url) {
+                document.execCommand('createLink', false, url);
+                updatePreview();
+            }
+        }
+
+        // Real-time Preview
+        const editor = document.getElementById('contentEditor');
+        const preview = document.getElementById('contentPreview');
+
+        editor.addEventListener('input', updatePreview);
+
+        function updatePreview() {
+            preview.innerHTML = editor.value
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/_(.*?)_/g, '<u>$1</u>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // Auto-save to localStorage
+        let autoSaveTimer;
+        editor.addEventListener('input', () => {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                localStorage.setItem('draft_content', editor.value);
+                localStorage.setItem('draft_title', document.getElementById('postTitle').value);
+            }, 1000);
+        });
+
+        // Restore draft on load
+        window.addEventListener('load', () => {
+            const savedContent = localStorage.getItem('draft_content');
+            const savedTitle = localStorage.getItem('draft_title');
+            
+            if (savedContent) {
+                if (confirm('저장된 임시 글이 있습니다. 불러오시겠습니까?')) {
+                    editor.value = savedContent;
+                    document.getElementById('postTitle').value = savedTitle || '';
+                    updatePreview();
+                }
+            }
+        });
+    </script>
+    
+    <!-- Admin Script -->
     <script src="/api/config"></script>
     <script src="js/admin-new.js"></script>
 </body>
