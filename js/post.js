@@ -2,13 +2,39 @@
 // 🎬 SMALLSM ARCHIVE - POST SCRIPT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+let supabase = null;
+
+// Wait for config to load
+function waitForConfig(callback) {
+    const startTime = Date.now();
+    const maxWait = 5000; // 5 seconds
+    
+    const interval = setInterval(() => {
+        if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
+            clearInterval(interval);
+            callback();
+        } else if (Date.now() - startTime > maxWait) {
+            clearInterval(interval);
+            console.error('⏱️ Config loading timeout');
+        }
+    }, 100);
+}
+
 // ═══════════════════════════════════════════════════
 // 1. SUPABASE INITIALIZATION
 // ═══════════════════════════════════════════════════
-const supabase = window.supabase.createClient(
-    SUPABASE_CONFIG.url,
-    SUPABASE_CONFIG.anonKey
-);
+function initializeSupabase() {
+    if (!window.supabase) {
+        console.error('❌ Supabase library not loaded');
+        return;
+    }
+    
+    supabase = window.supabase.createClient(
+        window.SUPABASE_CONFIG.url,
+        window.SUPABASE_CONFIG.anonKey
+    );
+    console.log('✅ Supabase initialized for post');
+}
 
 // ═══════════════════════════════════════════════════
 // 2. AGE VERIFICATION SYSTEM (Same as main.js)
@@ -25,35 +51,35 @@ function checkAgeVerification() {
         
         if (now - timestamp < VERIFICATION_DURATION) {
             hideDisclaimer();
-            return;
+            return true;
         }
     }
     
     showDisclaimer();
+    return false;
 }
 
 function showDisclaimer() {
     const overlay = document.getElementById('disclaimerOverlay');
     const container = document.getElementById('appContainer');
     
-    overlay.style.display = 'flex';
-    container.classList.add('content-blur');
+    if (overlay) overlay.style.display = 'flex';
+    if (container) container.classList.add('content-blur');
 }
 
 function hideDisclaimer() {
     const overlay = document.getElementById('disclaimerOverlay');
     const container = document.getElementById('appContainer');
     
-    overlay.style.display = 'none';
-    container.classList.remove('content-blur');
+    if (overlay) overlay.style.display = 'none';
+    if (container) container.classList.remove('content-blur');
 }
-
-// Button Handlers - Will be attached in DOMContentLoaded
 
 // ═══════════════════════════════════════════════════
 // 3. LOAD CATEGORIES (Same as main.js)
 // ═══════════════════════════════════════════════════
 async function loadCategories() {
+    if (!supabase) return;
     try {
         const { data: categories, error } = await supabase
             .from('categories')
@@ -64,6 +90,7 @@ async function loadCategories() {
         if (error) throw error;
         
         const nav = document.getElementById('categoryNav');
+        if (!nav) return;
         nav.innerHTML = '';
         
         categories.forEach(category => {
@@ -88,6 +115,7 @@ async function loadCategories() {
 // 4. LOAD POST CONTENT
 // ═══════════════════════════════════════════════════
 async function loadPost() {
+    if (!supabase) return;
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
     
@@ -99,7 +127,7 @@ async function loadPost() {
     try {
         // Check if user is admin
         const { data: { user } } = await supabase.auth.getUser();
-        const isAdmin = user && user.email === ADMIN_EMAIL;
+        const isAdmin = user && user.email === window.ADMIN_EMAIL;
         
         // Fetch post
         const { data: post, error } = await supabase
@@ -122,7 +150,7 @@ async function loadPost() {
         // Display post
         document.getElementById('pageTitle').textContent = `${post.title} - SMALLSM Archive`;
         document.getElementById('postTitle').textContent = post.title;
-        document.getElementById('postCategory').textContent = post.categories.name;
+        document.getElementById('postCategory').textContent = post.categories ? post.categories.name : '미분류';
         document.getElementById('postDate').textContent = new Date(post.created_at).toLocaleDateString('ko-KR', {
             year: 'numeric',
             month: 'long',
@@ -156,33 +184,36 @@ async function loadPost() {
 // ═══════════════════════════════════════════════════
 // 5. NIGHT MODE (Same as main.js)
 // ═══════════════════════════════════════════════════
-const modeToggle = document.getElementById('modeToggle');
 const NIGHT_MODE_KEY = 'night_mode';
 
-function loadNightMode() {
+function initNightMode() {
+    const modeToggle = document.getElementById('modeToggle');
+    if (!modeToggle) return;
+
     const isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === 'true';
     
     if (isNightMode) {
         document.body.classList.add('night-mode');
         modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
     }
-}
 
-modeToggle.addEventListener('click', () => {
-    const isNightMode = document.body.classList.toggle('night-mode');
-    localStorage.setItem(NIGHT_MODE_KEY, isNightMode);
-    
-    if (isNightMode) {
-        modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
-    } else {
-        modeToggle.innerHTML = '<span>🌙</span><span>Night Library</span>';
-    }
-});
+    modeToggle.addEventListener('click', () => {
+        const isNightMode = document.body.classList.toggle('night-mode');
+        localStorage.setItem(NIGHT_MODE_KEY, isNightMode);
+        
+        if (isNightMode) {
+            modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
+        } else {
+            modeToggle.innerHTML = '<span>🌙</span><span>Night Library</span>';
+        }
+    });
+}
 
 // ═══════════════════════════════════════════════════
 // 6. COPY PROTECTION (Same as main.js)
 // ═══════════════════════════════════════════════════
 document.addEventListener('copy', async (e) => {
+    if (!supabase) return;
     const selection = window.getSelection().toString();
     
     if (!selection) return;
@@ -217,17 +248,34 @@ document.addEventListener('copy', async (e) => {
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
     // Age verification button handlers
-    document.getElementById('btnYes').addEventListener('click', () => {
-        localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
-        hideDisclaimer();
-    });
+    const btnYes = document.getElementById('btnYes');
+    const btnNo = document.getElementById('btnNo');
 
-    document.getElementById('btnNo').addEventListener('click', () => {
-        window.location.href = 'https://www.google.com';
-    });
+    if (btnYes) {
+        btnYes.addEventListener('click', () => {
+            localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
+            hideDisclaimer();
+            waitForConfig(() => {
+                initializeSupabase();
+                loadCategories();
+                loadPost();
+            });
+        });
+    }
+
+    if (btnNo) {
+        btnNo.addEventListener('click', () => {
+            window.location.href = 'https://www.google.com';
+        });
+    }
     
-    checkAgeVerification();
-    loadCategories();
-    loadPost();
-    loadNightMode();
+    if (checkAgeVerification()) {
+        waitForConfig(() => {
+            initializeSupabase();
+            loadCategories();
+            loadPost();
+        });
+    }
+    
+    initNightMode();
 });
