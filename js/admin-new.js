@@ -4,7 +4,7 @@
 
 console.log('📱 Admin script loading...');
 
-let supabase = null;
+var supabaseAdmin = null;
 let isConfigReady = false;
 
 // Wait for config to load
@@ -42,13 +42,13 @@ function showAdminPanel() {
 
 // Check authentication
 async function checkAuth() {
-    if (!supabase) {
+    if (!supabaseAdmin) {
         console.log('⚠️ Supabase not ready for auth check');
         return;
     }
     
     try {
-        const { data: { user }, error } = await supabase.auth.getUser();
+        const { data: { user }, error } = await supabaseAdmin.auth.getUser();
         
         if (error || !user) {
             console.log('❌ Not authenticated');
@@ -58,7 +58,7 @@ async function checkAuth() {
         // Whitelist verification
         if (user.email !== window.ADMIN_EMAIL) {
             alert('관리자 권한이 없습니다.');
-            await supabase.auth.signOut();
+            await supabaseAdmin.auth.signOut();
             window.location.href = 'index.html';
             return;
         }
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await waitForConfig();
     
     // Initialize Supabase
-    supabase = window.supabase.createClient(
+    supabaseAdmin = window.supabase.createClient(
         window.SUPABASE_CONFIG.url,
         window.SUPABASE_CONFIG.anonKey
     );
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        if (!isConfigReady || !supabase) {
+        if (!isConfigReady || !supabaseAdmin) {
             showError('시스템 초기화 중입니다. 잠시 후 다시 시도하세요.');
             return;
         }
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             console.log('🔐 Attempting login...');
             
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await supabaseAdmin.auth.signInWithPassword({
                 email: email,
                 password: password
             });
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!confirm('로그아웃하시겠습니까?')) return;
             
             try {
-                await supabase.auth.signOut();
+                await supabaseAdmin.auth.signOut();
                 window.location.href = 'index.html';
             } catch (error) {
                 console.error('❌ Logout failed:', error);
