@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SML 관리자 모드</title>
+    <title>SML 관리자 모드 - 통합본</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -22,21 +22,18 @@
             </h1>
         </div>
         <nav class="flex-1 px-4 space-y-2">
-            <a href="#" class="sidebar-item active-menu flex items-center gap-3 p-3 rounded-lg transition-all">
+            <a href="admin.html" class="sidebar-item active-menu flex items-center gap-3 p-3 rounded-lg transition-all">
                 <i data-lucide="home"></i> <span>대시보드</span>
             </a>
             <a href="#" class="sidebar-item flex items-center gap-3 p-3 rounded-lg text-slate-600 transition-all">
                 <i data-lucide="file-text"></i> <span>게시글 관리</span>
             </a>
-            <a href="#" class="sidebar-item flex items-center gap-3 p-3 rounded-lg text-slate-600 transition-all">
-                <i data-lucide="users"></i> <span>사용자 관리</span>
-            </a>
-            <a href="#" class="sidebar-item flex items-center gap-3 p-3 rounded-lg text-slate-600 transition-all">
-                <i data-lucide="settings"></i> <span>설정</span>
+            <a href="/" class="sidebar-item flex items-center gap-3 p-3 rounded-lg text-slate-600 transition-all">
+                <i data-lucide="external-link"></i> <span>사이트 바로가기</span>
             </a>
         </nav>
         <div class="p-4 border-t border-slate-200">
-            <button class="flex items-center gap-3 w-full p-3 text-red-500 hover:bg-red-50 rounded-lg transition-all">
+            <button onclick="logout()" class="flex items-center gap-3 w-full p-3 text-red-500 hover:bg-red-50 rounded-lg transition-all">
                 <i data-lucide="log-out"></i> <span>로그아웃</span>
             </button>
         </div>
@@ -44,12 +41,9 @@
 
     <main class="flex-1 flex flex-col">
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
-            <h2 class="text-lg font-semibold text-slate-800">관리자 대시보드</h2>
+            <h2 class="text-lg font-semibold text-slate-800">관리 시스템</h2>
             <div class="flex items-center gap-4">
-                <span class="text-sm text-slate-500">환영합니다, 관리자님</span>
-                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
-                    AD
-                </div>
+                <span id="admin-name" class="text-sm text-slate-500">관리자님 환영합니다</span>
             </div>
         </header>
 
@@ -57,38 +51,18 @@
             <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-slate-500 mb-1">전체 게시글</p>
-                        <h3 class="text-3xl font-bold" id="total-posts">0</h3>
+                        <p class="text-sm text-slate-500 mb-1">총 게시글</p>
+                        <h3 class="text-3xl font-bold" id="total-count">0</h3>
                     </div>
-                    <div class="p-4 bg-blue-50 text-blue-600 rounded-lg">
-                        <i data-lucide="files"></i>
-                    </div>
+                    <div class="p-4 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="files"></i></div>
                 </div>
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-slate-500 mb-1">오늘 방문자</p>
-                        <h3 class="text-3xl font-bold" id="today-visitors">124</h3>
-                    </div>
-                    <div class="p-4 bg-green-50 text-green-600 rounded-lg">
-                        <i data-lucide="trending-up"></i>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-slate-500 mb-1">미답변 문의</p>
-                        <h3 class="text-3xl font-bold" id="pending-tasks">3</h3>
-                    </div>
-                    <div class="p-4 bg-orange-50 text-orange-600 rounded-lg">
-                        <i data-lucide="message-square"></i>
-                    </div>
-                </div>
-            </section>
+                </section>
 
             <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-6 border-b border-slate-200 flex justify-between items-center">
-                    <h3 class="font-bold text-lg text-slate-800">최근 게시글 목록</h3>
+                    <h3 class="font-bold text-lg text-slate-800">게시글 목록</h3>
                     <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2" onclick="location.href='post.html'">
-                        <i data-lucide="plus-circle" class="w-4 h-4"></i> 새 글 쓰기
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> 새 글 작성
                     </button>
                 </div>
                 
@@ -98,21 +72,12 @@
                             <tr>
                                 <th class="p-4 text-sm font-semibold text-slate-600 border-b">ID</th>
                                 <th class="p-4 text-sm font-semibold text-slate-600 border-b">제목</th>
-                                <th class="p-4 text-sm font-semibold text-slate-600 border-b">날짜</th>
-                                <th class="p-4 text-sm font-semibold text-slate-600 border-b text-center">작업</th>
+                                <th class="p-4 text-sm font-semibold text-slate-600 border-b">작성일</th>
+                                <th class="p-4 text-sm font-semibold text-slate-600 border-b text-center">관리</th>
                             </tr>
                         </thead>
-                        <tbody id="post-list-body">
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 text-sm text-slate-600 border-b">1</td>
-                                <td class="p-4 text-sm font-medium text-slate-800 border-b">첫 번째 공지사항입니다.</td>
-                                <td class="p-4 text-sm text-slate-500 border-b">2026-02-07</td>
-                                <td class="p-4 border-b text-center">
-                                    <button class="text-blue-600 hover:underline mr-3 text-sm">수정</button>
-                                    <button class="text-red-500 hover:underline text-sm">삭제</button>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <tbody id="posts-list">
+                            </tbody>
                     </table>
                 </div>
             </section>
@@ -120,22 +85,67 @@
     </main>
 
     <script>
-        // 아이콘 초기화
         lucide.createIcons();
 
-        // [데이터 렌더링 예시 로직]
-        // 나중에 API 연결 시 이 부분을 수정하여 실제 데이터를 불러오게 하면 됩니다.
-        async function fetchPosts() {
+        // 기존에 사용하시던 API 호출 및 렌더링 로직 통합
+        async function loadAdminData() {
             try {
-                // 예: const response = await fetch('/api/posts');
-                // const posts = await response.json();
-                console.log("데이터를 불러오는 로직을 여기에 작성하세요.");
+                const response = await fetch('/api/posts'); // 기존 API 경로
+                const posts = await response.json();
+                
+                const listBody = document.getElementById('posts-list');
+                const totalCountEl = document.getElementById('total-count');
+                
+                listBody.innerHTML = '';
+                totalCountEl.innerText = posts.length;
+
+                posts.forEach(post => {
+                    const row = `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 text-sm text-slate-500 border-b">${post.id || post._id}</td>
+                            <td class="p-4 text-sm font-medium text-slate-800 border-b">${post.title}</td>
+                            <td class="p-4 text-sm text-slate-500 border-b">${new Date(post.createdAt).toLocaleDateString()}</td>
+                            <td class="p-4 border-b text-center">
+                                <button onclick="editPost('${post.id || post._id}')" class="text-blue-600 hover:text-blue-800 font-medium mr-3 text-sm">수정</button>
+                                <button onclick="deletePost('${post.id || post._id}')" class="text-red-500 hover:text-red-700 font-medium text-sm">삭제</button>
+                            </td>
+                        </tr>
+                    `;
+                    listBody.insertAdjacentHTML('beforeend', row);
+                });
             } catch (error) {
-                console.error("데이터 로딩 실패:", error);
+                console.error("데이터 로드 실패:", error);
+                alert("게시글을 불러오는 중 오류가 발생했습니다.");
             }
         }
 
-        window.onload = fetchPosts;
+        // 기존 삭제 기능 유지
+        async function deletePost(id) {
+            if (!confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+            
+            try {
+                const response = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert("삭제되었습니다.");
+                    loadAdminData(); // 목록 새로고침
+                }
+            } catch (error) {
+                alert("삭제 실패");
+            }
+        }
+
+        // 수정 페이지 이동
+        function editPost(id) {
+            location.href = `post.html?id=${id}`;
+        }
+
+        function logout() {
+            // 기존 로그아웃 로직 (예: 세션 삭제 등)
+            location.href = '/';
+        }
+
+        // 초기 실행
+        window.onload = loadAdminData;
     </script>
 </body>
 </html>
