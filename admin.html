@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     
-    <title>Admin Panel - SMALLSM Archive</title>
+    <title>Admin Dashboard - SMALLSM Archive</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,266 +14,284 @@
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
     
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body class="admin-body">
     <!-- Login Screen -->
-    <div id="loginScreen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-deep);">
-        <div style="background: var(--bg-panel); padding: 3rem; border-radius: 8px; border: 1px solid var(--glass-border); max-width: 400px; width: 90%;">
-            <h2 style="color: var(--primary-brass); margin-bottom: 2rem; text-align: center;">관리자 로그인</h2>
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">이메일</label>
-                <input type="email" id="loginEmail" placeholder="이메일" 
-                       style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 4px; color: var(--text-primary); font-size: 1rem;">
+    <div id="loginScreen" class="login-screen">
+        <div class="login-panel">
+            <h2 class="login-title">🎬 관리자 로그인</h2>
+            <div class="form-group">
+                <label>이메일</label>
+                <input type="email" id="loginEmail" placeholder="admin@example.com" autocomplete="email">
             </div>
-            <div style="margin-bottom: 2rem;">
-                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">비밀번호</label>
-                <input type="password" id="loginPassword" placeholder="비밀번호" 
-                       style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 4px; color: var(--text-primary); font-size: 1rem;">
+            <div class="form-group">
+                <label>비밀번호</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
             </div>
-            <button id="loginBtn" 
-                    style="width: 100%; padding: 1rem; background: var(--primary-brass); color: var(--bg-deep); border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                로그인
-            </button>
-            <p id="loginError" style="color: #ff6b6b; margin-top: 1rem; text-align: center; display: none;"></p>
-            <p style="color: var(--text-secondary); margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
-                <a href="index.html" style="color: var(--primary-brass); text-decoration: none;">← 메인으로 돌아가기</a>
-            </p>
+            <button id="loginBtn" class="btn-primary">로그인</button>
+            <p id="loginError" class="error-message"></p>
+            <p class="back-link"><a href="index.html">← 메인으로 돌아가기</a></p>
         </div>
     </div>
 
-    <!-- Admin Container -->
-    <div class="admin-container" id="adminPanel" style="display: none;">
-        <!-- Header -->
-        <header class="admin-header">
-            <div>
-                <h1 class="admin-title">관리자 패널</h1>
-                <p class="site-subtitle">SMALLSM Archive Administration</p>
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="admin-dashboard" style="display: none;">
+        <!-- Top Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 class="dashboard-title">📚 SMALLSM Archive</h1>
+                <span class="admin-badge">관리자 모드</span>
             </div>
-            <button class="logout-btn" id="logoutBtn">로그아웃</button>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" title="다크모드 전환">
+                    <span class="icon">🌙</span>
+                </button>
+                <button class="btn-secondary" id="logoutBtn">로그아웃</button>
+            </div>
         </header>
 
-        <!-- Editor Section -->
-        <section class="editor-container">
-            <h2 class="form-label">새 게시물 작성</h2>
-            
-            <!-- Post Info -->
-            <div class="form-group">
-                <label class="form-label" for="postTitle">제목</label>
-                <input type="text" 
-                       id="postTitle" 
-                       class="form-input" 
-                       placeholder="게시물 제목을 입력하세요">
-            </div>
+        <div class="dashboard-container">
+            <!-- Left Sidebar Menu -->
+            <aside class="dashboard-sidebar">
+                <nav class="sidebar-nav">
+                    <button class="nav-item active" data-section="overview">
+                        <span class="icon">📊</span>
+                        <span class="text">대시보드</span>
+                    </button>
+                    <button class="nav-item" data-section="home">
+                        <span class="icon">🏠</span>
+                        <span class="text">홈 화면 관리</span>
+                    </button>
+                    <button class="nav-item" data-section="posts">
+                        <span class="icon">📝</span>
+                        <span class="text">게시글 관리</span>
+                        <span class="badge" id="postCount">0</span>
+                    </button>
+                    <button class="nav-item" data-section="categories">
+                        <span class="icon">📂</span>
+                        <span class="text">카테고리</span>
+                    </button>
+                    <button class="nav-item" data-section="trash">
+                        <span class="icon">🗑️</span>
+                        <span class="text">휴지통</span>
+                        <span class="badge warning" id="trashCount">0</span>
+                    </button>
+                    <button class="nav-item" data-section="settings">
+                        <span class="icon">⚙️</span>
+                        <span class="text">설정</span>
+                    </button>
+                </nav>
+            </aside>
 
-            <div class="form-group">
-                <label class="form-label" for="postCategory">카테고리</label>
-                <select id="postCategory" class="form-select">
-                    <option value="">카테고리 선택</option>
-                    <!-- Dynamically loaded -->
-                </select>
-            </div>
-
-            <!-- Privacy & Copy Protection -->
-            <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="isPrivate" class="form-checkbox">
-                    <label for="isPrivate">비밀글로 설정</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="originFree" class="form-checkbox">
-                    <label for="originFree">복사 시 출처 표기 비활성화</label>
-                </div>
-            </div>
-
-            <!-- Toolbar -->
-            <div class="editor-toolbar">
-                <button class="editor-btn" onclick="formatText('bold')"><strong>B</strong></button>
-                <button class="editor-btn" onclick="formatText('italic')"><em>I</em></button>
-                <button class="editor-btn" onclick="formatText('underline')"><u>U</u></button>
-                <button class="editor-btn" onclick="insertLink()">🔗 링크</button>
-            </div>
-
-            <!-- Split Editor -->
-            <div class="split-editor">
-                <div class="editor-pane">
-                    <label class="form-label">편집</label>
-                    <textarea id="contentEditor" 
-                              class="editor-input" 
-                              placeholder="내용을 입력하세요..."></textarea>
-                </div>
-                <div class="editor-pane">
-                    <label class="form-label">미리보기</label>
-                    <div id="contentPreview" class="preview-pane post-content">
-                        <p style="color: var(--text-secondary);">미리보기 영역</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button class="btn-save" id="savePostBtn">게시물 저장</button>
-            </div>
-        </section>
-        </section>
-
-        <!-- Home Screen Editor -->
-        <section class="editor-container">
-            <h2 class="form-label" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleSection('homeEditor')">
-                🏠 홈화면 편집
-                <span id="homeEditorToggle">▼</span>
-            </h2>
-            
-            <div id="homeEditorContent" style="display: none; margin-top: 1.5rem;">
-                <div class="form-group">
-                    <label class="form-label" for="homeTitle">메인 제목</label>
-                    <input type="text" 
-                           id="homeTitle" 
-                           class="form-input" 
-                           placeholder="환영합니다">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="homeSubtitle">부제목</label>
-                    <input type="text" 
-                           id="homeSubtitle" 
-                           class="form-input" 
-                           placeholder="SMALLSM Archive에 오신 것을 환영합니다">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="homeContent">본문</label>
-                    <textarea id="homeContent" 
-                              class="editor-input" 
-                              rows="6"
-                              placeholder="좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="showRecentPosts" class="form-checkbox">
-                        <label for="showRecentPosts">최신 게시물 표시</label>
-                    </div>
-                </div>
-
-                <div class="form-group" id="recentPostsCountGroup" style="display: none;">
-                    <label class="form-label" for="recentPostsCount">표시할 게시물 개수</label>
-                    <input type="number" 
-                           id="recentPostsCount" 
-                           class="form-input" 
-                           value="3" 
-                           min="1" 
-                           max="10">
-                </div>
-
-                <div class="action-buttons">
-                    <button class="btn-save" id="saveHomeBtn">홈화면 저장</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Category Management -->
-        <section class="editor-container">
-            <h2 class="form-label" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleSection('categoryManagement')">
-                📂 카테고리 관리
-                <span id="categoryManagementToggle">▼</span>
-            </h2>
-            
-            <div id="categoryManagementContent" style="display: none; margin-top: 1.5rem;">
-                <!-- Add New Category -->
-                <div style="background: rgba(206, 177, 128, 0.05); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid var(--glass-border);">
-                    <h3 style="color: var(--primary-brass); margin-bottom: 1rem; font-size: 1rem;">➕ 새 카테고리 추가</h3>
-                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
-                        <div style="flex: 1;">
-                            <input type="text" 
-                                   id="newCategoryName" 
-                                   class="form-input" 
-                                   placeholder="카테고리 이름 (예: REVIEW)">
+            <!-- Main Content Area -->
+            <main class="dashboard-main">
+                <!-- Overview Section -->
+                <section id="section-overview" class="content-section active">
+                    <h2 class="section-title">📊 대시보드</h2>
+                    
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📝</div>
+                            <div class="stat-info">
+                                <p class="stat-label">총 게시물</p>
+                                <p class="stat-value" id="statTotalPosts">0</p>
+                            </div>
                         </div>
-                        <button class="editor-btn" id="addCategoryBtn" style="padding: 0.8rem 1.5rem; white-space: nowrap;">
-                            추가하기
-                        </button>
+                        <div class="stat-card">
+                            <div class="stat-icon">🟢</div>
+                            <div class="stat-info">
+                                <p class="stat-label">공개 중</p>
+                                <p class="stat-value" id="statPublicPosts">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔴</div>
+                            <div class="stat-info">
+                                <p class="stat-label">비공개</p>
+                                <p class="stat-value" id="statPrivatePosts">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📂</div>
+                            <div class="stat-info">
+                                <p class="stat-label">카테고리</p>
+                                <p class="stat-value" id="statCategories">0</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Category List -->
-                <div id="categoryList">
-                    <!-- Dynamically loaded -->
-                </div>
-            </div>
-        <!-- Category Management -->
-        <section class="editor-container">
-            <h2 class="form-label">카테고리 관리</h2>
-            
-            <div id="categoryList">
-                <!-- Dynamically loaded -->
-            </div>
-        </section>
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <h3 class="card-title">🕐 최근 활동</h3>
+                        <div id="recentActivity" class="activity-list">
+                            <!-- Dynamically loaded -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <h3 class="card-title">⚡ 빠른 작업</h3>
+                        <div class="quick-actions">
+                            <button class="quick-btn" onclick="switchSection('posts')">
+                                <span class="icon">✍️</span>
+                                <span class="text">새 글 작성</span>
+                            </button>
+                            <button class="quick-btn" onclick="switchSection('home')">
+                                <span class="icon">🏠</span>
+                                <span class="text">홈 수정</span>
+                            </button>
+                            <button class="quick-btn" onclick="switchSection('categories')">
+                                <span class="icon">📂</span>
+                                <span class="text">카테고리 추가</span>
+                            </button>
+                            <button class="quick-btn" onclick="window.open('index.html', '_blank')">
+                                <span class="icon">🔗</span>
+                                <span class="text">사이트 보기</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Home Screen Management Section -->
+                <section id="section-home" class="content-section">
+                    <h2 class="section-title">🏠 홈 화면 관리</h2>
+                    
+                    <div class="split-layout">
+                        <!-- Editor -->
+                        <div class="editor-panel">
+                            <div class="card">
+                                <div class="form-group">
+                                    <label>메인 제목</label>
+                                    <input type="text" id="homeTitle" class="form-input" placeholder="환영합니다">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>부제목</label>
+                                    <input type="text" id="homeSubtitle" class="form-input" placeholder="SMALLSM Archive에 오신 것을 환영합니다">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>본문</label>
+                                    <textarea id="homeContent" class="form-textarea" rows="10" placeholder="좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요..."></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="showRecentPosts">
+                                        <span>최신 게시물 표시</span>
+                                    </label>
+                                </div>
+
+                                <div class="form-group" id="recentPostsCountGroup" style="display: none;">
+                                    <label>표시할 게시물 개수</label>
+                                    <input type="number" id="recentPostsCount" class="form-input" value="3" min="1" max="10">
+                                </div>
+
+                                <button class="btn-primary" id="saveHomeBtn">💾 저장하기</button>
+                            </div>
+                        </div>
+
+                        <!-- Live Preview -->
+                        <div class="preview-panel">
+                            <div class="preview-header">
+                                <span class="preview-title">실시간 미리보기</span>
+                                <button class="preview-theme-toggle" id="previewThemeToggle" title="다크모드로 보기">
+                                    🌙 다크
+                                </button>
+                            </div>
+                            <div class="preview-content" id="homePreview">
+                                <h1 id="previewTitle">환영합니다</h1>
+                                <p class="preview-subtitle" id="previewSubtitle">SMALLSM Archive에 오신 것을 환영합니다</p>
+                                <div class="preview-body" id="previewContent">
+                                    <p>좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Posts Management Section -->
+                <section id="section-posts" class="content-section">
+                    <h2 class="section-title">📝 게시글 관리</h2>
+                    
+                    <!-- Search and Filter -->
+                    <div class="card">
+                        <div class="toolbar">
+                            <input type="text" id="postSearch" class="search-input" placeholder="🔍 제목으로 검색...">
+                            <select id="postFilterCategory" class="filter-select">
+                                <option value="">모든 카테고리</option>
+                            </select>
+                            <select id="postFilterStatus" class="filter-select">
+                                <option value="">모든 상태</option>
+                                <option value="public">공개</option>
+                                <option value="private">비공개</option>
+                            </select>
+                            <button class="btn-primary" onclick="showNewPostEditor()">✍️ 새 글 작성</button>
+                        </div>
+                    </div>
+
+                    <!-- Posts List -->
+                    <div id="postsList" class="posts-list">
+                        <!-- Dynamically loaded -->
+                    </div>
+                </section>
+
+                <!-- Categories Management Section -->
+                <section id="section-categories" class="content-section">
+                    <h2 class="section-title">📂 카테고리 관리</h2>
+                    
+                    <!-- Add Category -->
+                    <div class="card">
+                        <h3 class="card-title">➕ 새 카테고리 추가</h3>
+                        <div class="add-category-form">
+                            <input type="text" id="newCategoryName" class="form-input" placeholder="카테고리 이름 (예: REVIEW)">
+                            <button class="btn-primary" id="addCategoryBtn">추가하기</button>
+                        </div>
+                    </div>
+
+                    <!-- Categories List -->
+                    <div id="categoriesList" class="categories-list">
+                        <!-- Dynamically loaded -->
+                    </div>
+                </section>
+
+                <!-- Trash Section -->
+                <section id="section-trash" class="content-section">
+                    <h2 class="section-title">🗑️휴지통</h2>
+                    <p class="section-desc">삭제된 항목은 30일간 보관됩니다.</p>
+                    
+                    <div id="trashList" class="trash-list">
+                        <!-- Dynamically loaded -->
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="section-settings" class="content-section">
+                    <h2 class="section-title">⚙️ 설정</h2>
+                    
+                    <div class="card">
+                        <h3 class="card-title">사이트 정보</h3>
+                        <div class="form-group">
+                            <label>사이트 이름</label>
+                            <input type="text" class="form-input" value="SMALLSM Archive" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>관리자 이메일</label>
+                            <input type="email" class="form-input" id="adminEmail" disabled>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
     </div>
 
     <!-- Scripts -->
-
-    <script>
-        // Toolbar Functions
-        function formatText(command) {
-            document.execCommand(command, false, null);
-            updatePreview();
-        }
-
-        function insertLink() {
-            const url = prompt('링크 URL을 입력하세요:');
-            if (url) {
-                document.execCommand('createLink', false, url);
-                updatePreview();
-            }
-        }
-
-        // Real-time Preview
-        const editor = document.getElementById('contentEditor');
-        const preview = document.getElementById('contentPreview');
-
-        editor.addEventListener('input', updatePreview);
-
-        function updatePreview() {
-            preview.innerHTML = editor.value
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/_(.*?)_/g, '<u>$1</u>')
-                .replace(/\n/g, '<br>');
-        }
-
-        // Auto-save to localStorage
-        let autoSaveTimer;
-        editor.addEventListener('input', () => {
-            clearTimeout(autoSaveTimer);
-            autoSaveTimer = setTimeout(() => {
-                localStorage.setItem('draft_content', editor.value);
-                localStorage.setItem('draft_title', document.getElementById('postTitle').value);
-            }, 1000);
-        });
-
-        // Restore draft on load
-        window.addEventListener('load', () => {
-            const savedContent = localStorage.getItem('draft_content');
-            const savedTitle = localStorage.getItem('draft_title');
-            
-            if (savedContent) {
-                if (confirm('저장된 임시 글이 있습니다. 불러오시겠습니까?')) {
-                    editor.value = savedContent;
-                    document.getElementById('postTitle').value = savedTitle || '';
-                    updatePreview();
-                }
-            }
-        });
-    </script>
-    
-    <!-- Admin Script -->
     <script src="/api/config"></script>
-    <script src="js/admin-new.js"></script>
+    <script src="js/admin-dashboard.js"></script>
 </body>
 </html>
