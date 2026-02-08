@@ -82,6 +82,88 @@
     // ═══════════════════════════════════════════════════
     // 4. CATEGORY LOADING
     // ═══════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════
+    // 4. HOME SETTINGS LOADING
+    // ═══════════════════════════════════════════════════
+    async function loadHomeSettings() {
+        if (!supabaseClient) return;
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('settings')
+                .select('*')
+                .in('key', ['home_title', 'home_subtitle', 'home_content', 'show_recent_posts', 'recent_posts_count']);
+            
+            if (error) throw error;
+            
+            const settings = {};
+            data.forEach(item => settings[item.key] = item.value);
+            
+            const title = document.getElementById('welcomeTitle');
+            const subtitle = document.querySelector('.post-meta span');
+            const content = document.getElementById('mainContent');
+            
+            if (title && settings.home_title) title.textContent = settings.home_title;
+            if (subtitle && settings.home_subtitle) subtitle.textContent = settings.home_subtitle;
+            if (content && settings.home_content) {
+                content.innerHTML = settings.home_content
+                    .split('\n')
+                    .map(line => `<p>${line}</p>`)
+                    .join('');
+            }
+            
+            // Handle recent posts if enabled
+            if (settings.show_recent_posts === 'true') {
+                const count = parseInt(settings.recent_posts_count) || 3;
+                await loadRecentPosts(count);
+            }
+            
+            console.log('✅ Home settings loaded');
+            
+        } catch (error) {
+            console.error('❌ Home settings loading failed:', error);
+        }
+    }
+
+    async function loadRecentPosts(count) {
+        try {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const isAdmin = user && user.email === window.ADMIN_EMAIL;
+            
+            let query = supabaseClient
+                .from('archive_posts')
+                .select('id, title, created_at')
+                .order('created_at', { ascending: false })
+                .limit(count);
+            
+            if (!isAdmin) {
+                query = query.eq('is_private', false);
+            }
+            
+            const { data: posts, error } = await query;
+            if (error) throw error;
+            
+            if (posts && posts.length > 0) {
+                const content = document.getElementById('mainContent');
+                const recentSection = document.createElement('div');
+                recentSection.style.marginTop = '3rem';
+                recentSection.innerHTML = `
+                    <h2 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--primary-brass); border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">최근 기록</h2>
+                    ${posts.map(post => `
+                        <div style="margin-bottom: 1rem;">
+                            <a href="post.html?id=${post.id}" style="color: var(--text-primary); text-decoration: none; font-size: 0.95rem;">
+                                • ${post.title} <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 0.5rem;">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
+                            </a>
+                        </div>
+                    `).join('')}
+                `;
+                content.appendChild(recentSection);
+            }
+        } catch (error) {
+            console.error('❌ Recent posts loading failed:', error);
+        }
+    }
+
     async function loadCategories() {
         if (!supabaseClient) {
             console.warn('⚠️ Supabase not initialized');
@@ -270,6 +352,44 @@
     // ═══════════════════════════════════════════════════
     // 7. NIGHT MODE
     // ═══════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════
+    // 7. LONG PRESS FOR ADMIN
+    // ═══════════════════════════════════════════════════
+    function initAdminLongPress() {
+        const copyright = document.getElementById('copyrightText');
+        if (!copyright) return;
+        
+        let pressTimer;
+        const PRESS_DURATION = 3000; // 3 seconds
+        
+        const startPress = (e) => {
+            // Prevent default only for touch to avoid scrolling issues
+            // but we want to allow normal interaction if it's not a long press
+            pressTimer = setTimeout(() => {
+                window.location.href = 'admin.html';
+            }, PRESS_DURATION);
+        };
+        
+        const cancelPress = () => {
+            clearTimeout(pressTimer);
+        };
+        
+        // Mouse events
+        copyright.addEventListener('mousedown', startPress);
+        copyright.addEventListener('mouseup', cancelPress);
+        copyright.addEventListener('mouseleave', cancelPress);
+        
+        // Touch events
+        copyright.addEventListener('touchstart', startPress);
+        copyright.addEventListener('touchend', cancelPress);
+        copyright.addEventListener('touchcancel', cancelPress);
+        
+        // Visual feedback (optional but helpful)
+        copyright.style.cursor = 'default';
+        copyright.style.userSelect = 'none';
+        copyright.style.webkitUserSelect = 'none';
+    }
+
     function initNightMode() {
         const modeToggle = document.getElementById('modeToggle');
         if (!modeToggle) return;
@@ -322,6 +442,7 @@
                 
                 waitForConfig(() => {
                     initializeSupabase();
+                    loadHomeSettings();
                     loadCategories();
                     initSearch();
                 });
@@ -341,12 +462,14 @@
         if (checkAgeVerification()) {
             waitForConfig(() => {
                 initializeSupabase();
+                loadHomeSettings();
                 loadCategories();
                 initSearch();
             });
         }
         
         initNightMode();
+        initAdminLongPress();
         
         console.log('🎉 Initialization complete');
     });
