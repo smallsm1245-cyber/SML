@@ -92,12 +92,36 @@
             const { data, error } = await supabaseClient
                 .from('settings')
                 .select('*')
-                .in('key', ['home_title', 'home_subtitle', 'home_content', 'show_recent_posts', 'recent_posts_count']);
+                .in('key', [
+                    'home_title', 'home_subtitle', 'home_content', 'show_recent_posts', 'recent_posts_count',
+                    'site_title', 'site_description', 'google_verification', 'naver_verification'
+                ]);
             
             if (error) throw error;
             
             const settings = {};
             data.forEach(item => settings[item.key] = item.value);
+
+            // Update Site SEO
+            if (settings.site_title) {
+                document.title = settings.site_title;
+                const titleTag = document.getElementById('siteTitleTag');
+                if (titleTag) titleTag.textContent = settings.site_title;
+                const siteTitleEl = document.querySelector('.site-title');
+                if (siteTitleEl) siteTitleEl.textContent = settings.site_title;
+            }
+            if (settings.site_description) {
+                const descTag = document.getElementById('siteDescTag');
+                if (descTag) descTag.content = settings.site_description;
+            }
+            if (settings.google_verification) {
+                const gTag = document.querySelector('meta[name="google-site-verification"]');
+                if (gTag) gTag.content = settings.google_verification;
+            }
+            if (settings.naver_verification) {
+                const nTag = document.querySelector('meta[name="naver-site-verification"]');
+                if (nTag) nTag.content = settings.naver_verification;
+            }
             
             const title = document.getElementById('welcomeTitle');
             const subtitle = document.querySelector('.post-meta span');

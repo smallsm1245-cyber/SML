@@ -66,8 +66,70 @@ async function showDashboard() {
         loadRecentActivity(),
         loadHomeSettings(),
         loadCategories(),
-        loadPosts()
+        loadPosts(),
+        loadSiteSettings()
     ]);
+}
+
+async function loadSiteSettings() {
+    try {
+        const { data } = await supabaseClient
+            .from('settings')
+            .select('*')
+            .in('key', ['site_title', 'site_description', 'google_verification', 'naver_verification']);
+        
+        const settings = {};
+        if (data) data.forEach(item => settings[item.key] = item.value);
+        
+        document.getElementById('siteTitleInput').value = settings.site_title || 'SMALLSM Archive';
+        document.getElementById('siteDescInput').value = settings.site_description || '';
+        document.getElementById('googleVerification').value = settings.google_verification || '';
+        document.getElementById('naverVerification').value = settings.naver_verification || '';
+        document.getElementById('adminEmailInput').value = window.ADMIN_EMAIL;
+        
+    } catch (error) {
+        console.error('Site settings loading failed:', error);
+    }
+}
+
+async function saveSiteSettings() {
+    const settings = [
+        { key: 'site_title', value: document.getElementById('siteTitleInput').value },
+        { key: 'site_description', value: document.getElementById('siteDescInput').value }
+    ];
+    
+    try {
+        for (const setting of settings) {
+            await supabaseClient.from('settings').upsert({
+                key: setting.key,
+                value: setting.value,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'key' });
+        }
+        alert('✅ 사이트 정보가 저장되었습니다!');
+    } catch (error) {
+        alert('❌ 저장 실패: ' + error.message);
+    }
+}
+
+async function saveSeoSettings() {
+    const settings = [
+        { key: 'google_verification', value: document.getElementById('googleVerification').value },
+        { key: 'naver_verification', value: document.getElementById('naverVerification').value }
+    ];
+    
+    try {
+        for (const setting of settings) {
+            await supabaseClient.from('settings').upsert({
+                key: setting.key,
+                value: setting.value,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'key' });
+        }
+        alert('✅ SEO 설정이 저장되었습니다!');
+    } catch (error) {
+        alert('❌ 저장 실패: ' + error.message);
+    }
 }
 
 // ═══════════════════════════════════════════════════
@@ -244,7 +306,7 @@ async function saveHomeSettings() {
 // ═══════════════════════════════════════════════════
 async function loadPosts() {
     try {
-        const { data: posts } = await supabaseClient
+        const { data: posts, error } = await supabaseClient
             .from('archive_posts')
             .select(`
                 id,
@@ -252,9 +314,15 @@ async function loadPosts() {
                 is_private,
                 created_at,
                 updated_at,
-                categories (name)
+                category_id
             `)
             .order('updated_at', { ascending: false });
+        
+        if (error) throw error;
+
+        const { data: categories } = await supabaseClient.from('categories').select('id, name');
+        const catMap = {};
+        if (categories) categories.forEach(c => catMap[c.id] = c.name);
         
         const container = document.getElementById('postsList');
         
@@ -268,7 +336,7 @@ async function loadPosts() {
                 ? '<span class="status-badge private">🔴 비공개</span>'
                 : '<span class="status-badge public">🟢 공개</span>';
             
-            const categoryName = post.categories?.name || 'Uncategorized';
+            const categoryName = catMap[post.category_id] || 'Uncategorized';
             const updatedTime = getTimeAgo(post.updated_at);
             const postUrl = `${window.location.origin}/post.html?id=${post.id}`;
             
@@ -279,7 +347,7 @@ async function loadPosts() {
                         <div class="post-badges">${statusBadge}</div>
                     </div>
                     <div class="post-meta">
-                        ${categoryName} • ${updatedTime} • 최종 수정일
+                        ${categoryName} • ${updatedTime}
                     </div>
                     <div class="post-actions">
                         <button class="action-btn" onclick="copyPostLink('${postUrl}')">📋 링크 복사</button>
@@ -292,8 +360,20 @@ async function loadPosts() {
         
     } catch (error) {
         console.error('Posts loading failed:', error);
+        document.getElementById('postsList').innerHTML = '<p style="color: var(--admin-danger);">데이터를 불러오지 못했습니다.</p>';
     }
 }
+
+window.showNewPostEditor = function() {
+    // Redirect to a new post page or show a modal
+    // For now, let's assume there's a post-editor.html or similar
+    // If not, we can implement a simple prompt or redirect to admin-new.js logic
+    window.location.href = 'admin.html?action=new'; 
+};
+
+window.editPost = function(id) {
+    window.location.href = `admin.html?action=edit&id=${id}`;
+};
 
 window.copyPostLink = function(url) {
     navigator.clipboard.writeText(url).then(() => {
@@ -344,72 +424,147 @@ window.deletePost = async function(id, title) {
 // ═══════════════════════════════════════════════════
 // CATEGORIES MANAGEMENT
 // ═══════════════════════════════════════════════════
+let currentCategories = [];
+
 async function loadCategories() {
     try {
-        const { data: categories } = await supabaseClient
+        const { data: categories, error } = await supabaseClient
             .from('categories')
             .select('*')
             .order('display_order', { ascending: true });
         
-        const container = document.getElementById('categoriesList');
-        
-        if (!categories || categories.length === 0) {
-            container.innerHTML = '<p style="color: var(--admin-text-dim);">카테고리가 없습니다.</p>';
-            return;
-        }
-        
-        container.innerHTML = categories.map(cat => {
-            const visibilityIcon = cat.is_visible ? '👁️' : '🙈';
-            
-            return `
-                <div class="category-item-card" draggable="true" data-id="${cat.id}" data-order="${cat.display_order}">
-                    <div class="category-header">
-                        <span class="drag-handle">⋮⋮</span>
-                        <input type="text" 
-                               class="category-name-input" 
-                               value="${cat.name}"
-                               onchange="updateCategoryName('${cat.id}', this.value)"
-                               onblur="this.dataset.original = this.value">
-                        <button class="visibility-toggle" onclick="toggleCategoryVisibility('${cat.id}', ${!cat.is_visible})">
-                            ${visibilityIcon}
-                        </button>
-                        <button class="action-btn" onclick="deleteCategory('${cat.id}', '${cat.name}')">🗑️</button>
-                    </div>
-                    <div class="category-controls">
-                        <div>
-                            <label style="color: var(--admin-text-dim); font-size: 0.9rem;">드롭다운</label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" ${cat.has_dropdown ? 'checked' : ''} 
-                                       onchange="updateCategoryDropdown('${cat.id}', this.checked)">
-                                <span>사용</span>
-                            </label>
-                        </div>
-                        <div id="dropdown_opts_${cat.id}" style="${cat.has_dropdown ? '' : 'opacity: 0.3;'}">
-                            <label style="color: var(--admin-text-dim); font-size: 0.9rem;">기본 상태</label>
-                            <label class="checkbox-label">
-                                <input type="radio" name="default_${cat.id}" value="open" ${cat.default_open ? 'checked' : ''}
-                                       onchange="updateCategoryDefaultOpen('${cat.id}', true)"
-                                       ${!cat.has_dropdown ? 'disabled' : ''}>
-                                <span>열림</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="radio" name="default_${cat.id}" value="closed" ${!cat.default_open ? 'checked' : ''}
-                                       onchange="updateCategoryDefaultOpen('${cat.id}', false)"
-                                       ${!cat.has_dropdown ? 'disabled' : ''}>
-                                <span>닫힘</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        
-        initDragAndDrop();
+        if (error) throw error;
+        currentCategories = categories || [];
+        renderCategories();
         
     } catch (error) {
         console.error('Categories loading failed:', error);
     }
 }
+
+function renderCategories() {
+    const container = document.getElementById('categoriesList');
+    if (currentCategories.length === 0) {
+        container.innerHTML = '<p style="color: var(--admin-text-dim);">카테고리가 없습니다.</p>';
+        return;
+    }
+
+    container.innerHTML = currentCategories.map(cat => {
+        const isHidden = !cat.is_visible;
+        const isSub = cat.is_sub || false;
+        
+        return `
+            <div class="category-item-card ${isSub ? 'sub-category' : ''}" data-id="${cat.id}">
+                <div class="drag-handle">≡</div>
+                <div class="category-header">
+                    <input type="text" class="category-name-input" value="${cat.name}" 
+                           oninput="updateLocalCategoryName('${cat.id}', this.value)">
+                </div>
+                <div class="category-actions">
+                    <button class="indent-btn" onclick="toggleLocalIndent('${cat.id}')" title="들여쓰기">
+                        ${isSub ? '⬅️' : '➡️'}
+                    </button>
+                    <button class="visibility-toggle ${isHidden ? 'hidden' : ''}" 
+                            onclick="toggleLocalVisibility('${cat.id}')">
+                        ${isHidden ? '🙈' : '👁️'}
+                    </button>
+                    <button class="action-btn danger" onclick="deleteLocalCategory('${cat.id}')">🗑️</button>
+                </div>
+            </div>
+        `;
+    }).join('') + `
+        <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
+            <button class="btn-primary" onclick="saveAllCategories()">✅ 카테고리 설정 적용하기</button>
+        </div>
+    `;
+
+    initSortable();
+}
+
+function initSortable() {
+    const el = document.getElementById('categoriesList');
+    if (!el || !window.Sortable) return;
+    
+    Sortable.create(el, {
+        handle: '.drag-handle',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function() {
+            const newOrder = [];
+            el.querySelectorAll('.category-item-card').forEach(item => {
+                newOrder.push(item.dataset.id);
+            });
+            
+            // Reorder currentCategories based on DOM
+            const reordered = [];
+            newOrder.forEach(id => {
+                const cat = currentCategories.find(c => c.id == id);
+                if (cat) reordered.push(cat);
+            });
+            currentCategories = reordered;
+            hasUnsavedChanges = true;
+        }
+    });
+}
+
+window.updateLocalCategoryName = function(id, name) {
+    const cat = currentCategories.find(c => c.id == id);
+    if (cat) {
+        cat.name = name;
+        hasUnsavedChanges = true;
+    }
+};
+
+window.toggleLocalIndent = function(id) {
+    const cat = currentCategories.find(c => c.id == id);
+    if (cat) {
+        cat.is_sub = !cat.is_sub;
+        renderCategories();
+        hasUnsavedChanges = true;
+    }
+};
+
+window.toggleLocalVisibility = function(id) {
+    const cat = currentCategories.find(c => c.id == id);
+    if (cat) {
+        cat.is_visible = !cat.is_visible;
+        renderCategories();
+        hasUnsavedChanges = true;
+    }
+};
+
+window.deleteLocalCategory = function(id) {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    currentCategories = currentCategories.filter(c => c.id != id);
+    renderCategories();
+    hasUnsavedChanges = true;
+};
+
+window.saveAllCategories = async function() {
+    try {
+        // Update all categories with their new order and properties
+        for (let i = 0; i < currentCategories.length; i++) {
+            const cat = currentCategories[i];
+            const { error } = await supabaseClient.from('categories').upsert({
+                id: cat.id,
+                name: cat.name,
+                display_order: i + 1,
+                is_visible: cat.is_visible,
+                is_sub: cat.is_sub,
+                updated_at: new Date().toISOString()
+            });
+            if (error) throw error;
+        }
+        
+        alert('✅ 모든 카테고리 변경사항이 저장되었습니다!');
+        hasUnsavedChanges = false;
+        loadCategories();
+        loadStatistics();
+    } catch (error) {
+        console.error('Save failed:', error);
+        alert('❌ 저장 실패: ' + error.message);
+    }
+};
 
 window.updateCategoryName = async function(id, newName) {
     try {
@@ -745,6 +900,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     document.getElementById('previewThemeToggle').addEventListener('click', togglePreviewTheme);
+    document.getElementById('saveSettingsBtn').addEventListener('click', saveSiteSettings);
+    document.getElementById('saveSeoBtn').addEventListener('click', saveSeoSettings);
+    
+    // Mobile menu toggle
+    const menuBtn = document.createElement('button');
+    menuBtn.className = 'mobile-menu-btn';
+    menuBtn.innerHTML = '☰';
+    document.querySelector('.header-left').prepend(menuBtn);
+    
+    menuBtn.addEventListener('click', () => {
+        document.querySelector('.dashboard-sidebar').classList.toggle('active');
+    });
     
     // Load saved theme
     const savedTheme = localStorage.getItem('admin_theme');
