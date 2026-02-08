@@ -186,39 +186,6 @@ async function loadPost() {
 // ═══════════════════════════════════════════════════
 const NIGHT_MODE_KEY = 'night_mode';
 
-// ═══════════════════════════════════════════════════
-// 7. LONG PRESS FOR ADMIN
-// ═══════════════════════════════════════════════════
-function initAdminLongPress() {
-    const copyright = document.getElementById('copyrightText');
-    if (!copyright) return;
-    
-    let pressTimer;
-    const PRESS_DURATION = 3000; // 3 seconds
-    
-    const startPress = (e) => {
-        pressTimer = setTimeout(() => {
-            window.location.href = 'admin.html';
-        }, PRESS_DURATION);
-    };
-    
-    const cancelPress = () => {
-        clearTimeout(pressTimer);
-    };
-    
-    copyright.addEventListener('mousedown', startPress);
-    copyright.addEventListener('mouseup', cancelPress);
-    copyright.addEventListener('mouseleave', cancelPress);
-    
-    copyright.addEventListener('touchstart', startPress);
-    copyright.addEventListener('touchend', cancelPress);
-    copyright.addEventListener('touchcancel', cancelPress);
-    
-    copyright.style.cursor = 'default';
-    copyright.style.userSelect = 'none';
-    copyright.style.webkitUserSelect = 'none';
-}
-
 function initNightMode() {
     const modeToggle = document.getElementById('modeToggle');
     if (!modeToggle) return;
@@ -311,5 +278,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     initNightMode();
-    initAdminLongPress();
 });
