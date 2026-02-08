@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     
-    <title>Admin Dashboard - SMALLSM Archive</title>
+    <title>Admin Panel - SMALLSM Archive</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Toast UI Editor -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/admin-toastui.css">
     
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -47,9 +50,7 @@
                 <span class="admin-badge">관리자 모드</span>
             </div>
             <div class="header-right">
-                <button class="theme-toggle" id="themeToggle" title="다크모드 전환">
-                    <span class="icon">🌙</span>
-                </button>
+                <button class="btn-secondary" onclick="window.open('index.html', '_blank')">🔗 사이트 보기</button>
                 <button class="btn-secondary" id="logoutBtn">로그아웃</button>
             </div>
         </header>
@@ -58,101 +59,102 @@
             <!-- Left Sidebar Menu -->
             <aside class="dashboard-sidebar">
                 <nav class="sidebar-nav">
-                    <button class="nav-item active" data-section="overview">
-                        <span class="icon">📊</span>
-                        <span class="text">대시보드</span>
+                    <button class="nav-item active" data-section="posts">
+                        <span class="icon">📝</span>
+                        <span class="text">게시글 관리</span>
+                        <span class="badge" id="postCount">0</span>
                     </button>
                     <button class="nav-item" data-section="home">
                         <span class="icon">🏠</span>
                         <span class="text">홈 화면 관리</span>
                     </button>
-                    <button class="nav-item" data-section="posts">
-                        <span class="icon">📝</span>
-                        <span class="text">게시글 관리</span>
-                        <span class="badge" id="postCount">0</span>
-                    </button>
                     <button class="nav-item" data-section="categories">
                         <span class="icon">📂</span>
                         <span class="text">카테고리</span>
-                    </button>
-                    <button class="nav-item" data-section="trash">
-                        <span class="icon">🗑️</span>
-                        <span class="text">휴지통</span>
-                        <span class="badge warning" id="trashCount">0</span>
-                    </button>
-                    <button class="nav-item" data-section="settings">
-                        <span class="icon">⚙️</span>
-                        <span class="text">설정</span>
                     </button>
                 </nav>
             </aside>
 
             <!-- Main Content Area -->
             <main class="dashboard-main">
-                <!-- Overview Section -->
-                <section id="section-overview" class="content-section active">
-                    <h2 class="section-title">📊 대시보드</h2>
+                <!-- Posts Management Section -->
+                <section id="section-posts" class="content-section active">
+                    <div class="section-header">
+                        <h2 class="section-title">📝 게시글 관리</h2>
+                        <button class="btn-primary" id="newPostBtn">✍️ 새 글 작성</button>
+                    </div>
                     
-                    <!-- Stats Cards -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">📝</div>
-                            <div class="stat-info">
-                                <p class="stat-label">총 게시물</p>
-                                <p class="stat-value" id="statTotalPosts">0</p>
+                    <!-- Post List View -->
+                    <div id="postListView">
+                        <!-- Search and Filter -->
+                        <div class="card">
+                            <div class="toolbar">
+                                <input type="text" id="postSearch" class="search-input" placeholder="🔍 제목으로 검색...">
+                                <select id="postFilterCategory" class="filter-select">
+                                    <option value="">모든 카테고리</option>
+                                </select>
+                                <select id="postFilterStatus" class="filter-select">
+                                    <option value="">모든 상태</option>
+                                    <option value="public">공개</option>
+                                    <option value="private">비공개</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">🟢</div>
-                            <div class="stat-info">
-                                <p class="stat-label">공개 중</p>
-                                <p class="stat-value" id="statPublicPosts">0</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">🔴</div>
-                            <div class="stat-info">
-                                <p class="stat-label">비공개</p>
-                                <p class="stat-value" id="statPrivatePosts">0</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">📂</div>
-                            <div class="stat-info">
-                                <p class="stat-label">카테고리</p>
-                                <p class="stat-value" id="statCategories">0</p>
-                            </div>
+
+                        <!-- Posts List -->
+                        <div id="postsList" class="posts-list">
+                            <div class="loading">게시물을 불러오는 중...</div>
                         </div>
                     </div>
 
-                    <!-- Recent Activity -->
-                    <div class="card">
-                        <h3 class="card-title">🕐 최근 활동</h3>
-                        <div id="recentActivity" class="activity-list">
-                            <!-- Dynamically loaded -->
-                        </div>
-                    </div>
+                    <!-- Post Editor View (Hidden by default) -->
+                    <div id="postEditorView" style="display: none;">
+                        <div class="card">
+                            <div class="editor-header">
+                                <button class="btn-secondary" id="backToListBtn">← 목록으로</button>
+                                <h3 id="editorTitle">새 글 작성</h3>
+                            </div>
 
-                    <!-- Quick Actions -->
-                    <div class="card">
-                        <h3 class="card-title">⚡ 빠른 작업</h3>
-                        <div class="quick-actions">
-                            <button class="quick-btn" onclick="switchSection('posts')">
-                                <span class="icon">✍️</span>
-                                <span class="text">새 글 작성</span>
-                            </button>
-                            <button class="quick-btn" onclick="switchSection('home')">
-                                <span class="icon">🏠</span>
-                                <span class="text">홈 수정</span>
-                            </button>
-                            <button class="quick-btn" onclick="switchSection('categories')">
-                                <span class="icon">📂</span>
-                                <span class="text">카테고리 추가</span>
-                            </button>
-                            <button class="quick-btn" onclick="window.open('index.html', '_blank')">
-                                <span class="icon">🔗</span>
-                                <span class="text">사이트 보기</span>
-                            </button>
+                            <!-- Post Meta -->
+                            <div class="form-group">
+                                <label for="postTitle">제목</label>
+                                <input type="text" id="postTitle" class="form-input" placeholder="게시물 제목을 입력하세요">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="postCategory">카테고리</label>
+                                    <select id="postCategory" class="form-select">
+                                        <option value="">카테고리 선택</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="isPrivate">
+                                        <span>비밀글로 설정</span>
+                                    </label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="originFree">
+                                        <span>복사 출처 비활성화</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Toast UI Editor -->
+                            <div class="form-group">
+                                <label>본문</label>
+                                <div id="editor"></div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <button class="btn-secondary" id="saveDraftBtn">💾 임시 저장</button>
+                                <button class="btn-primary" id="publishPostBtn">🚀 발행하기</button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -200,9 +202,6 @@
                         <div class="preview-panel">
                             <div class="preview-header">
                                 <span class="preview-title">실시간 미리보기</span>
-                                <button class="preview-theme-toggle" id="previewThemeToggle" title="다크모드로 보기">
-                                    🌙 다크
-                                </button>
                             </div>
                             <div class="preview-content" id="homePreview">
                                 <h1 id="previewTitle">환영합니다</h1>
@@ -212,32 +211,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
-
-                <!-- Posts Management Section -->
-                <section id="section-posts" class="content-section">
-                    <h2 class="section-title">📝 게시글 관리</h2>
-                    
-                    <!-- Search and Filter -->
-                    <div class="card">
-                        <div class="toolbar">
-                            <input type="text" id="postSearch" class="search-input" placeholder="🔍 제목으로 검색...">
-                            <select id="postFilterCategory" class="filter-select">
-                                <option value="">모든 카테고리</option>
-                            </select>
-                            <select id="postFilterStatus" class="filter-select">
-                                <option value="">모든 상태</option>
-                                <option value="public">공개</option>
-                                <option value="private">비공개</option>
-                            </select>
-                            <button class="btn-primary" onclick="showNewPostEditor()">✍️ 새 글 작성</button>
-                        </div>
-                    </div>
-
-                    <!-- Posts List -->
-                    <div id="postsList" class="posts-list">
-                        <!-- Dynamically loaded -->
                     </div>
                 </section>
 
@@ -259,60 +232,13 @@
                         <!-- Dynamically loaded -->
                     </div>
                 </section>
-
-                <!-- Trash Section -->
-                <section id="section-trash" class="content-section">
-                    <h2 class="section-title">🗑️휴지통</h2>
-                    <p class="section-desc">삭제된 항목은 30일간 보관됩니다.</p>
-                    
-                    <div id="trashList" class="trash-list">
-                        <!-- Dynamically loaded -->
-                    </div>
-                </section>
-
-                <!-- Settings Section -->
-                <section id="section-settings" class="content-section">
-                    <h2 class="section-title">⚙️ 설정</h2>
-                    
-                    <div class="card">
-                        <h3 class="card-title">사이트 정보</h3>
-                        <div class="form-group">
-                            <label>사이트 이름</label>
-                            <input type="text" id="siteTitleInput" class="form-input" placeholder="SMALLSM Archive">
-                        </div>
-                        <div class="form-group">
-                            <label>사이트 설명</label>
-                            <input type="text" id="siteDescInput" class="form-input" placeholder="시네마틱 아카이브 - 성향과 실천의 기록">
-                        </div>
-                        <div class="form-group">
-                            <label>관리자 이메일</label>
-                            <input type="email" id="adminEmailInput" class="form-input" disabled>
-                            <p style="font-size: 0.8rem; color: var(--admin-text-dim); margin-top: 0.5rem;">이메일 변경은 시스템 설정 파일에서 가능합니다.</p>
-                        </div>
-                        <button class="btn-primary" id="saveSettingsBtn">💾 설정 저장</button>
-                    </div>
-
-                    <div class="card">
-                        <h3 class="card-title">검색 엔진 최적화 (SEO)</h3>
-                        <p class="section-desc">Google 및 Naver 검색 결과에 노출되기 위한 메타 태그 설정입니다.</p>
-                        <div class="form-group">
-                            <label>Google Site Verification</label>
-                            <input type="text" id="googleVerification" class="form-input" placeholder="google-site-verification 코드">
-                        </div>
-                        <div class="form-group">
-                            <label>Naver Site Advisor Verification</label>
-                            <input type="text" id="naverVerification" class="form-input" placeholder="naver-site-verification 코드">
-                        </div>
-                        <button class="btn-primary" id="saveSeoBtn">💾 SEO 설정 저장</button>
-                    </div>
-                </section>
             </main>
         </div>
     </div>
 
     <!-- Scripts -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script src="/api/config"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script src="js/admin-dashboard.js"></script>
+    <script src="js/admin-toastui.js"></script>
 </body>
 </html>
