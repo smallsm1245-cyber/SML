@@ -19,8 +19,8 @@
     --admin-hover: rgba(206, 177, 128, 0.1);
 }
 
-/* Dark Mode */
-body.dark-theme {
+/* Night Mode */
+body.night-mode {
     --admin-bg: #0A0D12;
     --admin-panel: #0F1419;
     --admin-card: rgba(15, 20, 28, 0.95);
@@ -522,48 +522,50 @@ body.dark-theme {
 }
 
 /* ═══════════════════════════════════════════════════
-   POSTS LIST
+   POSTS LIST & CATEGORIES LIST
    ═══════════════════════════════════════════════════ */
 .posts-list,
 .categories-list,
 .trash-list {
-    .categories-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        background: var(--admin-panel);
-        padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid var(--admin-border);
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
 
-    .category-item-card {
-        background: var(--admin-card);
-        border: 1px solid var(--admin-border);
-        border-radius: 6px;
-        padding: 0.6rem 1rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        transition: all 0.2s;
-    }
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--admin-panel);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--admin-border);
+}
 
-    .category-item-card:hover {
-        border-color: var(--admin-primary);
-        background: var(--admin-hover);
-    }
+.category-item-card {
+    background: var(--admin-card);
+    border: 1px solid var(--admin-border);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s;
+}
 
-    .category-item-card.sortable-ghost {
-        opacity: 0.4;
-        background: var(--admin-primary);
-    }
+.category-item-card:hover {
+    border-color: var(--admin-primary);
+    background: var(--admin-hover);
+}
 
-    .category-item-card.sub-category {
-        margin-left: 2.5rem;
-        border-left: 3px solid var(--admin-primary);
-    }
+.category-item-card.sortable-ghost {
+    opacity: 0.4;
+    background: var(--admin-primary);
+}
 
-    s;
+.category-item-card.child-category {
+    margin-left: 2.5rem;
+    border-left: 2px solid var(--admin-primary);
 }
 
 .post-item:hover,

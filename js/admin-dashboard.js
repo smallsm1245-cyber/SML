@@ -8,57 +8,20 @@ let supabaseClient = null;
 let hasUnsavedChanges = false;
 
 // ═══════════════════════════════════════════════════
-// WAIT FOR CONFIG
+// SHARED UTILITIES (via window.utils)
 // ═══════════════════════════════════════════════════
-function waitForConfig() {
-    return new Promise((resolve) => {
-        const interval = setInterval(() => {
-            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
-                clearInterval(interval);
-                resolve();
-            }
-        }, 100);
-    });
-}
+const { waitForConfig, showError, getTimeAgo, checkAuth: checkAuthUtil } = window.utils || {};
 
-// ═══════════════════════════════════════════════════
-// SHOW ERROR
-// ═══════════════════════════════════════════════════
-function showError(message) {
-    const loginError = document.getElementById('loginError');
-    if (loginError) {
-        loginError.textContent = message;
-        loginError.classList.add('show');
-        setTimeout(() => loginError.classList.remove('show'), 3000);
-    }
-}
-
-// ═══════════════════════════════════════════════════
-// AUTHENTICATION
-// ═══════════════════════════════════════════════════
 async function checkAuth() {
-    if (!supabaseClient) return false;
-
-    try {
-        const { data: { user }, error } = await supabaseClient.auth.getUser();
-
-        if (error || !user) return false;
-
-        if (user.email !== window.ADMIN_EMAIL) {
-            await supabaseClient.auth.signOut();
-            return false;
-        }
-
-        return true;
-    } catch (error) {
-        console.error('Auth check failed:', error);
-        return false;
-    }
+    return await checkAuthUtil(supabaseClient, window.ADMIN_EMAIL);
 }
 
 async function showDashboard() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminDashboard').style.display = 'block';
+
+    // Initialize Toast UI Editor
+    initializeEditor();
 
     // Load all data
     await Promise.all([
@@ -195,40 +158,35 @@ async function loadRecentActivity() {
             return;
         }
 
-        container.innerHTML = posts.map(post => {
-            const time = getTimeAgo(post.updated_at);
-            return `
-                <div class="activity-item">
-                    <div class="activity-icon">📝</div>
-                    <div class="activity-content">
-                        <p class="activity-text">${post.title}</p>
-                        <p class="activity-time">${time}</p>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        // Assuming 'activities' is meant to be 'posts' from the query above
+        // And 'recentList' is meant to be 'container'
+        const recentList = container; // Map recentList to container
+        const activities = posts.map(post => ({ // Transform posts to match the 'activities' structure
+            type: 'post',
+            name: post.title,
+            action: 'update', // Assuming updated_at means update, or created_at means create
+            created_at: post.updated_at // Use updated_at for time
+        }));
 
+        if (activities) {
+            recentList.innerHTML = activities.map(item => {
+                const timeStr = getTimeAgo ? getTimeAgo(item.created_at) : item.created_at;
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon">${item.type === 'post' ? '📝' : '📂'}</div>
+                        <div class="activity-content">
+                            <p class="activity-text"><strong>${item.name}</strong> ${item.action === 'create' ? '생성' : '수정'}</p>
+                            <span class="activity-time">${timeStr}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
     } catch (error) {
         console.error('Activity loading failed:', error);
     }
 }
 
-function getTimeAgo(dateString) {
-    const now = new Date();
-    const past = new Date(dateString);
-    const diffMs = now - past;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 60) return `${diffMins}분 전`;
-    if (diffHours < 24) return `${diffHours}시간 전`;
-    return `${diffDays}일 전`;
-}
-
-// ═══════════════════════════════════════════════════
-// HOME SCREEN MANAGEMENT
-// ═══════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════
 // HOME SCREEN MANAGEMENT
 // ═══════════════════════════════════════════════════
@@ -255,7 +213,7 @@ async function loadHomeSettings() {
                 initialEditType: 'markdown',
                 previewStyle: 'vertical',
                 initialValue: settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.',
-                theme: 'dark', // Since we are in admin
+                theme: 'night', // Changed from 'dark' to 'night'
                 events: {
                     change: updateHomePreview
                 }
@@ -290,7 +248,7 @@ function updateHomePreview() {
     document.getElementById('previewSubtitle').textContent = subtitle;
 
     // Convert markdown to html for preview (simple conversion or use Viewer)
-    // Here we use a temporary Viewer calls or just simple HTML if simple text. 
+    // Here we use a temporary Viewer calls or just simple HTML if simple text.
     // Ideally we should use Viewer for preview too.
     const previewContainer = document.getElementById('previewContent');
     previewContainer.innerHTML = '';
@@ -377,25 +335,28 @@ async function loadPosts() {
             return;
         }
 
-        container.innerHTML = posts.map(post => {
-            const date = new Date(post.created_at).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric'
-            });
+        const postsList = document.getElementById('postsList');
+        if (postsList) {
+            postsList.innerHTML = posts.map(post => {
+                const date = getTimeAgo ? getTimeAgo(post.created_at) : post.created_at;
+                return `
+                    <div class="post-row" data-id="${post.id}">
+                        <div class="post-row-left">
+                            <span class="post-row-title">${post.title}</span>
+                            ${post.is_private ? '<span class="private-tag">🔒</span>' : ''}
+                        </div>
+                        <div class="post-row-right">
+                            <span class="post-row-date">${date}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
-            return `
-                <div class="post-row" onclick="editPost('${post.id}')">
-                    <div class="post-row-left">
-                        <span class="post-row-title">${post.title}</span>
-                        ${post.is_private ? '<span class="private-tag">🔒</span>' : ''}
-                    </div>
-                    <div class="post-row-right">
-                        <span class="post-row-date">${date}</span>
-                    </div>
-                </div>
-            `;
-        }).join('');
+            // Row click event
+            document.querySelectorAll('.post-row').forEach(row => {
+                row.addEventListener('click', () => editPost(row.dataset.id));
+            });
+        }
 
     } catch (error) {
         console.error('Posts loading failed:', error);
@@ -404,12 +365,200 @@ async function loadPosts() {
 }
 
 window.showNewPostEditor = function () {
-    window.location.href = 'admin-toastui.html?action=new';
+    document.getElementById('postListView').style.display = 'none';
+    document.getElementById('postEditorView').style.display = 'block';
+    document.getElementById('editorTitle').textContent = '새 글 작성';
+
+    // Clear form
+    document.getElementById('postTitle').value = '';
+    document.getElementById('postCategory').value = '';
+    document.getElementById('isPrivate').checked = false;
+    document.getElementById('originFree').checked = false;
+
+    if (editor) {
+        editor.setMarkdown('');
+    }
+
+    currentPostId = null;
+    window.scrollTo(0, 0);
 };
 
-window.editPost = function (id) {
-    window.location.href = `admin-toastui.html?action=edit&id=${id}`;
+window.editPost = async function (id) {
+    try {
+        const { data: post, error } = await supabaseClient
+            .from('archive_posts')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        // Switch to editor view
+        document.getElementById('postListView').style.display = 'none';
+        document.getElementById('postEditorView').style.display = 'block';
+        document.getElementById('editorTitle').textContent = '게시물 수정';
+
+        // Fill form
+        document.getElementById('postTitle').value = post.title;
+        document.getElementById('postCategory').value = post.category_id || '';
+        document.getElementById('isPrivate').checked = post.is_private;
+        document.getElementById('originFree').checked = post.origin_free;
+
+        // Set editor content
+        if (!editor) {
+            initializeEditor();
+        }
+        editor.setMarkdown(post.content);
+
+        // Store current post ID
+        currentPostId = id;
+
+        // Scroll to top
+        window.scrollTo(0, 0);
+
+    } catch (error) {
+        console.error('Edit post failed:', error);
+        alert('게시물을 불러오는 중 오류가 발생했습니다.');
+    }
 };
+
+window.backToList = function () {
+    document.getElementById('postListView').style.display = 'block';
+    document.getElementById('postEditorView').style.display = 'none';
+
+    currentPostId = null;
+    loadPosts();
+};
+
+window.publishPost = async function () {
+    const title = document.getElementById('postTitle').value.trim();
+    const categoryId = document.getElementById('postCategory').value;
+    const isPrivate = document.getElementById('isPrivate').checked;
+    const originFree = document.getElementById('originFree').checked;
+    const content = editor.getMarkdown();
+
+    if (!title) {
+        alert('제목을 입력하세요.');
+        return;
+    }
+
+    if (!categoryId) {
+        alert('카테고리를 선택하세요.');
+        return;
+    }
+
+    if (!content) {
+        alert('내용을 입력하세요.');
+        return;
+    }
+
+    try {
+        if (currentPostId) {
+            // Update existing post
+            const { error } = await supabaseClient
+                .from('archive_posts')
+                .update({
+                    title: title,
+                    content: content,
+                    category_id: categoryId,
+                    is_private: isPrivate,
+                    origin_free: originFree,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', currentPostId);
+
+            if (error) throw error;
+
+            alert('✅ 게시물이 수정되었습니다!');
+
+        } else {
+            // Create new post
+            const { error } = await supabaseClient
+                .from('archive_posts')
+                .insert([{
+                    title: title,
+                    content: content,
+                    category_id: categoryId,
+                    is_private: isPrivate,
+                    origin_free: originFree
+                }]);
+
+            if (error) throw error;
+
+            alert('✅ 게시물이 발행되었습니다!');
+        }
+
+        window.backToList();
+
+    } catch (error) {
+        console.error('Publish failed:', error);
+        alert('❌ 저장 실패: ' + error.message);
+    }
+};
+
+// ═══════════════════════════════════════════════════
+// TOAST UI EDITOR INITIALIZATION
+// ═══════════════════════════════════════════════════
+function initializeEditor() {
+    if (editor) return; // Already initialized
+
+    const Editor = toastui.Editor;
+
+    editor = new Editor({
+        el: document.querySelector('#editor'),
+        height: '500px',
+        initialEditType: 'markdown',
+        previewStyle: 'vertical',
+        placeholder: '내용을 입력하세요...',
+        theme: 'dark',
+        language: 'ko-KR',
+        toolbarItems: [
+            ['heading', 'bold', 'italic', 'strike'],
+            ['hr', 'quote'],
+            ['ul', 'ol', 'task', 'indent', 'outdent'],
+            ['table', 'image', 'link'],
+            ['code', 'codeblock'],
+            ['scrollSync']
+        ],
+        hooks: {
+            addImageBlobHook: async (blob, callback) => {
+                try {
+                    const url = await uploadImage(blob);
+                    callback(url, 'Image');
+                } catch (error) {
+                    console.error('Image upload failed:', error);
+                    alert('이미지 업로드 실패: ' + error.message);
+                }
+            }
+        }
+    });
+
+    console.log('✅ Toast UI Editor initialized');
+}
+
+async function uploadImage(file) {
+    try {
+        const fileExt = file.name ? file.name.split('.').pop() : 'png';
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `images/${fileName}`;
+
+        const { data, error } = await supabaseClient.storage
+            .from('archive-images')
+            .upload(filePath, file);
+
+        if (error) throw error;
+
+        const { data: urlData } = supabaseClient.storage
+            .from('archive-images')
+            .getPublicUrl(filePath);
+
+        return urlData.publicUrl;
+
+    } catch (error) {
+        console.error('Upload failed:', error);
+        throw error;
+    }
+}
 
 window.copyPostLink = function (url) {
     navigator.clipboard.writeText(url).then(() => {
@@ -787,39 +936,7 @@ window.deleteCategory = async function (id, name) {
     }
 };
 
-async function addCategory() {
-    const name = document.getElementById('newCategoryName').value.trim();
-    if (!name) {
-        alert('카테고리 이름을 입력하세요.');
-        return;
-    }
 
-    try {
-        const { data: categories } = await supabaseClient
-            .from('categories')
-            .select('display_order')
-            .order('display_order', { ascending: false })
-            .limit(1);
-
-        const maxOrder = categories && categories.length > 0 ? categories[0].display_order : 0;
-
-        await supabaseClient.from('categories').insert({
-            name: name,
-            is_visible: true,
-            display_order: maxOrder + 1,
-            parent_id: null
-        });
-
-        document.getElementById('newCategoryName').value = '';
-        alert('✅ 카테고리가 추가되었습니다!');
-        loadCategories();
-        loadStatistics();
-
-    } catch (error) {
-        console.error('Add failed:', error);
-        alert('❌ 추가 실패');
-    }
-}
 
 function initDragAndDrop() {
     const container = document.getElementById('categoriesList');
@@ -885,21 +1002,15 @@ async function updateCategoryOrder() {
 // THEME TOGGLE
 // ═══════════════════════════════════════════════════
 function toggleTheme() {
-    document.body.classList.toggle('dark-theme');
-    const isDark = document.body.classList.contains('dark-theme');
+    const isDark = document.body.classList.toggle('night-mode');
     localStorage.setItem('admin_theme', isDark ? 'dark' : 'light');
-
-    const icon = document.querySelector('#themeToggle .icon');
-    icon.textContent = isDark ? '☀️' : '🌙';
+    document.querySelector('#themeToggle .icon').textContent = isDark ? '☀️' : '🌙';
 }
 
 function togglePreviewTheme() {
     const preview = document.getElementById('homePreview');
-    const btn = document.getElementById('previewThemeToggle');
-
-    preview.classList.toggle('dark');
-    const isDark = preview.classList.contains('dark');
-    btn.textContent = isDark ? '☀️ 라이트' : '🌙 다크';
+    const isDark = preview.classList.toggle('dark');
+    document.getElementById('previewThemeToggle').textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
 }
 
 // ═══════════════════════════════════════════════════
@@ -989,34 +1100,12 @@ window.permanentDelete = async function (trashId) {
 // ═══════════════════════════════════════════════════
 // WAIT FOR CONFIG
 // ═══════════════════════════════════════════════════
-function waitForConfig() {
-    return new Promise((resolve, reject) => {
-        const startTime = Date.now();
-        const interval = setInterval(() => {
-            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
-                clearInterval(interval);
-                resolve();
-            } else if (Date.now() - startTime > 5000) {
-                clearInterval(interval);
-                reject(new Error('Config loading timeout'));
-            }
-        }, 100);
-    });
-}
+
 
 // ═══════════════════════════════════════════════════
 // SHOW ERROR
 // ═══════════════════════════════════════════════════
-function showError(message) {
-    const loginError = document.getElementById('loginError');
-    if (loginError) {
-        loginError.textContent = message;
-        loginError.classList.add('show');
-        setTimeout(() => loginError.classList.remove('show'), 3000);
-    } else {
-        alert(message);
-    }
-}
+
 
 // ═══════════════════════════════════════════════════
 // INITIALIZATION
@@ -1103,25 +1192,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('showRecentPosts').addEventListener('change', toggleRecentPostsCount);
     document.getElementById('saveHomeBtn').addEventListener('click', saveHomeSettings);
     document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
-    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-    document.getElementById('previewThemeToggle').addEventListener('click', togglePreviewTheme);
-    document.getElementById('saveSettingsBtn').addEventListener('click', saveSiteSettings);
-    document.getElementById('saveSeoBtn').addEventListener('click', saveSeoSettings);
-
-    // Mobile menu toggle
-    const menuBtn = document.createElement('button');
-    menuBtn.className = 'mobile-menu-btn';
-    menuBtn.innerHTML = '☰';
-    document.querySelector('.header-left').prepend(menuBtn);
-
-    menuBtn.addEventListener('click', () => {
-        document.querySelector('.dashboard-sidebar').classList.toggle('active');
-    });
+    // Theme toggling
+    function toggleTheme() {
+        const isDark = document.body.classList.toggle('night-mode');
+        localStorage.setItem('admin_theme', isDark ? 'dark' : 'light');
+        document.querySelector('#themeToggle .icon').textContent = isDark ? '☀️' : '🌙';
+    }
 
     // Load saved theme
     const savedTheme = localStorage.getItem('admin_theme');
     if (savedTheme === 'dark') {
-        document.body.classList.add('dark-theme');
+        document.body.classList.add('night-mode');
         document.querySelector('#themeToggle .icon').textContent = '☀️';
     }
 

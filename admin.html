@@ -230,25 +230,27 @@
                 <section id="section-posts" class="content-section">
                     <h2 class="section-title">📝 게시글 관리</h2>
 
-                    <!-- Search and Filter -->
-                    <div class="card">
-                        <div class="toolbar">
-                            <input type="text" id="postSearch" class="search-input" placeholder="🔍 제목으로 검색...">
-                            <select id="postFilterCategory" class="filter-select">
-                                <option value="">모든 카테고리</option>
-                            </select>
-                            <select id="postFilterStatus" class="filter-select">
-                                <option value="">모든 상태</option>
-                                <option value="public">공개</option>
-                                <option value="private">비공개</option>
-                            </select>
-                            <button class="btn-primary" onclick="showNewPostEditor()">✍️ 새 글 작성</button>
+                    <!-- Search and Filter (Post List View) -->
+                    <div id="postListView">
+                        <div class="card">
+                            <div class="toolbar">
+                                <input type="text" id="postSearch" class="search-input" placeholder="🔍 제목으로 검색...">
+                                <select id="postFilterCategory" class="filter-select">
+                                    <option value="">모든 카테고리</option>
+                                </select>
+                                <select id="postFilterStatus" class="filter-select">
+                                    <option value="">모든 상태</option>
+                                    <option value="public">공개</option>
+                                    <option value="private">비공개</option>
+                                </select>
+                                <button class="btn-primary" onclick="showNewPostEditor()">✍️ 새 글 작성</button>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Posts List -->
-                    <div id="postsList" class="posts-list">
-                        <!-- Dynamically loaded -->
+                        <!-- Posts List -->
+                        <div id="postsList" class="posts-list">
+                            <!-- Dynamically loaded -->
+                        </div>
                     </div>
 
                     <!-- Post Editor View (Hidden by default) -->
@@ -387,6 +389,10 @@
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script src="/api/config"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script type="module">
+        import * as utils from './js/utils.js';
+        window.utils = utils;
+    </script>
     <script src="js/admin-dashboard.js"></script>
 </body>
 
