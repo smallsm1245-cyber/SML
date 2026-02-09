@@ -365,15 +365,12 @@ async function loadPosts() {
                 updated_at,
                 category_id
             `)
-            .order('updated_at', { ascending: false });
+            .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        const { data: categories } = await supabaseClient.from('categories').select('id, name');
-        const catMap = {};
-        if (categories) categories.forEach(c => catMap[c.id] = c.name);
-
         const container = document.getElementById('postsList');
+        document.getElementById('postCount').textContent = posts ? posts.length : 0;
 
         if (!posts || posts.length === 0) {
             container.innerHTML = '<p style="color: var(--admin-text-dim); text-align: center; padding: 3rem;">게시물이 없습니다.</p>';
@@ -381,27 +378,20 @@ async function loadPosts() {
         }
 
         container.innerHTML = posts.map(post => {
-            const statusBadge = post.is_private
-                ? '<span class="status-badge private">🔴 비공개</span>'
-                : '<span class="status-badge public">🟢 공개</span>';
-
-            const categoryName = catMap[post.category_id] || 'Uncategorized';
-            const updatedTime = getTimeAgo(post.updated_at);
-            const postUrl = `${window.location.origin}/post.html?id=${post.id}`;
+            const date = new Date(post.created_at).toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            });
 
             return `
-                <div class="post-item">
-                    <div class="post-header">
-                        <a href="${postUrl}" class="post-title-link" target="_blank">${post.title}</a>
-                        <div class="post-badges">${statusBadge}</div>
+                <div class="post-row" onclick="editPost('${post.id}')">
+                    <div class="post-row-left">
+                        <span class="post-row-title">${post.title}</span>
+                        ${post.is_private ? '<span class="private-tag">🔒</span>' : ''}
                     </div>
-                    <div class="post-meta">
-                        ${categoryName} • ${updatedTime}
-                    </div>
-                    <div class="post-actions">
-                        <button class="action-btn" onclick="copyPostLink('${postUrl}')">📋 링크 복사</button>
-                        <button class="action-btn" onclick="editPost('${post.id}')">✏️ 수정</button>
-                        <button class="action-btn danger" onclick="deletePost('${post.id}', '${post.title}')">🗑️ 삭제</button>
+                    <div class="post-row-right">
+                        <span class="post-row-date">${date}</span>
                     </div>
                 </div>
             `;
@@ -427,11 +417,6 @@ window.copyPostLink = function (url) {
     }).catch(() => {
         alert('❌ 복사 실패');
     });
-};
-
-window.editPost = function (id) {
-    // TODO: Open editor
-    alert('편집 기능은 구현 예정입니다.');
 };
 
 window.deletePost = async function (id, title) {
