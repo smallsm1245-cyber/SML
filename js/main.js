@@ -2,11 +2,11 @@
 // 🎬 SMALLSM ARCHIVE - MAIN SCRIPT (Clean Version)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-(function() {
+(function () {
     'use strict';
-    
+
     console.log('🚀 SMALLSM Archive initializing...');
-    
+
     // ═══════════════════════════════════════════════════
     // 1. GLOBALS
     // ═══════════════════════════════════════════════════
@@ -14,7 +14,7 @@
     const VERIFICATION_KEY = 'age_verified';
     const VERIFICATION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
     const NIGHT_MODE_KEY = 'night_mode';
-    
+
     // ═══════════════════════════════════════════════════
     // 2. SUPABASE INITIALIZATION
     // ═══════════════════════════════════════════════════
@@ -24,17 +24,17 @@
                 console.error('❌ Supabase library not loaded');
                 return false;
             }
-            
+
             if (!window.SUPABASE_CONFIG || !window.SUPABASE_CONFIG.url) {
                 console.error('❌ Supabase config not found');
                 return false;
             }
-            
+
             supabaseClient = window.supabase.createClient(
                 window.SUPABASE_CONFIG.url,
                 window.SUPABASE_CONFIG.anonKey
             );
-            
+
             console.log('✅ Supabase initialized');
             return true;
         } catch (error) {
@@ -42,43 +42,43 @@
             return false;
         }
     }
-    
+
     // ═══════════════════════════════════════════════════
     // 3. AGE VERIFICATION
     // ═══════════════════════════════════════════════════
     function checkAgeVerification() {
         const verified = localStorage.getItem(VERIFICATION_KEY);
-        
+
         if (verified) {
             const timestamp = parseInt(verified);
             const now = Date.now();
-            
+
             if (now - timestamp < VERIFICATION_DURATION) {
                 hideDisclaimer();
                 return true;
             }
         }
-        
+
         showDisclaimer();
         return false;
     }
-    
+
     function showDisclaimer() {
         const overlay = document.getElementById('disclaimerOverlay');
         const container = document.getElementById('appContainer');
-        
+
         if (overlay) overlay.style.display = 'flex';
         if (container) container.classList.add('content-blur');
     }
-    
+
     function hideDisclaimer() {
         const overlay = document.getElementById('disclaimerOverlay');
         const container = document.getElementById('appContainer');
-        
+
         if (overlay) overlay.style.display = 'none';
         if (container) container.classList.remove('content-blur');
     }
-    
+
     // ═══════════════════════════════════════════════════
     // 4. CATEGORY LOADING
     // ═══════════════════════════════════════════════════
@@ -87,7 +87,7 @@
     // ═══════════════════════════════════════════════════
     async function loadHomeSettings() {
         if (!supabaseClient) return;
-        
+
         try {
             const { data, error } = await supabaseClient
                 .from('settings')
@@ -96,9 +96,9 @@
                     'home_title', 'home_subtitle', 'home_content', 'show_recent_posts', 'recent_posts_count',
                     'site_title', 'site_description', 'google_verification', 'naver_verification'
                 ]);
-            
+
             if (error) throw error;
-            
+
             const settings = {};
             data.forEach(item => settings[item.key] = item.value);
 
@@ -122,28 +122,40 @@
                 const nTag = document.querySelector('meta[name="naver-site-verification"]');
                 if (nTag) nTag.content = settings.naver_verification;
             }
-            
+
             const title = document.getElementById('welcomeTitle');
             const subtitle = document.querySelector('.post-meta span');
             const content = document.getElementById('mainContent');
-            
+
             if (title && settings.home_title) title.textContent = settings.home_title;
             if (subtitle && settings.home_subtitle) subtitle.textContent = settings.home_subtitle;
             if (content && settings.home_content) {
-                content.innerHTML = settings.home_content
-                    .split('\n')
-                    .map(line => `<p>${line}</p>`)
-                    .join('');
+                // Remove previous content/viewers
+                content.innerHTML = '';
+
+                try {
+                    // Initialize Toast UI Viewer
+                    const viewer = new toastui.Editor.factory({
+                        el: content,
+                        viewer: true,
+                        initialValue: settings.home_content
+                    });
+                    console.log('✅ Home content viewer initialized');
+                } catch (e) {
+                    console.error('❌ Viewer init error:', e);
+                    // Fallback just in case
+                    content.innerHTML = settings.home_content.split('\n').map(line => `<p>${line}</p>`).join('');
+                }
             }
-            
+
             // Handle recent posts if enabled
             if (settings.show_recent_posts === 'true') {
                 const count = parseInt(settings.recent_posts_count) || 3;
                 await loadRecentPosts(count);
             }
-            
+
             console.log('✅ Home settings loaded');
-            
+
         } catch (error) {
             console.error('❌ Home settings loading failed:', error);
         }
@@ -153,20 +165,20 @@
         try {
             const { data: { user } } = await supabaseClient.auth.getUser();
             const isAdmin = user && user.email === window.ADMIN_EMAIL;
-            
+
             let query = supabaseClient
                 .from('archive_posts')
                 .select('id, title, created_at')
                 .order('created_at', { ascending: false })
                 .limit(count);
-            
+
             if (!isAdmin) {
                 query = query.eq('is_private', false);
             }
-            
+
             const { data: posts, error } = await query;
             if (error) throw error;
-            
+
             if (posts && posts.length > 0) {
                 const content = document.getElementById('mainContent');
                 const recentSection = document.createElement('div');
@@ -193,95 +205,95 @@
             console.warn('⚠️ Supabase not initialized');
             return;
         }
-        
+
         try {
             const { data: categories, error } = await supabaseClient
                 .from('categories')
                 .select('*')
                 .eq('is_visible', true)
                 .order('display_order', { ascending: true });
-            
+
             if (error) throw error;
-            
+
             const nav = document.getElementById('categoryNav');
             if (!nav) return;
-            
+
             nav.innerHTML = '';
-            
+
             categories.forEach(category => {
                 const li = document.createElement('li');
                 li.className = 'category-item';
-                
+
                 const link = document.createElement('a');
                 link.href = `#category-${category.id}`;
                 link.className = 'category-link';
                 link.textContent = category.name;
                 link.dataset.categoryId = category.id;
-                
+
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     loadPostsByCategory(category.id);
-                    
+
                     document.querySelectorAll('.category-link').forEach(l => {
                         l.classList.remove('active');
                     });
                     link.classList.add('active');
                 });
-                
+
                 li.appendChild(link);
                 nav.appendChild(li);
             });
-            
+
             console.log('✅ Categories loaded');
-            
+
         } catch (error) {
             console.error('❌ Category loading failed:', error);
         }
     }
-    
+
     // ═══════════════════════════════════════════════════
     // 5. POST LOADING BY CATEGORY
     // ═══════════════════════════════════════════════════
     async function loadPostsByCategory(categoryId) {
         if (!supabaseClient) return;
-        
+
         try {
             const { data: { user } } = await supabaseClient.auth.getUser();
             const isAdmin = user && user.email === window.ADMIN_EMAIL;
-            
+
             let query = supabaseClient
                 .from('archive_posts')
                 .select('*')
                 .eq('category_id', categoryId)
                 .order('created_at', { ascending: false });
-            
+
             if (!isAdmin) {
                 query = query.eq('is_private', false);
             }
-            
+
             const { data: posts, error } = await query;
-            
+
             if (error) throw error;
-            
+
             const content = document.getElementById('mainContent');
             const title = document.getElementById('welcomeTitle');
-            
+
             if (!content || !title) return;
-            
+
             if (posts.length === 0) {
                 title.textContent = '게시물 없음';
                 content.innerHTML = '<p>이 카테고리에는 아직 게시물이 없습니다.</p>';
                 return;
             }
-            
+
             const { data: category } = await supabaseClient
                 .from('categories')
                 .select('name')
                 .eq('id', categoryId)
                 .single();
-            
+
             title.textContent = category.name;
-            
+
             content.innerHTML = posts.map(post => `
                 <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
                     <h3>
@@ -295,70 +307,70 @@
                     </p>
                 </div>
             `).join('');
-            
+
         } catch (error) {
             console.error('❌ Post loading failed:', error);
         }
     }
-    
+
     // ═══════════════════════════════════════════════════
     // 6. SEARCH FUNCTIONALITY
     // ═══════════════════════════════════════════════════
     let searchTimeout;
-    
+
     function initSearch() {
         const searchInput = document.getElementById('searchInput');
         if (!searchInput) return;
-        
+
         searchInput.addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
-            
+
             searchTimeout = setTimeout(async () => {
                 const query = e.target.value.trim();
-                
+
                 if (query.length < 2) return;
-                
+
                 try {
                     const { data: { user } } = await supabaseClient.auth.getUser();
                     const isAdmin = user && user.email === window.ADMIN_EMAIL;
-                    
+
                     let searchQuery = supabaseClient
                         .from('archive_posts')
                         .select('id, title, created_at, category_id')
                         .ilike('title', `%${query}%`)
                         .order('created_at', { ascending: false })
                         .limit(10);
-                    
+
                     if (!isAdmin) {
                         searchQuery = searchQuery.eq('is_private', false);
                     }
-                    
+
                     const { data: results, error } = await searchQuery;
-                    
+
                     if (error) throw error;
-                    
+
                     displaySearchResults(results);
-                    
+
                 } catch (error) {
                     console.error('❌ Search failed:', error);
                 }
             }, 300);
         });
     }
-    
+
     function displaySearchResults(results) {
         const content = document.getElementById('mainContent');
         const title = document.getElementById('welcomeTitle');
-        
+
         if (!content || !title) return;
-        
+
         title.textContent = '검색 결과';
-        
+
         if (results.length === 0) {
             content.innerHTML = '<p>검색 결과가 없습니다.</p>';
             return;
         }
-        
+
         content.innerHTML = results.map(post => `
             <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
                 <h3>
@@ -372,7 +384,7 @@
             </div>
         `).join('');
     }
-    
+
     // ═══════════════════════════════════════════════════
     // 7. NIGHT MODE
     // ═══════════════════════════════════════════════════
@@ -382,10 +394,10 @@
     function initAdminLongPress() {
         const copyright = document.getElementById('copyrightText');
         if (!copyright) return;
-        
+
         let pressTimer;
         const PRESS_DURATION = 3000; // 3 seconds
-        
+
         const startPress = (e) => {
             // Prevent default only for touch to avoid scrolling issues
             // but we want to allow normal interaction if it's not a long press
@@ -393,21 +405,21 @@
                 window.location.href = 'admin.html';
             }, PRESS_DURATION);
         };
-        
+
         const cancelPress = () => {
             clearTimeout(pressTimer);
         };
-        
+
         // Mouse events
         copyright.addEventListener('mousedown', startPress);
         copyright.addEventListener('mouseup', cancelPress);
         copyright.addEventListener('mouseleave', cancelPress);
-        
+
         // Touch events
         copyright.addEventListener('touchstart', startPress);
         copyright.addEventListener('touchend', cancelPress);
         copyright.addEventListener('touchcancel', cancelPress);
-        
+
         // Visual feedback (optional but helpful)
         copyright.style.cursor = 'default';
         copyright.style.userSelect = 'none';
@@ -417,18 +429,18 @@
     function initNightMode() {
         const modeToggle = document.getElementById('modeToggle');
         if (!modeToggle) return;
-        
+
         const isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === 'true';
-        
+
         if (isNightMode) {
             document.body.classList.add('night-mode');
             modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
         }
-        
+
         modeToggle.addEventListener('click', () => {
             const nightMode = document.body.classList.toggle('night-mode');
             localStorage.setItem(NIGHT_MODE_KEY, nightMode);
-            
+
             if (nightMode) {
                 modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
             } else {
@@ -436,7 +448,7 @@
             }
         });
     }
-    
+
     // ═══════════════════════════════════════════════════
     // 8. INITIALIZATION
     // ═══════════════════════════════════════════════════
@@ -452,10 +464,10 @@
             }
         }, 100);
     }
-    
+
     document.addEventListener('DOMContentLoaded', () => {
         console.log('📱 DOM ready');
-        
+
         // Yes button
         const btnYes = document.getElementById('btnYes');
         if (btnYes) {
@@ -463,7 +475,7 @@
                 console.log('✅ Yes clicked');
                 localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
                 hideDisclaimer();
-                
+
                 waitForConfig(() => {
                     initializeSupabase();
                     loadHomeSettings();
@@ -472,7 +484,7 @@
                 });
             });
         }
-        
+
         // No button
         const btnNo = document.getElementById('btnNo');
         if (btnNo) {
@@ -481,7 +493,7 @@
                 window.location.href = 'https://www.google.com';
             });
         }
-        
+
         // Check verification
         if (checkAgeVerification()) {
             waitForConfig(() => {
@@ -491,11 +503,11 @@
                 initSearch();
             });
         }
-        
+
         initNightMode();
         initAdminLongPress();
-        
+
         console.log('🎉 Initialization complete');
     });
-    
+
 })();

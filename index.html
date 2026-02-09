@@ -1,36 +1,43 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    
+
     <!-- SEO & Open Graph -->
     <title id="siteTitleTag">SMALLSM Archive</title>
     <meta name="description" id="siteDescTag" content="시네마틱 아카이브 - 성향과 실천의 기록">
     <meta name="google-site-verification" content="">
     <meta name="naver-site-verification" content="">
-    
+
     <meta property="og:type" content="website">
     <meta property="og:title" content="SMALLSM Archive">
     <meta property="og:description" content="시네마틱 아카이브 - 성향과 실천의 기록">
     <meta property="og:image" content="/assets/og-image.jpg">
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Noto+Serif+KR:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Toast UI Viewer -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css" />
+
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <!-- Age Verification Disclaimer -->
     <div id="disclaimerOverlay" class="disclaimer-overlay">
         <div class="disclaimer-content">
             <h2>성인 인증</h2>
             <p>본 사이트는 성인 지향 콘텐츠를 포함하고 있습니다.<br>
-            귀하는 만 19세 이상이십니까?</p>
+                귀하는 만 19세 이상이십니까?</p>
             <div class="disclaimer-buttons">
                 <button class="btn btn-primary" id="btnYes">예 (19세 이상)</button>
                 <button class="btn btn-secondary" id="btnNo">아니요</button>
@@ -49,10 +56,7 @@
 
             <!-- Search -->
             <div class="search-box">
-                <input type="text" 
-                       class="search-input" 
-                       id="searchInput"
-                       placeholder="검색어를 입력하세요...">
+                <input type="text" class="search-input" id="searchInput" placeholder="검색어를 입력하세요...">
             </div>
 
             <!-- Categories -->
@@ -93,7 +97,9 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
     <script src="/api/config" async></script>
     <script src="js/main.js"></script>
 </body>
+
 </html>
