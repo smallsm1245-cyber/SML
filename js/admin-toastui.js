@@ -1,679 +1,844 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   🎬 SMALLSM ARCHIVE - TOAST UI EDITOR ADMIN STYLES
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🎬 SMALLSM ARCHIVE - TOAST UI EDITOR INTEGRATION
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-/* ═══════════════════════════════════════════════════
-   ROOT VARIABLES
-   ═══════════════════════════════════════════════════ */
-:root {
-    --admin-bg: #0F0F0E;
-    --admin-panel: #1A1A18;
-    --admin-card: rgba(25, 25, 23, 0.9);
-    --admin-border: rgba(206, 177, 128, 0.2);
-    --admin-primary: #CEB180;
-    --admin-text: #E8E6E3;
-    --admin-text-dim: #A89F91;
-    --admin-success: #4CAF50;
-    --admin-warning: #FF9800;
-    --admin-danger: #F44336;
-    --admin-hover: rgba(206, 177, 128, 0.1);
+console.log('🚀 Toast UI Admin loading...');
+
+let supabaseClient = null;
+let editor = null;
+let currentPostId = null;
+
+// ═══════════════════════════════════════════════════
+// WAIT FOR CONFIG
+// ═══════════════════════════════════════════════════
+function waitForConfig() {
+    return new Promise((resolve) => {
+        const interval = setInterval(() => {
+            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 100);
+    });
 }
 
-/* ═══════════════════════════════════════════════════
-   BASE STYLES
-   ═══════════════════════════════════════════════════ */
-.admin-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Noto Serif KR', serif;
-    background: var(--admin-bg);
-    color: var(--admin-text);
-    overflow-x: hidden;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-/* ═══════════════════════════════════════════════════
-   LOGIN SCREEN
-   ═══════════════════════════════════════════════════ */
-.login-screen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: var(--admin-bg);
-}
-
-.login-panel {
-    background: var(--admin-card);
-    padding: 3rem;
-    border-radius: 12px;
-    border: 1px solid var(--admin-border);
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
-
-.login-title {
-    color: var(--admin-primary);
-    text-align: center;
-    margin-bottom: 2rem;
-    font-size: 1.5rem;
-}
-
-.error-message {
-    color: var(--admin-danger);
-    text-align: center;
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    display: none;
-}
-
-.error-message.show {
-    display: block;
-}
-
-.back-link {
-    text-align: center;
-    margin-top: 1.5rem;
-}
-
-.back-link a {
-    color: var(--admin-primary);
-    text-decoration: none;
-    font-size: 0.9rem;
-}
-
-/* ═══════════════════════════════════════════════════
-   DASHBOARD LAYOUT
-   ═══════════════════════════════════════════════════ */
-.admin-dashboard {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.dashboard-header {
-    background: var(--admin-panel);
-    border-bottom: 1px solid var(--admin-border);
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.dashboard-title {
-    font-size: 1.3rem;
-    margin: 0;
-    color: var(--admin-primary);
-}
-
-.admin-badge {
-    background: rgba(206, 177, 128, 0.2);
-    color: var(--admin-primary);
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.header-right {
-    display: flex;
-    gap: 1rem;
-}
-
-.dashboard-container {
-    display: flex;
-    flex: 1;
-}
-
-/* ═══════════════════════════════════════════════════
-   SIDEBAR
-   ═══════════════════════════════════════════════════ */
-.dashboard-sidebar {
-    width: 260px;
-    background: var(--admin-panel);
-    border-right: 1px solid var(--admin-border);
-    padding: 1.5rem 0;
-}
-
-.sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 0.8rem 1.5rem;
-    background: transparent;
-    border: none;
-    border-left: 3px solid transparent;
-    color: var(--admin-text-dim);
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-align: left;
-}
-
-.nav-item .icon {
-    font-size: 1.2rem;
-}
-
-.nav-item .text {
-    flex: 1;
-}
-
-.nav-item .badge {
-    background: var(--admin-primary);
-    color: var(--admin-bg);
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.nav-item:hover {
-    background: var(--admin-hover);
-    color: var(--admin-text);
-}
-
-.nav-item.active {
-    background: rgba(206, 177, 128, 0.15);
-    border-left-color: var(--admin-primary);
-    color: var(--admin-primary);
-}
-
-/* ═══════════════════════════════════════════════════
-   MAIN CONTENT
-   ═══════════════════════════════════════════════════ */
-.dashboard-main {
-    flex: 1;
-    padding: 2rem;
-    overflow-y: auto;
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
-}
-
-.content-section {
-    display: none;
-}
-
-.content-section.active {
-    display: block;
-    animation: fadeIn 0.3s;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
+// ═══════════════════════════════════════════════════
+// AUTHENTICATION
+// ═══════════════════════════════════════════════════
+function showError(message) {
+    const loginError = document.getElementById('loginError');
+    if (loginError) {
+        loginError.textContent = message;
+        loginError.classList.add('show');
+        setTimeout(() => loginError.classList.remove('show'), 3000);
     }
 }
 
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
+async function checkAuth() {
+    if (!supabaseClient) return false;
 
-.section-title {
-    font-size: 1.8rem;
-    color: var(--admin-primary);
-    margin: 0;
-}
+    try {
+        const { data: { user }, error } = await supabaseClient.auth.getUser();
 
-/* ═══════════════════════════════════════════════════
-   CARDS
-   ═══════════════════════════════════════════════════ */
-.card {
-    background: var(--admin-card);
-    border: 1px solid var(--admin-border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-}
+        if (error || !user) return false;
 
-.card-title {
-    font-size: 1.1rem;
-    color: var(--admin-primary);
-    margin-bottom: 1rem;
-}
+        if (user.email !== window.ADMIN_EMAIL) {
+            await supabaseClient.auth.signOut();
+            return false;
+        }
 
-/* ═══════════════════════════════════════════════════
-   FORM ELEMENTS
-   ═══════════════════════════════════════════════════ */
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    color: var(--admin-primary);
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-}
-
-.form-input,
-.form-textarea,
-.form-select,
-.search-input,
-.filter-select {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--admin-border);
-    border-radius: 8px;
-    color: var(--admin-text);
-    font-family: inherit;
-    font-size: 1rem;
-    transition: all 0.3s;
-}
-
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus,
-.search-input:focus,
-.filter-select:focus {
-    outline: none;
-    border-color: var(--admin-primary);
-    box-shadow: 0 0 15px rgba(206, 177, 128, 0.2);
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 150px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 1rem;
-    align-items: end;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    color: var(--admin-text);
-}
-
-.checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-/* ═══════════════════════════════════════════════════
-   BUTTONS
-   ═══════════════════════════════════════════════════ */
-.btn-primary,
-.btn-secondary,
-.btn-danger {
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-family: inherit;
-}
-
-.btn-primary {
-    background: var(--admin-primary);
-    color: var(--admin-bg);
-}
-
-.btn-primary:hover {
-    background: #D4A574;
-    box-shadow: 0 5px 20px rgba(206, 177, 128, 0.3);
-    transform: translateY(-2px);
-}
-
-.btn-secondary {
-    background: transparent;
-    border: 1px solid var(--admin-border);
-    color: var(--admin-text);
-}
-
-.btn-secondary:hover {
-    border-color: var(--admin-primary);
-    background: var(--admin-hover);
-}
-
-.btn-danger {
-    background: var(--admin-danger);
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #D32F2F;
-}
-
-/* ═══════════════════════════════════════════════════
-   TOOLBAR
-   ═══════════════════════════════════════════════════ */
-.toolbar {
-    display: flex;
-    gap: 1rem;
-}
-
-.toolbar .search-input {
-    flex: 1;
-}
-
-/* ═══════════════════════════════════════════════════
-   POSTS LIST
-   ═══════════════════════════════════════════════════ */
-.posts-list {
-    display: flex;
-    flex-direction: column;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.post-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.2rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: transparent;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.post-row:hover {
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.post-row-left {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.post-row-title {
-    color: #FFB74D;
-    /* Orange/Gold from image */
-    font-size: 1.1rem;
-    font-weight: 500;
-}
-
-.private-tag {
-    font-size: 0.8rem;
-    opacity: 0.7;
-}
-
-.post-row-right {
-    text-align: right;
-}
-
-.post-row-date {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.9rem;
-    font-family: sans-serif;
-}
-
-/* Hide old styles if not used, or keep for other sections */
-.post-item {
-    display: none;
-}
-
-.loading {
-    text-align: center;
-    color: var(--admin-text-dim);
-    padding: 3rem;
-}
-
-/* ═══════════════════════════════════════════════════
-   EDITOR
-   ═══════════════════════════════════════════════════ */
-.editor-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--admin-border);
-}
-
-.editor-header h3 {
-    flex: 1;
-    margin: 0;
-    color: var(--admin-primary);
-    font-size: 1.3rem;
-}
-
-#editor {
-    min-height: 500px;
-    border: 1px solid var(--admin-border);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-/* Toast UI Editor Dark Theme */
-.toastui-editor-defaultUI {
-    border: none !important;
-}
-
-.toastui-editor-defaultUI-toolbar {
-    background: rgba(0, 0, 0, 0.3) !important;
-    border-bottom: 1px solid var(--admin-border) !important;
-}
-
-.toastui-editor-toolbar-icons {
-    color: var(--admin-text) !important;
-}
-
-.toastui-editor-md-container,
-.toastui-editor-ww-container {
-    background: rgba(0, 0, 0, 0.2) !important;
-}
-
-.toastui-editor-contents,
-.ProseMirror {
-    color: var(--admin-text) !important;
-}
-
-.toastui-editor-md-code,
-.toastui-editor-md-code-block {
-    background: rgba(0, 0, 0, 0.3) !important;
-    color: var(--admin-text) !important;
-}
-
-/* ═══════════════════════════════════════════════════
-   ACTION BUTTONS
-   ═══════════════════════════════════════════════════ */
-.action-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--admin-border);
-}
-
-/* ═══════════════════════════════════════════════════
-   SPLIT LAYOUT (Home Preview)
-   ═══════════════════════════════════════════════════ */
-.split-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-}
-
-.preview-panel {
-    position: sticky;
-    top: 100px;
-    height: fit-content;
-}
-
-.preview-header {
-    padding: 1rem;
-    background: var(--admin-panel);
-    border: 1px solid var(--admin-border);
-    border-bottom: none;
-    border-radius: 12px 12px 0 0;
-}
-
-.preview-title {
-    color: var(--admin-primary);
-    font-weight: 600;
-}
-
-.preview-content {
-    background: white;
-    color: #000;
-    padding: 2rem;
-    border: 1px solid var(--admin-border);
-    border-radius: 0 0 12px 12px;
-    min-height: 400px;
-}
-
-.preview-content h1 {
-    color: #CEB180;
-    margin-bottom: 1rem;
-}
-
-.preview-subtitle {
-    color: #666;
-    margin-bottom: 2rem;
-}
-
-/* ═══════════════════════════════════════════════════
-   CATEGORIES
-   ═══════════════════════════════════════════════════ */
-.add-category-form {
-    display: flex;
-    gap: 1rem;
-}
-
-.add-category-form .form-input {
-    flex: 1;
-}
-
-.categories-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.category-item-card {
-    background: var(--admin-card);
-    border: 1px solid var(--admin-border);
-    border-radius: 8px;
-    padding: 0.8rem;
-    cursor: move;
-    transition: all 0.3s;
-}
-
-.category-item-card:hover {
-    border-color: var(--admin-primary);
-    box-shadow: 0 0 20px rgba(206, 177, 128, 0.15);
-}
-
-.category-header {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin-bottom: 0;
-}
-
-.drag-handle {
-    cursor: grab;
-    font-size: 1.2rem;
-    color: var(--admin-text-dim);
-}
-
-.category-name-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: var(--admin-primary);
-    font-size: 1rem;
-    font-weight: 600;
-    padding: 0.2rem;
-    transition: all 0.3s;
-}
-
-.category-name-input:hover {
-    border-bottom-color: var(--admin-border);
-}
-
-.category-name-input:focus {
-    outline: none;
-    border-bottom-color: var(--admin-primary);
-}
-
-.visibility-toggle {
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-/* ═══════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════ */
-@media (max-width: 1024px) {
-    .split-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .preview-panel {
-        position: static;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
+        return true;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        return false;
     }
 }
 
-@media (max-width: 768px) {
-    .dashboard-sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid var(--admin-border);
-    }
+async function showDashboard() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'block';
 
-    .sidebar-nav {
-        flex-direction: row;
-        overflow-x: auto;
-    }
+    // Initialize Toast UI Editor
+    initializeEditor();
 
-    .nav-item {
-        border-left: none;
-        border-bottom: 3px solid transparent;
-        min-width: 120px;
-    }
+    // Load data
+    await Promise.all([
+        loadPosts(),
+        loadCategories(),
+        loadHomeSettings()
+    ]);
 
-    .nav-item.active {
-        border-left: none;
-        border-bottom-color: var(--admin-primary);
+    // Check for actions in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    const id = urlParams.get('id');
+
+    if (action === 'new') {
+        showNewPostEditor();
+    } else if (action === 'edit' && id) {
+        editPost(id);
     }
 }
+
+// ═══════════════════════════════════════════════════
+// TOAST UI EDITOR
+// ═══════════════════════════════════════════════════
+function initializeEditor() {
+    if (editor) return; // Already initialized
+
+    const Editor = toastui.Editor;
+
+    editor = new Editor({
+        el: document.querySelector('#editor'),
+        height: '500px',
+        initialEditType: 'markdown',
+        previewStyle: 'vertical',
+        placeholder: '내용을 입력하세요...',
+        language: 'ko-KR',
+        toolbarItems: [
+            ['heading', 'bold', 'italic', 'strike'],
+            ['hr', 'quote'],
+            ['ul', 'ol', 'task', 'indent', 'outdent'],
+            ['table', 'image', 'link'],
+            ['code', 'codeblock'],
+            ['scrollSync']
+        ],
+        hooks: {
+            addImageBlobHook: async (blob, callback) => {
+                try {
+                    const url = await uploadImage(blob);
+                    callback(url, 'Image');
+                } catch (error) {
+                    console.error('Image upload failed:', error);
+                    alert('이미지 업로드 실패: ' + error.message);
+                }
+            }
+        }
+    });
+
+    console.log('✅ Toast UI Editor initialized');
+
+    // Initialize Home Editor
+    if (!window.homeEditorInstance) {
+        window.homeEditorInstance = new Editor({
+            el: document.querySelector('#homeEditor'),
+            height: '300px',
+            initialEditType: 'markdown',
+            previewStyle: 'vertical',
+            language: 'ko-KR',
+            initialValue: '',
+            events: {
+                change: updateHomePreview
+            }
+        });
+    }
+}
+
+async function uploadImage(file) {
+    try {
+        const fileExt = file.name ? file.name.split('.').pop() : 'png';
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `images/${fileName}`;
+
+        const { data, error } = await supabaseClient.storage
+            .from('archive-images')
+            .upload(filePath, file);
+
+        if (error) throw error;
+
+        const { data: urlData } = supabaseClient.storage
+            .from('archive-images')
+            .getPublicUrl(filePath);
+
+        return urlData.publicUrl;
+
+    } catch (error) {
+        console.error('Upload failed:', error);
+        throw error;
+    }
+}
+
+// ═══════════════════════════════════════════════════
+// SECTION SWITCHING
+// ═══════════════════════════════════════════════════
+function switchSection(sectionName) {
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+    document.getElementById(`section-${sectionName}`).classList.add('active');
+    document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+// POSTS MANAGEMENT
+// ═══════════════════════════════════════════════════
+async function loadPosts() {
+    try {
+        const { data: posts, error } = await supabaseClient
+            .from('archive_posts')
+            .select(`
+                    id,
+                    title,
+                    is_private,
+                    created_at,
+                    updated_at,
+                    categories (name)
+                `)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const container = document.getElementById('postsList');
+        document.getElementById('postCount').textContent = posts ? posts.length : 0;
+
+        if (!posts || posts.length === 0) {
+            container.innerHTML = '<div class="loading">게시물이 없습니다.</div>';
+            return;
+        }
+
+        container.innerHTML = posts.map(post => {
+            const date = new Date(post.created_at).toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            });
+
+            return `
+                    <div class="post-row" onclick="editPost('${post.id}')">
+                        <div class="post-row-left">
+                            <span class="post-row-title">${post.title}</span>
+                            ${post.is_private ? '<span class="private-tag">🔒</span>' : ''}
+                        </div>
+                        <div class="post-row-right">
+                            <span class="post-row-date">${date}</span>
+                        </div>
+                    </div>
+                `;
+        }).join('');
+
+    } catch (error) {
+        console.error('Posts loading failed:', error);
+        document.getElementById('postsList').innerHTML = '<div class="loading">게시물을 불러오는 중 오류가 발생했습니다.</div>';
+    }
+}
+
+function getTimeAgo(dateString) {
+    const now = new Date();
+    const past = new Date(dateString);
+    const diffMs = now - past;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return '방금 전';
+    if (diffMins < 60) return `${diffMins}분 전`;
+    if (diffHours < 24) return `${diffHours}시간 전`;
+    return `${diffDays}일 전`;
+}
+
+window.copyPostLink = function (url) {
+    navigator.clipboard.writeText(url).then(() => {
+        alert('✅ 링크가 복사되었습니다!');
+    }).catch(() => {
+        alert('❌ 복사 실패');
+    });
+};
+
+window.editPost = async function (id) {
+    try {
+        const { data: post, error } = await supabaseClient
+            .from('archive_posts')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        // Switch to editor view
+        document.getElementById('postListView').style.display = 'none';
+        document.getElementById('postEditorView').style.display = 'block';
+        document.getElementById('editorTitle').textContent = '게시물 수정';
+
+        // Fill form
+        document.getElementById('postTitle').value = post.title;
+        document.getElementById('postCategory').value = post.category_id;
+        document.getElementById('isPrivate').checked = post.is_private;
+        document.getElementById('originFree').checked = post.origin_free;
+
+        // Set editor content
+        editor.setMarkdown(post.content);
+
+        // Store current post ID
+        currentPostId = id;
+
+        // Scroll to top
+        window.scrollTo(0, 0);
+
+    } catch (error) {
+        console.error('Edit post failed:', error);
+        alert('게시물을 불러오는 중 오류가 발생했습니다.');
+    }
+};
+
+window.deletePost = async function (id, title) {
+    if (!confirm(`"${title}"를 삭제하시겠습니까?`)) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('archive_posts')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        alert('✅ 삭제되었습니다.');
+        loadPosts();
+
+    } catch (error) {
+        console.error('Delete failed:', error);
+        alert('❌ 삭제 실패: ' + error.message);
+    }
+};
+
+function showNewPostEditor() {
+    document.getElementById('postListView').style.display = 'none';
+    document.getElementById('postEditorView').style.display = 'block';
+    document.getElementById('editorTitle').textContent = '새 글 작성';
+
+    // Clear form
+    document.getElementById('postTitle').value = '';
+    document.getElementById('postCategory').value = '';
+    document.getElementById('isPrivate').checked = false;
+    document.getElementById('originFree').checked = false;
+    editor.setMarkdown('');
+
+    currentPostId = null;
+
+    window.scrollTo(0, 0);
+}
+
+function backToList() {
+    document.getElementById('postListView').style.display = 'block';
+    document.getElementById('postEditorView').style.display = 'none';
+
+    currentPostId = null;
+
+    loadPosts();
+}
+
+async function publishPost() {
+    const title = document.getElementById('postTitle').value.trim();
+    const categoryId = document.getElementById('postCategory').value;
+    const isPrivate = document.getElementById('isPrivate').checked;
+    const originFree = document.getElementById('originFree').checked;
+    const content = editor.getMarkdown();
+
+    if (!title) {
+        alert('제목을 입력하세요.');
+        return;
+    }
+
+    if (!categoryId) {
+        alert('카테고리를 선택하세요.');
+        return;
+    }
+
+    if (!content) {
+        alert('내용을 입력하세요.');
+        return;
+    }
+
+    try {
+        if (currentPostId) {
+            // Update existing post
+            const { error } = await supabaseClient
+                .from('archive_posts')
+                .update({
+                    title: title,
+                    content: content,
+                    category_id: categoryId,
+                    is_private: isPrivate,
+                    origin_free: originFree,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', currentPostId);
+
+            if (error) throw error;
+
+            alert('✅ 게시물이 수정되었습니다!');
+
+        } else {
+            // Create new post
+            const { error } = await supabaseClient
+                .from('archive_posts')
+                .insert([{
+                    title: title,
+                    content: content,
+                    category_id: categoryId,
+                    is_private: isPrivate,
+                    origin_free: originFree
+                }]);
+
+            if (error) throw error;
+
+            alert('✅ 게시물이 발행되었습니다!');
+        }
+
+        backToList();
+
+    } catch (error) {
+        console.error('Publish failed:', error);
+        alert('❌ 저장 실패: ' + error.message);
+    }
+}
+
+// ═══════════════════════════════════════════════════
+// CATEGORIES MANAGEMENT
+// ═══════════════════════════════════════════════════
+async function loadCategories() {
+    try {
+        const { data: categories, error } = await supabaseClient
+            .from('categories')
+            .select('*')
+            .eq('is_visible', true)
+            .order('display_order', { ascending: true });
+
+        if (error) throw error;
+
+        const categorySelect = document.getElementById('postCategory'); // Changed from 'categorySelect' to 'postCategory'
+        if (categorySelect) {
+            // Organize into hierarchy for display
+            const roots = categories.filter(c => !c.parent_id);
+            const childrenMap = {};
+            categories.filter(c => c.parent_id).forEach(c => {
+                if (!childrenMap[c.parent_id]) childrenMap[c.parent_id] = [];
+                childrenMap[c.parent_id].push(c);
+            });
+
+            let optionsHtml = '<option value="">카테고리 선택</option>';
+
+            roots.forEach(root => {
+                optionsHtml += `<option value="${root.id}">${root.name}</option>`;
+                if (childrenMap[root.id]) {
+                    childrenMap[root.id].forEach(child => {
+                        optionsHtml += `<option value="${child.id}">&nbsp;&nbsp;&nbsp;&nbsp;└ ${child.name}</option>`;
+                    });
+                }
+            });
+
+            categorySelect.innerHTML = optionsHtml;
+        }
+
+        // Update filter select
+        const filterSelect = document.getElementById('postFilterCategory');
+        filterSelect.innerHTML = '<option value="">모든 카테고리</option>' +
+            categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+
+        // Update categories list
+        const container = document.getElementById('categoriesList');
+
+        if (!categories || categories.length === 0) {
+            container.innerHTML = '<p style="color: var(--admin-text-dim);">카테고리가 없습니다.</p>';
+            return;
+        }
+
+        container.innerHTML = categories.map(cat => {
+            const visibilityIcon = cat.is_visible ? '👁️' : '🙈';
+
+            return `
+                <div class="category-item-card" draggable="true" data-id="${cat.id}">
+                    <div class="category-header">
+                        <span class="drag-handle">⋮⋮</span>
+                        <input type="text" 
+                               class="category-name-input" 
+                               value="${cat.name}"
+                               onchange="updateCategoryName('${cat.id}', this.value)">
+                        <button class="visibility-toggle" onclick="toggleCategoryVisibility('${cat.id}', ${!cat.is_visible})">
+                            ${visibilityIcon}
+                        </button>
+                        <button class="action-btn danger" onclick="deleteCategory('${cat.id}', '${cat.name}')">🗑️</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        initDragAndDrop();
+
+    } catch (error) {
+        console.error('Categories loading failed:', error);
+    }
+}
+
+window.updateCategoryName = async function (id, newName) {
+    try {
+        await supabaseClient.from('categories').update({ name: newName }).eq('id', id);
+        console.log('✅ Category name updated');
+    } catch (error) {
+        console.error('Update failed:', error);
+        alert('❌ 이름 변경 실패');
+    }
+};
+
+window.toggleCategoryVisibility = async function (id, isVisible) {
+    try {
+        await supabaseClient.from('categories').update({ is_visible: isVisible }).eq('id', id);
+        loadCategories();
+    } catch (error) {
+        console.error('Update failed:', error);
+    }
+};
+
+window.deleteCategory = async function (id, name) {
+    if (!confirm(`"${name}" 카테고리를 삭제하시겠습니까?`)) return;
+
+    try {
+        const { data: posts } = await supabaseClient.from('archive_posts').select('id').eq('category_id', id);
+
+        if (posts && posts.length > 0) {
+            if (!confirm(`⚠️ ${posts.length}개의 게시물이 있습니다.\n\n게시물도 함께 삭제됩니까?`)) {
+                return;
+            }
+            await supabaseClient.from('archive_posts').delete().eq('category_id', id);
+        }
+
+        await supabaseClient.from('categories').delete().eq('id', id);
+        alert('✅ 삭제되었습니다.');
+        loadCategories();
+
+    } catch (error) {
+        console.error('Delete failed:', error);
+        alert('❌ 삭제 실패');
+    }
+};
+
+async function addCategory() {
+    const name = document.getElementById('newCategoryName').value.trim();
+    if (!name) {
+        alert('카테고리 이름을 입력하세요.');
+        return;
+    }
+
+    try {
+        const { data: categories } = await supabaseClient
+            .from('categories')
+            .select('display_order')
+            .order('display_order', { ascending: false })
+            .limit(1);
+
+        const maxOrder = categories && categories.length > 0 ? categories[0].display_order : 0;
+
+        await supabaseClient.from('categories').insert({
+            name: name,
+            is_visible: true,
+            has_dropdown: true,
+            default_open: false,
+            display_order: maxOrder + 1
+        });
+
+        document.getElementById('newCategoryName').value = '';
+        alert('✅ 카테고리가 추가되었습니다!');
+        loadCategories();
+
+    } catch (error) {
+        console.error('Add failed:', error);
+        alert('❌ 추가 실패');
+    }
+}
+
+async function saveAllCategories() {
+    const items = document.querySelectorAll('.category-item-card');
+
+    try {
+        for (let i = 0; i < items.length; i++) {
+            const id = items[i].dataset.id;
+            const input = items[i].querySelector('.category-name-input');
+            const newName = input ? input.value : null;
+
+            if (newName) {
+                // Update order and name
+                await supabaseClient.from('categories').update({
+                    display_order: i + 1,
+                    name: newName
+                }).eq('id', id);
+            }
+        }
+
+        alert('✅ 모든 카테고리 변경사항이 저장되었습니다!');
+        loadCategories();
+    } catch (error) {
+        console.error('Save failed:', error);
+        alert('❌ 저장 실패: ' + error.message);
+    }
+}
+
+function initDragAndDrop() {
+    const container = document.getElementById('categoriesList');
+    let draggedElement = null;
+
+    container.querySelectorAll('.category-item-card').forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+            draggedElement = item;
+            item.style.opacity = '0.5';
+        });
+
+        item.addEventListener('dragend', (e) => {
+            item.style.opacity = '1';
+        });
+
+        item.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        item.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            if (draggedElement !== item) {
+                const allItems = [...container.querySelectorAll('.category-item-card')];
+                const draggedIndex = allItems.indexOf(draggedElement);
+                const targetIndex = allItems.indexOf(item);
+
+                if (draggedIndex < targetIndex) {
+                    item.after(draggedElement);
+                } else {
+                    item.before(draggedElement);
+                }
+
+                await updateCategoryOrder();
+            }
+        });
+    });
+}
+
+async function updateCategoryOrder() {
+    const items = document.querySelectorAll('.category-item-card');
+
+    try {
+        for (let i = 0; i < items.length; i++) {
+            const id = items[i].dataset.id;
+            await supabaseClient.from('categories').update({ display_order: i + 1 }).eq('id', id);
+        }
+        console.log('✅ Order updated');
+    } catch (error) {
+        console.error('Order update failed:', error);
+    }
+}
+
+// ═══════════════════════════════════════════════════
+// HOME SCREEN MANAGEMENT
+// ═══════════════════════════════════════════════════
+async function loadHomeSettings() {
+    try {
+        const { data } = await supabaseClient
+            .from('settings')
+            .select('*')
+            .in('key', ['home_title', 'home_subtitle', 'home_content', 'show_recent_posts', 'recent_posts_count']);
+
+        const settings = {};
+        data.forEach(item => settings[item.key] = item.value);
+
+        document.getElementById('homeTitle').value = settings.home_title || '환영합니다';
+        document.getElementById('homeSubtitle').value = settings.home_subtitle || 'SMALLSM Archive에 오신 것을 환영합니다';
+
+        if (window.homeEditorInstance) {
+            window.homeEditorInstance.setMarkdown(settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.');
+        }
+
+        document.getElementById('showRecentPosts').checked = settings.show_recent_posts === 'true';
+        document.getElementById('recentPostsCount').value = settings.recent_posts_count || '3';
+
+        updateHomePreview();
+        toggleRecentPostsCount();
+
+    } catch (error) {
+        console.error('Home settings loading failed:', error);
+    }
+}
+
+function updateHomePreview() {
+    const title = document.getElementById('homeTitle').value;
+    const subtitle = document.getElementById('homeSubtitle').value;
+    const content = window.homeEditorInstance ? window.homeEditorInstance.getHTML() : '';
+
+    document.getElementById('previewTitle').textContent = title;
+    document.getElementById('previewSubtitle').textContent = subtitle;
+    document.getElementById('previewContent').innerHTML = content;
+}
+
+function toggleRecentPostsCount() {
+    const checkbox = document.getElementById('showRecentPosts');
+    const countGroup = document.getElementById('recentPostsCountGroup');
+    countGroup.style.display = checkbox.checked ? 'block' : 'none';
+}
+
+async function saveHomeSettings() {
+    const settings = [
+        { key: 'home_title', value: document.getElementById('homeTitle').value },
+        { key: 'home_subtitle', value: document.getElementById('homeSubtitle').value },
+        { key: 'home_content', value: window.homeEditorInstance ? window.homeEditorInstance.getMarkdown() : '' },
+        { key: 'show_recent_posts', value: document.getElementById('showRecentPosts').checked.toString() },
+        { key: 'recent_posts_count', value: document.getElementById('recentPostsCount').value }
+    ];
+
+    try {
+        for (const setting of settings) {
+            await supabaseClient.from('settings').upsert({
+                key: setting.key,
+                value: setting.value,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'key' });
+        }
+
+        alert('✅ 홈화면이 저장되었습니다!');
+
+    } catch (error) {
+        console.error('Save failed:', error);
+        alert('❌ 저장 실패: ' + error.message);
+    }
+}
+
+// ═══════════════════════════════════════════════════
+// SEARCH AND FILTER
+// ═══════════════════════════════════════════════════
+function setupSearchAndFilter() {
+    const searchInput = document.getElementById('postSearch');
+    const categoryFilter = document.getElementById('postFilterCategory');
+    const statusFilter = document.getElementById('postFilterStatus');
+
+    searchInput.addEventListener('input', filterPosts);
+    categoryFilter.addEventListener('change', filterPosts);
+    statusFilter.addEventListener('change', filterPosts);
+}
+
+function filterPosts() {
+    const searchTerm = document.getElementById('postSearch').value.toLowerCase();
+    const selectedCategory = document.getElementById('postFilterCategory').value;
+    const selectedStatus = document.getElementById('postFilterStatus').value;
+
+    const posts = document.querySelectorAll('.post-item');
+
+    posts.forEach(post => {
+        const title = post.querySelector('.post-title-link').textContent.toLowerCase();
+        const category = post.querySelector('.post-meta').textContent;
+        const isPrivate = post.querySelector('.status-badge.private') !== null;
+
+        let show = true;
+
+        if (searchTerm && !title.includes(searchTerm)) {
+            show = false;
+        }
+
+        if (selectedStatus === 'public' && isPrivate) {
+            show = false;
+        } else if (selectedStatus === 'private' && !isPrivate) {
+            show = false;
+        }
+
+        post.style.display = show ? 'block' : 'none';
+    });
+}
+
+// ═══════════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('📱 DOM ready');
+
+    await waitForConfig();
+
+    supabaseClient = window.supabase.createClient(
+        window.SUPABASE_CONFIG.url,
+        window.SUPABASE_CONFIG.anonKey
+    );
+
+    console.log('✅ Supabase initialized');
+
+    // Check if already logged in
+    if (await checkAuth()) {
+        await showDashboard();
+    }
+
+    // Login button
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+
+        if (!email || !password) {
+            showError('이메일과 비밀번호를 입력하세요');
+            return;
+        }
+
+        if (email !== window.ADMIN_EMAIL) {
+            showError('관리자 권한이 없습니다');
+            return;
+        }
+
+        try {
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+
+            await showDashboard();
+        } catch (error) {
+            showError(error.message || '로그인 실패');
+        }
+    });
+
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        if (!confirm('로그아웃하시겠습니까?')) return;
+
+        await supabaseClient.auth.signOut();
+        window.location.reload();
+    });
+
+    // Nav buttons
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            switchSection(btn.dataset.section);
+        });
+    });
+
+    // Post editor buttons
+    document.getElementById('newPostBtn').addEventListener('click', showNewPostEditor);
+    document.getElementById('backToListBtn').addEventListener('click', backToList);
+    document.getElementById('publishPostBtn').addEventListener('click', publishPost);
+    document.getElementById('saveDraftBtn').addEventListener('click', () => {
+        localStorage.setItem('draft_post', JSON.stringify({
+            title: document.getElementById('postTitle').value,
+            category: document.getElementById('postCategory').value,
+            content: editor.getMarkdown(),
+            timestamp: Date.now()
+        }));
+        alert('✅ 임시 저장되었습니다!');
+    });
+
+    // Home preview real-time
+    ['homeTitle', 'homeSubtitle'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateHomePreview);
+    });
+
+    // Hook into editor change for preview
+    if (window.homeEditorInstance) {
+        window.homeEditorInstance.on('change', updateHomePreview);
+    }
+
+    document.getElementById('showRecentPosts').addEventListener('change', toggleRecentPostsCount);
+    document.getElementById('saveHomeBtn').addEventListener('click', saveHomeSettings);
+    document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
+
+    const saveCatBtn = document.getElementById('saveCategoriesBtn');
+    if (saveCatBtn) saveCatBtn.addEventListener('click', saveAllCategories);
+
+    // Setup search and filter
+    setupSearchAndFilter();
+
+    // Home Link
+    const dashboardTitle = document.querySelector('.dashboard-title');
+    if (dashboardTitle) {
+        dashboardTitle.style.cursor = 'pointer';
+        dashboardTitle.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    }
+
+    console.log('🎉 Admin initialized');
+});
