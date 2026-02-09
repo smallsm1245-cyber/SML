@@ -1,31 +1,35 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    
+
     <title id="pageTitle">게시물 - SMALLSM Archive</title>
     <meta name="description" content="SMALLSM Archive의 기록">
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
-    
+    <!-- Toast UI Viewer -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css" />
+
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+
 <body>
     <!-- Age Verification Disclaimer -->
     <div id="disclaimerOverlay" class="disclaimer-overlay">
         <div class="disclaimer-content">
             <h2>성인 인증</h2>
             <p>본 사이트는 성인 지향 콘텐츠를 포함하고 있습니다.<br>
-            귀하는 만 19세 이상이십니까?</p>
+                귀하는 만 19세 이상이십니까?</p>
             <div class="disclaimer-buttons">
                 <button class="btn btn-primary" id="btnYes">예 (19세 이상)</button>
                 <button class="btn btn-secondary" id="btnNo">아니요</button>
@@ -44,10 +48,7 @@
 
             <!-- Search -->
             <div class="search-box">
-                <input type="text" 
-                       class="search-input" 
-                       id="searchInput"
-                       placeholder="검색어를 입력하세요...">
+                <input type="text" class="search-input" id="searchInput" placeholder="검색어를 입력하세요...">
             </div>
 
             <!-- Categories -->
@@ -86,7 +87,9 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
     <script src="/api/config"></script>
     <script src="js/post.js"></script>
 </body>
+
 </html>

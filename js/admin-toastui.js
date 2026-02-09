@@ -70,8 +70,13 @@ async function showDashboard() {
 
     // Check for actions in URL
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('action') === 'new') {
+    const action = urlParams.get('action');
+    const id = urlParams.get('id');
+
+    if (action === 'new') {
         showNewPostEditor();
+    } else if (action === 'edit' && id) {
+        editPost(id);
     }
 }
 
@@ -112,6 +117,18 @@ function initializeEditor() {
     });
 
     console.log('✅ Toast UI Editor initialized');
+
+    // Initialize Home Editor
+    if (!window.homeEditorInstance) {
+        window.homeEditorInstance = new Editor({
+            el: document.querySelector('#homeEditor'),
+            height: '300px',
+            initialEditType: 'markdown',
+            previewStyle: 'vertical',
+            language: 'ko-KR',
+            initialValue: ''
+        });
+    }
 }
 
 async function uploadImage(file) {
@@ -604,7 +621,11 @@ async function loadHomeSettings() {
 
         document.getElementById('homeTitle').value = settings.home_title || '환영합니다';
         document.getElementById('homeSubtitle').value = settings.home_subtitle || 'SMALLSM Archive에 오신 것을 환영합니다';
-        document.getElementById('homeContent').value = settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.';
+
+        if (window.homeEditorInstance) {
+            window.homeEditorInstance.setMarkdown(settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.');
+        }
+
         document.getElementById('showRecentPosts').checked = settings.show_recent_posts === 'true';
         document.getElementById('recentPostsCount').value = settings.recent_posts_count || '3';
 
@@ -619,15 +640,11 @@ async function loadHomeSettings() {
 function updateHomePreview() {
     const title = document.getElementById('homeTitle').value;
     const subtitle = document.getElementById('homeSubtitle').value;
-    const content = document.getElementById('homeContent').value;
+    const content = window.homeEditorInstance ? window.homeEditorInstance.getHTML() : '';
 
     document.getElementById('previewTitle').textContent = title;
     document.getElementById('previewSubtitle').textContent = subtitle;
-    document.getElementById('previewContent').innerHTML = content
-        .split('\n')
-        .filter(line => line.trim())
-        .map(line => `<p>${line}</p>`)
-        .join('');
+    document.getElementById('previewContent').innerHTML = content;
 }
 
 function toggleRecentPostsCount() {
@@ -640,7 +657,7 @@ async function saveHomeSettings() {
     const settings = [
         { key: 'home_title', value: document.getElementById('homeTitle').value },
         { key: 'home_subtitle', value: document.getElementById('homeSubtitle').value },
-        { key: 'home_content', value: document.getElementById('homeContent').value },
+        { key: 'home_content', value: window.homeEditorInstance ? window.homeEditorInstance.getMarkdown() : '' },
         { key: 'show_recent_posts', value: document.getElementById('showRecentPosts').checked.toString() },
         { key: 'recent_posts_count', value: document.getElementById('recentPostsCount').value }
     ];
@@ -791,6 +808,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Setup search and filter
     setupSearchAndFilter();
+
+    // Home Link
+    const dashboardTitle = document.querySelector('.dashboard-title');
+    if (dashboardTitle) {
+        dashboardTitle.style.cursor = 'pointer';
+        dashboardTitle.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    }
 
     console.log('🎉 Admin initialized');
 });

@@ -369,7 +369,7 @@ window.showNewPostEditor = function () {
 };
 
 window.editPost = function (id) {
-    window.location.href = `admin.html?action=edit&id=${id}`;
+    window.location.href = `admin-toastui.html?action=edit&id=${id}`;
 };
 
 window.copyPostLink = function (url) {

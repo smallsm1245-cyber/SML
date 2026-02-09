@@ -157,18 +157,14 @@ async function loadPost() {
             day: 'numeric'
         });
 
-        // Process content
-        let processedContent = post.content;
-
-        // Convert markdown-style formatting to HTML
-        processedContent = processedContent
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/_(.*?)_/g, '<u>$1</u>')
-            .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">')
-            .replace(/\n/g, '<br>');
-
-        document.getElementById('postContent').innerHTML = processedContent;
+        // Initialize Toast UI Viewer
+        const Viewer = toastui.Editor;
+        const viewer = Viewer.factory({
+            el: document.querySelector('#postContent'),
+            viewer: true,
+            height: 'auto',
+            initialValue: post.content
+        });
 
         // Add copy protection class if needed
         if (!post.origin_free) {
@@ -311,5 +307,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initNightMode();
+    initNightMode();
     initAdminLongPress();
+
+    // Home Link
+    const titleConfig = document.querySelector('.sidebar-header');
+    if (titleConfig) {
+        titleConfig.style.cursor = 'pointer';
+        titleConfig.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    }
 });
