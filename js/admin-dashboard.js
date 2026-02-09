@@ -4,13 +4,15 @@
 
 console.log('🚀 Wiki Dashboard loading...');
 
+import * as utils from './utils.js';
+window.utils = utils;
+
 let supabaseClient = null;
+let editor = null;
+let currentPostId = null;
 let hasUnsavedChanges = false;
 
-// ═══════════════════════════════════════════════════
-// SHARED UTILITIES (via window.utils)
-// ═══════════════════════════════════════════════════
-const { waitForConfig, showError, getTimeAgo, checkAuth: checkAuthUtil } = window.utils || {};
+const { waitForConfig, showError, getTimeAgo, checkAuth: checkAuthUtil } = utils;
 
 async function checkAuth() {
     return await checkAuthUtil(supabaseClient, window.ADMIN_EMAIL);
@@ -375,7 +377,9 @@ window.showNewPostEditor = function () {
     document.getElementById('isPrivate').checked = false;
     document.getElementById('originFree').checked = false;
 
-    if (editor) {
+    if (!editor) {
+        initializeEditor();
+    } else {
         editor.setMarkdown('');
     }
 
@@ -1167,43 +1171,87 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Logout button
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-        if (!confirm('로그아웃하시겠습니까?')) return;
-
-        await supabaseClient.auth.signOut();
-        window.location.reload();
-    });
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            if (!confirm('로그아웃하시겠습니까?')) return;
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        });
+    }
 
     // Nav buttons
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.addEventListener('click', () => {
             const section = btn.dataset.section;
             switchSection(section);
-
             if (section === 'trash') loadTrash();
         });
     });
 
     // Home preview real-time
     ['homeTitle', 'homeSubtitle', 'homeContent'].forEach(id => {
-        document.getElementById(id).addEventListener('input', updateHomePreview);
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateHomePreview);
     });
 
-    document.getElementById('showRecentPosts').addEventListener('change', toggleRecentPostsCount);
-    document.getElementById('saveHomeBtn').addEventListener('click', saveHomeSettings);
-    document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
+    const recentPostsToggle = document.getElementById('showRecentPosts');
+    if (recentPostsToggle) recentPostsToggle.addEventListener('change', toggleRecentPostsCount);
+
+    const saveHomeBtn = document.getElementById('saveHomeBtn');
+    if (saveHomeBtn) saveHomeBtn.addEventListener('click', saveHomeSettings);
+
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    if (addCategoryBtn) addCategoryBtn.addEventListener('click', addCategory);
+
     // Theme toggling
-    function toggleTheme() {
+    window.toggleTheme = function () {
         const isDark = document.body.classList.toggle('night-mode');
         localStorage.setItem('admin_theme', isDark ? 'dark' : 'light');
-        document.querySelector('#themeToggle .icon').textContent = isDark ? '☀️' : '🌙';
+        const icon = document.querySelector('#themeToggle .icon');
+        if (icon) icon.textContent = isDark ? '☀️' : '🌙';
     }
+
+    const themeToggleBtn = document.getElementById('themeToggle');
+    if (themeToggleBtn) themeToggleBtn.addEventListener('click', window.toggleTheme);
+
+    const previewThemeToggle = document.getElementById('previewThemeToggle');
+    if (previewThemeToggle) previewThemeToggle.addEventListener('click', togglePreviewTheme);
+
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSiteSettings);
+
+    const saveSeoBtn = document.getElementById('saveSeoBtn');
+    if (saveSeoBtn) saveSeoBtn.addEventListener('click', saveSeoSettings);
+
+    // Editor buttons
+    const backToListBtn = document.getElementById('backToListBtn');
+    if (backToListBtn) backToListBtn.addEventListener('click', backToList);
+
+    const publishPostBtn = document.getElementById('publishPostBtn');
+    if (publishPostBtn) publishPostBtn.addEventListener('click', publishPost);
+
+    const saveDraftBtn = document.getElementById('saveDraftBtn');
+    if (saveDraftBtn) saveDraftBtn.addEventListener('click', publishPost);
+
+    // Mobile menu toggle
+    const menuBtn = document.createElement('button');
+    menuBtn.className = 'mobile-menu-btn';
+    menuBtn.innerHTML = '☰';
+    const headerLeft = document.querySelector('.header-left');
+    if (headerLeft) headerLeft.prepend(menuBtn);
+
+    menuBtn.addEventListener('click', () => {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        if (sidebar) sidebar.classList.toggle('active');
+    });
 
     // Load saved theme
     const savedTheme = localStorage.getItem('admin_theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('night-mode');
-        document.querySelector('#themeToggle .icon').textContent = '☀️';
+        const icon = document.querySelector('#themeToggle .icon');
+        if (icon) icon.textContent = '☀️';
     }
 
     // Unsaved changes warning
@@ -1216,3 +1264,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     console.log('🎉 Dashboard initialized');
 });
+
+// Export functions to window for HTML onclick attributes
+window.switchSection = switchSection;
+window.saveSiteSettings = saveSiteSettings;
+window.saveSeoSettings = saveSeoSettings;
+window.toggleTheme = toggleTheme;
+window.togglePreviewTheme = togglePreviewTheme;
