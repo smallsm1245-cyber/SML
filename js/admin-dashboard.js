@@ -405,14 +405,6 @@ async function loadPosts() {
     }
 }
 
-window.showNewPostEditor = function () {
-    window.location.href = 'admin-toastui.html?action=new';
-};
-
-window.editPost = function (id) {
-    window.location.href = `admin-toastui.html?action=edit&id=${id}`;
-};
-
 window.copyPostLink = function (url) {
     navigator.clipboard.writeText(url).then(() => {
         alert('✅ 링크가 복사되었습니다!');
