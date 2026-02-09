@@ -1163,7 +1163,14 @@ function initializeEditor() {
 }
 
 window.showNewPostEditor = function () {
-    document.getElementById('postsList').parentElement.style.display = 'none';
+    const listView = document.querySelector('#section-posts .card:has(.toolbar), #postsList'); // Find list related elements
+    // Better way: wrap the list in its own container
+    const listControls = document.querySelector('#section-posts .card');
+    const listBody = document.getElementById('postsList');
+
+    if (listControls) listControls.style.display = 'none';
+    if (listBody) listBody.style.display = 'none';
+
     document.getElementById('postEditorView').style.display = 'block';
     document.getElementById('editorTitle').textContent = '새 글 작성';
 
@@ -1194,7 +1201,12 @@ window.editPost = async function (id) {
         if (error) throw error;
 
         // Switch to editor view
-        document.getElementById('postsList').parentElement.style.display = 'none';
+        const listControls = document.querySelector('#section-posts .card');
+        const listBody = document.getElementById('postsList');
+
+        if (listControls) listControls.style.display = 'none';
+        if (listBody) listBody.style.display = 'none';
+
         document.getElementById('postEditorView').style.display = 'block';
         document.getElementById('editorTitle').textContent = '게시물 수정';
 
@@ -1225,7 +1237,12 @@ window.editPost = async function (id) {
 };
 
 window.backToList = function () {
-    document.getElementById('postsList').parentElement.style.display = 'block';
+    const listControls = document.querySelector('#section-posts .card');
+    const listBody = document.getElementById('postsList');
+
+    if (listControls) listControls.style.display = 'block';
+    if (listBody) listBody.style.display = 'block';
+
     document.getElementById('postEditorView').style.display = 'none';
     currentPostId = null;
 };
