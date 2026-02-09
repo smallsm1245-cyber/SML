@@ -130,10 +130,14 @@
             if (title && settings.home_title) title.textContent = settings.home_title;
             if (subtitle && settings.home_subtitle) subtitle.textContent = settings.home_subtitle;
             if (content && settings.home_content) {
-                content.innerHTML = settings.home_content
-                    .split('\n')
-                    .map(line => `<p>${line}</p>`)
-                    .join('');
+                // Initialize Toast UI Viewer
+                const Viewer = toastui.Editor;
+                // Check if viewer already exists to avoid duplicates if called multiple times (though loadHomeSettings is usually once)
+                content.innerHTML = '';
+                const viewer = new Viewer({
+                    el: content,
+                    initialValue: settings.home_content
+                });
             }
 
             // Handle recent posts if enabled

@@ -229,6 +229,11 @@ function getTimeAgo(dateString) {
 // ═══════════════════════════════════════════════════
 // HOME SCREEN MANAGEMENT
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// HOME SCREEN MANAGEMENT
+// ═══════════════════════════════════════════════════
+let homeEditor;
+
 async function loadHomeSettings() {
     try {
         const { data } = await supabaseClient
@@ -241,9 +246,31 @@ async function loadHomeSettings() {
 
         document.getElementById('homeTitle').value = settings.home_title || '환영합니다';
         document.getElementById('homeSubtitle').value = settings.home_subtitle || 'SMALLSM Archive에 오신 것을 환영합니다';
-        document.getElementById('homeContent').value = settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.';
+
+        // Init Editor if not exists
+        if (!homeEditor) {
+            homeEditor = new toastui.Editor({
+                el: document.querySelector('#homeContentEditor'),
+                height: '400px',
+                initialEditType: 'markdown',
+                previewStyle: 'vertical',
+                initialValue: settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.',
+                theme: 'dark', // Since we are in admin
+                events: {
+                    change: updateHomePreview
+                }
+            });
+        } else {
+            homeEditor.setMarkdown(settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.');
+        }
+
         document.getElementById('showRecentPosts').checked = settings.show_recent_posts === 'true';
         document.getElementById('recentPostsCount').value = settings.recent_posts_count || '3';
+
+        // Add listeners for other inputs
+        ['homeTitle', 'homeSubtitle'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateHomePreview);
+        });
 
         updateHomePreview();
         toggleRecentPostsCount();
@@ -256,14 +283,34 @@ async function loadHomeSettings() {
 function updateHomePreview() {
     const title = document.getElementById('homeTitle').value;
     const subtitle = document.getElementById('homeSubtitle').value;
-    const content = document.getElementById('homeContent').value;
+    // Get content from editor
+    const content = homeEditor ? homeEditor.getMarkdown() : '';
 
     document.getElementById('previewTitle').textContent = title;
     document.getElementById('previewSubtitle').textContent = subtitle;
-    document.getElementById('previewContent').innerHTML = content
-        .split('\n')
-        .map(line => `<p>${line}</p>`)
-        .join('');
+
+    // Convert markdown to html for preview (simple conversion or use Viewer)
+    // Here we use a temporary Viewer calls or just simple HTML if simple text. 
+    // Ideally we should use Viewer for preview too.
+    const previewContainer = document.getElementById('previewContent');
+    previewContainer.innerHTML = '';
+
+    // For preview, we can render using Viewer logic or just simple text if markdown is not complex
+    // But since user wants Toast UI, we should probably render it properly.
+    // However, creating a new Viewer every keystroke is heavy.
+    // Let's rely on Editor's preview for editing, and this preview is for "Home Logic".
+    // We can just dump the markdown or basic HTML.
+
+    // Better: Helper to render markdown
+    if (!window.previewViewer) {
+        const Viewer = toastui.Editor;
+        window.previewViewer = new Viewer({
+            el: previewContainer,
+            initialValue: content
+        });
+    } else {
+        window.previewViewer.setMarkdown(content);
+    }
 
     hasUnsavedChanges = true;
 }
@@ -275,10 +322,12 @@ function toggleRecentPostsCount() {
 }
 
 async function saveHomeSettings() {
+    const content = homeEditor ? homeEditor.getMarkdown() : '';
+
     const settings = [
         { key: 'home_title', value: document.getElementById('homeTitle').value },
         { key: 'home_subtitle', value: document.getElementById('homeSubtitle').value },
-        { key: 'home_content', value: document.getElementById('homeContent').value },
+        { key: 'home_content', value: content },
         { key: 'show_recent_posts', value: document.getElementById('showRecentPosts').checked.toString() },
         { key: 'recent_posts_count', value: document.getElementById('recentPostsCount').value }
     ];

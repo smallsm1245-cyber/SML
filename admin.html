@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    
+
     <title>Admin Dashboard - SMALLSM Archive</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin-dashboard.css">
-    
+    <!-- Toast UI Editor -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css" />
+
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+
 <body class="admin-body">
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
@@ -92,7 +97,7 @@
                 <!-- Overview Section -->
                 <section id="section-overview" class="content-section active">
                     <h2 class="section-title">📊 대시보드</h2>
-                    
+
                     <!-- Stats Cards -->
                     <div class="stats-grid">
                         <div class="stat-card">
@@ -160,7 +165,7 @@
                 <!-- Home Screen Management Section -->
                 <section id="section-home" class="content-section">
                     <h2 class="section-title">🏠 홈 화면 관리</h2>
-                    
+
                     <div class="split-layout">
                         <!-- Editor -->
                         <div class="editor-panel">
@@ -172,12 +177,14 @@
 
                                 <div class="form-group">
                                     <label>부제목</label>
-                                    <input type="text" id="homeSubtitle" class="form-input" placeholder="SMALLSM Archive에 오신 것을 환영합니다">
+                                    <input type="text" id="homeSubtitle" class="form-input"
+                                        placeholder="SMALLSM Archive에 오신 것을 환영합니다">
                                 </div>
 
                                 <div class="form-group">
                                     <label>본문</label>
-                                    <textarea id="homeContent" class="form-textarea" rows="10" placeholder="좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요..."></textarea>
+                                    <div id="homeContentEditor"></div>
+                                    <input type="hidden" id="homeContent">
                                 </div>
 
                                 <div class="form-group">
@@ -189,7 +196,8 @@
 
                                 <div class="form-group" id="recentPostsCountGroup" style="display: none;">
                                     <label>표시할 게시물 개수</label>
-                                    <input type="number" id="recentPostsCount" class="form-input" value="3" min="1" max="10">
+                                    <input type="number" id="recentPostsCount" class="form-input" value="3" min="1"
+                                        max="10">
                                 </div>
 
                                 <button class="btn-primary" id="saveHomeBtn">💾 저장하기</button>
@@ -218,7 +226,7 @@
                 <!-- Posts Management Section -->
                 <section id="section-posts" class="content-section">
                     <h2 class="section-title">📝 게시글 관리</h2>
-                    
+
                     <!-- Search and Filter -->
                     <div class="card">
                         <div class="toolbar">
@@ -244,12 +252,13 @@
                 <!-- Categories Management Section -->
                 <section id="section-categories" class="content-section">
                     <h2 class="section-title">📂 카테고리 관리</h2>
-                    
+
                     <!-- Add Category -->
                     <div class="card">
                         <h3 class="card-title">➕ 새 카테고리 추가</h3>
                         <div class="add-category-form">
-                            <input type="text" id="newCategoryName" class="form-input" placeholder="카테고리 이름 (예: REVIEW)">
+                            <input type="text" id="newCategoryName" class="form-input"
+                                placeholder="카테고리 이름 (예: REVIEW)">
                             <button class="btn-primary" id="addCategoryBtn">추가하기</button>
                         </div>
                     </div>
@@ -264,7 +273,7 @@
                 <section id="section-trash" class="content-section">
                     <h2 class="section-title">🗑️휴지통</h2>
                     <p class="section-desc">삭제된 항목은 30일간 보관됩니다.</p>
-                    
+
                     <div id="trashList" class="trash-list">
                         <!-- Dynamically loaded -->
                     </div>
@@ -273,7 +282,7 @@
                 <!-- Settings Section -->
                 <section id="section-settings" class="content-section">
                     <h2 class="section-title">⚙️ 설정</h2>
-                    
+
                     <div class="card">
                         <h3 class="card-title">사이트 정보</h3>
                         <div class="form-group">
@@ -282,12 +291,14 @@
                         </div>
                         <div class="form-group">
                             <label>사이트 설명</label>
-                            <input type="text" id="siteDescInput" class="form-input" placeholder="시네마틱 아카이브 - 성향과 실천의 기록">
+                            <input type="text" id="siteDescInput" class="form-input"
+                                placeholder="시네마틱 아카이브 - 성향과 실천의 기록">
                         </div>
                         <div class="form-group">
                             <label>관리자 이메일</label>
                             <input type="email" id="adminEmailInput" class="form-input" disabled>
-                            <p style="font-size: 0.8rem; color: var(--admin-text-dim); margin-top: 0.5rem;">이메일 변경은 시스템 설정 파일에서 가능합니다.</p>
+                            <p style="font-size: 0.8rem; color: var(--admin-text-dim); margin-top: 0.5rem;">이메일 변경은 시스템
+                                설정 파일에서 가능합니다.</p>
                         </div>
                         <button class="btn-primary" id="saveSettingsBtn">💾 설정 저장</button>
                     </div>
@@ -297,11 +308,13 @@
                         <p class="section-desc">Google 및 Naver 검색 결과에 노출되기 위한 메타 태그 설정입니다.</p>
                         <div class="form-group">
                             <label>Google Site Verification</label>
-                            <input type="text" id="googleVerification" class="form-input" placeholder="google-site-verification 코드">
+                            <input type="text" id="googleVerification" class="form-input"
+                                placeholder="google-site-verification 코드">
                         </div>
                         <div class="form-group">
                             <label>Naver Site Advisor Verification</label>
-                            <input type="text" id="naverVerification" class="form-input" placeholder="naver-site-verification 코드">
+                            <input type="text" id="naverVerification" class="form-input"
+                                placeholder="naver-site-verification 코드">
                         </div>
                         <button class="btn-primary" id="saveSeoBtn">💾 SEO 설정 저장</button>
                     </div>
@@ -311,8 +324,10 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script src="/api/config"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="js/admin-dashboard.js"></script>
 </body>
+
 </html>
