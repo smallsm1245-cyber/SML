@@ -1018,6 +1018,8 @@ window.deleteCategory = async function (id, name) {
 
 async function addCategory() {
     const name = document.getElementById('newCategoryName').value.trim();
+    const parentId = document.getElementById('newCategoryParent').value;
+
     if (!name) {
         alert('카테고리 이름을 입력하세요.');
         return;
@@ -1032,12 +1034,17 @@ async function addCategory() {
 
         const maxOrder = categories && categories.length > 0 ? categories[0].display_order : 0;
 
-        await supabaseClient.from('categories').insert({
+        const newCategory = {
             name: name,
             is_visible: true,
-            display_order: maxOrder + 1,
-            parent_id: null
-        });
+            display_order: maxOrder + 1
+        };
+
+        if (parentId) {
+            newCategory.parent_id = parentId;
+        }
+
+        await supabaseClient.from('categories').insert(newCategory);
 
         document.getElementById('newCategoryName').value = '';
         alert('✅ 카테고리가 추가되었습니다!');
