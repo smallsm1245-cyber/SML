@@ -542,7 +542,22 @@
             if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
                 clearInterval(interval);
                 callback();
-            } else if (Date.now() - startTime > maxWait) {
+                return;
+            }
+
+            // Local Config Fallback
+            if (typeof SUPABASE_CONFIG_LOCAL !== 'undefined' && SUPABASE_CONFIG_LOCAL.url) {
+                console.log('⚠️ Using LOCAL CONFIG');
+                window.SUPABASE_CONFIG = SUPABASE_CONFIG_LOCAL;
+                if (typeof ADMIN_EMAIL_LOCAL !== 'undefined') {
+                    window.ADMIN_EMAIL = ADMIN_EMAIL_LOCAL;
+                }
+                clearInterval(interval);
+                callback();
+                return;
+            }
+
+            if (Date.now() - startTime > maxWait) {
                 clearInterval(interval);
                 console.error('⏱️ Config loading timeout');
             }
