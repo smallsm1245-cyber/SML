@@ -126,7 +126,10 @@ function initializeEditor() {
             initialEditType: 'markdown',
             previewStyle: 'vertical',
             language: 'ko-KR',
-            initialValue: ''
+            initialValue: '',
+            events: {
+                change: updateHomePreview
+            }
         });
     }
 }
@@ -795,9 +798,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Home preview real-time
-    ['homeTitle', 'homeSubtitle', 'homeContent'].forEach(id => {
-        document.getElementById(id).addEventListener('input', updateHomePreview);
+    ['homeTitle', 'homeSubtitle'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateHomePreview);
     });
+
+    // Hook into editor change for preview
+    if (window.homeEditorInstance) {
+        window.homeEditorInstance.on('change', updateHomePreview);
+    }
 
     document.getElementById('showRecentPosts').addEventListener('change', toggleRecentPostsCount);
     document.getElementById('saveHomeBtn').addEventListener('click', saveHomeSettings);
