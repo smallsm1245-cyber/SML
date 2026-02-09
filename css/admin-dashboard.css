@@ -250,8 +250,15 @@ body.dark-theme {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .section-title {
@@ -520,41 +527,43 @@ body.dark-theme {
 .posts-list,
 .categories-list,
 .trash-list {
-  .categories-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    background: var(--admin-panel);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid var(--admin-border);
-}
+    .categories-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        background: var(--admin-panel);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--admin-border);
+    }
 
-.category-item-card {
-    background: var(--admin-card);
-    border: 1px solid var(--admin-border);
-    border-radius: 6px;
-    padding: 0.6rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: all 0.2s;
-}
+    .category-item-card {
+        background: var(--admin-card);
+        border: 1px solid var(--admin-border);
+        border-radius: 6px;
+        padding: 0.6rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.2s;
+    }
 
-.category-item-card:hover {
-    border-color: var(--admin-primary);
-    background: var(--admin-hover);
-}
+    .category-item-card:hover {
+        border-color: var(--admin-primary);
+        background: var(--admin-hover);
+    }
 
-.category-item-card.sortable-ghost {
-    opacity: 0.4;
-    background: var(--admin-primary);
-}
+    .category-item-card.sortable-ghost {
+        opacity: 0.4;
+        background: var(--admin-primary);
+    }
 
-.category-item-card.sub-category {
-    margin-left: 2.5rem;
-    border-left: 3px solid var(--admin-primary);
-}s;
+    .category-item-card.sub-category {
+        margin-left: 2.5rem;
+        border-left: 3px solid var(--admin-primary);
+    }
+
+    s;
 }
 
 .post-item:hover,
@@ -688,7 +697,8 @@ body.dark-theme {
     gap: 0.5rem;
 }
 
-.visibility-toggle, .indent-btn {
+.visibility-toggle,
+.indent-btn {
     background: transparent;
     border: 1px solid var(--admin-border);
     color: var(--admin-text-dim);
@@ -699,7 +709,8 @@ body.dark-theme {
     transition: all 0.2s;
 }
 
-.visibility-toggle:hover, .indent-btn:hover {
+.visibility-toggle:hover,
+.indent-btn:hover {
     border-color: var(--admin-primary);
     color: var(--admin-primary);
 }
@@ -800,7 +811,7 @@ body.dark-theme {
     .split-layout {
         grid-template-columns: 1fr;
     }
-    
+
     .preview-panel {
         position: static;
     }
@@ -810,7 +821,7 @@ body.dark-theme {
     .dashboard-header {
         padding: 0.8rem 1rem;
     }
-    
+
     .dashboard-title {
         font-size: 1.1rem;
     }
@@ -822,13 +833,13 @@ body.dark-theme {
         height: 100vh;
         z-index: 200;
         transition: left 0.3s;
-        box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
     }
-    
+
     .dashboard-sidebar.active {
         left: 0;
     }
-    
+
     .dashboard-main {
         padding: 1rem;
     }
@@ -841,7 +852,7 @@ body.dark-theme {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    
+
     .quick-actions {
         grid-template-columns: 1fr;
         gap: 0.8rem;
@@ -885,4 +896,64 @@ body.dark-theme {
     .mobile-menu-btn {
         display: block;
     }
+}
+
+/* ═══════════════════════════════════════════════════
+   MINIMALIST LIST STYLES (New)
+   ═══════════════════════════════════════════════════ */
+.posts-list {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 0;
+    /* Override previous gap */
+}
+
+.post-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.post-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.post-row-left {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.post-row-title {
+    color: #FFB74D;
+    /* Orange/Gold */
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.private-tag {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    filter: grayscale(0.5);
+}
+
+.post-row-right {
+    text-align: right;
+}
+
+.post-row-date {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    font-family: sans-serif;
+}
+
+/* Ensure old card styles don't interfere */
+.post-item {
+    display: none;
 }
