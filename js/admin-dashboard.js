@@ -685,8 +685,10 @@ window.deletePost = async function (id, title) {
 // CATEGORIES MANAGEMENT
 // ═══════════════════════════════════════════════════
 let currentCategories = [];
+let deletedCategoryIds = new Set();
 
 async function loadCategories() {
+    deletedCategoryIds.clear();
     try {
         const { data: categories, error } = await supabaseClient
             .from('categories')
@@ -864,10 +866,76 @@ window.toggleLocalVisibility = function (id) {
 };
 
 window.deleteLocalCategory = function (id) {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
+    if (!confirm('정말 삭제하시겠습니까? (저장 시 영구 삭제됩니다)')) return;
+
+    // Track for deletion
+    deletedCategoryIds.add(id);
+
+    // Remove from local list
     currentCategories = currentCategories.filter(c => c.id != id);
+
     renderCategories();
     hasUnsavedChanges = true;
+};
+
+window.saveAllCategories = async function () {
+    if (!confirm('변경된 카테고리 설정을 저장하시겠습니까?')) return;
+
+    try {
+        // 1. Handle Deletions first
+        if (deletedCategoryIds.size > 0) {
+            const idsToDelete = Array.from(deletedCategoryIds);
+            const { error: deleteError } = await supabaseClient
+                .from('categories')
+                .delete()
+                .in('id', idsToDelete);
+
+            if (deleteError) throw deleteError;
+            deletedCategoryIds.clear();
+        }
+
+        // 2. Handle Updates (Hierarchy & Order)
+        let lastParentId = null;
+        const upserts = currentCategories.map((cat, index) => {
+            // Logic to determine parent based on is_sub
+            // If is_sub is true, it uses the last seen parent.
+            // If is_sub is false, it becomes the new lastParent.
+
+            let parentId = null;
+            if (cat.is_sub) {
+                parentId = lastParentId;
+                // If there's no parent above (e.g. first item is sub), it defaults to null (becomes root)
+                // or we could force it to be root.
+            } else {
+                lastParentId = cat.id;
+            }
+
+            return {
+                id: cat.id,
+                name: cat.name,
+                is_visible: cat.is_visible,
+                display_order: index + 1,
+                parent_id: parentId
+            };
+        });
+
+        if (upserts.length > 0) {
+            const { error: upsertError } = await supabaseClient
+                .from('categories')
+                .upsert(upserts);
+
+            if (upsertError) throw upsertError;
+        }
+
+        alert('✅ 카테고리 설정이 저장되었습니다!');
+        hasUnsavedChanges = false;
+        loadCategories(); // Reload to reflect DB state
+        loadStatistics();
+
+    } catch (error) {
+        console.error('Save categories failed:', error);
+        alert('❌ 저장 실패: ' + error.message);
+    }
 };
 
 async function addCategory() {
