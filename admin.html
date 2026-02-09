@@ -16,6 +16,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/admin-toastui-hierarchy.css">
     <!-- Toast UI Editor -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css" />
@@ -249,6 +250,57 @@
                     <div id="postsList" class="posts-list">
                         <!-- Dynamically loaded -->
                     </div>
+
+                    <!-- Post Editor View (Hidden by default) -->
+                    <div id="postEditorView" style="display: none;">
+                        <div class="card">
+                            <div class="editor-header">
+                                <button class="btn-secondary" id="backToListBtn">← 목록으로</button>
+                                <h3 id="editorTitle">새 글 작성</h3>
+                            </div>
+
+                            <!-- Post Meta -->
+                            <div class="form-group">
+                                <label for="postTitle">제목</label>
+                                <input type="text" id="postTitle" class="form-input" placeholder="게시물 제목을 입력하세요">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="postCategory">카테고리</label>
+                                    <select id="postCategory" class="form-select">
+                                        <option value="">카테고리 선택</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="isPrivate">
+                                        <span>비밀글로 설정</span>
+                                    </label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="originFree">
+                                        <span>복사 출처 비활성화</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Toast UI Editor -->
+                            <div class="form-group">
+                                <label>본문</label>
+                                <div id="editor"></div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <button class="btn-secondary" id="saveDraftBtn">💾 임시 저장</button>
+                                <button class="btn-primary" id="publishPostBtn">🚀 발행하기</button>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- Categories Management Section -->
@@ -259,10 +311,16 @@
                     <div class="card">
                         <h3 class="card-title">➕ 새 카테고리 추가</h3>
                         <div class="add-category-form">
+                            <select id="newCategoryParent" class="form-select" style="flex: 0 0 200px;">
+                                <option value="">📁 대분류로 추가</option>
+                            </select>
                             <input type="text" id="newCategoryName" class="form-input"
-                                placeholder="카테고리 이름 (예: REVIEW)">
+                                placeholder="카테고리 이름 (예: BDSM이란?)">
                             <button class="btn-primary" id="addCategoryBtn">추가하기</button>
                         </div>
+                        <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--admin-text-dim);">
+                            💡 대분류는 그룹 역할만 하며 글을 작성할 수 없습니다. 글 작성은 소분류에서만 가능합니다.
+                        </p>
                     </div>
 
                     <!-- Categories List -->

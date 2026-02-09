@@ -481,6 +481,14 @@ async function loadCategories() {
                 currentCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         }
 
+        // Populate Parent Category Selector
+        const parentSelect = document.getElementById('newCategoryParent');
+        if (parentSelect) {
+            const roots = currentCategories.filter(c => !c.parent_id);
+            parentSelect.innerHTML = '<option value="">📁 대분류로 추가</option>' +
+                roots.map(root => `<option value="${root.id}">📄 ${root.name}의 소분류로 추가</option>`).join('');
+        }
+
     } catch (error) {
         console.error('Categories loading failed:', error);
     }
@@ -493,35 +501,73 @@ function renderCategories() {
         return;
     }
 
-    container.innerHTML = currentCategories.map(cat => {
-        const isHidden = !cat.is_visible;
-        const isSub = cat.is_sub || false;
+    // Organize into hierarchy
+    const roots = currentCategories.filter(c => !c.parent_id);
+    const childrenMap = {};
+    currentCategories.filter(c => c.parent_id).forEach(c => {
+        if (!childrenMap[c.parent_id]) childrenMap[c.parent_id] = [];
+        childrenMap[c.parent_id].push(c);
+    });
 
-        return `
-            <div class="category-item-card ${isSub ? 'sub-category' : ''}" data-id="${cat.id}">
+    let html = '';
+
+    roots.forEach(root => {
+        const isHidden = !root.is_visible;
+        const childCount = childrenMap[root.id] ? childrenMap[root.id].length : 0;
+
+        // Parent category card
+        html += `
+            <div class="category-item-card parent-category" data-id="${root.id}">
                 <div class="drag-handle">≡</div>
+                <span class="category-type-badge">📁 대분류</span>
                 <div class="category-header">
-                    <input type="text" class="category-name-input" value="${cat.name}" 
-                           oninput="updateLocalCategoryName('${cat.id}', this.value)">
+                    <input type="text" class="category-name-input" value="${root.name}" 
+                           oninput="updateLocalCategoryName('${root.id}', this.value)">
                 </div>
+                <span class="child-count">${childCount}개 소분류</span>
                 <div class="category-actions">
-                    <button class="indent-btn" onclick="toggleLocalIndent('${cat.id}')" title="들여쓰기">
-                        ${isSub ? '⬅️' : '➡️'}
-                    </button>
                     <button class="visibility-toggle ${isHidden ? 'off' : ''}" 
-                            onclick="toggleLocalVisibility('${cat.id}')">
+                            onclick="toggleLocalVisibility('${root.id}')">
                         ${isHidden ? '🙈' : '👁️'}
                     </button>
-                    <button class="action-btn danger" onclick="deleteLocalCategory('${cat.id}')">🗑️</button>
+                    <button class="action-btn danger" onclick="deleteLocalCategory('${root.id}')">🗑️</button>
                 </div>
             </div>
         `;
-    }).join('') + `
+
+        // Child categories
+        if (childrenMap[root.id]) {
+            childrenMap[root.id].forEach(child => {
+                const childIsHidden = !child.is_visible;
+                html += `
+                    <div class="category-item-card child-category" data-id="${child.id}" data-parent="${root.id}">
+                        <div class="drag-handle">≡</div>
+                        <span class="category-indent">└─</span>
+                        <span class="category-type-badge">📄 소분류</span>
+                        <div class="category-header">
+                            <input type="text" class="category-name-input" value="${child.name}" 
+                                   oninput="updateLocalCategoryName('${child.id}', this.value)">
+                        </div>
+                        <div class="category-actions">
+                            <button class="visibility-toggle ${childIsHidden ? 'off' : ''}" 
+                                    onclick="toggleLocalVisibility('${child.id}')">
+                                ${childIsHidden ? '🙈' : '👁️'}
+                            </button>
+                            <button class="action-btn danger" onclick="deleteLocalCategory('${child.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    });
+
+    html += `
         <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
             <button class="btn-primary" onclick="saveAllCategories()">✅ 카테고리 설정 적용하기</button>
         </div>
     `;
 
+    container.innerHTML = html;
     initSortable();
 }
 
@@ -594,6 +640,48 @@ window.deleteLocalCategory = function (id) {
     renderCategories();
     hasUnsavedChanges = true;
 };
+
+async function addCategory() {
+    const name = document.getElementById('newCategoryName').value.trim();
+    const parentId = document.getElementById('newCategoryParent').value;
+
+    if (!name) {
+        alert('카테고리 이름을 입력하세요.');
+        return;
+    }
+
+    try {
+        const maxOrder = currentCategories.length > 0
+            ? Math.max(...currentCategories.map(c => c.display_order || 0))
+            : 0;
+
+        const newCategory = {
+            name: name,
+            is_visible: true,
+            has_dropdown: true,
+            default_open: false,
+            display_order: maxOrder + 1
+        };
+
+        // Add parent_id if selected
+        if (parentId) {
+            newCategory.parent_id = parentId;
+        }
+
+        await supabaseClient.from('categories').insert(newCategory);
+
+        document.getElementById('newCategoryName').value = '';
+        document.getElementById('newCategoryParent').value = '';
+
+        const categoryType = parentId ? '소분류' : '대분류';
+        alert(`✅ ${categoryType} 카테고리가 추가되었습니다!`);
+        await loadCategories();
+
+    } catch (error) {
+        console.error('Add failed:', error);
+        alert('❌ 추가 실패');
+    }
+}
 
 window.saveAllCategories = async function () {
     try {
