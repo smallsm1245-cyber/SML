@@ -865,18 +865,7 @@ window.toggleLocalVisibility = function (id) {
     }
 };
 
-window.deleteLocalCategory = function (id) {
-    if (!confirm('정말 삭제하시겠습니까? (저장 시 영구 삭제됩니다)')) return;
 
-    // Track for deletion
-    deletedCategoryIds.add(id);
-
-    // Remove from local list
-    currentCategories = currentCategories.filter(c => c.id != id);
-
-    renderCategories();
-    hasUnsavedChanges = true;
-};
 
 window.saveAllCategories = async function () {
     console.log('🔧 saveAllCategories called');
@@ -1104,8 +1093,13 @@ window.deleteCategory = async function (id, name) {
 // DELETE CATEGORY (LOCAL)
 // ═══════════════════════════════════════════════════
 window.deleteLocalCategory = function (id) {
+    console.log('🗑️ deleteLocalCategory called with id:', id);
+
     const cat = currentCategories.find(c => c.id == id);
-    if (!cat) return;
+    if (!cat) {
+        console.warn('⚠️ Category not found:', id);
+        return;
+    }
 
     // Check for children
     const children = currentCategories.filter(c => c.parent_id == id);
@@ -1115,18 +1109,29 @@ window.deleteLocalCategory = function (id) {
         message = `⚠️ 이 카테고리에는 ${children.length}개의 소분류가 포함되어 있습니다.\n\n삭제하면 소분류도 함께 삭제됩니다.\n계속하시겠습니까?`;
     }
 
-    if (!confirm(message)) return;
+    if (!confirm(message)) {
+        console.log('❌ Deletion cancelled by user');
+        return;
+    }
+
+    console.log('✅ User confirmed deletion');
+    console.log('📝 Adding to deletedCategoryIds:', id);
 
     // Track parent for deletion
     deletedCategoryIds.add(id);
 
     // Track children for deletion
     children.forEach(child => {
+        console.log('📝 Adding child to deletedCategoryIds:', child.id);
         deletedCategoryIds.add(child.id);
     });
 
+    console.log('🗑️ deletedCategoryIds after add:', Array.from(deletedCategoryIds));
+
     // Remove parent and children from local list
     currentCategories = currentCategories.filter(c => c.id != id && c.parent_id != id);
+
+    console.log('📋 currentCategories count after filter:', currentCategories.length);
 
     renderCategories();
     hasUnsavedChanges = true;
