@@ -107,44 +107,24 @@
                 document.title = settings.site_title;
                 const titleTag = document.getElementById('siteTitleTag');
                 if (titleTag) titleTag.textContent = settings.site_title;
-                const siteTitleEl = document.querySelector('.site-title');
+                const siteTitleEl = document.querySelector('.site-title a');
                 if (siteTitleEl) siteTitleEl.textContent = settings.site_title;
-                console.log('✅ Site Title Updated:', settings.site_title);
             }
             if (settings.site_description) {
                 const descTag = document.getElementById('siteDescTag');
                 if (descTag) descTag.content = settings.site_description;
-                console.log('✅ Site Description Updated');
-            }
-            if (settings.google_site_verification) {
-                const gTag = document.querySelector('meta[name="google-site-verification"]');
-                if (gTag) {
-                    gTag.content = settings.google_site_verification;
-                    console.log('✅ Google Verification Tag Updated:', settings.google_site_verification);
-                } else {
-                    console.warn('⚠️ Google Meta Tag not found in HTML');
-                }
-            }
-            if (settings.naver_verification) {
-                const nTag = document.querySelector('meta[name="naver-site-verification"]');
-                if (nTag) {
-                    nTag.content = settings.naver_verification;
-                    console.log('✅ Naver Verification Tag Updated:', settings.naver_verification);
-                } else {
-                    console.warn('⚠️ Naver Meta Tag not found in HTML');
-                }
             }
 
+            // Update Home Content
             const title = document.getElementById('welcomeTitle');
-            const subtitle = document.querySelector('.post-meta span');
-            const content = document.getElementById('mainContent');
+            const subtitle = document.getElementById('welcomeSubtitle');
+            const content = document.getElementById('welcomeContent');
 
             if (title && settings.home_title) title.textContent = settings.home_title;
             if (subtitle && settings.home_subtitle) subtitle.textContent = settings.home_subtitle;
             if (content && settings.home_content) {
                 // Initialize Toast UI Viewer
                 const Viewer = toastui.Editor;
-                // Check if viewer already exists to avoid duplicates if called multiple times (though loadHomeSettings is usually once)
                 content.innerHTML = '';
                 const viewer = new Viewer({
                     el: content,
@@ -184,14 +164,16 @@
             if (error) throw error;
 
             if (posts && posts.length > 0) {
-                const content = document.getElementById('mainContent');
+                const content = document.getElementById('welcomeContent');
+                if (!content) return;
+
                 const recentSection = document.createElement('div');
                 recentSection.style.marginTop = '3rem';
                 recentSection.innerHTML = `
                     <h2 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--primary-brass); border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">최근 기록</h2>
                     ${posts.map(post => `
                         <div style="margin-bottom: 1rem;">
-                            <a href="post.html?id=${post.id}" style="color: var(--text-primary); text-decoration: none; font-size: 0.95rem;">
+                            <a href="javascript:void(0);" onclick="loadPost(${post.id})" style="color: var(--text-primary); text-decoration: none; font-size: 0.95rem;">
                                 • ${post.title} <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 0.5rem;">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
                             </a>
                         </div>
@@ -205,13 +187,10 @@
     }
 
     async function loadCategories() {
-        if (!supabaseClient) {
-            console.warn('⚠️ Supabase not initialized');
-            return;
-        }
+        if (!supabaseClient) return;
 
         try {
-            // Fetch Categories
+            // Fetch Categories & Counts
             const { data: categories, error } = await supabaseClient
                 .from('categories')
                 .select('*')
@@ -220,36 +199,30 @@
 
             if (error) throw error;
 
-            // Fetch Post Counts (public only)
             const { data: posts } = await supabaseClient
                 .from('archive_posts')
-                .select('category_id, is_private')
-                .eq('is_private', false); // Only count public posts for visitor
+                .select('category_id')
+                .eq('is_private', false);
 
-            // Aggregation
             const counts = {};
             if (posts) {
-                posts.forEach(p => {
-                    counts[p.category_id] = (counts[p.category_id] || 0) + 1;
-                });
+                posts.forEach(p => counts[p.category_id] = (counts[p.category_id] || 0) + 1);
             }
 
-            // Recursive Count Update for Parents
-            // Note: This assumes a 2-level hierarchy (Parent -> Child) or ordered such that children are processed or we can iterate.
-            // Since we manipulate 'counts', let's iterate to add child counts to parents.
-            // A simple approach for 2-level:
+            // Add child counts to parents
             if (categories) {
-                const parentIds = new Set(categories.filter(c => !c.parent_id).map(c => c.id));
                 categories.forEach(c => {
-                    if (c.parent_id && parentIds.has(c.parent_id)) {
-                        counts[c.parent_id] = (counts[c.parent_id] || 0) + (counts[c.id] || 0);
+                    if (c.parent_id) {
+                        // Find parent and add
+                        const parent = categories.find(p => p.id === c.parent_id);
+                        if (parent) {
+                            counts[parent.id] = (counts[parent.id] || 0) + (counts[c.id] || 0);
+                        }
                     }
                 });
             }
 
             renderCategories(categories || [], counts);
-
-            console.log('✅ Categories loaded');
 
         } catch (error) {
             console.error('❌ Categories loading failed:', error);
@@ -257,10 +230,10 @@
     }
 
     function renderCategories(categories, counts) {
-        const nav = document.getElementById('categoryNav');
-        if (!nav) return;
+        // TARGET categoryList NOT categoryNav (which contains menu items)
+        const list = document.getElementById('categoryList');
+        if (!list) return;
 
-        // organize into hierarchy
         const roots = categories.filter(c => !c.parent_id);
         const childrenMap = {};
         categories.filter(c => c.parent_id).forEach(c => {
@@ -268,12 +241,11 @@
             childrenMap[c.parent_id].push(c);
         });
 
-        nav.innerHTML = roots.map(root => {
+        list.innerHTML = roots.map(root => {
             const children = childrenMap[root.id] || [];
             const hasChildren = children.length > 0;
             const count = counts[root.id] || 0;
 
-            // Accordion HTML
             return `
                 <li class="category-item">
                     <div class="category-header-wrap" onclick="toggleAccordion('${root.id}')">
@@ -314,16 +286,62 @@
     };
 
     window.filterByCategory = function (categoryId, element) {
-        // Remove active class
         document.querySelectorAll('.category-link, .submenu-link').forEach(el => el.classList.remove('active'));
         if (element) element.classList.add('active');
 
         loadPostsByCategory(categoryId);
     };
 
+    // Global function to load a single post (for recent posts link)
+    window.loadPost = async function (postId) {
+        if (!supabaseClient) return;
+        try {
+            const { data: post, error } = await supabaseClient
+                .from('archive_posts')
+                .select('*')
+                .eq('id', postId)
+                .single();
+
+            if (error) throw error;
+
+            showPostView(post, post.title); // Re-use show logic
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     // ═══════════════════════════════════════════════════
-    // 5. POST LOADING BY CATEGORY (Modified for Direct View)
+    // 5. POST LOADING & VIEW SWITCHING
     // ═══════════════════════════════════════════════════
+    function switchSection(sectionId) {
+        // Hide all sections
+        document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
+        // Show target
+        document.getElementById(sectionId).style.display = 'block';
+
+        // Update menu active state
+        document.querySelectorAll('.category-link, .submenu-link, #menuHome, #menuInclinations').forEach(el => el.classList.remove('active'));
+
+        if (sectionId === 'homeSection') {
+            document.getElementById('menuHome').classList.add('active');
+        } else if (sectionId === 'inclinationsSection') {
+            document.getElementById('menuInclinations').classList.add('active');
+        }
+
+        // Mobile menu close
+        document.querySelector('.dashboard-sidebar').classList.remove('active');
+    }
+
+    // Explicit Home Button Handler
+    const menuHome = document.getElementById('menuHome');
+    if (menuHome) {
+        menuHome.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchSection('homeSection');
+        });
+    }
+
     async function loadPostsByCategory(categoryId) {
         if (!supabaseClient) return;
 
@@ -342,19 +360,7 @@
             }
 
             const { data: posts, error } = await query;
-
             if (error) throw error;
-
-            const content = document.getElementById('mainContent');
-            const title = document.getElementById('welcomeTitle');
-
-            if (!content || !title) return;
-
-            if (posts.length === 0) {
-                title.textContent = '게시물 없음';
-                content.innerHTML = '<p>이 카테고리에는 아직 게시물이 없습니다.</p>';
-                return;
-            }
 
             const { data: category } = await supabaseClient
                 .from('categories')
@@ -362,71 +368,71 @@
                 .eq('id', categoryId)
                 .single();
 
-            // Check if there is exactly ONE post
-            if (posts.length === 1) {
-                const post = posts[0];
-                title.textContent = post.title;
+            const categoryName = category ? category.name : 'Category';
 
-                // Clear previous content
-                content.innerHTML = '';
-
-                // Add Meta Info
-                const metaDiv = document.querySelector('.post-meta');
-                if (metaDiv) {
-                    const dateStr = new Date(post.created_at).toLocaleDateString('ko-KR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    const categoryName = category ? category.name : '';
-                    metaDiv.innerHTML = `<span>${categoryName}</span> • <span>${dateStr}</span>`;
-                }
-
-                // Initialize Toast UI Viewer for the content
-                const Viewer = toastui.Editor;
-                const viewer = new Viewer({
-                    el: content,
-                    initialValue: post.content,
-                    theme: 'dark' // Assuming dark theme is preferred or matches style
-                });
-
-                // Copy protection if needed
-                if (!post.origin_free) {
-                    content.classList.add('copy-protected');
-                    // Re-bind copy protection if not global
-                    // Note: Global copy listener in main.js handles generic copy, 
-                    // but specific attribution might depend on postId. 
-                    // The global listener checks `window.location.search`.
-                    // Since we are in SPA mode, the URL might not have ?id=...
-                    // We might need to update the global copy handler or pushState.
-                    // For now, let's keep it simple.
-                }
-
+            if (posts.length === 0) {
+                showPostList([], categoryName, '이 카테고리에는 게시물이 없습니다.');
                 return;
             }
 
-            // Multiple posts - Show List
-            title.textContent = category.name;
-            const metaDiv = document.querySelector('.post-meta');
-            if (metaDiv) metaDiv.innerHTML = `<span>총 ${posts.length}개의 게시물</span>`;
+            if (posts.length === 1) {
+                showPostView(posts[0], categoryName);
+                return;
+            }
 
-            content.innerHTML = posts.map(post => `
-                <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
-                    <h3>
-                        <a href="post.html?id=${post.id}" style="color: var(--primary-brass); text-decoration: none;">
-                            ${post.title}
-                            ${post.is_private ? '<span style="font-size: 0.8em; color: var(--accent-amber);"> 🔒</span>' : ''}
-                        </a>
-                    </h3>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
-                        ${new Date(post.created_at).toLocaleDateString('ko-KR')}
-                    </p>
-                </div>
-            `).join('');
+            showPostList(posts, categoryName);
 
         } catch (error) {
             console.error('❌ Post loading failed:', error);
         }
+    }
+
+    function showPostView(post, categoryName) {
+        switchSection('postsSection');
+
+        document.getElementById('postTitle').textContent = post.title;
+        document.getElementById('postCategory').textContent = categoryName;
+        document.getElementById('postDate').textContent = new Date(post.created_at).toLocaleDateString('ko-KR');
+
+        const content = document.getElementById('postContent');
+        content.innerHTML = '';
+
+        const Viewer = toastui.Editor;
+        new Viewer({
+            el: content,
+            initialValue: post.content,
+            theme: 'dark'
+        });
+    }
+
+    function showPostList(posts, titleText, emptyMsg) {
+        switchSection('postsSection');
+
+        document.getElementById('postTitle').textContent = titleText;
+        document.getElementById('postCategory').textContent = '';
+        document.getElementById('postDate').textContent = '';
+
+        const content = document.getElementById('postContent');
+        content.innerHTML = '';
+
+        if (posts.length === 0) {
+            content.innerHTML = `<p>${emptyMsg || '게시물이 없습니다.'}</p>`;
+            return;
+        }
+
+        content.innerHTML = posts.map(post => `
+             <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
+                <h3>
+                    <a href="javascript:void(0);" onclick="loadPost(${post.id})" style="color: var(--primary-brass); text-decoration: none;">
+                        ${post.title}
+                        ${post.is_private ? '<span style="font-size: 0.8em; color: var(--accent-amber);"> 🔒</span>' : ''}
+                    </a>
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                    ${new Date(post.created_at).toLocaleDateString('ko-KR')}
+                </p>
+            </div>
+        `).join('');
     }
 
     // ═══════════════════════════════════════════════════
@@ -443,7 +449,7 @@
 
             searchTimeout = setTimeout(async () => {
                 const query = e.target.value.trim();
-
+                // ... (Search logic similar to before but using showPostList)
                 if (query.length < 2) return;
 
                 try {
@@ -452,53 +458,26 @@
 
                     let searchQuery = supabaseClient
                         .from('archive_posts')
-                        .select('id, title, created_at, category_id')
+                        .select('id, title, created_at, category_id, is_private, content') // content needed? no
                         .ilike('title', `%${query}%`)
                         .order('created_at', { ascending: false })
                         .limit(10);
 
-                    if (!isAdmin) {
-                        searchQuery = searchQuery.eq('is_private', false);
-                    }
+                    if (!isAdmin) searchQuery = searchQuery.eq('is_private', false);
 
                     const { data: results, error } = await searchQuery;
-
                     if (error) throw error;
 
-                    displaySearchResults(results);
+                    showPostList(results, '검색 결과: ' + query);
 
-                } catch (error) {
-                    console.error('❌ Search failed:', error);
-                }
+                } catch (e) { console.error(e); }
+
             }, 300);
         });
     }
 
     function displaySearchResults(results) {
-        const content = document.getElementById('mainContent');
-        const title = document.getElementById('welcomeTitle');
-
-        if (!content || !title) return;
-
-        title.textContent = '검색 결과';
-
-        if (results.length === 0) {
-            content.innerHTML = '<p>검색 결과가 없습니다.</p>';
-            return;
-        }
-
-        content.innerHTML = results.map(post => `
-            <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
-                <h3>
-                    <a href="post.html?id=${post.id}" style="color: var(--primary-brass); text-decoration: none;">
-                        ${post.title}
-                    </a>
-                </h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
-                    ${new Date(post.created_at).toLocaleDateString('ko-KR')}
-                </p>
-            </div>
-        `).join('');
+        // Deprecated, using showPostList
     }
 
     // ═══════════════════════════════════════════════════
