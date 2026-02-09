@@ -23,8 +23,16 @@
         href="https://cdn.jsdelivr.net/npm/@toast-ui/editor@3.2.2/dist/theme/toastui-editor-dark.min.css" />
     <link rel="stylesheet" href="css/toastui-custom.css">
 
+    <!-- Toast UI Editor JS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@toast-ui/editor@3.2.2/dist/toastui-editor-all.min.js"></script>
+
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Scripts -->
+    <script src="/api/config"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script defer src="js/admin-dashboard.js"></script>
 </head>
 
 <body class="admin-body">
@@ -385,11 +393,7 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@toast-ui/editor@3.2.2/dist/toastui-editor-all.min.js"></script>
-    <script src="/api/config"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script src="js/admin-dashboard.js"></script>
+    <!-- Scripts were moved to head for better reliability -->
 </body>
 
 </html>
