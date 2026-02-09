@@ -9,22 +9,7 @@ let editor = null;
 let currentPostId = null;
 
 // ═══════════════════════════════════════════════════
-// URL ACTION HANDLER
-// ═══════════════════════════════════════════════════
-async function handleUrlAction() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get('action');
-    const id = urlParams.get('id');
-
-    if (action === 'new') {
-        showNewPostEditor();
-    } else if (action === 'edit' && id) {
-        window.editPost(id);
-    }
-}
-
-// ═══════════════════════════════════════════════════
-// WAIT FOR CONFIG
+// WAIT FOR CONFIG & INITIALIZATION
 // ═══════════════════════════════════════════════════
 function waitForConfig() {
     return new Promise((resolve) => {
@@ -38,16 +23,27 @@ function waitForConfig() {
 }
 
 // ═══════════════════════════════════════════════════
-// AUTHENTICATION & VIEW
+// AUTHENTICATION
 // ═══════════════════════════════════════════════════
+function showError(message) {
+    const loginError = document.getElementById('loginError');
+    if (loginError) {
+        loginError.textContent = message;
+        loginError.classList.add('show');
+        setTimeout(() => loginError.classList.remove('show'), 3000);
+    }
+}
+
 async function checkAuth() {
     if (!supabaseClient) return false;
     try {
         const { data: { user }, error } = await supabaseClient.auth.getUser();
         if (error || !user) return false;
-        // ADMIN_EMAIL이 설정되지 않았을 경우를 대비한 기본값 확인
+        
+        // 관리자 이메일 검증 (기본값 설정)
         const adminEmail = window.ADMIN_EMAIL || 'sml-brown@naver.com';
         if (user.email !== adminEmail) {
+            console.warn('관리자 권한이 없는 계정입니다.');
             await supabaseClient.auth.signOut();
             return false;
         }
@@ -58,108 +54,142 @@ async function checkAuth() {
 }
 
 async function showDashboard() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminDashboard').style.display = 'block';
+    console.log('📊 Showing Dashboard...');
+    const loginScreen = document.getElementById('loginScreen');
+    const adminDashboard = document.getElementById('adminDashboard');
     
+    if (loginScreen) loginScreen.style.display = 'none';
+    if (adminDashboard) adminDashboard.style.display = 'block';
+    
+    // 에디터 및 데이터 초기화
     initializeEditor();
     
-    // 로딩 시작 전 상태 표시
-    const container = document.getElementById('postsList');
-    if (container) container.innerHTML = '<div class="loading">데이터를 불러오는 중입니다...</div>';
-
+    // 데이터 로딩 (에러 핸들링 추가)
     try {
         await Promise.all([
             loadPosts(),
             loadCategories(),
             loadHomeSettings()
         ]);
-        handleUrlAction();
+        
+        // URL 액션 처리 (action=new 등)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('action') === 'new') showNewPostEditor();
+        if (urlParams.get('action') === 'edit' && urlParams.get('id')) window.editPost(urlParams.get('id'));
+        
     } catch (err) {
-        console.error("초기 데이터 로딩 실패:", err);
+        console.error('데이터 로드 중 오류 발생:', err);
     }
 }
 
 // ═══════════════════════════════════════════════════
-// POSTS MANAGEMENT (로딩 로직 강화)
+// POSTS MANAGEMENT
 // ═══════════════════════════════════════════════════
 async function loadPosts() {
     try {
-        // [CHECK] 테이블명이 archive_posts가 맞는지 확인 필요
         const { data: posts, error } = await supabaseClient
             .from('archive_posts')
-            .select(`
-                id,
-                title,
-                is_private,
-                created_at,
-                updated_at,
-                category_id,
-                categories ( name )
-            `)
+            .select('id, title, is_private, updated_at, categories(name)')
             .order('updated_at', { ascending: false });
         
-        if (error) {
-            console.error('Supabase Query Error:', error);
-            throw error;
-        }
+        if (error) throw error;
 
         const container = document.getElementById('postsList');
         const countBadge = document.getElementById('postCount');
         
         if (countBadge) countBadge.textContent = posts ? posts.length : 0;
-        
+        if (!container) return;
+
         if (!posts || posts.length === 0) {
-            container.innerHTML = '<div class="loading">작성된 게시물이 없습니다.</div>';
+            container.innerHTML = '<div class="loading">게시물이 없습니다.</div>';
             return;
         }
-        
-        container.innerHTML = posts.map(post => {
-            const statusBadge = post.is_private 
-                ? '<span class="status-badge private">🔴 비공개</span>'
-                : '<span class="status-badge public">🟢 공개</span>';
-            
-            const categoryName = post.categories?.name || '미지정';
-            const updatedTime = getTimeAgo(post.updated_at);
-            
-            return `
-                <div class="post-item">
-                    <div class="post-header">
-                        <span class="post-title-link" onclick="editPost('${post.id}')">${post.title}</span>
-                        <div class="post-badges">${statusBadge}</div>
-                    </div>
-                    <div class="post-meta">
-                        ${categoryName} • ${updatedTime}
-                    </div>
-                    <div class="post-actions">
-                        <button class="action-btn" onclick="editPost('${post.id}')">✏️ 수정</button>
-                        <button class="action-btn danger" onclick="deletePost('${post.id}', '${post.title.replace(/'/g, "\\'")}')">🗑️ 삭제</button>
-                    </div>
+
+        container.innerHTML = posts.map(post => `
+            <div class="post-item">
+                <div class="post-header">
+                    <span class="post-title-link" onclick="editPost('${post.id}')">${post.title}</span>
+                    <div class="post-badges">${post.is_private ? '🔴 비공개' : '🟢 공개'}</div>
                 </div>
-            `;
-        }).join('');
-        
+                <div class="post-meta">${post.categories?.name || '미분류'} • ${getTimeAgo(post.updated_at)}</div>
+                <div class="post-actions">
+                    <button class="action-btn" onclick="editPost('${post.id}')">✏️ 수정</button>
+                    <button class="action-btn danger" onclick="deletePost('${post.id}', '${post.title.replace(/'/g, "\\'")}')">🗑️ 삭제</button>
+                </div>
+            </div>
+        `).join('');
     } catch (error) {
-        console.error('Posts loading failed:', error);
-        const container = document.getElementById('postsList');
-        if (container) {
-            container.innerHTML = `
-                <div class="loading" style="color: #ff4d4d;">
-                    ⚠️ 데이터를 불러오지 못했습니다.<br>
-                    <small>${error.message || '네트워크 오류 또는 권한 문제'}</small>
-                </div>`;
-        }
+        console.error('게시글 로드 실패:', error);
+        document.getElementById('postsList').innerHTML = '<div class="loading">데이터 권한 오류가 발생했습니다. (RLS 확인 필요)</div>';
     }
 }
 
 // ═══════════════════════════════════════════════════
-// [필수 확인] 데이터베이스 권한 해결 방법 (SQL)
+// INITIALIZATION (이 부분이 로그인 즉시 전환을 결정합니다)
 // ═══════════════════════════════════════════════════
-/* 만약 위 코드를 적용해도 여전히 멈춰있다면, Supabase SQL Editor에서 다음을 실행하세요:
+document.addEventListener('DOMContentLoaded', async () => {
+    await waitForConfig();
+    
+    supabaseClient = window.supabase.createClient(
+        window.SUPABASE_CONFIG.url,
+        window.SUPABASE_CONFIG.anonKey
+    );
 
-ALTER TABLE archive_posts DISABLE ROW LEVEL SECURITY;
--- 또는 관리자 접근 허용 정책 추가 --
-CREATE POLICY "Admin full access" ON archive_posts FOR ALL USING (auth.role() = 'authenticated');
-*/
+    // 1. 이미 로그인된 상태인지 확인
+    if (await checkAuth()) {
+        await showDashboard();
+    }
 
-// (이하 생략 - 이전 제공된 initializeEditor, publishPost 등 기능 포함)
-// ... 나머지 함수들은 기존의 완성본 코드를 유지하십시오.
+    // 2. 로그인 버튼 이벤트
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!email || !password) {
+                showError('정보를 입력해주세요.');
+                return;
+            }
+
+            try {
+                // 로그인 시도
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                
+                if (error) throw error;
+
+                // 로그인 성공 시 관리자 이메일 다시 확인
+                if (data.user.email !== (window.ADMIN_EMAIL || 'sml-brown@naver.com')) {
+                    await supabaseClient.auth.signOut();
+                    showError('관리자 권한이 없습니다.');
+                    return;
+                }
+
+                // 즉시 대시보드로 전환
+                await showDashboard();
+                
+            } catch (error) {
+                showError(error.message === 'Invalid login credentials' ? '비밀번호가 틀렸습니다.' : error.message);
+            }
+        });
+    }
+
+    // 로그아웃 버튼
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await supabaseClient.auth.signOut();
+        window.location.reload();
+    });
+
+    // 섹션 전환 버튼들
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const section = btn.dataset.section;
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`section-${section}`).classList.add('active');
+            btn.classList.add('active');
+        });
+    });
+});
+
+// ... (기타 함수: initializeEditor, getTimeAgo, loadCategories 등은 기존 유지)
