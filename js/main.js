@@ -44,23 +44,6 @@
     }
 
     // ═══════════════════════════════════════════════════
-    // 6. INITIALIZATION
-    // ═══════════════════════════════════════════════════
-    document.addEventListener('DOMContentLoaded', async () => {
-        checkAgeVerification();
-
-        try {
-            await waitForConfig();
-            initializeSupabase();
-            await loadCategories();
-            await loadSiteSettings();
-            await loadHomeSettings();
-        } catch (error) {
-            console.error('Init failed:', error);
-        }
-    });
-
-    // ═══════════════════════════════════════════════════
     // 3. AGE VERIFICATION
     // ═══════════════════════════════════════════════════
     function checkAgeVerification() {
@@ -492,32 +475,42 @@
 
     function initNightMode() {
         const modeToggle = document.getElementById('modeToggle');
-        // Theme persistence
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'night') {
+        if (!modeToggle) return;
+
+        const isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === 'true';
+
+        if (isNightMode) {
             document.body.classList.add('night-mode');
-            if (modeToggle) modeToggle.querySelector('span:first-child').textContent = '☀️';
-        } else {
-            // Default to 'library' if no theme or 'night' is not set
-            if (modeToggle) modeToggle.querySelector('span:first-child').textContent = '🌙';
+            modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
         }
 
-        if (modeToggle) {
-            modeToggle.addEventListener('click', () => {
-                const isNight = document.body.classList.toggle('night-mode');
-                localStorage.setItem('theme', isNight ? 'night' : 'library');
-                modeToggle.querySelector('span:first-child').textContent = isNight ? '☀️' : '🌙';
-            });
-        }
+        modeToggle.addEventListener('click', () => {
+            const nightMode = document.body.classList.toggle('night-mode');
+            localStorage.setItem(NIGHT_MODE_KEY, nightMode);
+
+            if (nightMode) {
+                modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
+            } else {
+                modeToggle.innerHTML = '<span>🌙</span><span>Night Library</span>';
+            }
+        });
     }
 
     // ═══════════════════════════════════════════════════
     // 8. INITIALIZATION
     // ═══════════════════════════════════════════════════
-    // ═══════════════════════════════════════════════════
-    // SHARED UTILITIES (via window.utils)
-    // ═══════════════════════════════════════════════════
-    const { waitForConfig } = window.utils || {};
+    function waitForConfig(callback, maxWait = 5000) {
+        const startTime = Date.now();
+        const interval = setInterval(() => {
+            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
+                clearInterval(interval);
+                callback();
+            } else if (Date.now() - startTime > maxWait) {
+                clearInterval(interval);
+                console.error('⏱️ Config loading timeout');
+            }
+        }, 100);
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         console.log('📱 DOM ready');

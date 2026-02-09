@@ -4,11 +4,21 @@
 
 let supabaseClient = null;
 
-// ═══════════════════════════════════════════════════
-// SHARED UTILITIES (via window.utils)
-// ═══════════════════════════════════════════════════
-const { waitForConfig, getTimeAgo } = window.utils || {};
+// Wait for config to load
+function waitForConfig(callback) {
+    const startTime = Date.now();
+    const maxWait = 5000; // 5 seconds
 
+    const interval = setInterval(() => {
+        if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
+            clearInterval(interval);
+            callback();
+        } else if (Date.now() - startTime > maxWait) {
+            clearInterval(interval);
+            console.error('⏱️ Config loading timeout');
+        }
+    }, 100);
+}
 
 // ═══════════════════════════════════════════════════
 // 1. SUPABASE INITIALIZATION
@@ -196,12 +206,11 @@ async function loadPost() {
         document.getElementById('pageTitle').textContent = `${post.title} - SMALLSM Archive`;
         document.getElementById('postTitle').textContent = post.title;
         document.getElementById('postCategory').textContent = post.categories ? post.categories.name : '미분류';
-        // Use getTimeAgo from utils
-        const timeAgoStr = getTimeAgo ? getTimeAgo(post.updated_at) : '';
-        document.getElementById('postMeta').innerHTML = `
-            <span class="meta-item">📅 ${timeAgoStr || new Date(post.updated_at).toLocaleDateString()}</span>
-            <span class="meta-item">👁️ ${post.view_count || 0} views</span>
-        `;
+        document.getElementById('postDate').textContent = new Date(post.created_at).toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
 
         // Initialize Toast UI Viewer
         const Viewer = toastui.Editor;
@@ -225,27 +234,7 @@ async function loadPost() {
 // ═══════════════════════════════════════════════════
 // 5. NIGHT MODE (Same as main.js)
 // ═══════════════════════════════════════════════════
-// const NIGHT_MODE_KEY = 'night_mode'; // Removed as per instruction
-
-function initNightMode() {
-    const modeToggle = document.getElementById('modeToggle');
-    if (!modeToggle) return;
-
-    // Theme persistence
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'night') {
-        document.body.classList.add('night-mode');
-        if (modeToggle) modeToggle.querySelector('span:first-child').textContent = '☀️';
-    }
-
-    if (modeToggle) {
-        modeToggle.addEventListener('click', () => {
-            const isNight = document.body.classList.toggle('night-mode');
-            localStorage.setItem('theme', isNight ? 'night' : 'library');
-            modeToggle.querySelector('span:first-child').textContent = isNight ? '☀️' : '🌙';
-        });
-    }
-}
+const NIGHT_MODE_KEY = 'night_mode';
 
 // ═══════════════════════════════════════════════════
 // 7. LONG PRESS FOR ADMIN
@@ -280,6 +269,28 @@ function initAdminLongPress() {
     copyright.style.webkitUserSelect = 'none';
 }
 
+function initNightMode() {
+    const modeToggle = document.getElementById('modeToggle');
+    if (!modeToggle) return;
+
+    const isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === 'true';
+
+    if (isNightMode) {
+        document.body.classList.add('night-mode');
+        modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
+    }
+
+    modeToggle.addEventListener('click', () => {
+        const isNightMode = document.body.classList.toggle('night-mode');
+        localStorage.setItem(NIGHT_MODE_KEY, isNightMode);
+
+        if (isNightMode) {
+            modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
+        } else {
+            modeToggle.innerHTML = '<span>🌙</span><span>Night Library</span>';
+        }
+    });
+}
 
 // ═══════════════════════════════════════════════════
 // 6. COPY PROTECTION (Same as main.js)

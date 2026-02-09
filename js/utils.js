@@ -6,32 +6,14 @@
  * Wait for global configuration to be loaded from /api/config
  */
 export function waitForConfig() {
-    return new Promise((resolve, reject) => {
-        const startTime = Date.now();
+    return new Promise((resolve) => {
         const interval = setInterval(() => {
             if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
                 clearInterval(interval);
                 resolve();
-            } else if (Date.now() - startTime > 5000) {
-                clearInterval(interval);
-                reject(new Error('Config loading timeout'));
             }
         }, 100);
     });
-}
-
-/**
- * Show error message in central UI or alert
- */
-export function showError(message, elementId = 'loginError') {
-    const errorEl = document.getElementById(elementId);
-    if (errorEl) {
-        errorEl.textContent = message;
-        errorEl.classList.add('show');
-        setTimeout(() => errorEl.classList.remove('show'), 3000);
-    } else {
-        alert(message);
-    }
 }
 
 /**

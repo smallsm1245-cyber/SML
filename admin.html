@@ -230,35 +230,32 @@
                 <section id="section-posts" class="content-section">
                     <h2 class="section-title">📝 게시글 관리</h2>
 
-                    <!-- Search and Filter (Post List View) -->
-                    <div id="postListView">
-                        <div class="card">
-                            <div class="toolbar">
-                                <input type="text" id="postSearch" class="search-input" placeholder="🔍 제목으로 검색...">
-                                <select id="postFilterCategory" class="filter-select">
-                                    <option value="">모든 카테고리</option>
-                                </select>
-                                <select id="postFilterStatus" class="filter-select">
-                                    <option value="">모든 상태</option>
-                                    <option value="public">공개</option>
-                                    <option value="private">비공개</option>
-                                </select>
-                                <button type="button" class="btn-primary" onclick="showNewPostEditor()">✍️ 새 글
-                                    작성</button>
-                            </div>
+                    <!-- Search and Filter -->
+                    <div class="card">
+                        <div class="toolbar">
+                            <input type="text" id="postSearch" class="search-input" placeholder="🔍 제목으로 검색...">
+                            <select id="postFilterCategory" class="filter-select">
+                                <option value="">모든 카테고리</option>
+                            </select>
+                            <select id="postFilterStatus" class="filter-select">
+                                <option value="">모든 상태</option>
+                                <option value="public">공개</option>
+                                <option value="private">비공개</option>
+                            </select>
+                            <button class="btn-primary" onclick="showNewPostEditor()">✍️ 새 글 작성</button>
                         </div>
+                    </div>
 
-                        <!-- Posts List -->
-                        <div id="postsList" class="posts-list">
-                            <!-- Dynamically loaded -->
-                        </div>
+                    <!-- Posts List -->
+                    <div id="postsList" class="posts-list">
+                        <!-- Dynamically loaded -->
                     </div>
 
                     <!-- Post Editor View (Hidden by default) -->
                     <div id="postEditorView" style="display: none;">
                         <div class="card">
                             <div class="editor-header">
-                                <button type="button" class="btn-secondary" id="backToListBtn">← 목록으로</button>
+                                <button class="btn-secondary" id="backToListBtn">← 목록으로</button>
                                 <h3 id="editorTitle">새 글 작성</h3>
                             </div>
 
@@ -299,8 +296,8 @@
 
                             <!-- Action Buttons -->
                             <div class="action-buttons">
-                                <button type="button" class="btn-secondary" id="saveDraftBtn">💾 임시 저장</button>
-                                <button type="button" class="btn-primary" id="publishPostBtn">🚀 발행하기</button>
+                                <button class="btn-secondary" id="saveDraftBtn">💾 임시 저장</button>
+                                <button class="btn-primary" id="publishPostBtn">🚀 발행하기</button>
                             </div>
                         </div>
                     </div>
@@ -319,7 +316,7 @@
                             </select>
                             <input type="text" id="newCategoryName" class="form-input"
                                 placeholder="카테고리 이름 (예: BDSM이란?)">
-                            <button type="button" class="btn-primary" id="addCategoryBtn">추가하기</button>
+                            <button class="btn-primary" id="addCategoryBtn">추가하기</button>
                         </div>
                         <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--admin-text-dim);">
                             💡 대분류는 그룹 역할만 하며 글을 작성할 수 없습니다. 글 작성은 소분류에서만 가능합니다.
@@ -363,7 +360,7 @@
                             <p style="font-size: 0.8rem; color: var(--admin-text-dim); margin-top: 0.5rem;">이메일 변경은 시스템
                                 설정 파일에서 가능합니다.</p>
                         </div>
-                        <button type="button" class="btn-primary" id="saveSettingsBtn">💾 설정 저장</button>
+                        <button class="btn-primary" id="saveSettingsBtn">💾 설정 저장</button>
                     </div>
 
                     <div class="card">
@@ -379,7 +376,7 @@
                             <input type="text" id="naverVerification" class="form-input"
                                 placeholder="naver-site-verification 코드">
                         </div>
-                        <button type="button" class="btn-primary" id="saveSeoBtn">💾 SEO 설정 저장</button>
+                        <button class="btn-primary" id="saveSeoBtn">💾 SEO 설정 저장</button>
                     </div>
                 </section>
             </main>
@@ -390,7 +387,7 @@
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script src="/api/config"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script type="module" src="js/admin-dashboard.js"></script>
+    <script src="js/admin-dashboard.js"></script>
 </body>
 
 </html>
