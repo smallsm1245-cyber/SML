@@ -109,18 +109,30 @@
                 if (titleTag) titleTag.textContent = settings.site_title;
                 const siteTitleEl = document.querySelector('.site-title');
                 if (siteTitleEl) siteTitleEl.textContent = settings.site_title;
+                console.log('✅ Site Title Updated:', settings.site_title);
             }
             if (settings.site_description) {
                 const descTag = document.getElementById('siteDescTag');
                 if (descTag) descTag.content = settings.site_description;
+                console.log('✅ Site Description Updated');
             }
             if (settings.google_site_verification) {
                 const gTag = document.querySelector('meta[name="google-site-verification"]');
-                if (gTag) gTag.content = settings.google_site_verification;
+                if (gTag) {
+                    gTag.content = settings.google_site_verification;
+                    console.log('✅ Google Verification Tag Updated:', settings.google_site_verification);
+                } else {
+                    console.warn('⚠️ Google Meta Tag not found in HTML');
+                }
             }
             if (settings.naver_verification) {
                 const nTag = document.querySelector('meta[name="naver-site-verification"]');
-                if (nTag) nTag.content = settings.naver_verification;
+                if (nTag) {
+                    nTag.content = settings.naver_verification;
+                    console.log('✅ Naver Verification Tag Updated:', settings.naver_verification);
+                } else {
+                    console.warn('⚠️ Naver Meta Tag not found in HTML');
+                }
             }
 
             const title = document.getElementById('welcomeTitle');
