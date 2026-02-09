@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Noto+Serif+KR:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🎬 SMALLSM ARCHIVE - CINEMATIC SYSTEM STYLESHEET
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -14,16 +16,16 @@
     --text-secondary: #A89F91;
     --accent-amber: #D4A574;
     --glass-border: rgba(206, 177, 128, 0.2);
-    
+
     /* Typography */
     --font-serif: 'Source Han Serif', serif;
     --font-display: 'Cinzel', serif;
     --font-mono: 'Courier Prime', monospace;
-    
+
     /* Spacing */
     --sidebar-width: 280px;
     --content-max: 800px;
-    
+
     /* Effects */
     --glow-subtle: 0 0 20px rgba(206, 177, 128, 0.15);
     --glow-medium: 0 0 40px rgba(206, 177, 128, 0.25);
@@ -46,7 +48,7 @@ body.night-mode {
     box-sizing: border-box;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap');
+
 
 body {
     font-family: var(--font-serif);
@@ -65,28 +67,39 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
-        repeating-linear-gradient(
-            0deg,
+    background:
+        repeating-linear-gradient(0deg,
             transparent,
             transparent 2px,
             rgba(206, 177, 128, 0.02) 2px,
-            rgba(206, 177, 128, 0.02) 4px
-        );
+            rgba(206, 177, 128, 0.02) 4px);
     pointer-events: none;
     z-index: 1;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     font-family: var(--font-display);
     color: var(--primary-brass);
     font-weight: 600;
     letter-spacing: 0.05em;
 }
 
-h1 { font-size: 2.5rem; margin-bottom: 1.5rem; }
-h2 { font-size: 1.8rem; margin: 2rem 0 1rem; }
-h3 { font-size: 1.3rem; margin: 1.5rem 0 0.8rem; }
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+h2 {
+    font-size: 1.8rem;
+    margin: 2rem 0 1rem;
+}
+
+h3 {
+    font-size: 1.3rem;
+    margin: 1.5rem 0 0.8rem;
+}
 
 p {
     margin-bottom: 1rem;
@@ -184,11 +197,25 @@ p {
     animation: fadeInUp 0.5s ease forwards;
 }
 
-.category-item:nth-child(1) { animation-delay: 0.1s; }
-.category-item:nth-child(2) { animation-delay: 0.2s; }
-.category-item:nth-child(3) { animation-delay: 0.3s; }
-.category-item:nth-child(4) { animation-delay: 0.4s; }
-.category-item:nth-child(5) { animation-delay: 0.5s; }
+.category-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.category-item:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.category-item:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.category-item:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.category-item:nth-child(5) {
+    animation-delay: 0.5s;
+}
 
 .category-link {
     display: block;
@@ -285,6 +312,7 @@ p {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -404,8 +432,13 @@ p {
 }
 
 @keyframes overlayFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .disclaimer-content {
@@ -424,6 +457,7 @@ p {
         transform: scale(0.8) translateY(-50px);
         opacity: 0;
     }
+
     to {
         transform: scale(1) translateY(0);
         opacity: 1;
@@ -698,8 +732,15 @@ p {
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
 }
 
 .error-title {
@@ -724,27 +765,27 @@ p {
         z-index: 1000;
         width: 80%;
     }
-    
+
     .sidebar.active {
         transform: translateX(0);
     }
-    
+
     .main-content {
         padding: 2rem 1.5rem;
     }
-    
+
     .content-panel {
         padding: 2rem 1.5rem;
     }
-    
+
     .post-title {
         font-size: 1.8rem;
     }
-    
+
     .split-editor {
         grid-template-columns: 1fr;
     }
-    
+
     .admin-header {
         flex-direction: column;
         gap: 1rem;
@@ -759,6 +800,7 @@ p {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -777,7 +819,9 @@ p {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -791,10 +835,21 @@ p {
     text-align: center;
 }
 
-.mt-2 { margin-top: 1rem; }
-.mt-4 { margin-top: 2rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-4 { margin-bottom: 2rem; }
+.mt-2 {
+    margin-top: 1rem;
+}
+
+.mt-4 {
+    margin-top: 2rem;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 2rem;
+}
 
 /* Copy Protection Enhancement */
 .copy-protected::after {

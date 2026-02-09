@@ -2,13 +2,13 @@
 // 🎬 SMALLSM ARCHIVE - POST SCRIPT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-let supabase = null;
+let supabaseClient = null;
 
 // Wait for config to load
 function waitForConfig(callback) {
     const startTime = Date.now();
     const maxWait = 5000; // 5 seconds
-    
+
     const interval = setInterval(() => {
         if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
             clearInterval(interval);
@@ -28,8 +28,8 @@ function initializeSupabase() {
         console.error('❌ Supabase library not loaded');
         return;
     }
-    
-    supabase = window.supabase.createClient(
+
+    supabaseClient = window.supabase.createClient(
         window.SUPABASE_CONFIG.url,
         window.SUPABASE_CONFIG.anonKey
     );
@@ -44,17 +44,17 @@ const VERIFICATION_DURATION = 24 * 60 * 60 * 1000;
 
 function checkAgeVerification() {
     const verified = localStorage.getItem(VERIFICATION_KEY);
-    
+
     if (verified) {
         const timestamp = parseInt(verified);
         const now = Date.now();
-        
+
         if (now - timestamp < VERIFICATION_DURATION) {
             hideDisclaimer();
             return true;
         }
     }
-    
+
     showDisclaimer();
     return false;
 }
@@ -62,7 +62,7 @@ function checkAgeVerification() {
 function showDisclaimer() {
     const overlay = document.getElementById('disclaimerOverlay');
     const container = document.getElementById('appContainer');
-    
+
     if (overlay) overlay.style.display = 'flex';
     if (container) container.classList.add('content-blur');
 }
@@ -70,7 +70,7 @@ function showDisclaimer() {
 function hideDisclaimer() {
     const overlay = document.getElementById('disclaimerOverlay');
     const container = document.getElementById('appContainer');
-    
+
     if (overlay) overlay.style.display = 'none';
     if (container) container.classList.remove('content-blur');
 }
@@ -79,33 +79,33 @@ function hideDisclaimer() {
 // 3. LOAD CATEGORIES (Same as main.js)
 // ═══════════════════════════════════════════════════
 async function loadCategories() {
-    if (!supabase) return;
+    if (!supabaseClient) return;
     try {
-        const { data: categories, error } = await supabase
+        const { data: categories, error } = await supabaseClient
             .from('categories')
             .select('*')
             .eq('is_visible', true)
             .order('display_order', { ascending: true });
-        
+
         if (error) throw error;
-        
+
         const nav = document.getElementById('categoryNav');
         if (!nav) return;
         nav.innerHTML = '';
-        
+
         categories.forEach(category => {
             const li = document.createElement('li');
             li.className = 'category-item';
-            
+
             const link = document.createElement('a');
             link.href = `index.html#category-${category.id}`;
             link.className = 'category-link';
             link.textContent = category.name;
-            
+
             li.appendChild(link);
             nav.appendChild(li);
         });
-        
+
     } catch (error) {
         console.error('카테고리 로딩 실패:', error);
     }
@@ -115,22 +115,22 @@ async function loadCategories() {
 // 4. LOAD POST CONTENT
 // ═══════════════════════════════════════════════════
 async function loadPost() {
-    if (!supabase) return;
+    if (!supabaseClient) return;
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
-    
+
     if (!postId) {
         window.location.href = '404.html';
         return;
     }
-    
+
     try {
         // Check if user is admin
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         const isAdmin = user && user.email === window.ADMIN_EMAIL;
-        
+
         // Fetch post
-        const { data: post, error } = await supabase
+        const { data: post, error } = await supabaseClient
             .from('archive_posts')
             .select(`
                 *,
@@ -138,15 +138,15 @@ async function loadPost() {
             `)
             .eq('id', postId)
             .single();
-        
+
         if (error) throw error;
-        
+
         // Security: Check if post is private and user is not admin
         if (post.is_private && !isAdmin) {
             window.location.href = '404.html';
             return;
         }
-        
+
         // Display post
         document.getElementById('pageTitle').textContent = `${post.title} - SMALLSM Archive`;
         document.getElementById('postTitle').textContent = post.title;
@@ -156,10 +156,10 @@ async function loadPost() {
             month: 'long',
             day: 'numeric'
         });
-        
+
         // Process content
         let processedContent = post.content;
-        
+
         // Convert markdown-style formatting to HTML
         processedContent = processedContent
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -167,14 +167,14 @@ async function loadPost() {
             .replace(/_(.*?)_/g, '<u>$1</u>')
             .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">')
             .replace(/\n/g, '<br>');
-        
+
         document.getElementById('postContent').innerHTML = processedContent;
-        
+
         // Add copy protection class if needed
         if (!post.origin_free) {
             document.getElementById('postContent').classList.add('copy-protected');
         }
-        
+
     } catch (error) {
         console.error('게시물 로딩 실패:', error);
         window.location.href = '404.html';
@@ -192,28 +192,28 @@ const NIGHT_MODE_KEY = 'night_mode';
 function initAdminLongPress() {
     const copyright = document.getElementById('copyrightText');
     if (!copyright) return;
-    
+
     let pressTimer;
     const PRESS_DURATION = 3000; // 3 seconds
-    
+
     const startPress = (e) => {
         pressTimer = setTimeout(() => {
             window.location.href = 'admin.html';
         }, PRESS_DURATION);
     };
-    
+
     const cancelPress = () => {
         clearTimeout(pressTimer);
     };
-    
+
     copyright.addEventListener('mousedown', startPress);
     copyright.addEventListener('mouseup', cancelPress);
     copyright.addEventListener('mouseleave', cancelPress);
-    
+
     copyright.addEventListener('touchstart', startPress);
     copyright.addEventListener('touchend', cancelPress);
     copyright.addEventListener('touchcancel', cancelPress);
-    
+
     copyright.style.cursor = 'default';
     copyright.style.userSelect = 'none';
     copyright.style.webkitUserSelect = 'none';
@@ -224,7 +224,7 @@ function initNightMode() {
     if (!modeToggle) return;
 
     const isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === 'true';
-    
+
     if (isNightMode) {
         document.body.classList.add('night-mode');
         modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
@@ -233,7 +233,7 @@ function initNightMode() {
     modeToggle.addEventListener('click', () => {
         const isNightMode = document.body.classList.toggle('night-mode');
         localStorage.setItem(NIGHT_MODE_KEY, isNightMode);
-        
+
         if (isNightMode) {
             modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
         } else {
@@ -246,22 +246,22 @@ function initNightMode() {
 // 6. COPY PROTECTION (Same as main.js)
 // ═══════════════════════════════════════════════════
 document.addEventListener('copy', async (e) => {
-    if (!supabase) return;
+    if (!supabaseClient) return;
     const selection = window.getSelection().toString();
-    
+
     if (!selection) return;
-    
+
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
-    
+
     if (postId) {
         try {
-            const { data: post } = await supabase
+            const { data: post } = await supabaseClient
                 .from('archive_posts')
                 .select('origin_free')
                 .eq('id', postId)
                 .single();
-            
+
             if (post && post.origin_free) {
                 return;
             }
@@ -269,9 +269,9 @@ document.addEventListener('copy', async (e) => {
             console.error('복사 보호 확인 실패:', error);
         }
     }
-    
+
     const attribution = `\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n본 기록은 SMALLSM Archive의 자산입니다.\n출처: ${window.location.href}\n⚠️ 무단 수정 및 상업적 이용을 금합니다.\n━━━━━━━━━━━━━━━━━━━━━━━━`;
-    
+
     e.clipboardData.setData('text/plain', selection + attribution);
     e.preventDefault();
 });
@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'https://www.google.com';
         });
     }
-    
+
     if (checkAgeVerification()) {
         waitForConfig(() => {
             initializeSupabase();
@@ -309,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadPost();
         });
     }
-    
+
     initNightMode();
     initAdminLongPress();
 });

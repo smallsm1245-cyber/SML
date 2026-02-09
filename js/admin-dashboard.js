@@ -468,7 +468,7 @@ function renderCategories() {
                     <button class="indent-btn" onclick="toggleLocalIndent('${cat.id}')" title="들여쓰기">
                         ${isSub ? '⬅️' : '➡️'}
                     </button>
-                    <button class="visibility-toggle ${isHidden ? 'hidden' : ''}" 
+                    <button class="visibility-toggle ${isHidden ? 'off' : ''}" 
                             onclick="toggleLocalVisibility('${cat.id}')">
                         ${isHidden ? '🙈' : '👁️'}
                     </button>

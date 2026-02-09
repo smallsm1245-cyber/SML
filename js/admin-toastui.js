@@ -512,6 +512,32 @@ async function addCategory() {
     }
 }
 
+async function saveAllCategories() {
+    const items = document.querySelectorAll('.category-item-card');
+
+    try {
+        for (let i = 0; i < items.length; i++) {
+            const id = items[i].dataset.id;
+            const input = items[i].querySelector('.category-name-input');
+            const newName = input ? input.value : null;
+
+            if (newName) {
+                // Update order and name
+                await supabaseClient.from('categories').update({
+                    display_order: i + 1,
+                    name: newName
+                }).eq('id', id);
+            }
+        }
+
+        alert('✅ 모든 카테고리 변경사항이 저장되었습니다!');
+        loadCategories();
+    } catch (error) {
+        console.error('Save failed:', error);
+        alert('❌ 저장 실패: ' + error.message);
+    }
+}
+
 function initDragAndDrop() {
     const container = document.getElementById('categoriesList');
     let draggedElement = null;
@@ -759,6 +785,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('showRecentPosts').addEventListener('change', toggleRecentPostsCount);
     document.getElementById('saveHomeBtn').addEventListener('click', saveHomeSettings);
     document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
+
+    const saveCatBtn = document.getElementById('saveCategoriesBtn');
+    if (saveCatBtn) saveCatBtn.addEventListener('click', saveAllCategories);
 
     // Setup search and filter
     setupSearchAndFilter();

@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    
+
     <title>Admin Panel - SMALLSM Archive</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Toast UI Editor -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
-    
+
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin-toastui.css">
-    
+
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+
 <body class="admin-body">
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
@@ -83,7 +85,7 @@
                         <h2 class="section-title">📝 게시글 관리</h2>
                         <button class="btn-primary" id="newPostBtn">✍️ 새 글 작성</button>
                     </div>
-                    
+
                     <!-- Post List View -->
                     <div id="postListView">
                         <!-- Search and Filter -->
@@ -162,7 +164,7 @@
                 <!-- Home Screen Management Section -->
                 <section id="section-home" class="content-section">
                     <h2 class="section-title">🏠 홈 화면 관리</h2>
-                    
+
                     <div class="split-layout">
                         <!-- Editor -->
                         <div class="editor-panel">
@@ -174,12 +176,14 @@
 
                                 <div class="form-group">
                                     <label>부제목</label>
-                                    <input type="text" id="homeSubtitle" class="form-input" placeholder="SMALLSM Archive에 오신 것을 환영합니다">
+                                    <input type="text" id="homeSubtitle" class="form-input"
+                                        placeholder="SMALLSM Archive에 오신 것을 환영합니다">
                                 </div>
 
                                 <div class="form-group">
                                     <label>본문</label>
-                                    <textarea id="homeContent" class="form-textarea" rows="10" placeholder="좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요..."></textarea>
+                                    <textarea id="homeContent" class="form-textarea" rows="10"
+                                        placeholder="좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요..."></textarea>
                                 </div>
 
                                 <div class="form-group">
@@ -191,7 +195,8 @@
 
                                 <div class="form-group" id="recentPostsCountGroup" style="display: none;">
                                     <label>표시할 게시물 개수</label>
-                                    <input type="number" id="recentPostsCount" class="form-input" value="3" min="1" max="10">
+                                    <input type="number" id="recentPostsCount" class="form-input" value="3" min="1"
+                                        max="10">
                                 </div>
 
                                 <button class="btn-primary" id="saveHomeBtn">💾 저장하기</button>
@@ -217,12 +222,13 @@
                 <!-- Categories Management Section -->
                 <section id="section-categories" class="content-section">
                     <h2 class="section-title">📂 카테고리 관리</h2>
-                    
+
                     <!-- Add Category -->
                     <div class="card">
                         <h3 class="card-title">➕ 새 카테고리 추가</h3>
                         <div class="add-category-form">
-                            <input type="text" id="newCategoryName" class="form-input" placeholder="카테고리 이름 (예: REVIEW)">
+                            <input type="text" id="newCategoryName" class="form-input"
+                                placeholder="카테고리 이름 (예: REVIEW)">
                             <button class="btn-primary" id="addCategoryBtn">추가하기</button>
                         </div>
                     </div>
@@ -230,6 +236,10 @@
                     <!-- Categories List -->
                     <div id="categoriesList" class="categories-list">
                         <!-- Dynamically loaded -->
+                    </div>
+
+                    <div style="margin-top: 1.5rem; text-align: center;">
+                        <button class="btn-primary" id="saveCategoriesBtn">💾 카테고리 순서 및 이름 저장</button>
                     </div>
                 </section>
             </main>
@@ -241,4 +251,5 @@
     <script src="/api/config"></script>
     <script src="js/admin-toastui.js"></script>
 </body>
+
 </html>
