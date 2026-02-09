@@ -159,10 +159,8 @@ async function loadPost() {
 
         // Initialize Toast UI Viewer
         const Viewer = toastui.Editor;
-        const viewer = Viewer.factory({
+        const viewer = new Viewer({
             el: document.querySelector('#postContent'),
-            viewer: true,
-            height: 'auto',
             initialValue: post.content
         });
 
@@ -173,7 +171,8 @@ async function loadPost() {
 
     } catch (error) {
         console.error('게시물 로딩 실패:', error);
-        window.location.href = '404.html';
+        // window.location.href = '404.html'; // Debugging
+        document.getElementById('postContent').innerHTML = `<p style="color:red">오류 발생: ${error.message}</p>`;
     }
 }
 
