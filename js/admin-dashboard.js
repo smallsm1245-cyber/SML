@@ -1084,7 +1084,51 @@ window.deleteCategory = async function (id, name) {
     }
 };
 
+// ═══════════════════════════════════════════════════
+// DELETE CATEGORY (LOCAL)
+// ═══════════════════════════════════════════════════
+window.deleteLocalCategory = function (id) {
+    const cat = currentCategories.find(c => c.id == id);
+    if (!cat) return;
+
+    // Check for children
+    const children = currentCategories.filter(c => c.parent_id == id);
+    let message = '정말 삭제하시겠습니까? (저장 시 영구 삭제됩니다)';
+
+    if (children.length > 0) {
+        message = `⚠️ 이 카테고리에는 ${children.length}개의 소분류가 포함되어 있습니다.\n\n삭제하면 소분류도 함께 삭제됩니다.\n계속하시겠습니까?`;
+    }
+
+    if (!confirm(message)) return;
+
+    // Track parent for deletion
+    deletedCategoryIds.add(id);
+
+    // Track children for deletion
+    children.forEach(child => {
+        deletedCategoryIds.add(child.id);
+    });
+
+    // Remove parent and children from local list
+    currentCategories = currentCategories.filter(c => c.id != id && c.parent_id != id);
+
+    renderCategories();
+    hasUnsavedChanges = true;
+};
+
+// ═══════════════════════════════════════════════════
+// ADD CATEGORY (IMMEDIATE)
+// ═══════════════════════════════════════════════════
 async function addCategory() {
+    if (hasUnsavedChanges) {
+        if (!confirm('⚠️ 저장하지 않은 변경사항(삭제/순서변경)이 있습니다.\n\n카테고리를 추가하면 변경사항이 저장되지 않고 목록이 새로고침됩니다.\n\n정말 진행하시겠습니까?')) {
+            return;
+        }
+        // If they proceed, unsaved changes are lost (reset)
+        deletedCategoryIds.clear();
+        hasUnsavedChanges = false;
+    }
+
     const name = document.getElementById('newCategoryName').value.trim();
     const parentId = document.getElementById('newCategoryParent').value;
 
