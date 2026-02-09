@@ -222,6 +222,19 @@
                 });
             }
 
+            // Recursive Count Update for Parents
+            // Note: This assumes a 2-level hierarchy (Parent -> Child) or ordered such that children are processed or we can iterate.
+            // Since we manipulate 'counts', let's iterate to add child counts to parents.
+            // A simple approach for 2-level:
+            if (categories) {
+                const parentIds = new Set(categories.filter(c => !c.parent_id).map(c => c.id));
+                categories.forEach(c => {
+                    if (c.parent_id && parentIds.has(c.parent_id)) {
+                        counts[c.parent_id] = (counts[c.parent_id] || 0) + (counts[c.id] || 0);
+                    }
+                });
+            }
+
             renderCategories(categories || [], counts);
 
             console.log('✅ Categories loaded');
@@ -289,8 +302,6 @@
     };
 
     window.filterByCategory = function (categoryId, element) {
-        // if (event) event.stopPropagation(); // Removed to allow accordion toggle bubbling
-
         // Remove active class
         document.querySelectorAll('.category-link, .submenu-link').forEach(el => el.classList.remove('active'));
         if (element) element.classList.add('active');
@@ -299,7 +310,7 @@
     };
 
     // ═══════════════════════════════════════════════════
-    // 5. POST LOADING BY CATEGORY
+    // 5. POST LOADING BY CATEGORY (Modified for Direct View)
     // ═══════════════════════════════════════════════════
     async function loadPostsByCategory(categoryId) {
         if (!supabaseClient) return;
@@ -339,7 +350,53 @@
                 .eq('id', categoryId)
                 .single();
 
+            // Check if there is exactly ONE post
+            if (posts.length === 1) {
+                const post = posts[0];
+                title.textContent = post.title;
+
+                // Clear previous content
+                content.innerHTML = '';
+
+                // Add Meta Info
+                const metaDiv = document.querySelector('.post-meta');
+                if (metaDiv) {
+                    const dateStr = new Date(post.created_at).toLocaleDateString('ko-KR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    const categoryName = category ? category.name : '';
+                    metaDiv.innerHTML = `<span>${categoryName}</span> • <span>${dateStr}</span>`;
+                }
+
+                // Initialize Toast UI Viewer for the content
+                const Viewer = toastui.Editor;
+                const viewer = new Viewer({
+                    el: content,
+                    initialValue: post.content,
+                    theme: 'dark' // Assuming dark theme is preferred or matches style
+                });
+
+                // Copy protection if needed
+                if (!post.origin_free) {
+                    content.classList.add('copy-protected');
+                    // Re-bind copy protection if not global
+                    // Note: Global copy listener in main.js handles generic copy, 
+                    // but specific attribution might depend on postId. 
+                    // The global listener checks `window.location.search`.
+                    // Since we are in SPA mode, the URL might not have ?id=...
+                    // We might need to update the global copy handler or pushState.
+                    // For now, let's keep it simple.
+                }
+
+                return;
+            }
+
+            // Multiple posts - Show List
             title.textContent = category.name;
+            const metaDiv = document.querySelector('.post-meta');
+            if (metaDiv) metaDiv.innerHTML = `<span>총 ${posts.length}개의 게시물</span>`;
 
             content.innerHTML = posts.map(post => `
                 <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
