@@ -990,48 +990,7 @@ async function addCategory() {
     }
 }
 
-window.saveAllCategories = async function () {
-    try {
-        // Update all categories with their new order and properties
-        // Calculate parent_id based on is_sub and order
-        let lastRootId = null;
 
-        for (let i = 0; i < currentCategories.length; i++) {
-            const cat = currentCategories[i];
-
-            let parentId = null;
-            if (cat.is_sub) {
-                if (lastRootId) {
-                    parentId = lastRootId;
-                } else {
-                    // Orphaned sub (e.g. first item was forced sub?), treat as root
-                    cat.is_sub = false;
-                    lastRootId = cat.id;
-                }
-            } else {
-                lastRootId = cat.id;
-            }
-
-            const { error } = await supabaseClient.from('categories').upsert({
-                id: cat.id,
-                name: cat.name,
-                display_order: i + 1,
-                is_visible: cat.is_visible,
-                parent_id: parentId, // Save calculated parent_id
-                updated_at: new Date().toISOString()
-            });
-            if (error) throw error;
-        }
-
-        alert('✅ 모든 카테고리 변경사항이 저장되었습니다!');
-        hasUnsavedChanges = false;
-        loadCategories();
-        loadStatistics();
-    } catch (error) {
-        console.error('Save failed:', error);
-        alert('❌ 저장 실패: ' + error.message);
-    }
-};
 
 window.updateCategoryName = async function (id, newName) {
     try {
