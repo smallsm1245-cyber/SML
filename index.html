@@ -61,11 +61,7 @@
             <!-- Categories -->
             <nav>
                 <ul class="category-nav" id="categoryNav">
-                    <li class="menu-header">카테고리</li>
-                    <div id="categoryList">
-                        <li><a href="#" id="menuInclinations">💞 세부성향</a></li>
-                        <!-- Javascript will populate categories here -->
-                    </div>
+                    <!-- Dynamically loaded -->
                 </ul>
             </nav>
 
@@ -80,64 +76,14 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Mobile Header -->
-            <header class="mobile-header">
-                <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
-                <div class="site-title">SMALLSM Archive</div>
-            </header>
-
-            <!-- Home Section -->
-            <div id="homeSection" class="content-section active">
-                <div class="welcome-hero">
-                    <h1 class="welcome-title" id="welcomeTitle">환영합니다</h1>
-                    <p class="welcome-subtitle" id="welcomeSubtitle">SMALLSM Archive에 오신 것을 환영합니다</p>
+            <div class="content-panel">
+                <h1 class="post-title" id="welcomeTitle">환영합니다</h1>
+                <div class="post-meta">
+                    <span>SMALLSM Archive에 오신 것을 환영합니다</span>
                 </div>
-
-                <div class="home-content toastui-editor-contents" id="welcomeContent">
-                    <!-- Content from DB -->
-                </div>
-
-                <!-- Recent Posts Section (Optional) -->
-                <div id="recentPostsSection" class="recent-posts-section" style="display: none;">
-                    <h2 class="section-heading">최신 게시물</h2>
-                    <div id="recentPostsList" class="recent-posts-list">
-                        <!-- Dynamically loaded -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Inclinations Section -->
-            <div id="inclinationsSection" class="content-section" style="display: none;">
-                <div class="section-header">
-                    <h2 class="section-title">세부성향 가이드</h2>
-                    <p class="section-subtitle">성향별 특징과 역할을 자세히 알아보세요</p>
-                </div>
-
-                <!-- Filter Tabs -->
-                <div class="filter-tabs">
-                    <button class="filter-tab active" data-filter="all">전체</button>
-                    <button class="filter-tab" data-filter="top">Top</button>
-                    <button class="filter-tab" data-filter="bottom">Bottom</button>
-                    <button class="filter-tab" data-filter="switch">Switch</button>
-                </div>
-
-                <!-- Cards Grid -->
-                <div class="inclinations-grid" id="inclinationsGrid">
-                    <!-- Dynamically loaded from JS -->
-                </div>
-            </div>
-
-            <!-- Posts List Section -->
-            <div id="postsSection" class="content-section" style="display: none;">
-                <div class="content-panel">
-                    <h1 class="post-title" id="postTitle"></h1>
-                    <div class="post-meta">
-                        <span id="postDate"></span>
-                        <span id="postCategory"></span>
-                    </div>
-                    <div class="post-content toastui-editor-contents" id="postContent">
-                        <!-- Post content will be loaded here -->
-                    </div>
+                <div class="post-content" id="mainContent">
+                    <p>좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.</p>
+                    <p>이곳은 성향과 실천, 그리고 깊이 있는 사색이 담긴 공간입니다.</p>
                 </div>
             </div>
 
@@ -152,7 +98,6 @@
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/api/config" async></script>
-    <script src="js/config.local.js"></script>
     <script src="js/main.js"></script>
 </body>
 

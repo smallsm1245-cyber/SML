@@ -685,12 +685,10 @@ window.deletePost = async function (id, title) {
 // CATEGORIES MANAGEMENT
 // ═══════════════════════════════════════════════════
 let currentCategories = [];
-let deletedChildrenIds = new Set();
-let deletedParentIds = new Set();
+let deletedCategoryIds = new Set();
 
 async function loadCategories() {
-    deletedChildrenIds.clear();
-    deletedParentIds.clear();
+    deletedCategoryIds.clear();
     try {
         const { data: categories, error } = await supabaseClient
             .from('categories')
@@ -881,30 +879,29 @@ window.deleteLocalCategory = function (id) {
 };
 
 window.saveAllCategories = async function () {
+    console.log('🔧 saveAllCategories called');
+    console.log('📋 Current categories:', currentCategories);
+    console.log('🗑️ Deleted IDs:', Array.from(deletedCategoryIds));
+
     if (!confirm('변경된 카테고리 설정을 저장하시겠습니까?')) return;
 
     try {
-        // 1. Handle Deletions (Children First, then Parents)
-        if (deletedChildrenIds.size > 0) {
-            const childrenToDelete = Array.from(deletedChildrenIds);
-            const { error: childError } = await supabaseClient
+        // 1. Handle Deletions first
+        if (deletedCategoryIds.size > 0) {
+            const idsToDelete = Array.from(deletedCategoryIds);
+            console.log('🗑️ Deleting categories:', idsToDelete);
+
+            const { error: deleteError } = await supabaseClient
                 .from('categories')
                 .delete()
-                .in('id', childrenToDelete);
+                .in('id', idsToDelete);
 
-            if (childError) throw childError;
-            deletedChildrenIds.clear();
-        }
-
-        if (deletedParentIds.size > 0) {
-            const parentsToDelete = Array.from(deletedParentIds);
-            const { error: parentError } = await supabaseClient
-                .from('categories')
-                .delete()
-                .in('id', parentsToDelete);
-
-            if (parentError) throw parentError;
-            deletedParentIds.clear();
+            if (deleteError) {
+                console.error('❌ Delete error:', deleteError);
+                throw deleteError;
+            }
+            console.log('✅ Deletions successful');
+            deletedCategoryIds.clear();
         }
 
         // 2. Handle Updates (Hierarchy & Order)
@@ -932,12 +929,18 @@ window.saveAllCategories = async function () {
             };
         });
 
+        console.log('📝 Upserting categories:', upserts);
+
         if (upserts.length > 0) {
             const { error: upsertError } = await supabaseClient
                 .from('categories')
                 .upsert(upserts);
 
-            if (upsertError) throw upsertError;
+            if (upsertError) {
+                console.error('❌ Upsert error:', upsertError);
+                throw upsertError;
+            }
+            console.log('✅ Upserts successful');
         }
 
         alert('✅ 카테고리 설정이 저장되었습니다!');
@@ -946,7 +949,7 @@ window.saveAllCategories = async function () {
         loadStatistics();
 
     } catch (error) {
-        console.error('Save categories failed:', error);
+        console.error('❌ Save categories failed:', error);
         alert('❌ 저장 실패: ' + error.message);
     }
 };
@@ -1114,16 +1117,13 @@ window.deleteLocalCategory = function (id) {
 
     if (!confirm(message)) return;
 
-    // Track for deletion: Children FIRST, then Parent
-    children.forEach(child => {
-        deletedChildrenIds.add(child.id);
-    });
+    // Track parent for deletion
+    deletedCategoryIds.add(id);
 
-    if (cat.parent_id) {
-        deletedChildrenIds.add(cat.id);
-    } else {
-        deletedParentIds.add(cat.id);
-    }
+    // Track children for deletion
+    children.forEach(child => {
+        deletedCategoryIds.add(child.id);
+    });
 
     // Remove parent and children from local list
     currentCategories = currentCategories.filter(c => c.id != id && c.parent_id != id);
@@ -1141,8 +1141,7 @@ async function addCategory() {
             return;
         }
         // If they proceed, unsaved changes are lost (reset)
-        deletedChildrenIds.clear();
-        deletedParentIds.clear();
+        deletedCategoryIds.clear();
         hasUnsavedChanges = false;
     }
 
@@ -1351,4 +1350,152 @@ window.permanentDelete = async function (trashId) {
     }
 };
 
+// ═══════════════════════════════════════════════════
+// WAIT FOR CONFIG
+// ═══════════════════════════════════════════════════
+function waitForConfig() {
+    return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+        const interval = setInterval(() => {
+            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
+                clearInterval(interval);
+                resolve();
+            } else if (Date.now() - startTime > 5000) {
+                clearInterval(interval);
+                reject(new Error('Config loading timeout'));
+            }
+        }, 100);
+    });
+}
 
+// ═══════════════════════════════════════════════════
+// SHOW ERROR
+// ═══════════════════════════════════════════════════
+function showError(message) {
+    const loginError = document.getElementById('loginError');
+    if (loginError) {
+        loginError.textContent = message;
+        loginError.classList.add('show');
+        setTimeout(() => loginError.classList.remove('show'), 3000);
+    } else {
+        alert(message);
+    }
+}
+
+// ═══════════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('📱 DOM ready');
+
+    // Login button (Attached immediately)
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!email || !password) {
+                showError('이메일과 비밀번호를 입력하세요');
+                return;
+            }
+
+            if (!supabaseClient) {
+                showError('⚠️ 시스템 초기화 중입니다. 잠시 후 다시 시도하세요.');
+                return;
+            }
+
+            if (email !== window.ADMIN_EMAIL) {
+                showError('관리자 권한이 없습니다');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+
+                await showDashboard();
+            } catch (error) {
+                showError(error.message || '로그인 실패');
+            }
+        });
+    }
+
+    try {
+        await waitForConfig();
+
+        supabaseClient = window.supabase.createClient(
+            window.SUPABASE_CONFIG.url,
+            window.SUPABASE_CONFIG.anonKey
+        );
+
+        console.log('✅ Supabase initialized');
+
+        // Check if already logged in
+        if (await checkAuth()) {
+            await showDashboard();
+        }
+
+    } catch (error) {
+        console.error('Initialization failed:', error);
+        showError('시스템 초기화 실패: 설정 파일을 불러올 수 없습니다.');
+    }
+
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        if (!confirm('로그아웃하시겠습니까?')) return;
+
+        await supabaseClient.auth.signOut();
+        window.location.reload();
+    });
+
+    // Nav buttons
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const section = btn.dataset.section;
+            switchSection(section);
+
+            if (section === 'trash') loadTrash();
+        });
+    });
+
+    // Home preview real-time
+    ['homeTitle', 'homeSubtitle', 'homeContent'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updateHomePreview);
+    });
+
+    document.getElementById('showRecentPosts').addEventListener('change', toggleRecentPostsCount);
+    document.getElementById('saveHomeBtn').addEventListener('click', saveHomeSettings);
+    document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    document.getElementById('previewThemeToggle').addEventListener('click', togglePreviewTheme);
+    document.getElementById('saveSettingsBtn').addEventListener('click', saveSiteSettings);
+    document.getElementById('saveSeoBtn').addEventListener('click', saveSeoSettings);
+
+    // Mobile menu toggle
+    const menuBtn = document.createElement('button');
+    menuBtn.className = 'mobile-menu-btn';
+    menuBtn.innerHTML = '☰';
+    document.querySelector('.header-left').prepend(menuBtn);
+
+    menuBtn.addEventListener('click', () => {
+        document.querySelector('.dashboard-sidebar').classList.toggle('active');
+    });
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('admin_theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        document.querySelector('#themeToggle .icon').textContent = '☀️';
+    }
+
+    // Unsaved changes warning
+    window.addEventListener('beforeunload', (e) => {
+        if (hasUnsavedChanges) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    console.log('🎉 Dashboard initialized');
+});

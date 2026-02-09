@@ -107,24 +107,44 @@
                 document.title = settings.site_title;
                 const titleTag = document.getElementById('siteTitleTag');
                 if (titleTag) titleTag.textContent = settings.site_title;
-                const siteTitleEl = document.querySelector('.site-title a');
+                const siteTitleEl = document.querySelector('.site-title');
                 if (siteTitleEl) siteTitleEl.textContent = settings.site_title;
+                console.log('✅ Site Title Updated:', settings.site_title);
             }
             if (settings.site_description) {
                 const descTag = document.getElementById('siteDescTag');
                 if (descTag) descTag.content = settings.site_description;
+                console.log('✅ Site Description Updated');
+            }
+            if (settings.google_site_verification) {
+                const gTag = document.querySelector('meta[name="google-site-verification"]');
+                if (gTag) {
+                    gTag.content = settings.google_site_verification;
+                    console.log('✅ Google Verification Tag Updated:', settings.google_site_verification);
+                } else {
+                    console.warn('⚠️ Google Meta Tag not found in HTML');
+                }
+            }
+            if (settings.naver_verification) {
+                const nTag = document.querySelector('meta[name="naver-site-verification"]');
+                if (nTag) {
+                    nTag.content = settings.naver_verification;
+                    console.log('✅ Naver Verification Tag Updated:', settings.naver_verification);
+                } else {
+                    console.warn('⚠️ Naver Meta Tag not found in HTML');
+                }
             }
 
-            // Update Home Content
             const title = document.getElementById('welcomeTitle');
-            const subtitle = document.getElementById('welcomeSubtitle');
-            const content = document.getElementById('welcomeContent');
+            const subtitle = document.querySelector('.post-meta span');
+            const content = document.getElementById('mainContent');
 
             if (title && settings.home_title) title.textContent = settings.home_title;
             if (subtitle && settings.home_subtitle) subtitle.textContent = settings.home_subtitle;
             if (content && settings.home_content) {
                 // Initialize Toast UI Viewer
                 const Viewer = toastui.Editor;
+                // Check if viewer already exists to avoid duplicates if called multiple times (though loadHomeSettings is usually once)
                 content.innerHTML = '';
                 const viewer = new Viewer({
                     el: content,
@@ -164,16 +184,14 @@
             if (error) throw error;
 
             if (posts && posts.length > 0) {
-                const content = document.getElementById('welcomeContent');
-                if (!content) return;
-
+                const content = document.getElementById('mainContent');
                 const recentSection = document.createElement('div');
                 recentSection.style.marginTop = '3rem';
                 recentSection.innerHTML = `
                     <h2 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--primary-brass); border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">최근 기록</h2>
                     ${posts.map(post => `
                         <div style="margin-bottom: 1rem;">
-                            <a href="javascript:void(0);" onclick="loadPost(${post.id})" style="color: var(--text-primary); text-decoration: none; font-size: 0.95rem;">
+                            <a href="post.html?id=${post.id}" style="color: var(--text-primary); text-decoration: none; font-size: 0.95rem;">
                                 • ${post.title} <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 0.5rem;">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
                             </a>
                         </div>
@@ -187,10 +205,13 @@
     }
 
     async function loadCategories() {
-        if (!supabaseClient) return;
+        if (!supabaseClient) {
+            console.warn('⚠️ Supabase not initialized');
+            return;
+        }
 
         try {
-            // Fetch Categories & Counts
+            // Fetch Categories
             const { data: categories, error } = await supabaseClient
                 .from('categories')
                 .select('*')
@@ -199,30 +220,36 @@
 
             if (error) throw error;
 
+            // Fetch Post Counts (public only)
             const { data: posts } = await supabaseClient
                 .from('archive_posts')
-                .select('category_id')
-                .eq('is_private', false);
+                .select('category_id, is_private')
+                .eq('is_private', false); // Only count public posts for visitor
 
+            // Aggregation
             const counts = {};
             if (posts) {
-                posts.forEach(p => counts[p.category_id] = (counts[p.category_id] || 0) + 1);
+                posts.forEach(p => {
+                    counts[p.category_id] = (counts[p.category_id] || 0) + 1;
+                });
             }
 
-            // Add child counts to parents
+            // Recursive Count Update for Parents
+            // Note: This assumes a 2-level hierarchy (Parent -> Child) or ordered such that children are processed or we can iterate.
+            // Since we manipulate 'counts', let's iterate to add child counts to parents.
+            // A simple approach for 2-level:
             if (categories) {
+                const parentIds = new Set(categories.filter(c => !c.parent_id).map(c => c.id));
                 categories.forEach(c => {
-                    if (c.parent_id) {
-                        // Find parent and add
-                        const parent = categories.find(p => p.id === c.parent_id);
-                        if (parent) {
-                            counts[parent.id] = (counts[parent.id] || 0) + (counts[c.id] || 0);
-                        }
+                    if (c.parent_id && parentIds.has(c.parent_id)) {
+                        counts[c.parent_id] = (counts[c.parent_id] || 0) + (counts[c.id] || 0);
                     }
                 });
             }
 
             renderCategories(categories || [], counts);
+
+            console.log('✅ Categories loaded');
 
         } catch (error) {
             console.error('❌ Categories loading failed:', error);
@@ -230,10 +257,10 @@
     }
 
     function renderCategories(categories, counts) {
-        // TARGET categoryList NOT categoryNav (which contains menu items)
-        const list = document.getElementById('categoryList');
-        if (!list) return;
+        const nav = document.getElementById('categoryNav');
+        if (!nav) return;
 
+        // organize into hierarchy
         const roots = categories.filter(c => !c.parent_id);
         const childrenMap = {};
         categories.filter(c => c.parent_id).forEach(c => {
@@ -241,11 +268,12 @@
             childrenMap[c.parent_id].push(c);
         });
 
-        list.innerHTML = roots.map(root => {
+        nav.innerHTML = roots.map(root => {
             const children = childrenMap[root.id] || [];
             const hasChildren = children.length > 0;
             const count = counts[root.id] || 0;
 
+            // Accordion HTML
             return `
                 <li class="category-item">
                     <div class="category-header-wrap" onclick="toggleAccordion('${root.id}')">
@@ -286,51 +314,16 @@
     };
 
     window.filterByCategory = function (categoryId, element) {
+        // Remove active class
         document.querySelectorAll('.category-link, .submenu-link').forEach(el => el.classList.remove('active'));
         if (element) element.classList.add('active');
 
         loadPostsByCategory(categoryId);
     };
 
-    // Global function to load a single post (for recent posts link)
-    window.loadPost = async function (postId) {
-        if (!supabaseClient) return;
-        try {
-            const { data: post, error } = await supabaseClient
-                .from('archive_posts')
-                .select('*')
-                .eq('id', postId)
-                .single();
-
-            if (error) throw error;
-
-            showPostView(post, post.title); // Re-use show logic
-
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
     // ═══════════════════════════════════════════════════
-    // 5. POST LOADING & VIEW SWITCHING
+    // 5. POST LOADING BY CATEGORY (Modified for Direct View)
     // ═══════════════════════════════════════════════════
-    function switchSection(sectionId) {
-        // Hide all sections
-        document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
-        // Show target
-        document.getElementById(sectionId).style.display = 'block';
-
-        // Update menu active state
-        document.querySelectorAll('.category-link, .submenu-link, #menuInclinations').forEach(el => el.classList.remove('active'));
-
-        if (sectionId === 'inclinationsSection') {
-            document.getElementById('menuInclinations').classList.add('active');
-        }
-
-        // Mobile menu close
-        document.querySelector('.dashboard-sidebar').classList.remove('active');
-    }
-
     async function loadPostsByCategory(categoryId) {
         if (!supabaseClient) return;
 
@@ -349,7 +342,19 @@
             }
 
             const { data: posts, error } = await query;
+
             if (error) throw error;
+
+            const content = document.getElementById('mainContent');
+            const title = document.getElementById('welcomeTitle');
+
+            if (!content || !title) return;
+
+            if (posts.length === 0) {
+                title.textContent = '게시물 없음';
+                content.innerHTML = '<p>이 카테고리에는 아직 게시물이 없습니다.</p>';
+                return;
+            }
 
             const { data: category } = await supabaseClient
                 .from('categories')
@@ -357,71 +362,71 @@
                 .eq('id', categoryId)
                 .single();
 
-            const categoryName = category ? category.name : 'Category';
-
-            if (posts.length === 0) {
-                showPostList([], categoryName, '이 카테고리에는 게시물이 없습니다.');
-                return;
-            }
-
+            // Check if there is exactly ONE post
             if (posts.length === 1) {
-                showPostView(posts[0], categoryName);
+                const post = posts[0];
+                title.textContent = post.title;
+
+                // Clear previous content
+                content.innerHTML = '';
+
+                // Add Meta Info
+                const metaDiv = document.querySelector('.post-meta');
+                if (metaDiv) {
+                    const dateStr = new Date(post.created_at).toLocaleDateString('ko-KR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    const categoryName = category ? category.name : '';
+                    metaDiv.innerHTML = `<span>${categoryName}</span> • <span>${dateStr}</span>`;
+                }
+
+                // Initialize Toast UI Viewer for the content
+                const Viewer = toastui.Editor;
+                const viewer = new Viewer({
+                    el: content,
+                    initialValue: post.content,
+                    theme: 'dark' // Assuming dark theme is preferred or matches style
+                });
+
+                // Copy protection if needed
+                if (!post.origin_free) {
+                    content.classList.add('copy-protected');
+                    // Re-bind copy protection if not global
+                    // Note: Global copy listener in main.js handles generic copy, 
+                    // but specific attribution might depend on postId. 
+                    // The global listener checks `window.location.search`.
+                    // Since we are in SPA mode, the URL might not have ?id=...
+                    // We might need to update the global copy handler or pushState.
+                    // For now, let's keep it simple.
+                }
+
                 return;
             }
 
-            showPostList(posts, categoryName);
+            // Multiple posts - Show List
+            title.textContent = category.name;
+            const metaDiv = document.querySelector('.post-meta');
+            if (metaDiv) metaDiv.innerHTML = `<span>총 ${posts.length}개의 게시물</span>`;
+
+            content.innerHTML = posts.map(post => `
+                <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
+                    <h3>
+                        <a href="post.html?id=${post.id}" style="color: var(--primary-brass); text-decoration: none;">
+                            ${post.title}
+                            ${post.is_private ? '<span style="font-size: 0.8em; color: var(--accent-amber);"> 🔒</span>' : ''}
+                        </a>
+                    </h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                        ${new Date(post.created_at).toLocaleDateString('ko-KR')}
+                    </p>
+                </div>
+            `).join('');
 
         } catch (error) {
             console.error('❌ Post loading failed:', error);
         }
-    }
-
-    function showPostView(post, categoryName) {
-        switchSection('postsSection');
-
-        document.getElementById('postTitle').textContent = post.title;
-        document.getElementById('postCategory').textContent = categoryName;
-        document.getElementById('postDate').textContent = new Date(post.created_at).toLocaleDateString('ko-KR');
-
-        const content = document.getElementById('postContent');
-        content.innerHTML = '';
-
-        const Viewer = toastui.Editor;
-        new Viewer({
-            el: content,
-            initialValue: post.content,
-            theme: 'dark'
-        });
-    }
-
-    function showPostList(posts, titleText, emptyMsg) {
-        switchSection('postsSection');
-
-        document.getElementById('postTitle').textContent = titleText;
-        document.getElementById('postCategory').textContent = '';
-        document.getElementById('postDate').textContent = '';
-
-        const content = document.getElementById('postContent');
-        content.innerHTML = '';
-
-        if (posts.length === 0) {
-            content.innerHTML = `<p>${emptyMsg || '게시물이 없습니다.'}</p>`;
-            return;
-        }
-
-        content.innerHTML = posts.map(post => `
-             <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
-                <h3>
-                    <a href="javascript:void(0);" onclick="loadPost(${post.id})" style="color: var(--primary-brass); text-decoration: none;">
-                        ${post.title}
-                        ${post.is_private ? '<span style="font-size: 0.8em; color: var(--accent-amber);"> 🔒</span>' : ''}
-                    </a>
-                </h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
-                    ${new Date(post.created_at).toLocaleDateString('ko-KR')}
-                </p>
-            </div>
-        `).join('');
     }
 
     // ═══════════════════════════════════════════════════
@@ -438,7 +443,7 @@
 
             searchTimeout = setTimeout(async () => {
                 const query = e.target.value.trim();
-                // ... (Search logic similar to before but using showPostList)
+
                 if (query.length < 2) return;
 
                 try {
@@ -447,26 +452,53 @@
 
                     let searchQuery = supabaseClient
                         .from('archive_posts')
-                        .select('id, title, created_at, category_id, is_private, content') // content needed? no
+                        .select('id, title, created_at, category_id')
                         .ilike('title', `%${query}%`)
                         .order('created_at', { ascending: false })
                         .limit(10);
 
-                    if (!isAdmin) searchQuery = searchQuery.eq('is_private', false);
+                    if (!isAdmin) {
+                        searchQuery = searchQuery.eq('is_private', false);
+                    }
 
                     const { data: results, error } = await searchQuery;
+
                     if (error) throw error;
 
-                    showPostList(results, '검색 결과: ' + query);
+                    displaySearchResults(results);
 
-                } catch (e) { console.error(e); }
-
+                } catch (error) {
+                    console.error('❌ Search failed:', error);
+                }
             }, 300);
         });
     }
 
     function displaySearchResults(results) {
-        // Deprecated, using showPostList
+        const content = document.getElementById('mainContent');
+        const title = document.getElementById('welcomeTitle');
+
+        if (!content || !title) return;
+
+        title.textContent = '검색 결과';
+
+        if (results.length === 0) {
+            content.innerHTML = '<p>검색 결과가 없습니다.</p>';
+            return;
+        }
+
+        content.innerHTML = results.map(post => `
+            <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
+                <h3>
+                    <a href="post.html?id=${post.id}" style="color: var(--primary-brass); text-decoration: none;">
+                        ${post.title}
+                    </a>
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                    ${new Date(post.created_at).toLocaleDateString('ko-KR')}
+                </p>
+            </div>
+        `).join('');
     }
 
     // ═══════════════════════════════════════════════════
@@ -542,22 +574,7 @@
             if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
                 clearInterval(interval);
                 callback();
-                return;
-            }
-
-            // Local Config Fallback
-            if (typeof SUPABASE_CONFIG_LOCAL !== 'undefined' && SUPABASE_CONFIG_LOCAL.url) {
-                console.log('⚠️ Using LOCAL CONFIG');
-                window.SUPABASE_CONFIG = SUPABASE_CONFIG_LOCAL;
-                if (typeof ADMIN_EMAIL_LOCAL !== 'undefined') {
-                    window.ADMIN_EMAIL = ADMIN_EMAIL_LOCAL;
-                }
-                clearInterval(interval);
-                callback();
-                return;
-            }
-
-            if (Date.now() - startTime > maxWait) {
+            } else if (Date.now() - startTime > maxWait) {
                 clearInterval(interval);
                 console.error('⏱️ Config loading timeout');
             }
@@ -571,6 +588,7 @@
         const btnYes = document.getElementById('btnYes');
         if (btnYes) {
             btnYes.addEventListener('click', () => {
+                console.log('✅ Yes clicked');
                 localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
                 hideDisclaimer();
 
@@ -579,146 +597,33 @@
                     loadHomeSettings();
                     loadCategories();
                     initSearch();
-                    initAdminLongPress();
-                    initNightMode();
-                    initInclinations();
                 });
             });
         }
 
-        // ═══════════════════════════════════════════════════
-        // 9. INCLINATIONS FEATURE
-        // ═══════════════════════════════════════════════════
-
-        // Sample Data Structure
-        const INCLINATIONS_DATA = [
-            {
-                id: 'dom_1',
-                name: 'Dominant',
-                position: 'top',
-                description: '지배적인 성향을 가진 파트너',
-                tags: ['통제', '리드', '책임'],
-                image: 'https://via.placeholder.com/300x200/3a3a3a/ffffff?text=Dominant'
-            },
-            {
-                id: 'sub_1',
-                name: 'Submissive',
-                position: 'bottom',
-                description: '지배받는 것을 선호하는 파트너',
-                tags: ['순종', '팔로우', '헌신'],
-                image: 'https://via.placeholder.com/300x200/3a3a3a/ffffff?text=Submissive'
-            },
-            {
-                id: 'switch_1',
-                name: 'Switch',
-                position: 'switch',
-                description: '상황에 따라 역할을 바꾸는 파트너',
-                tags: ['유연성', '양면성', '멀티'],
-                image: 'https://via.placeholder.com/300x200/3a3a3a/ffffff?text=Switch'
-            },
-            {
-                id: 'hunter_1',
-                name: 'Hunter',
-                position: 'top',
-                description: '적극적으로 파트너를 공략하는 성향',
-                tags: ['추적', '공략', '적극성'],
-                image: 'https://via.placeholder.com/300x200/3a3a3a/ffffff?text=Hunter'
-            },
-            {
-                id: 'prey_1',
-                name: 'Prey',
-                position: 'bottom',
-                description: '공략당하는 상황을 즐기는 성향',
-                tags: ['도망', '긴장감', '피동'],
-                image: 'https://via.placeholder.com/300x200/3a3a3a/ffffff?text=Prey'
-            }
-        ];
-
-        function initInclinations() {
-            // Sidebar Menu
-            const menuBtn = document.getElementById('menuInclinations');
-            if (menuBtn) {
-                menuBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    showInclinationsSection();
-                });
-            }
-
-            // Tab Filters
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Update active tab
-                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-
-                    // Filter
-                    const filter = tab.dataset.filter;
-                    renderInclinations(filter);
-                });
+        // No button
+        const btnNo = document.getElementById('btnNo');
+        if (btnNo) {
+            btnNo.addEventListener('click', () => {
+                console.log('❌ No clicked');
+                window.location.href = 'https://www.google.com';
             });
-
-            // Initial Render
-            renderInclinations('all');
         }
 
-        function showInclinationsSection() {
-            // Hide other sections
-            document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.category-link, .submenu-link').forEach(el => el.classList.remove('active'));
-            document.getElementById('menuHome').classList.remove('active');
-
-            // Show Inclinations
-            document.getElementById('inclinationsSection').style.display = 'block';
-            document.getElementById('menuInclinations').classList.add('active');
-
-            // Mobile menu close
-            document.querySelector('.dashboard-sidebar').classList.remove('active');
-        }
-
-        function renderInclinations(filter) {
-            const grid = document.getElementById('inclinationsGrid');
-            if (!grid) return;
-
-            const filteredData = filter === 'all'
-                ? INCLINATIONS_DATA
-                : INCLINATIONS_DATA.filter(item => item.position === filter.toLowerCase());
-
-            if (filteredData.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem;">해당하는 성향 카드가 없습니다.</p>';
-                return;
-            }
-
-            grid.innerHTML = filteredData.map(item => `
-                <div class="inclination-card">
-                    <div class="card-image" style="background-image: url('${item.image}')"></div>
-                    <div class="card-content">
-                        <div class="card-header">
-                            <h3 class="card-title">${item.name}</h3>
-                            <span class="position-badge ${item.position}">${item.position.toUpperCase()}</span>
-                        </div>
-                        <p class="card-desc">${item.description}</p>
-                        <div class="card-tags">
-                            ${item.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
+        // Check verification
         if (checkAgeVerification()) {
             waitForConfig(() => {
                 initializeSupabase();
                 loadHomeSettings();
                 loadCategories();
                 initSearch();
-                initAdminLongPress();
-                initNightMode();
-                initInclinations();
             });
-        } else {
-            // If checking age fails (returns false show disclaimer), we wait for interaction
-            initAdminLongPress(); // Still allow admin access
         }
+
+        initNightMode();
+        initAdminLongPress();
+
+        console.log('🎉 Initialization complete');
     });
 
 })();
