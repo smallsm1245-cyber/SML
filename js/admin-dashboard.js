@@ -5,28 +5,7 @@
 console.log('🚀 Wiki Dashboard loading...');
 
 let supabaseClient = null;
-let editor = null;
-let homeEditor = null;
-let currentPostId = null;
 let hasUnsavedChanges = false;
-
-// ═══════════════════════════════════════════════════
-// WAIT FOR LIBS
-// ═══════════════════════════════════════════════════
-function waitForToastUI() {
-    return new Promise((resolve) => {
-        if (window.toastui && window.toastui.Editor) {
-            resolve();
-            return;
-        }
-        const interval = setInterval(() => {
-            if (window.toastui && window.toastui.Editor) {
-                clearInterval(interval);
-                resolve();
-            }
-        }, 100);
-    });
-}
 
 // ═══════════════════════════════════════════════════
 // WAIT FOR CONFIG
@@ -80,9 +59,6 @@ async function checkAuth() {
 async function showDashboard() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminDashboard').style.display = 'block';
-
-    // Wait for Toast UI library
-    await waitForToastUI();
 
     // Load all data
     await Promise.all([
@@ -253,6 +229,10 @@ function getTimeAgo(dateString) {
 // ═══════════════════════════════════════════════════
 // HOME SCREEN MANAGEMENT
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// HOME SCREEN MANAGEMENT
+// ═══════════════════════════════════════════════════
+let homeEditor;
 
 async function loadHomeSettings() {
     try {
@@ -269,21 +249,17 @@ async function loadHomeSettings() {
 
         // Init Editor if not exists
         if (!homeEditor) {
-            if (typeof toastui !== 'undefined') {
-                homeEditor = new toastui.Editor({
-                    el: document.querySelector('#homeContentEditor'),
-                    height: '400px',
-                    initialEditType: 'markdown',
-                    previewStyle: 'vertical',
-                    initialValue: settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.',
-                    theme: 'dark',
-                    events: {
-                        change: updateHomePreview
-                    }
-                });
-            } else {
-                console.error('Toast UI not loaded for Home Editor');
-            }
+            homeEditor = new toastui.Editor({
+                el: document.querySelector('#homeContentEditor'),
+                height: '400px',
+                initialEditType: 'markdown',
+                previewStyle: 'vertical',
+                initialValue: settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.',
+                theme: 'dark', // Since we are in admin
+                events: {
+                    change: updateHomePreview
+                }
+            });
         } else {
             homeEditor.setMarkdown(settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.');
         }
@@ -426,6 +402,14 @@ async function loadPosts() {
         document.getElementById('postsList').innerHTML = '<p style="color: var(--admin-danger);">데이터를 불러오지 못했습니다.</p>';
     }
 }
+
+window.showNewPostEditor = function () {
+    window.location.href = 'admin-toastui.html?action=new';
+};
+
+window.editPost = function (id) {
+    window.location.href = `admin-toastui.html?action=edit&id=${id}`;
+};
 
 window.copyPostLink = function (url) {
     navigator.clipboard.writeText(url).then(() => {
@@ -1124,10 +1108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('saveSettingsBtn').addEventListener('click', saveSiteSettings);
     document.getElementById('saveSeoBtn').addEventListener('click', saveSeoSettings);
 
-    // Toast UI Editor buttons
-    document.getElementById('backToListBtn').addEventListener('click', backToList);
-    document.getElementById('publishPostBtn').addEventListener('click', publishPost);
-
     // Mobile menu toggle
     const menuBtn = document.createElement('button');
     menuBtn.className = 'mobile-menu-btn';
@@ -1155,171 +1135,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     console.log('🎉 Dashboard initialized');
 });
-
-// ═══════════════════════════════════════════════════
-// TOAST UI EDITOR
-// ═══════════════════════════════════════════════════
-function initializeEditor() {
-    if (editor) return; // Already initialized
-
-    const Editor = toastui.Editor;
-
-    editor = new Editor({
-        el: document.querySelector('#editor'),
-        height: '500px',
-        initialEditType: 'markdown',
-        previewStyle: 'vertical',
-        placeholder: '내용을 입력하세요...',
-        language: 'ko-KR',
-        toolbarItems: [
-            ['heading', 'bold', 'italic', 'strike'],
-            ['hr', 'quote'],
-            ['ul', 'ol', 'task', 'indent', 'outdent'],
-            ['table', 'image', 'link'],
-            ['code', 'codeblock'],
-            ['scrollSync']
-        ]
-    });
-
-    console.log('✅ Toast UI Editor initialized');
-}
-
-window.showNewPostEditor = function () {
-    const listView = document.querySelector('#section-posts .card:has(.toolbar), #postsList'); // Find list related elements
-    // Better way: wrap the list in its own container
-    const listControls = document.querySelector('#section-posts .card');
-    const listBody = document.getElementById('postsList');
-
-    if (listControls) listControls.style.display = 'none';
-    if (listBody) listBody.style.display = 'none';
-
-    document.getElementById('postEditorView').style.display = 'block';
-    document.getElementById('editorTitle').textContent = '새 글 작성';
-
-    // Clear form
-    document.getElementById('postTitle').value = '';
-    document.getElementById('postCategory').value = '';
-    document.getElementById('isPrivate').checked = false;
-    document.getElementById('originFree').checked = false;
-
-    if (editor) {
-        editor.setMarkdown('');
-    } else {
-        initializeEditor();
-    }
-
-    currentPostId = null;
-    window.scrollTo(0, 0);
-};
-
-window.editPost = async function (id) {
-    try {
-        const { data: post, error } = await supabaseClient
-            .from('archive_posts')
-            .select('*')
-            .eq('id', id)
-            .single();
-
-        if (error) throw error;
-
-        // Switch to editor view
-        const listControls = document.querySelector('#section-posts .card');
-        const listBody = document.getElementById('postsList');
-
-        if (listControls) listControls.style.display = 'none';
-        if (listBody) listBody.style.display = 'none';
-
-        document.getElementById('postEditorView').style.display = 'block';
-        document.getElementById('editorTitle').textContent = '게시물 수정';
-
-        // Fill form
-        document.getElementById('postTitle').value = post.title;
-        document.getElementById('postCategory').value = post.category_id;
-        document.getElementById('isPrivate').checked = post.is_private;
-        document.getElementById('originFree').checked = post.origin_free;
-
-        // Initialize editor if needed
-        if (!editor) {
-            initializeEditor();
-        }
-
-        // Set editor content
-        editor.setMarkdown(post.content);
-
-        // Store current post ID
-        currentPostId = id;
-
-        // Scroll to top
-        window.scrollTo(0, 0);
-
-    } catch (error) {
-        console.error('Edit post failed:', error);
-        alert('게시물을 불러오는 중 오류가 발생했습니다.');
-    }
-};
-
-window.backToList = function () {
-    const listControls = document.querySelector('#section-posts .card');
-    const listBody = document.getElementById('postsList');
-
-    if (listControls) listControls.style.display = 'block';
-    if (listBody) listBody.style.display = 'block';
-
-    document.getElementById('postEditorView').style.display = 'none';
-    currentPostId = null;
-};
-
-async function publishPost() {
-    const title = document.getElementById('postTitle').value.trim();
-    const categoryId = document.getElementById('postCategory').value;
-    const isPrivate = document.getElementById('isPrivate').checked;
-    const originFree = document.getElementById('originFree').checked;
-    const content = editor.getMarkdown();
-
-    if (!title) {
-        alert('제목을 입력하세요.');
-        return;
-    }
-
-    if (!categoryId) {
-        alert('카테고리를 선택하세요.');
-        return;
-    }
-
-    try {
-        const postData = {
-            title,
-            category_id: categoryId,
-            content,
-            is_private: isPrivate,
-            origin_free: originFree
-        };
-
-        if (currentPostId) {
-            // Update existing post
-            const { error } = await supabaseClient
-                .from('archive_posts')
-                .update(postData)
-                .eq('id', currentPostId);
-
-            if (error) throw error;
-            alert('✅ 게시물이 수정되었습니다!');
-        } else {
-            // Create new post
-            const { error } = await supabaseClient
-                .from('archive_posts')
-                .insert(postData);
-
-            if (error) throw error;
-            alert('✅ 게시물이 발행되었습니다!');
-        }
-
-        backToList();
-        loadPosts();
-
-    } catch (error) {
-        console.error('Publish failed:', error);
-        alert('❌ 발행 실패: ' + error.message);
-    }
-}
-
