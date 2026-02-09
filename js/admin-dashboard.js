@@ -1,5 +1,5 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎬 SMALLSM ARCHIVE - WIKI DASHBOARD (Complete)
+// 🎬 SMALLSM ARCHIVE - WIKI DASHBOARD (Complete & Debugged)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 console.log('🚀 Wiki Dashboard loading...');
@@ -136,7 +136,6 @@ async function saveSeoSettings() {
 // SECTION SWITCHING
 // ═══════════════════════════════════════════════════
 window.switchSection = function(sectionName) {
-    // Check unsaved changes
     if (hasUnsavedChanges) {
         if (!confirm('저장하지 않은 변경사항이 있습니다. 정말 이동하시겠습니까?')) {
             return;
@@ -144,13 +143,14 @@ window.switchSection = function(sectionName) {
         hasUnsavedChanges = false;
     }
     
-    // Hide all sections
     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     
-    // Show selected section
-    document.getElementById(`section-${sectionName}`).classList.add('active');
-    document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+    const section = document.getElementById(`section-${sectionName}`);
+    const navItem = document.querySelector(`[data-section="${sectionName}"]`);
+    
+    if (section) section.classList.add('active');
+    if (navItem) navItem.classList.add('active');
 };
 
 // ═══════════════════════════════════════════════════
@@ -237,7 +237,7 @@ async function loadHomeSettings() {
             .in('key', ['home_title', 'home_subtitle', 'home_content', 'show_recent_posts', 'recent_posts_count']);
         
         const settings = {};
-        data.forEach(item => settings[item.key] = item.value);
+        if (data) data.forEach(item => settings[item.key] = item.value);
         
         document.getElementById('homeTitle').value = settings.home_title || '환영합니다';
         document.getElementById('homeSubtitle').value = settings.home_subtitle || 'SMALLSM Archive에 오신 것을 환영합니다';
@@ -271,7 +271,7 @@ function updateHomePreview() {
 function toggleRecentPostsCount() {
     const checkbox = document.getElementById('showRecentPosts');
     const countGroup = document.getElementById('recentPostsCountGroup');
-    countGroup.style.display = checkbox.checked ? 'block' : 'none';
+    if (countGroup) countGroup.style.display = checkbox.checked ? 'block' : 'none';
 }
 
 async function saveHomeSettings() {
@@ -302,29 +302,29 @@ async function saveHomeSettings() {
 }
 
 // ═══════════════════════════════════════════════════
-// POSTS MANAGEMENT
+// POSTS MANAGEMENT (Enhanced Debugging)
 // ═══════════════════════════════════════════════════
 async function loadPosts() {
+    const container = document.getElementById('postsList');
     try {
+        console.log('📡 게시글 불러오기 시도 중 (Table: archive_posts)...');
+        
         const { data: posts, error } = await supabaseClient
             .from('archive_posts')
-            .select(`
-                id,
-                title,
-                is_private,
-                created_at,
-                updated_at,
-                category_id
-            `)
+            .select('id, title, is_private, created_at, updated_at, category_id')
             .order('updated_at', { ascending: false });
         
-        if (error) throw error;
+        if (error) {
+            console.error('❌ DB 에러 발생:', error.message);
+            console.error('상세 정보:', error.details, error.hint);
+            throw error;
+        }
+
+        console.log('✅ 데이터 수신 성공:', posts.length, '개의 게시글');
 
         const { data: categories } = await supabaseClient.from('categories').select('id, name');
         const catMap = {};
         if (categories) categories.forEach(c => catMap[c.id] = c.name);
-        
-        const container = document.getElementById('postsList');
         
         if (!posts || posts.length === 0) {
             container.innerHTML = '<p style="color: var(--admin-text-dim); text-align: center; padding: 3rem;">게시물이 없습니다.</p>';
@@ -360,16 +360,9 @@ async function loadPosts() {
         
     } catch (error) {
         console.error('Posts loading failed:', error);
-        document.getElementById('postsList').innerHTML = '<p style="color: var(--admin-danger);">데이터를 불러오지 못했습니다.</p>';
+        container.innerHTML = `<p style="color: var(--admin-danger); padding: 2rem;">❌ 데이터를 불러오지 못했습니다.<br><small>${error.message}</small></p>`;
     }
 }
-
-window.showNewPostEditor = function() {
-    // Redirect to a new post page or show a modal
-    // For now, let's assume there's a post-editor.html or similar
-    // If not, we can implement a simple prompt or redirect to admin-new.js logic
-    window.location.href = 'admin.html?action=new'; 
-};
 
 window.editPost = function(id) {
     window.location.href = `admin.html?action=edit&id=${id}`;
@@ -383,32 +376,25 @@ window.copyPostLink = function(url) {
     });
 };
 
-window.editPost = function(id) {
-    // TODO: Open editor
-    alert('편집 기능은 구현 예정입니다.');
-};
-
 window.deletePost = async function(id, title) {
     if (!confirm(`"${title}"를 삭제하시겠습니까?\n\n휴지통으로 이동되며 30일 후 자동 삭제됩니다.`)) {
         return;
     }
     
     try {
-        // Get post data
         const { data: post } = await supabaseClient
             .from('archive_posts')
             .select('*')
             .eq('id', id)
             .single();
         
-        // Move to trash
         await supabaseClient.from('trash').insert({
             item_type: 'post',
             item_id: id,
-            item_data: post
+            item_data: post,
+            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
         });
         
-        // Delete from posts
         await supabaseClient.from('archive_posts').delete().eq('id', id);
         
         alert('✅ 휴지통으로 이동되었습니다.');
@@ -444,6 +430,8 @@ async function loadCategories() {
 
 function renderCategories() {
     const container = document.getElementById('categoriesList');
+    if (!container) return;
+
     if (currentCategories.length === 0) {
         container.innerHTML = '<p style="color: var(--admin-text-dim);">카테고리가 없습니다.</p>';
         return;
@@ -478,12 +466,12 @@ function renderCategories() {
         </div>
     `;
 
-    initSortable();
+    if (window.Sortable) initSortable();
 }
 
 function initSortable() {
     const el = document.getElementById('categoriesList');
-    if (!el || !window.Sortable) return;
+    if (!el) return;
     
     Sortable.create(el, {
         handle: '.drag-handle',
@@ -495,7 +483,6 @@ function initSortable() {
                 newOrder.push(item.dataset.id);
             });
             
-            // Reorder currentCategories based on DOM
             const reordered = [];
             newOrder.forEach(id => {
                 const cat = currentCategories.find(c => c.id == id);
@@ -542,7 +529,6 @@ window.deleteLocalCategory = function(id) {
 
 window.saveAllCategories = async function() {
     try {
-        // Update all categories with their new order and properties
         for (let i = 0; i < currentCategories.length; i++) {
             const cat = currentCategories[i];
             const { error } = await supabaseClient.from('categories').upsert({
@@ -566,69 +552,9 @@ window.saveAllCategories = async function() {
     }
 };
 
-window.updateCategoryName = async function(id, newName) {
-    try {
-        await supabaseClient.from('categories').update({ name: newName }).eq('id', id);
-        console.log('✅ Category name updated');
-    } catch (error) {
-        console.error('Update failed:', error);
-        alert('❌ 이름 변경 실패');
-    }
-};
-
-window.toggleCategoryVisibility = async function(id, isVisible) {
-    try {
-        await supabaseClient.from('categories').update({ is_visible: isVisible }).eq('id', id);
-        loadCategories();
-    } catch (error) {
-        console.error('Update failed:', error);
-    }
-};
-
-window.updateCategoryDropdown = async function(id, hasDropdown) {
-    try {
-        await supabaseClient.from('categories').update({ has_dropdown: hasDropdown }).eq('id', id);
-        const opts = document.getElementById(`dropdown_opts_${id}`);
-        if (opts) opts.style.opacity = hasDropdown ? '1' : '0.3';
-    } catch (error) {
-        console.error('Update failed:', error);
-    }
-};
-
-window.updateCategoryDefaultOpen = async function(id, defaultOpen) {
-    try {
-        await supabaseClient.from('categories').update({ default_open: defaultOpen }).eq('id', id);
-    } catch (error) {
-        console.error('Update failed:', error);
-    }
-};
-
-window.deleteCategory = async function(id, name) {
-    if (!confirm(`"${name}" 카테고리를 삭제하시겠습니까?`)) return;
-    
-    try {
-        const { data: posts } = await supabaseClient.from('archive_posts').select('id').eq('category_id', id);
-        
-        if (posts && posts.length > 0) {
-            if (!confirm(`⚠️ ${posts.length}개의 게시물이 있습니다.\n\n게시물도 함께 삭제됩니까?`)) {
-                return;
-            }
-            await supabaseClient.from('archive_posts').delete().eq('category_id', id);
-        }
-        
-        await supabaseClient.from('categories').delete().eq('id', id);
-        alert('✅ 삭제되었습니다.');
-        loadCategories();
-        loadStatistics();
-        
-    } catch (error) {
-        console.error('Delete failed:', error);
-        alert('❌ 삭제 실패');
-    }
-};
-
 async function addCategory() {
-    const name = document.getElementById('newCategoryName').value.trim();
+    const nameInput = document.getElementById('newCategoryName');
+    const name = nameInput.value.trim();
     if (!name) {
         alert('카테고리 이름을 입력하세요.');
         return;
@@ -646,12 +572,10 @@ async function addCategory() {
         await supabaseClient.from('categories').insert({
             name: name,
             is_visible: true,
-            has_dropdown: true,
-            default_open: false,
             display_order: maxOrder + 1
         });
         
-        document.getElementById('newCategoryName').value = '';
+        nameInput.value = '';
         alert('✅ 카테고리가 추가되었습니다!');
         loadCategories();
         loadStatistics();
@@ -662,90 +586,17 @@ async function addCategory() {
     }
 }
 
-function initDragAndDrop() {
-    const container = document.getElementById('categoriesList');
-    let draggedElement = null;
-    
-    container.querySelectorAll('.category-item-card').forEach(item => {
-        item.addEventListener('dragstart', (e) => {
-            draggedElement = item;
-            item.style.opacity = '0.5';
-        });
-        
-        item.addEventListener('dragend', (e) => {
-            item.style.opacity = '1';
-        });
-        
-        item.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            const afterElement = getDragAfterElement(container, e.clientY);
-            if (afterElement == null) {
-                container.appendChild(draggedElement);
-            } else {
-                container.insertBefore(draggedElement, afterElement);
-            }
-        });
-        
-        item.addEventListener('drop', async (e) => {
-            e.preventDefault();
-            await updateCategoryOrder();
-        });
-    });
-}
-
-function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('.category-item-card:not(.dragging)')];
-    
-    return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-        
-        if (offset < 0 && offset > closest.offset) {
-            return { offset: offset, element: child };
-        } else {
-            return closest;
-        }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
-
-async function updateCategoryOrder() {
-    const items = document.querySelectorAll('.category-item-card');
-    
-    try {
-        for (let i = 0; i < items.length; i++) {
-            const id = items[i].dataset.id;
-            await supabaseClient.from('categories').update({ display_order: i + 1 }).eq('id', id);
-        }
-        console.log('✅ Order updated');
-    } catch (error) {
-        console.error('Order update failed:', error);
-    }
-}
-
 // ═══════════════════════════════════════════════════
-// THEME TOGGLE
+// THEME & TRASH
 // ═══════════════════════════════════════════════════
 function toggleTheme() {
     document.body.classList.toggle('dark-theme');
     const isDark = document.body.classList.contains('dark-theme');
     localStorage.setItem('admin_theme', isDark ? 'dark' : 'light');
-    
     const icon = document.querySelector('#themeToggle .icon');
-    icon.textContent = isDark ? '☀️' : '🌙';
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
 }
 
-function togglePreviewTheme() {
-    const preview = document.getElementById('homePreview');
-    const btn = document.getElementById('previewThemeToggle');
-    
-    preview.classList.toggle('dark');
-    const isDark = preview.classList.contains('dark');
-    btn.textContent = isDark ? '☀️ 라이트' : '🌙 다크';
-}
-
-// ═══════════════════════════════════════════════════
-// TRASH
-// ═══════════════════════════════════════════════════
 async function loadTrash() {
     try {
         const { data: items } = await supabaseClient
@@ -764,7 +615,7 @@ async function loadTrash() {
         
         container.innerHTML = items.map(item => {
             const daysLeft = Math.ceil((new Date(item.expires_at) - new Date()) / (1000 * 60 * 60 * 24));
-            const title = item.item_data.title || item.item_data.name;
+            const title = item.item_data.title || item.item_data.name || 'Untitled';
             
             return `
                 <div class="trash-item">
@@ -776,7 +627,7 @@ async function loadTrash() {
                         ${item.item_type === 'post' ? '📝 게시물' : '📂 카테고리'} • ${new Date(item.deleted_at).toLocaleString('ko-KR')}
                     </div>
                     <div class="post-actions">
-                        <button class="action-btn" onclick="restoreItem('${item.id}', '${item.item_type}', '${item.item_id}')">♻️ 복구</button>
+                        <button class="action-btn" onclick="restoreItem('${item.id}', '${item.item_type}')">♻️ 복구</button>
                         <button class="action-btn danger" onclick="permanentDelete('${item.id}')">🗑️ 영구 삭제</button>
                     </div>
                 </div>
@@ -788,24 +639,18 @@ async function loadTrash() {
     }
 }
 
-window.restoreItem = async function(trashId, itemType, itemId) {
+window.restoreItem = async function(trashId, itemType) {
     try {
         const { data: trashItem } = await supabaseClient.from('trash').select('*').eq('id', trashId).single();
+        const table = itemType === 'post' ? 'archive_posts' : 'categories';
         
-        if (itemType === 'post') {
-            await supabaseClient.from('archive_posts').insert(trashItem.item_data);
-        } else {
-            await supabaseClient.from('categories').insert(trashItem.item_data);
-        }
-        
+        await supabaseClient.from(table).insert(trashItem.item_data);
         await supabaseClient.from('trash').delete().eq('id', trashId);
         
         alert('✅ 복구되었습니다!');
         loadTrash();
-        if (itemType === 'post') loadPosts();
-        else loadCategories();
+        itemType === 'post' ? loadPosts() : loadCategories();
         loadStatistics();
-        
     } catch (error) {
         console.error('Restore failed:', error);
         alert('❌ 복구 실패');
@@ -813,16 +658,12 @@ window.restoreItem = async function(trashId, itemType, itemId) {
 };
 
 window.permanentDelete = async function(trashId) {
-    if (!confirm('⚠️ 영구적으로 삭제됩니다.\n\n복구할 수 없습니다. 계속하시겠습니까?')) {
-        return;
-    }
-    
+    if (!confirm('⚠️ 영구적으로 삭제됩니다. 복구할 수 없습니다.')) return;
     try {
         await supabaseClient.from('trash').delete().eq('id', trashId);
         alert('✅ 영구 삭제되었습니다.');
         loadTrash();
     } catch (error) {
-        console.error('Delete failed:', error);
         alert('❌ 삭제 실패');
     }
 };
@@ -832,7 +673,6 @@ window.permanentDelete = async function(trashId) {
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('📱 DOM ready');
-    
     await waitForConfig();
     
     supabaseClient = window.supabase.createClient(
@@ -842,20 +682,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     console.log('✅ Supabase initialized');
     
-    // Check if already logged in
     if (await checkAuth()) {
         await showDashboard();
     }
     
-    // Login button
     document.getElementById('loginBtn').addEventListener('click', async () => {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
-        
-        if (!email || !password) {
-            showError('이메일과 비밀번호를 입력하세요');
-            return;
-        }
         
         if (email !== window.ADMIN_EMAIL) {
             showError('관리자 권한이 없습니다');
@@ -865,68 +698,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) throw error;
-            
             await showDashboard();
         } catch (error) {
             showError(error.message || '로그인 실패');
         }
     });
     
-    // Logout button
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         if (!confirm('로그아웃하시겠습니까?')) return;
-        
         await supabaseClient.auth.signOut();
         window.location.reload();
     });
     
-    // Nav buttons
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.addEventListener('click', () => {
             const section = btn.dataset.section;
             switchSection(section);
-            
             if (section === 'trash') loadTrash();
         });
     });
     
-    // Home preview real-time
+    // UI Events
     ['homeTitle', 'homeSubtitle', 'homeContent'].forEach(id => {
-        document.getElementById(id).addEventListener('input', updateHomePreview);
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateHomePreview);
     });
     
     document.getElementById('showRecentPosts').addEventListener('change', toggleRecentPostsCount);
     document.getElementById('saveHomeBtn').addEventListener('click', saveHomeSettings);
     document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-    document.getElementById('previewThemeToggle').addEventListener('click', togglePreviewTheme);
     document.getElementById('saveSettingsBtn').addEventListener('click', saveSiteSettings);
     document.getElementById('saveSeoBtn').addEventListener('click', saveSeoSettings);
-    
-    // Mobile menu toggle
-    const menuBtn = document.createElement('button');
-    menuBtn.className = 'mobile-menu-btn';
-    menuBtn.innerHTML = '☰';
-    document.querySelector('.header-left').prepend(menuBtn);
-    
-    menuBtn.addEventListener('click', () => {
-        document.querySelector('.dashboard-sidebar').classList.toggle('active');
-    });
-    
+
     // Load saved theme
-    const savedTheme = localStorage.getItem('admin_theme');
-    if (savedTheme === 'dark') {
+    if (localStorage.getItem('admin_theme') === 'dark') {
         document.body.classList.add('dark-theme');
-        document.querySelector('#themeToggle .icon').textContent = '☀️';
     }
-    
-    // Unsaved changes warning
-    window.addEventListener('beforeunload', (e) => {
-        if (hasUnsavedChanges) {
-            e.preventDefault();
-            e.returnValue = '';
-        }
-    });
-    
-    console.log('🎉 Dashboard initialized');
 });
