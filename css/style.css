@@ -3,7 +3,12 @@
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 /* ═══════════════════════════════════════════════════
-   0. ROOT VARIABLES - 색상 중앙 제어
+   0. EXTERNAL RESOURCES - 반드시 최상단 위치
+   ═══════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap');
+
+/* ═══════════════════════════════════════════════════
+   1. ROOT VARIABLES - 색상 및 폰트 제어
    ═══════════════════════════════════════════════════ */
 :root {
     /* Color Palette */
@@ -38,15 +43,13 @@ body.night-mode {
 }
 
 /* ═══════════════════════════════════════════════════
-   1. BASE RESET & TYPOGRAPHY
+   2. BASE RESET & TYPOGRAPHY
    ═══════════════════════════════════════════════════ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&display=swap');
 
 body {
     font-family: var(--font-serif);
@@ -94,7 +97,7 @@ p {
 }
 
 /* ═══════════════════════════════════════════════════
-   2. LAYOUT STRUCTURE - Flex-Grid Hybrid
+   3. LAYOUT STRUCTURE
    ═══════════════════════════════════════════════════ */
 .app-container {
     display: flex;
@@ -104,7 +107,7 @@ p {
 }
 
 /* ═══════════════════════════════════════════════════
-   3. SIDEBAR - Floating Navigation
+   4. SIDEBAR - Floating Navigation
    ═══════════════════════════════════════════════════ */
 .sidebar {
     width: var(--sidebar-width);
@@ -259,7 +262,7 @@ p {
 }
 
 /* ═══════════════════════════════════════════════════
-   4. MAIN CONTENT AREA
+   5. MAIN CONTENT AREA
    ═══════════════════════════════════════════════════ */
 .main-content {
     flex: 1;
@@ -373,7 +376,7 @@ p {
 }
 
 /* ═══════════════════════════════════════════════════
-   5. FOOTER
+   6. FOOTER
    ═══════════════════════════════════════════════════ */
 .site-footer {
     text-align: center;
@@ -383,10 +386,11 @@ p {
     font-family: var(--font-mono);
     font-size: 0.85rem;
     color: var(--text-secondary);
+    position: relative;
 }
 
 /* ═══════════════════════════════════════════════════
-   6. AGE VERIFICATION DISCLAIMER
+   7. AGE VERIFICATION DISCLAIMER
    ═══════════════════════════════════════════════════ */
 .disclaimer-overlay {
     position: fixed;
@@ -400,12 +404,6 @@ p {
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    animation: overlayFadeIn 0.5s ease;
-}
-
-@keyframes overlayFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
 }
 
 .disclaimer-content {
@@ -428,17 +426,6 @@ p {
         transform: scale(1) translateY(0);
         opacity: 1;
     }
-}
-
-.disclaimer-content h2 {
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
-}
-
-.disclaimer-content p {
-    margin-bottom: 2rem;
-    line-height: 1.8;
-    color: var(--text-secondary);
 }
 
 .disclaimer-buttons {
@@ -465,33 +452,14 @@ p {
     color: var(--bg-deep);
 }
 
-.btn-primary:hover {
-    background: var(--accent-amber);
-    border-color: var(--accent-amber);
-    box-shadow: var(--glow-medium);
-    transform: translateY(-2px);
-}
-
 .btn-secondary {
     background: transparent;
     border-color: var(--text-secondary);
     color: var(--text-secondary);
 }
 
-.btn-secondary:hover {
-    border-color: var(--primary-brass);
-    color: var(--primary-brass);
-    box-shadow: inset 0 0 20px rgba(206, 177, 128, 0.2);
-}
-
-/* Content Blur when Disclaimer Active */
-.content-blur {
-    filter: blur(20px);
-    pointer-events: none;
-}
-
 /* ═══════════════════════════════════════════════════
-   7. ADMIN PANEL
+   8. ADMIN PANEL & EDITOR
    ═══════════════════════════════════════════════════ */
 .admin-container {
     padding: 2rem;
@@ -510,69 +478,10 @@ p {
     border-radius: 12px;
 }
 
-.admin-title {
-    font-size: 2rem;
-}
-
-.logout-btn {
-    padding: 0.6rem 1.5rem;
-    background: transparent;
-    border: 1px solid var(--text-secondary);
-    color: var(--text-secondary);
-    font-family: var(--font-display);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.logout-btn:hover {
-    border-color: var(--primary-brass);
-    color: var(--primary-brass);
-}
-
-/* Editor Container */
-.editor-container {
-    background: var(--bg-panel);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-}
-
-.editor-toolbar {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--glass-border);
-}
-
-.editor-btn {
-    padding: 0.5rem 1rem;
-    background: rgba(206, 177, 128, 0.1);
-    border: 1px solid var(--glass-border);
-    color: var(--text-primary);
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.editor-btn:hover {
-    background: rgba(206, 177, 128, 0.2);
-    border-color: var(--primary-brass);
-}
-
-/* Split View Editor */
 .split-editor {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
-}
-
-.editor-pane {
-    min-height: 500px;
 }
 
 .editor-input {
@@ -585,131 +494,6 @@ p {
     color: var(--text-primary);
     font-family: var(--font-serif);
     font-size: 1rem;
-    line-height: 1.8;
-    resize: vertical;
-}
-
-.editor-input:focus {
-    outline: none;
-    border-color: var(--primary-brass);
-    box-shadow: 0 0 20px rgba(206, 177, 128, 0.2);
-}
-
-.preview-pane {
-    padding: 1.5rem;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
-    overflow-y: auto;
-}
-
-/* Form Controls */
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--primary-brass);
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-}
-
-.form-input,
-.form-select {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
-    color: var(--text-primary);
-    font-family: var(--font-serif);
-    font-size: 1rem;
-}
-
-.form-input:focus,
-.form-select:focus {
-    outline: none;
-    border-color: var(--primary-brass);
-    box-shadow: 0 0 15px rgba(206, 177, 128, 0.2);
-}
-
-.checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.form-checkbox {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-}
-
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
-.btn-save {
-    flex: 1;
-    padding: 1rem;
-    background: var(--primary-brass);
-    border: none;
-    border-radius: 8px;
-    color: var(--bg-deep);
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-save:hover {
-    background: var(--accent-amber);
-    box-shadow: var(--glow-medium);
-    transform: translateY(-2px);
-}
-
-/* ═══════════════════════════════════════════════════
-   8. 404 ERROR PAGE
-   ═══════════════════════════════════════════════════ */
-.error-page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    text-align: center;
-    padding: 2rem;
-}
-
-.error-content {
-    max-width: 600px;
-}
-
-.error-icon {
-    font-size: 5rem;
-    margin-bottom: 2rem;
-    opacity: 0.5;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-}
-
-.error-title {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-.error-message {
-    color: var(--text-secondary);
-    margin-bottom: 2rem;
     line-height: 1.8;
 }
 
@@ -733,78 +517,21 @@ p {
         padding: 2rem 1.5rem;
     }
     
-    .content-panel {
-        padding: 2rem 1.5rem;
-    }
-    
-    .post-title {
-        font-size: 1.8rem;
-    }
-    
     .split-editor {
         grid-template-columns: 1fr;
     }
-    
-    .admin-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
 }
 
 /* ═══════════════════════════════════════════════════
-   10. ANIMATIONS
+   10. ANIMATIONS & UTILITIES
    ═══════════════════════════════════════════════════ */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Loading State */
-.loading {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid var(--glass-border);
-    border-top-color: var(--primary-brass);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
+.hidden { display: none !important; }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* ═══════════════════════════════════════════════════
-   11. UTILITY CLASSES
-   ═══════════════════════════════════════════════════ */
-.hidden {
-    display: none !important;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.mt-2 { margin-top: 1rem; }
-.mt-4 { margin-top: 2rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-4 { margin-bottom: 2rem; }
-
-/* Copy Protection Enhancement */
-.copy-protected::after {
-    content: '\A\A━━━━━━━━━━━━━━━━━━━━━━━━\A본 기록은 SMALLSM Archive의 자산입니다.\A출처: [사이트 주소]\A⚠️ 무단 수정 및 상업적 이용을 금합니다.\A━━━━━━━━━━━━━━━━━━━━━━━━';
-    white-space: pre;
-}
-
-/* ═══════════════════════════════════════════════════
-   12. ADMIN LINK - 푸터 관리자 링크
-   ═══════════════════════════════════════════════════ */
 .admin-link {
     position: absolute;
     right: 2rem;
@@ -820,9 +547,4 @@ p {
     opacity: 1;
     color: var(--primary-brass);
     transform: scale(1.2);
-    filter: drop-shadow(0 0 8px rgba(206, 177, 128, 0.5));
-}
-
-.site-footer {
-    position: relative;
 }
