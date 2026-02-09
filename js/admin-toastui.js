@@ -177,14 +177,14 @@ async function loadPosts() {
         const { data: posts, error } = await supabaseClient
             .from('archive_posts')
             .select(`
-                id,
-                title,
-                is_private,
-                created_at,
-                updated_at,
-                categories (name)
-            `)
-            .order('updated_at', { ascending: false });
+                    id,
+                    title,
+                    is_private,
+                    created_at,
+                    updated_at,
+                    categories (name)
+                `)
+            .order('created_at', { ascending: false });
 
         if (error) throw error;
 
@@ -197,30 +197,23 @@ async function loadPosts() {
         }
 
         container.innerHTML = posts.map(post => {
-            const statusBadge = post.is_private
-                ? '<span class="status-badge private">🔴 비공개</span>'
-                : '<span class="status-badge public">🟢 공개</span>';
-
-            const categoryName = post.categories?.name || 'Uncategorized';
-            const updatedTime = getTimeAgo(post.updated_at);
-            const postUrl = `${window.location.origin}/post.html?id=${post.id}`;
+            const date = new Date(post.created_at).toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            });
 
             return `
-                <div class="post-item">
-                    <div class="post-header">
-                        <a href="${postUrl}" class="post-title-link" target="_blank">${post.title}</a>
-                        <div class="post-badges">${statusBadge}</div>
+                    <div class="post-row" onclick="editPost('${post.id}')">
+                        <div class="post-row-left">
+                            <span class="post-row-title">${post.title}</span>
+                            ${post.is_private ? '<span class="private-tag">🔒</span>' : ''}
+                        </div>
+                        <div class="post-row-right">
+                            <span class="post-row-date">${date}</span>
+                        </div>
                     </div>
-                    <div class="post-meta">
-                        ${categoryName} • ${updatedTime}
-                    </div>
-                    <div class="post-actions">
-                        <button class="action-btn" onclick="copyPostLink('${postUrl}')">📋 링크 복사</button>
-                        <button class="action-btn" onclick="editPost('${post.id}')">✏️ 수정</button>
-                        <button class="action-btn danger" onclick="deletePost('${post.id}', '${post.title.replace(/'/g, "\\'")}')">🗑️ 삭제</button>
-                    </div>
-                </div>
-            `;
+                `;
         }).join('');
 
     } catch (error) {
