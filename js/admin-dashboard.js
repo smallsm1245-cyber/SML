@@ -76,14 +76,14 @@ async function loadSiteSettings() {
         const { data } = await supabaseClient
             .from('settings')
             .select('*')
-            .in('key', ['site_title', 'site_description', 'google_verification', 'naver_verification']);
+            .in('key', ['site_title', 'site_description', 'google_site_verification', 'naver_verification']);
 
         const settings = {};
         if (data) data.forEach(item => settings[item.key] = item.value);
 
         document.getElementById('siteTitleInput').value = settings.site_title || 'SMALLSM Archive';
         document.getElementById('siteDescInput').value = settings.site_description || '';
-        document.getElementById('googleVerification').value = settings.google_verification || '';
+        document.getElementById('googleVerification').value = settings.google_site_verification || '';
         document.getElementById('naverVerification').value = settings.naver_verification || '';
         document.getElementById('adminEmailInput').value = window.ADMIN_EMAIL;
 
@@ -114,7 +114,7 @@ async function saveSiteSettings() {
 
 async function saveSeoSettings() {
     const settings = [
-        { key: 'google_verification', value: document.getElementById('googleVerification').value },
+        { key: 'google_site_verification', value: document.getElementById('googleVerification').value },
         { key: 'naver_verification', value: document.getElementById('naverVerification').value }
     ];
 

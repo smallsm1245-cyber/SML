@@ -94,7 +94,7 @@
                 .select('*')
                 .in('key', [
                     'home_title', 'home_subtitle', 'home_content', 'show_recent_posts', 'recent_posts_count',
-                    'site_title', 'site_description', 'google_verification', 'naver_verification'
+                    'site_title', 'site_description', 'google_site_verification', 'naver_verification'
                 ]);
 
             if (error) throw error;
@@ -114,9 +114,9 @@
                 const descTag = document.getElementById('siteDescTag');
                 if (descTag) descTag.content = settings.site_description;
             }
-            if (settings.google_verification) {
+            if (settings.google_site_verification) {
                 const gTag = document.querySelector('meta[name="google-site-verification"]');
-                if (gTag) gTag.content = settings.google_verification;
+                if (gTag) gTag.content = settings.google_site_verification;
             }
             if (settings.naver_verification) {
                 const nTag = document.querySelector('meta[name="naver-site-verification"]');
