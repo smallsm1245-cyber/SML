@@ -411,9 +411,9 @@ async function loadCategories() {
 
         if (error) throw error;
 
-        const categorySelect = document.getElementById('postCategory'); // Changed from 'categorySelect' to 'postCategory'
+        const categorySelect = document.getElementById('postCategory');
         if (categorySelect) {
-            // Organize into hierarchy for display
+            // Organize into hierarchy
             const roots = categories.filter(c => !c.parent_id);
             const childrenMap = {};
             categories.filter(c => c.parent_id).forEach(c => {
@@ -423,24 +423,37 @@ async function loadCategories() {
 
             let optionsHtml = '<option value="">카테고리 선택</option>';
 
+            // Only show child categories (subcategories) - parent categories are groups only
             roots.forEach(root => {
-                optionsHtml += `<option value="${root.id}">${root.name}</option>`;
-                if (childrenMap[root.id]) {
+                if (childrenMap[root.id] && childrenMap[root.id].length > 0) {
+                    // Add parent as optgroup label (non-selectable)
+                    optionsHtml += `<optgroup label="📁 ${root.name}">`;
                     childrenMap[root.id].forEach(child => {
-                        optionsHtml += `<option value="${child.id}">&nbsp;&nbsp;&nbsp;&nbsp;└ ${child.name}</option>`;
+                        optionsHtml += `<option value="${child.id}">${child.name}</option>`;
                     });
+                    optionsHtml += `</optgroup>`;
                 }
             });
 
             categorySelect.innerHTML = optionsHtml;
         }
 
-        // Update filter select
+        // Update filter select (show all for filtering purposes)
         const filterSelect = document.getElementById('postFilterCategory');
-        filterSelect.innerHTML = '<option value="">모든 카테고리</option>' +
-            categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        if (filterSelect) {
+            filterSelect.innerHTML = '<option value="">모든 카테고리</option>' +
+                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        }
 
-        // Update categories list
+        // Update parent category selector for adding new categories
+        const parentSelect = document.getElementById('newCategoryParent');
+        if (parentSelect) {
+            const roots = categories.filter(c => !c.parent_id);
+            parentSelect.innerHTML = '<option value="">📁 대분류로 추가</option>' +
+                roots.map(root => `<option value="${root.id}">📄 ${root.name}의 소분류로 추가</option>`).join('');
+        }
+
+        // Update categories list with hierarchy
         const container = document.getElementById('categoriesList');
 
         if (!categories || categories.length === 0) {
@@ -448,26 +461,65 @@ async function loadCategories() {
             return;
         }
 
-        container.innerHTML = categories.map(cat => {
-            const visibilityIcon = cat.is_visible ? '👁️' : '🙈';
+        // Organize into hierarchy for display
+        const roots = categories.filter(c => !c.parent_id);
+        const childrenMap = {};
+        categories.filter(c => c.parent_id).forEach(c => {
+            if (!childrenMap[c.parent_id]) childrenMap[c.parent_id] = [];
+            childrenMap[c.parent_id].push(c);
+        });
 
-            return `
-                <div class="category-item-card" draggable="true" data-id="${cat.id}">
+        let html = '';
+
+        roots.forEach(root => {
+            const visibilityIcon = root.is_visible ? '👁️' : '🙈';
+            const childCount = childrenMap[root.id] ? childrenMap[root.id].length : 0;
+
+            // Parent category card
+            html += `
+                <div class="category-item-card parent-category" draggable="true" data-id="${root.id}">
                     <div class="category-header">
                         <span class="drag-handle">⋮⋮</span>
+                        <span class="category-type-badge">📁 대분류</span>
                         <input type="text" 
                                class="category-name-input" 
-                               value="${cat.name}"
-                               onchange="updateCategoryName('${cat.id}', this.value)">
-                        <button class="visibility-toggle" onclick="toggleCategoryVisibility('${cat.id}', ${!cat.is_visible})">
+                               value="${root.name}"
+                               onchange="updateCategoryName('${root.id}', this.value)">
+                        <span class="child-count">${childCount}개 소분류</span>
+                        <button class="visibility-toggle" onclick="toggleCategoryVisibility('${root.id}', ${!root.is_visible})">
                             ${visibilityIcon}
                         </button>
-                        <button class="action-btn danger" onclick="deleteCategory('${cat.id}', '${cat.name}')">🗑️</button>
+                        <button class="action-btn danger" onclick="deleteCategory('${root.id}', '${root.name}')">🗑️</button>
                     </div>
                 </div>
             `;
-        }).join('');
 
+            // Child categories
+            if (childrenMap[root.id]) {
+                childrenMap[root.id].forEach(child => {
+                    const childVisibilityIcon = child.is_visible ? '👁️' : '🙈';
+                    html += `
+                        <div class="category-item-card child-category" draggable="true" data-id="${child.id}" data-parent="${root.id}">
+                            <div class="category-header">
+                                <span class="drag-handle">⋮⋮</span>
+                                <span class="category-indent">└─</span>
+                                <span class="category-type-badge">📄 소분류</span>
+                                <input type="text" 
+                                       class="category-name-input" 
+                                       value="${child.name}"
+                                       onchange="updateCategoryName('${child.id}', this.value)">
+                                <button class="visibility-toggle" onclick="toggleCategoryVisibility('${child.id}', ${!child.is_visible})">
+                                    ${childVisibilityIcon}
+                                </button>
+                                <button class="action-btn danger" onclick="deleteCategory('${child.id}', '${child.name}')">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        });
+
+        container.innerHTML = html;
         initDragAndDrop();
 
     } catch (error) {
@@ -519,6 +571,8 @@ window.deleteCategory = async function (id, name) {
 
 async function addCategory() {
     const name = document.getElementById('newCategoryName').value.trim();
+    const parentId = document.getElementById('newCategoryParent').value;
+
     if (!name) {
         alert('카테고리 이름을 입력하세요.');
         return;
@@ -533,16 +587,26 @@ async function addCategory() {
 
         const maxOrder = categories && categories.length > 0 ? categories[0].display_order : 0;
 
-        await supabaseClient.from('categories').insert({
+        const newCategory = {
             name: name,
             is_visible: true,
             has_dropdown: true,
             default_open: false,
             display_order: maxOrder + 1
-        });
+        };
+
+        // Add parent_id if selected
+        if (parentId) {
+            newCategory.parent_id = parentId;
+        }
+
+        await supabaseClient.from('categories').insert(newCategory);
 
         document.getElementById('newCategoryName').value = '';
-        alert('✅ 카테고리가 추가되었습니다!');
+        document.getElementById('newCategoryParent').value = '';
+
+        const categoryType = parentId ? '소분류' : '대분류';
+        alert(`✅ ${categoryType} 카테고리가 추가되었습니다!`);
         loadCategories();
 
     } catch (error) {
