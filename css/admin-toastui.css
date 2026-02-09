@@ -386,12 +386,13 @@
 }
 
 /* ═══════════════════════════════════════════════════
-   POSTS LIST
+   POSTS LIST (Minimalist Row Style)
    ═══════════════════════════════════════════════════ */
 .posts-list {
     display: flex;
     flex-direction: column;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 0;
 }
 
 .post-row {
@@ -412,19 +413,20 @@
 .post-row-left {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.8rem;
 }
 
 .post-row-title {
     color: #FFB74D;
-    /* Orange/Gold from image */
+    /* Orange/Gold */
     font-size: 1.1rem;
     font-weight: 500;
 }
 
 .private-tag {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     opacity: 0.7;
+    filter: grayscale(0.5);
 }
 
 .post-row-right {
@@ -437,16 +439,11 @@
     font-family: sans-serif;
 }
 
-/* Hide old styles if not used, or keep for other sections */
 .post-item {
     display: none;
 }
 
-.loading {
-    text-align: center;
-    color: var(--admin-text-dim);
-    padding: 3rem;
-}
+/* Hide old card style */
 
 /* ═══════════════════════════════════════════════════
    EDITOR
@@ -564,7 +561,7 @@
 }
 
 /* ═══════════════════════════════════════════════════
-   CATEGORIES
+   CATEGORY CARD
    ═══════════════════════════════════════════════════ */
 .add-category-form {
     display: flex;
@@ -599,42 +596,56 @@
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    margin-bottom: 0;
+    flex: 1;
 }
 
 .drag-handle {
     cursor: grab;
-    font-size: 1.2rem;
     color: var(--admin-text-dim);
+    font-size: 1rem;
+    user-select: none;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
 }
 
 .category-name-input {
     flex: 1;
     background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: var(--admin-primary);
-    font-size: 1rem;
-    font-weight: 600;
-    padding: 0.2rem;
-    transition: all 0.3s;
-}
-
-.category-name-input:hover {
-    border-bottom-color: var(--admin-border);
+    border: 1px solid transparent;
+    color: var(--admin-text);
+    font-size: 0.95rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
 }
 
 .category-name-input:focus {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: var(--admin-primary);
     outline: none;
-    border-bottom-color: var(--admin-primary);
+}
+
+.category-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .visibility-toggle {
     background: transparent;
-    border: none;
-    font-size: 1.5rem;
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text-dim);
     cursor: pointer;
-    transition: all 0.3s;
+    font-size: 0.9rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.visibility-toggle:hover {
+    border-color: var(--admin-primary);
+    color: var(--admin-primary);
 }
 
 /* ═══════════════════════════════════════════════════
