@@ -289,7 +289,7 @@
     };
 
     window.filterByCategory = function (categoryId, element) {
-        if (event) event.stopPropagation(); // Prevent accordion toggle if clicking link
+        // if (event) event.stopPropagation(); // Removed to allow accordion toggle bubbling
 
         // Remove active class
         document.querySelectorAll('.category-link, .submenu-link').forEach(el => el.classList.remove('active'));
