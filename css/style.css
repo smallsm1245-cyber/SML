@@ -39,15 +39,19 @@
 }
 
 /* Night Library Mode */
+/* Night Library Mode - High Contrast & Depth */
 body.night-mode {
-    --bg-deep: #2E3133;
-    /* Namuwiki Dark */
-    --bg-panel: #26292B;
+    --bg-deep: #000000;
+    /* Pure Black Background */
+    --bg-panel: #1A1A1A;
+    /* Dark Gray Panel for Depth */
     --text-primary: #E0E0E0;
-    --text-secondary: #AAAAAA;
-    --glass-border: #444444;
+    --text-secondary: #888888;
+    --glass-border: #333333;
     --link-color: #5AA9FA;
-    --primary-brass: #CEB180;
+    --primary-brass: #D4A574;
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.5);
+    /* Deep shadow */
 }
 
 /* ═══════════════════════════════════════════════════
@@ -69,11 +73,26 @@ body {
     transition: background 0.3s ease;
     word-break: break-all;
     /* Wiki style line breaking */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* Remove Texture Overlay for cleaner look */
+/* Texture Overlay - Grain Effect */
 body::before {
-    display: none;
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    display: block;
+    /* Re-enable texture */
 }
 
 h1,
@@ -150,20 +169,24 @@ p {
 
 .site-title {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 2rem;
+    /* Increased size */
+    font-weight: 900;
+    /* Heavier weight */
     color: var(--primary-brass);
     text-align: center;
     letter-spacing: 0.1em;
     margin-bottom: 0.5rem;
-    text-shadow: var(--glow-subtle);
+    text-shadow: 0 0 10px rgba(212, 165, 116, 0.3);
+    /* Subtle glow */
 }
 
 .site-subtitle {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
     text-align: center;
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 /* Search Box */
@@ -302,19 +325,24 @@ p {
 .main-content {
     flex: 1;
     padding: 2rem;
+    /* Reduced outer padding */
     max-width: var(--content-max);
     margin: 0 auto;
     width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Panel - Clean Style */
+/* Panel - Clean Style with Depth */
 .content-panel {
     background: var(--bg-panel);
     border: 1px solid var(--glass-border);
-    border-radius: 0;
-    /* Squared corners like Wiki */
-    padding: 2.5rem;
+    border-radius: 4px;
+    /* Slight rounded corner */
+    padding: 3rem 4rem;
+    /* Specific internal padding */
     box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 @keyframes panelFadeIn {
@@ -415,14 +443,20 @@ body.night-mode .post-content strong {
 /* ═══════════════════════════════════════════════════
    5. FOOTER
    ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   5. FOOTER
+   ═══════════════════════════════════════════════════ */
 .site-footer {
     text-align: center;
-    padding: 2rem;
-    margin-top: 4rem;
-    border-top: 1px solid var(--glass-border);
+    padding: 1.5rem;
+    margin-top: 2rem;
+    /* Reduced top margin */
+    /* border-top: 1px solid var(--glass-border); */
+    /* Optional: Remove border if too disjointed */
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
+    opacity: 0.7;
 }
 
 /* ═══════════════════════════════════════════════════
