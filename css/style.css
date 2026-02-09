@@ -952,3 +952,167 @@ body.night-mode .post-content strong {
 .site-footer {
     position: relative;
 }
+
+/* ═══════════════════════════════════════════════════
+   13. INCLINATIONS FEATURE STYLES
+   ═══════════════════════════════════════════════════ */
+
+/* Filter Tabs */
+.filter-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.filter-tab {
+    padding: 0.8rem 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    color: var(--text-secondary);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.filter-tab:hover {
+    border-color: var(--primary-brass);
+    color: var(--primary-brass);
+    background: rgba(206, 177, 128, 0.1);
+    transform: translateY(-2px);
+}
+
+.filter-tab.active {
+    background: var(--primary-brass);
+    border-color: var(--primary-brass);
+    color: var(--bg-deep);
+    box-shadow: 0 0 15px rgba(206, 177, 128, 0.4);
+}
+
+/* Grid Layout */
+.inclinations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding-bottom: 3rem;
+}
+
+/* Card Style */
+.inclination-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: var(--shadow-card);
+}
+
+.inclination-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-color: var(--primary-brass);
+}
+
+.card-image {
+    width: 100%;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-title {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin: 0;
+    border: none;
+}
+
+.card-desc {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+/* Position Badges */
+.position-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--font-mono);
+}
+
+.position-badge.top {
+    background: rgba(217, 83, 79, 0.1);
+    color: #D9534F;
+    border: 1px solid rgba(217, 83, 79, 0.3);
+}
+
+.position-badge.bottom {
+    background: rgba(91, 192, 222, 0.1);
+    color: #5BC0DE;
+    border: 1px solid rgba(91, 192, 222, 0.3);
+}
+
+.position-badge.switch {
+    background: rgba(156, 39, 176, 0.1);
+    color: #9C27B0;
+    border: 1px solid rgba(156, 39, 176, 0.3);
+}
+
+/* Tags */
+.card-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tag {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+}
+
+body.night-mode .tag {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .inclinations-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-tabs {
+        gap: 0.5rem;
+    }
+
+    .filter-tab {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}

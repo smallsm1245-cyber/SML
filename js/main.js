@@ -588,7 +588,6 @@
         const btnYes = document.getElementById('btnYes');
         if (btnYes) {
             btnYes.addEventListener('click', () => {
-                console.log('✅ Yes clicked');
                 localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
                 hideDisclaimer();
 
@@ -597,33 +596,146 @@
                     loadHomeSettings();
                     loadCategories();
                     initSearch();
+                    initAdminLongPress();
+                    initNightMode();
+                    initInclinations();
                 });
             });
         }
 
-        // No button
-        const btnNo = document.getElementById('btnNo');
-        if (btnNo) {
-            btnNo.addEventListener('click', () => {
-                console.log('❌ No clicked');
-                window.location.href = 'https://www.google.com';
+        // ═══════════════════════════════════════════════════
+        // 9. INCLINATIONS FEATURE
+        // ═══════════════════════════════════════════════════
+
+        // Sample Data Structure
+        const INCLINATIONS_DATA = [
+            {
+                id: 'dom_1',
+                name: 'Dominant',
+                position: 'top',
+                description: '지배적인 성향을 가진 파트너',
+                tags: ['통제', '리드', '책임'],
+                image: 'https://via.placeholder.com/300x200/3a3a3a/ffffff?text=Dominant'
+            },
+            {
+                id: 'sub_1',
+                name: 'Submissive',
+                position: 'bottom',
+                description: '지배받는 것을 선호하는 파트너',
+                tags: ['순종', '팔로우', '헌신'],
+                image: 'https://via.placeholder.com/300x200/3a3a3a/ffffff?text=Submissive'
+            },
+            {
+                id: 'switch_1',
+                name: 'Switch',
+                position: 'switch',
+                description: '상황에 따라 역할을 바꾸는 파트너',
+                tags: ['유연성', '양면성', '멀티'],
+                image: 'https://via.placeholder.com/300x200/3a3a3a/ffffff?text=Switch'
+            },
+            {
+                id: 'hunter_1',
+                name: 'Hunter',
+                position: 'top',
+                description: '적극적으로 파트너를 공략하는 성향',
+                tags: ['추적', '공략', '적극성'],
+                image: 'https://via.placeholder.com/300x200/3a3a3a/ffffff?text=Hunter'
+            },
+            {
+                id: 'prey_1',
+                name: 'Prey',
+                position: 'bottom',
+                description: '공략당하는 상황을 즐기는 성향',
+                tags: ['도망', '긴장감', '피동'],
+                image: 'https://via.placeholder.com/300x200/3a3a3a/ffffff?text=Prey'
+            }
+        ];
+
+        function initInclinations() {
+            // Sidebar Menu
+            const menuBtn = document.getElementById('menuInclinations');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showInclinationsSection();
+                });
+            }
+
+            // Tab Filters
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Update active tab
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    // Filter
+                    const filter = tab.dataset.filter;
+                    renderInclinations(filter);
+                });
             });
+
+            // Initial Render
+            renderInclinations('all');
         }
 
-        // Check verification
+        function showInclinationsSection() {
+            // Hide other sections
+            document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.category-link, .submenu-link').forEach(el => el.classList.remove('active'));
+            document.getElementById('menuHome').classList.remove('active');
+
+            // Show Inclinations
+            document.getElementById('inclinationsSection').style.display = 'block';
+            document.getElementById('menuInclinations').classList.add('active');
+
+            // Mobile menu close
+            document.querySelector('.dashboard-sidebar').classList.remove('active');
+        }
+
+        function renderInclinations(filter) {
+            const grid = document.getElementById('inclinationsGrid');
+            if (!grid) return;
+
+            const filteredData = filter === 'all'
+                ? INCLINATIONS_DATA
+                : INCLINATIONS_DATA.filter(item => item.position === filter.toLowerCase());
+
+            if (filteredData.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem;">해당하는 성향 카드가 없습니다.</p>';
+                return;
+            }
+
+            grid.innerHTML = filteredData.map(item => `
+                <div class="inclination-card">
+                    <div class="card-image" style="background-image: url('${item.image}')"></div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h3 class="card-title">${item.name}</h3>
+                            <span class="position-badge ${item.position}">${item.position.toUpperCase()}</span>
+                        </div>
+                        <p class="card-desc">${item.description}</p>
+                        <div class="card-tags">
+                            ${item.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         if (checkAgeVerification()) {
             waitForConfig(() => {
                 initializeSupabase();
                 loadHomeSettings();
                 loadCategories();
                 initSearch();
+                initAdminLongPress();
+                initNightMode();
+                initInclinations();
             });
+        } else {
+            // If checking age fails (returns false show disclaimer), we wait for interaction
+            initAdminLongPress(); // Still allow admin access
         }
-
-        initNightMode();
-        initAdminLongPress();
-
-        console.log('🎉 Initialization complete');
     });
 
 })();

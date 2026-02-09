@@ -685,10 +685,12 @@ window.deletePost = async function (id, title) {
 // CATEGORIES MANAGEMENT
 // ═══════════════════════════════════════════════════
 let currentCategories = [];
-let deletedCategoryIds = new Set();
+let deletedChildrenIds = new Set();
+let deletedParentIds = new Set();
 
 async function loadCategories() {
-    deletedCategoryIds.clear();
+    deletedChildrenIds.clear();
+    deletedParentIds.clear();
     try {
         const { data: categories, error } = await supabaseClient
             .from('categories')
@@ -882,16 +884,27 @@ window.saveAllCategories = async function () {
     if (!confirm('변경된 카테고리 설정을 저장하시겠습니까?')) return;
 
     try {
-        // 1. Handle Deletions first
-        if (deletedCategoryIds.size > 0) {
-            const idsToDelete = Array.from(deletedCategoryIds);
-            const { error: deleteError } = await supabaseClient
+        // 1. Handle Deletions (Children First, then Parents)
+        if (deletedChildrenIds.size > 0) {
+            const childrenToDelete = Array.from(deletedChildrenIds);
+            const { error: childError } = await supabaseClient
                 .from('categories')
                 .delete()
-                .in('id', idsToDelete);
+                .in('id', childrenToDelete);
 
-            if (deleteError) throw deleteError;
-            deletedCategoryIds.clear();
+            if (childError) throw childError;
+            deletedChildrenIds.clear();
+        }
+
+        if (deletedParentIds.size > 0) {
+            const parentsToDelete = Array.from(deletedParentIds);
+            const { error: parentError } = await supabaseClient
+                .from('categories')
+                .delete()
+                .in('id', parentsToDelete);
+
+            if (parentError) throw parentError;
+            deletedParentIds.clear();
         }
 
         // 2. Handle Updates (Hierarchy & Order)
@@ -1101,13 +1114,16 @@ window.deleteLocalCategory = function (id) {
 
     if (!confirm(message)) return;
 
-    // Track parent for deletion
-    deletedCategoryIds.add(id);
-
-    // Track children for deletion
+    // Track for deletion: Children FIRST, then Parent
     children.forEach(child => {
-        deletedCategoryIds.add(child.id);
+        deletedChildrenIds.add(child.id);
     });
+
+    if (cat.parent_id) {
+        deletedChildrenIds.add(cat.id);
+    } else {
+        deletedParentIds.add(cat.id);
+    }
 
     // Remove parent and children from local list
     currentCategories = currentCategories.filter(c => c.id != id && c.parent_id != id);
@@ -1125,7 +1141,8 @@ async function addCategory() {
             return;
         }
         // If they proceed, unsaved changes are lost (reset)
-        deletedCategoryIds.clear();
+        deletedChildrenIds.clear();
+        deletedParentIds.clear();
         hasUnsavedChanges = false;
     }
 
