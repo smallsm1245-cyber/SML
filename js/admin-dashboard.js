@@ -6,8 +6,27 @@ console.log('🚀 Wiki Dashboard loading...');
 
 let supabaseClient = null;
 let editor = null;
+let homeEditor = null;
 let currentPostId = null;
 let hasUnsavedChanges = false;
+
+// ═══════════════════════════════════════════════════
+// WAIT FOR LIBS
+// ═══════════════════════════════════════════════════
+function waitForToastUI() {
+    return new Promise((resolve) => {
+        if (window.toastui && window.toastui.Editor) {
+            resolve();
+            return;
+        }
+        const interval = setInterval(() => {
+            if (window.toastui && window.toastui.Editor) {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 100);
+    });
+}
 
 // ═══════════════════════════════════════════════════
 // WAIT FOR CONFIG
@@ -61,6 +80,9 @@ async function checkAuth() {
 async function showDashboard() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminDashboard').style.display = 'block';
+
+    // Wait for Toast UI library
+    await waitForToastUI();
 
     // Load all data
     await Promise.all([
@@ -231,10 +253,6 @@ function getTimeAgo(dateString) {
 // ═══════════════════════════════════════════════════
 // HOME SCREEN MANAGEMENT
 // ═══════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════
-// HOME SCREEN MANAGEMENT
-// ═══════════════════════════════════════════════════
-let homeEditor;
 
 async function loadHomeSettings() {
     try {
@@ -251,17 +269,21 @@ async function loadHomeSettings() {
 
         // Init Editor if not exists
         if (!homeEditor) {
-            homeEditor = new toastui.Editor({
-                el: document.querySelector('#homeContentEditor'),
-                height: '400px',
-                initialEditType: 'markdown',
-                previewStyle: 'vertical',
-                initialValue: settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.',
-                theme: 'dark', // Since we are in admin
-                events: {
-                    change: updateHomePreview
-                }
-            });
+            if (typeof toastui !== 'undefined') {
+                homeEditor = new toastui.Editor({
+                    el: document.querySelector('#homeContentEditor'),
+                    height: '400px',
+                    initialEditType: 'markdown',
+                    previewStyle: 'vertical',
+                    initialValue: settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.',
+                    theme: 'dark',
+                    events: {
+                        change: updateHomePreview
+                    }
+                });
+            } else {
+                console.error('Toast UI not loaded for Home Editor');
+            }
         } else {
             homeEditor.setMarkdown(settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.');
         }
