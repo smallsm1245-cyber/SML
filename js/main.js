@@ -321,25 +321,14 @@
         document.getElementById(sectionId).style.display = 'block';
 
         // Update menu active state
-        document.querySelectorAll('.category-link, .submenu-link, #menuHome, #menuInclinations').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.category-link, .submenu-link, #menuInclinations').forEach(el => el.classList.remove('active'));
 
-        if (sectionId === 'homeSection') {
-            document.getElementById('menuHome').classList.add('active');
-        } else if (sectionId === 'inclinationsSection') {
+        if (sectionId === 'inclinationsSection') {
             document.getElementById('menuInclinations').classList.add('active');
         }
 
         // Mobile menu close
         document.querySelector('.dashboard-sidebar').classList.remove('active');
-    }
-
-    // Explicit Home Button Handler
-    const menuHome = document.getElementById('menuHome');
-    if (menuHome) {
-        menuHome.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchSection('homeSection');
-        });
     }
 
     async function loadPostsByCategory(categoryId) {
