@@ -199,6 +199,7 @@
         }
 
         try {
+            // Fetch Categories
             const { data: categories, error } = await supabaseClient
                 .from('categories')
                 .select('*')
@@ -207,41 +208,95 @@
 
             if (error) throw error;
 
-            const nav = document.getElementById('categoryNav');
-            if (!nav) return;
+            // Fetch Post Counts (public only)
+            const { data: posts } = await supabaseClient
+                .from('archive_posts')
+                .select('category_id, is_private')
+                .eq('is_private', false); // Only count public posts for visitor
 
-            nav.innerHTML = '';
-
-            categories.forEach(category => {
-                const li = document.createElement('li');
-                li.className = 'category-item';
-
-                const link = document.createElement('a');
-                link.href = `#category-${category.id}`;
-                link.className = 'category-link';
-                link.textContent = category.name;
-                link.dataset.categoryId = category.id;
-
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    loadPostsByCategory(category.id);
-
-                    document.querySelectorAll('.category-link').forEach(l => {
-                        l.classList.remove('active');
-                    });
-                    link.classList.add('active');
+            // Aggregation
+            const counts = {};
+            if (posts) {
+                posts.forEach(p => {
+                    counts[p.category_id] = (counts[p.category_id] || 0) + 1;
                 });
+            }
 
-                li.appendChild(link);
-                nav.appendChild(li);
-            });
+            renderCategories(categories || [], counts);
 
             console.log('✅ Categories loaded');
 
         } catch (error) {
-            console.error('❌ Category loading failed:', error);
+            console.error('❌ Categories loading failed:', error);
         }
     }
+
+    function renderCategories(categories, counts) {
+        const nav = document.getElementById('categoryNav');
+        if (!nav) return;
+
+        // organize into hierarchy
+        const roots = categories.filter(c => !c.parent_id);
+        const childrenMap = {};
+        categories.filter(c => c.parent_id).forEach(c => {
+            if (!childrenMap[c.parent_id]) childrenMap[c.parent_id] = [];
+            childrenMap[c.parent_id].push(c);
+        });
+
+        nav.innerHTML = roots.map(root => {
+            const children = childrenMap[root.id] || [];
+            const hasChildren = children.length > 0;
+            const count = counts[root.id] || 0;
+
+            // Accordion HTML
+            return `
+                <li class="category-item">
+                    <div class="category-header-wrap" onclick="toggleAccordion('${root.id}')">
+                        <a href="javascript:void(0);" onclick="filterByCategory('${root.id}', this)" class="category-link ${hasChildren ? 'has-children' : ''}" data-id="${root.id}">
+                            <span class="cat-name">${root.name}</span>
+                            <span class="cat-count">(${count})</span>
+                            ${hasChildren ? '<span class="accordion-indicator" id="ind-' + root.id + '">▸</span>' : ''}
+                        </a>
+                    </div>
+                    ${hasChildren ? `
+                        <ul class="submenu" id="sub-${root.id}" style="display: none;">
+                            ${children.map(child => {
+                const childCount = counts[child.id] || 0;
+                return `
+                                    <li class="submenu-item">
+                                        <a href="javascript:void(0);" onclick="filterByCategory('${child.id}', this)" class="submenu-link" data-id="${child.id}">
+                                            - ${child.name} <span class="cat-count">(${childCount})</span>
+                                        </a>
+                                    </li>
+                                `;
+            }).join('')}
+                        </ul>
+                    ` : ''}
+                </li>
+            `;
+        }).join('');
+    }
+
+    window.toggleAccordion = function (id) {
+        const submenu = document.getElementById(`sub-${id}`);
+        const indicator = document.getElementById(`ind-${id}`);
+
+        if (submenu) {
+            const isHidden = submenu.style.display === 'none';
+            submenu.style.display = isHidden ? 'block' : 'none';
+            if (indicator) indicator.textContent = isHidden ? '▾' : '▸';
+        }
+    };
+
+    window.filterByCategory = function (categoryId, element) {
+        if (event) event.stopPropagation(); // Prevent accordion toggle if clicking link
+
+        // Remove active class
+        document.querySelectorAll('.category-link, .submenu-link').forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        loadPostsByCategory(categoryId);
+    };
 
     // ═══════════════════════════════════════════════════
     // 5. POST LOADING BY CATEGORY

@@ -407,14 +407,34 @@ async function loadCategories() {
         const { data: categories, error } = await supabaseClient
             .from('categories')
             .select('*')
+            .eq('is_visible', true)
             .order('display_order', { ascending: true });
 
         if (error) throw error;
 
-        // Update category select in post editor
-        const select = document.getElementById('postCategory');
-        select.innerHTML = '<option value="">카테고리 선택</option>' +
-            categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        const categorySelect = document.getElementById('postCategory'); // Changed from 'categorySelect' to 'postCategory'
+        if (categorySelect) {
+            // Organize into hierarchy for display
+            const roots = categories.filter(c => !c.parent_id);
+            const childrenMap = {};
+            categories.filter(c => c.parent_id).forEach(c => {
+                if (!childrenMap[c.parent_id]) childrenMap[c.parent_id] = [];
+                childrenMap[c.parent_id].push(c);
+            });
+
+            let optionsHtml = '<option value="">카테고리 선택</option>';
+
+            roots.forEach(root => {
+                optionsHtml += `<option value="${root.id}">${root.name}</option>`;
+                if (childrenMap[root.id]) {
+                    childrenMap[root.id].forEach(child => {
+                        optionsHtml += `<option value="${child.id}">&nbsp;&nbsp;&nbsp;&nbsp;└ ${child.name}</option>`;
+                    });
+                }
+            });
+
+            categorySelect.innerHTML = optionsHtml;
+        }
 
         // Update filter select
         const filterSelect = document.getElementById('postFilterCategory');

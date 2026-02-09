@@ -480,7 +480,13 @@ async function loadCategories() {
             .order('display_order', { ascending: true });
 
         if (error) throw error;
-        currentCategories = categories || [];
+
+        // Map parent_id to is_sub for UI compatibility
+        currentCategories = (categories || []).map(cat => ({
+            ...cat,
+            is_sub: !!cat.parent_id
+        }));
+
         renderCategories();
 
         // Populate Filter Dropdown
@@ -569,9 +575,20 @@ window.updateLocalCategoryName = function (id, name) {
 };
 
 window.toggleLocalIndent = function (id) {
-    const cat = currentCategories.find(c => c.id == id);
+    const index = currentCategories.findIndex(c => c.id == id);
+    if (index === 0) {
+        alert('첫 번째 카테고리는 하위 카테고리가 될 수 없습니다.');
+        return;
+    }
+
+    const cat = currentCategories[index];
     if (cat) {
+        // Toggle indentation
         cat.is_sub = !cat.is_sub;
+
+        // If un-indenting, but next items are sub, they might become orphaned or attached to this one.
+        // For 2-depth, it's fine. If this becomes root, subsequent subs become its children.
+
         renderCategories();
         hasUnsavedChanges = true;
     }
@@ -596,14 +613,31 @@ window.deleteLocalCategory = function (id) {
 window.saveAllCategories = async function () {
     try {
         // Update all categories with their new order and properties
+        // Calculate parent_id based on is_sub and order
+        let lastRootId = null;
+
         for (let i = 0; i < currentCategories.length; i++) {
             const cat = currentCategories[i];
+
+            let parentId = null;
+            if (cat.is_sub) {
+                if (lastRootId) {
+                    parentId = lastRootId;
+                } else {
+                    // Orphaned sub (e.g. first item was forced sub?), treat as root
+                    cat.is_sub = false;
+                    lastRootId = cat.id;
+                }
+            } else {
+                lastRootId = cat.id;
+            }
+
             const { error } = await supabaseClient.from('categories').upsert({
                 id: cat.id,
                 name: cat.name,
                 display_order: i + 1,
                 is_visible: cat.is_visible,
-                is_sub: cat.is_sub,
+                parent_id: parentId, // Save calculated parent_id
                 updated_at: new Date().toISOString()
             });
             if (error) throw error;
@@ -699,9 +733,8 @@ async function addCategory() {
         await supabaseClient.from('categories').insert({
             name: name,
             is_visible: true,
-            has_dropdown: true,
-            default_open: false,
-            display_order: maxOrder + 1
+            display_order: maxOrder + 1,
+            parent_id: null
         });
 
         document.getElementById('newCategoryName').value = '';
