@@ -1,124 +1,132 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎬 SMALLSM ARCHIVE - WIKI DASHBOARD (Complete & Editor Fixed)
+// 🎬 SMALLSM ARCHIVE - WIKI DASHBOARD (Full System)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-console.log('🚀 Wiki Dashboard loading...');
+console.log('🚀 Wiki Dashboard system starting...');
 
 let supabaseClient = null;
 let hasUnsavedChanges = false;
 
 // ═══════════════════════════════════════════════════
-// WAIT FOR CONFIG & INIT
-// ═══════════════════════════════════════════════════
-function waitForConfig() {
-    return new Promise((resolve) => {
-        const interval = setInterval(() => {
-            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
-                clearInterval(interval);
-                resolve();
-            }
-        }, 100);
-    });
-}
-
-// ═══════════════════════════════════════════════════
-// EDITOR FUNCTIONS (에러 해결 핵심)
+// EDITOR & ACTION FUNCTIONS (Global Scope)
 // ═══════════════════════════════════════════════════
 window.showNewPostEditor = function() {
-    console.log("📝 새 게시글 작성 페이지로 이동");
-    // 새 글 작성을 위한 admin.html (혹은 post-editor.html) 경로로 이동
-    window.location.href = 'admin.html?action=new'; 
+    console.log("📝 신규 게시글 작성 모드 진입");
+    // 섹션 전환 로직이 있다면 해당 섹션으로 이동, 아니면 페이지 이동
+    if(document.getElementById('section-posts')) {
+        switchSection('posts');
+        alert('글쓰기 기능은 현재 준비 중이거나 별도의 에디터 페이지가 필요합니다.');
+    } else {
+        window.location.href = 'admin.html?action=new';
+    }
 };
 
-// 만약 현재 페이지가 글쓰기 모드라면 초기화 로직 수행
-function checkURLParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get('action');
-    if (action === 'new' || action === 'edit') {
-        console.log("🛠 에디터 모드 활성화");
-        // 여기에 에디터 초기화 로직 추가 가능
-    }
-}
+window.editPost = function(id) {
+    console.log("✏️ 게시글 수정 ID:", id);
+    window.location.href = `admin.html?action=edit&id=${id}`;
+};
 
 // ═══════════════════════════════════════════════════
-// POSTS MANAGEMENT (0개 문제 해결을 위한 로깅 강화)
+// CORE LOADERS
 // ═══════════════════════════════════════════════════
 async function loadPosts() {
     const container = document.getElementById('postsList');
     if (!container) return;
 
     try {
-        console.log('📡 게시글 데이터 요청 중...');
+        console.log('📡 게시글 불러오기 시도 중 (Table: archive_posts)...');
+        
         const { data: posts, error } = await supabaseClient
             .from('archive_posts')
-            .select('*')
+            .select('id, title, is_private, created_at, updated_at, category_id')
             .order('updated_at', { ascending: false });
         
-        if (error) throw error;
+        if (error) {
+            console.error('❌ DB 에러:', error.message);
+            throw error;
+        }
 
-        console.log(`✅ 수신 결과: ${posts ? posts.length : 0}개의 게시글`);
+        console.log('✅ 데이터 수신 성공:', posts.length, '개의 게시글');
 
         if (!posts || posts.length === 0) {
             container.innerHTML = `
-                <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                    <p>표시할 게시글이 없습니다.</p>
-                    <small style="display: block; margin-top: 1rem; opacity: 0.6;">
-                        (DB에 데이터가 있는데도 안 나온다면 Supabase RLS 설정을 확인하세요)
-                    </small>
+                <div class="no-data-notice" style="text-align: center; padding: 3rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                    <p style="color: var(--primary-brass); font-size: 1.2rem;">불러온 게시글이 없습니다.</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                        데이터베이스에 글이 있다면 <strong>Supabase RLS Policy</strong>를 확인하세요.
+                    </p>
+                    <button class="btn-primary mt-4" onclick="location.reload()" style="padding: 5px 15px; font-size: 0.8rem;">🔄 새로고침</button>
                 </div>`;
             return;
         }
         
-        // 데이터가 있을 경우 렌더링 로직 (기존과 동일)
-        renderPostsList(posts);
+        // 데이터 렌더링
+        container.innerHTML = posts.map(post => {
+            const status = post.is_private ? '🔴 비공개' : '🟢 공개';
+            return `
+                <div class="post-item" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--glass-border);">
+                    <div>
+                        <span style="color: var(--text-secondary); font-size: 0.8rem;">[${status}]</span>
+                        <strong style="margin-left: 10px;">${post.title}</strong>
+                    </div>
+                    <div class="post-actions">
+                        <button class="editor-btn" onclick="editPost('${post.id}')">✏️ 수정</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
         
     } catch (error) {
-        console.error('❌ 게시글 로딩 에러:', error.message);
-        container.innerHTML = `<p style="color: red;">데이터 로딩 실패: ${error.message}</p>`;
+        container.innerHTML = `<p style="color: var(--admin-danger);">❌ 로딩 에러: ${error.message}</p>`;
     }
 }
-
-function renderPostsList(posts) {
-    const container = document.getElementById('postsList');
-    container.innerHTML = posts.map(post => `
-        <div class="post-item" style="border-bottom: 1px solid var(--glass-border); padding: 1rem 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <strong>${post.title}</strong>
-                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${new Date(post.updated_at).toLocaleDateString()}</div>
-                </div>
-                <div class="post-actions">
-                    <button class="action-btn" onclick="editPost('${post.id}')">✏️</button>
-                    <button class="action-btn danger" onclick="deletePost('${post.id}', '${post.title}')">🗑️</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-
-// ... (기존 loadStatistics, loadCategories 등 나머지 함수 유지) ...
 
 // ═══════════════════════════════════════════════════
 // INITIALIZATION
 // ═══════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', async () => {
-    await waitForConfig();
-    
+async function init() {
+    // 1. Config 대기
+    if (!window.SUPABASE_CONFIG) {
+        console.warn("⏳ Waiting for config...");
+        setTimeout(init, 100);
+        return;
+    }
+
+    // 2. Client 초기화
     supabaseClient = window.supabase.createClient(
         window.SUPABASE_CONFIG.url,
         window.SUPABASE_CONFIG.anonKey
     );
-    
-    // URL 파라미터 체크 (에디터 모드인지 확인)
-    checkURLParams();
+    console.log('✅ Supabase initialized');
 
-    // 로그인 체크 후 대시보드 표시
+    // 3. 인증 상태 확인 및 대시보드 표시
     const { data: { user } } = await supabaseClient.auth.getUser();
+    
     if (user && user.email === window.ADMIN_EMAIL) {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('adminDashboard').style.display = 'block';
+        console.log("🔑 관리자 인증 완료");
+        const loginScreen = document.getElementById('loginScreen');
+        const adminDashboard = document.getElementById('adminDashboard');
         
+        if (loginScreen) loginScreen.style.display = 'none';
+        if (adminDashboard) adminDashboard.style.display = 'block';
+        
+        // 초기 데이터 로드
         loadPosts();
-        // 나머지 데이터 로딩 함수들 호출...
+        if (typeof loadStatistics === 'function') loadStatistics();
+        if (typeof loadCategories === 'function') loadCategories();
     }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📱 DOM ready');
+    init();
 });
+
+// ═══════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════
+window.switchSection = function(sectionName) {
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(`section-${sectionName}`);
+    if (target) target.classList.add('active');
+};
