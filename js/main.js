@@ -83,128 +83,78 @@
     // 4. CATEGORY LOADING
     // ═══════════════════════════════════════════════════
     // ═══════════════════════════════════════════════════
-    // 4. HOME SETTINGS LOADING
+    // 4. HOME: POST GRID LOADING
     // ═══════════════════════════════════════════════════
-    async function loadHomeSettings() {
+    async function loadRecentPosts() {
         if (!supabaseClient) return;
 
+        const container = document.getElementById('content');
+        if (!container) return;
+
+        container.innerHTML = '<div class="loading-msg" style="grid-column: 1/-1; text-align: center;">기록을 불러오는 중...</div>';
+
         try {
-            const { data, error } = await supabaseClient
-                .from('settings')
+            // 1. Fetch Posts
+            const { data: posts, error } = await supabaseClient
+                .from('archive_posts') // Using correct table name
                 .select('*')
-                .in('key', [
-                    'home_title', 'home_subtitle', 'home_content', 'show_recent_posts', 'recent_posts_count',
-                    'site_title', 'site_description', 'google_verification', 'naver_verification'
-                ]);
-
-            if (error) throw error;
-
-            const settings = {};
-            data.forEach(item => settings[item.key] = item.value);
-
-            // Update Site SEO
-            if (settings.site_title) {
-                document.title = settings.site_title;
-                const titleTag = document.getElementById('siteTitleTag');
-                if (titleTag) titleTag.textContent = settings.site_title;
-                const siteTitleEl = document.querySelector('.site-title');
-                if (siteTitleEl) siteTitleEl.textContent = settings.site_title;
-            }
-            if (settings.site_description) {
-                const descTag = document.getElementById('siteDescTag');
-                if (descTag) descTag.content = settings.site_description;
-            }
-            if (settings.google_verification) {
-                const gTag = document.querySelector('meta[name="google-site-verification"]');
-                if (gTag) gTag.content = settings.google_verification;
-            }
-            if (settings.naver_verification) {
-                const nTag = document.querySelector('meta[name="naver-site-verification"]');
-                if (nTag) nTag.content = settings.naver_verification;
-            }
-
-            const title = document.getElementById('welcomeTitle');
-            const subtitle = document.querySelector('.post-meta span');
-            const content = document.getElementById('mainContent');
-
-            if (title && settings.home_title) title.textContent = settings.home_title;
-            if (subtitle && settings.home_subtitle) subtitle.textContent = settings.home_subtitle;
-            if (content && settings.home_content) {
-                // Remove previous content/viewers
-                content.innerHTML = '';
-
-                try {
-                    // Initialize Toast UI Viewer
-                    const viewer = new toastui.Editor.factory({
-                        el: content,
-                        viewer: true,
-                        initialValue: settings.home_content
-                    });
-                    console.log('✅ Home content viewer initialized');
-                } catch (e) {
-                    console.error('❌ Viewer init error:', e);
-                    // Fallback just in case
-                    content.innerHTML = settings.home_content.split('\n').map(line => `<p>${line}</p>`).join('');
-                }
-            }
-
-            // Handle recent posts if enabled
-            if (settings.show_recent_posts === 'true') {
-                const count = parseInt(settings.recent_posts_count) || 3;
-                await loadRecentPosts(count);
-            }
-
-            console.log('✅ Home settings loaded');
-
-        } catch (error) {
-            console.error('❌ Home settings loading failed:', error);
-        }
-    }
-
-    async function loadRecentPosts(count) {
-        try {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            const isAdmin = user && user.email === window.ADMIN_EMAIL;
-
-            let query = supabaseClient
-                .from('archive_posts')
-                .select('id, title, created_at')
+                .eq('is_visible', true)
                 .order('created_at', { ascending: false })
-                .limit(count);
+                .limit(20);
 
-            if (!isAdmin) {
-                query = query.eq('is_private', false);
-            }
-
-            const { data: posts, error } = await query;
             if (error) throw error;
 
-            if (posts && posts.length > 0) {
-                const content = document.getElementById('mainContent');
-                const recentSection = document.createElement('div');
-                recentSection.style.marginTop = '3rem';
-                recentSection.innerHTML = `
-                    <h2 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--primary-brass); border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">최근 기록</h2>
-                    ${posts.map(post => `
-                        <div style="margin-bottom: 1rem;">
-                            <a href="post.html?id=${post.id}" style="color: var(--text-primary); text-decoration: none; font-size: 0.95rem;">
-                                • ${post.title} <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 0.5rem;">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
-                            </a>
-                        </div>
-                    `).join('')}
-                `;
-                content.appendChild(recentSection);
+            console.log('✅ Loaded posts:', posts.length);
+
+            // 2. Render Grid
+            if (!posts || posts.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:3rem;">아직 등록된 기록이 없습니다.</p>';
+                return;
             }
-        } catch (error) {
-            console.error('❌ Recent posts loading failed:', error);
+
+            container.innerHTML = ''; // Clear loading
+
+            posts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.onclick = () => window.location.href = `post.html?id=${post.id}`;
+
+                // Content Strip for Excerpt
+                const rawContent = post.content || '';
+                const plainText = rawContent.replace(/[#*`\[\]]/g, '').slice(0, 120) + '...';
+                const dateStr = new Date(post.created_at).toLocaleDateString('ko-KR');
+                const categoryName = post.category_name || 'Archive'; // We might need to join categories or just show default
+
+                // Thumb: Search for first image in markdown, else default color
+                const imgMatch = rawContent.match(/!\[.*?\]\((.*?)\)/);
+                const bgStyle = imgMatch ? `background-image: url('${imgMatch[1]}');` : 'background-color: #EAE6DE;';
+
+                card.innerHTML = `
+                    <div class="post-card-thumb" style="${bgStyle}"></div>
+                    <div class="post-card-body">
+                        <div class="post-card-cat">${post.is_private ? '🔒 Private' : 'Public'}</div>
+                        <h3 class="post-card-title">${post.title}</h3>
+                        <p class="post-card-excerpt">${plainText}</p>
+                        <div class="post-card-meta">
+                            <span>The Private Lab</span>
+                            <span>${dateStr}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+        } catch (e) {
+            console.error('❌ Error loading posts:', e);
+            container.innerHTML = '<p class="error-msg" style="grid-column: 1/-1;">데이터를 불러오지 못했습니다.</p>';
         }
     }
 
+    // ═══════════════════════════════════════════════════
+    // 5. SIDEBAR WIDGETS
+    // ═══════════════════════════════════════════════════
     async function loadCategories() {
-        if (!supabaseClient) {
-            console.warn('⚠️ Supabase not initialized');
-            return;
-        }
+        if (!supabaseClient) return;
 
         try {
             const { data: categories, error } = await supabaseClient
@@ -215,40 +165,94 @@
 
             if (error) throw error;
 
-            const nav = document.getElementById('categoryNav');
-            if (!nav) return;
+            const list = document.getElementById('categoryList');
+            if (!list) return;
 
-            nav.innerHTML = '';
+            // Keep "All Posts"
+            list.innerHTML = '<li><a href="#" class="toc-link active" data-id="all">All Posts</a></li>';
 
-            categories.forEach(category => {
+            categories.forEach(cat => {
                 const li = document.createElement('li');
-                li.className = 'category-item';
+                li.innerHTML = `<a href="#" class="toc-link" data-id="${cat.id}">${cat.name}</a>`;
 
-                const link = document.createElement('a');
-                link.href = `#category-${category.id}`;
-                link.className = 'category-link';
-                link.textContent = category.name;
-                link.dataset.categoryId = category.id;
-
-                link.addEventListener('click', (e) => {
+                // Click Handler
+                li.querySelector('a').addEventListener('click', (e) => {
                     e.preventDefault();
-                    loadPostsByCategory(category.id);
-
-                    document.querySelectorAll('.category-link').forEach(l => {
-                        l.classList.remove('active');
-                    });
-                    link.classList.add('active');
+                    filterPostsByCategory(cat.id);
+                    document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
+                    e.target.classList.add('active');
                 });
 
-                li.appendChild(link);
-                nav.appendChild(li);
+                list.appendChild(li);
             });
 
-            console.log('✅ Categories loaded');
-
-        } catch (error) {
-            console.error('❌ Category loading failed:', error);
+        } catch (e) {
+            console.error('❌ Category load failed:', e);
         }
+    }
+
+    async function filterPostsByCategory(categoryId) {
+        // Simple client-side re-fetch or filter
+        // For now, let's re-fetch (simpler for pagination later)
+        // ... Implementation similar to loadRecentPosts but with .eq('category_id') ...
+        // For MVP, just alerting or simple log
+        console.log('Filter by:', categoryId);
+        // Reuse loadRecentPosts with a filter arg if we refactor, 
+        // but for now let's just reload all (simplification). 
+        // A proper implementation would update loadRecentPosts to accept a filter.
+
+        // Quick Implementation:
+        const container = document.getElementById('content');
+        container.innerHTML = '<div class="loading-msg">Filtering...</div>';
+
+        try {
+            let query = supabaseClient
+                .from('archive_posts')
+                .select('*')
+                .eq('is_visible', true)
+                .order('created_at', { ascending: false });
+
+            if (categoryId !== 'all') {
+                query = query.eq('category_id', categoryId);
+            }
+
+            const { data: posts, error } = await query;
+            if (error) throw error;
+
+            // Render (Code duplication sucks, but quick fix)
+            container.innerHTML = '';
+            if (!posts || posts.length === 0) {
+                container.innerHTML = '<p style="padding:2rem;">이 카테고리에 글이 없습니다.</p>';
+                return;
+            }
+
+            posts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.onclick = () => window.location.href = `post.html?id=${post.id}`;
+
+                const rawContent = post.content || '';
+                const plainText = rawContent.replace(/[#*`\[\]]/g, '').slice(0, 120) + '...';
+                const dateStr = new Date(post.created_at).toLocaleDateString();
+                const imgMatch = rawContent.match(/!\[.*?\]\((.*?)\)/);
+                const bgStyle = imgMatch ? `background-image: url('${imgMatch[1]}');` : 'background-color: #EAE6DE;';
+
+                card.innerHTML = `
+                    <div class="post-card-thumb" style="${bgStyle}"></div>
+                    <div class="post-card-body">
+                        <div class="post-card-cat">${post.is_private ? '🔒' : ''} Archive</div>
+                        <h3 class="post-card-title">${post.title}</h3>
+                        <p class="post-card-excerpt">${plainText}</p>
+                        <div class="post-card-meta">
+                            <span>The Private Lab</span>
+                            <span>${dateStr}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+        } catch (e) { console.error(e); }
     }
 
     // ═══════════════════════════════════════════════════
@@ -478,7 +482,7 @@
 
                 waitForConfig(() => {
                     initializeSupabase();
-                    loadHomeSettings();
+                    loadRecentPosts();
                     loadCategories();
                     initSearch();
                 });
@@ -498,7 +502,8 @@
         if (checkAgeVerification()) {
             waitForConfig(() => {
                 initializeSupabase();
-                loadHomeSettings();
+                // Load grid instead of home settings
+                loadRecentPosts();
                 loadCategories();
                 initSearch();
             });

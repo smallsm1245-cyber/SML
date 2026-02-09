@@ -114,13 +114,17 @@ async function loadCategories() {
 // ═══════════════════════════════════════════════════
 // 4. LOAD POST CONTENT
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// 4. LOAD POST CONTENT
+// ═══════════════════════════════════════════════════
 async function loadPost() {
     if (!supabaseClient) return;
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
     if (!postId) {
-        window.location.href = '404.html';
+        // window.location.href = 'index.html'; // Redirect to home instead of 404 for now
+        document.getElementById('postContent').innerHTML = '<p>게시물을 찾을 수 없습니다.</p>';
         return;
     }
 
@@ -143,36 +147,42 @@ async function loadPost() {
 
         // Security: Check if post is private and user is not admin
         if (post.is_private && !isAdmin) {
-            window.location.href = '404.html';
+            alert('비공개 게시물입니다.');
+            window.location.href = 'index.html';
             return;
         }
 
-        // Display post
-        document.getElementById('pageTitle').textContent = `${post.title} - SMALLSM Archive`;
+        // Show Article Container
+        document.getElementById('postArticle').style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
+
+        // Display Metadata
+        document.title = `${post.title} | THE PRIVATE LAB`;
         document.getElementById('postTitle').textContent = post.title;
-        document.getElementById('postCategory').textContent = post.categories ? post.categories.name : '미분류';
-        document.getElementById('postDate').textContent = new Date(post.created_at).toLocaleDateString('ko-KR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+        document.getElementById('postCategory').textContent = post.categories ? post.categories.name : 'Uncategorized';
+
+        // Format Date
+        const dateObj = new Date(post.created_at);
+        document.getElementById('postDate').textContent = dateObj.toLocaleDateString('ko-KR', {
+            year: 'numeric', month: 'long', day: 'numeric'
         });
 
-        // Initialize Toast UI Viewer
-        const Viewer = toastui.Editor;
-        const viewer = new Viewer({
-            el: document.querySelector('#postContent'),
-            initialValue: post.content
-        });
-
-        // Add copy protection class if needed
-        if (!post.origin_free) {
-            document.getElementById('postContent').classList.add('copy-protected');
+        // Initialize Toast UI Viewer using our custom module
+        if (window.PrivateLabViewer) {
+            const viewer = PrivateLabViewer.init('#postContent', post.content);
+            if (viewer) {
+                // Generate TOC
+                PrivateLabViewer.generateTOC(post.content, 'tocContainer');
+            }
+        } else {
+            // Fallback if module missing
+            console.error('PrivateLabViewer module not found');
+            document.getElementById('postContent').innerText = post.content;
         }
 
     } catch (error) {
         console.error('게시물 로딩 실패:', error);
-        // window.location.href = '404.html'; // Debugging
-        document.getElementById('postContent').innerHTML = `<p style="color:red">오류 발생: ${error.message}</p>`;
+        document.getElementById('loading').innerHTML = `<p style="color:red">오류가 발생했습니다.<br>${error.message}</p>`;
     }
 }
 
