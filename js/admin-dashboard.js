@@ -38,17 +38,17 @@ function showError(message) {
 // ═══════════════════════════════════════════════════
 async function checkAuth() {
     if (!supabaseClient) return false;
-    
+
     try {
         const { data: { user }, error } = await supabaseClient.auth.getUser();
-        
+
         if (error || !user) return false;
-        
+
         if (user.email !== window.ADMIN_EMAIL) {
             await supabaseClient.auth.signOut();
             return false;
         }
-        
+
         return true;
     } catch (error) {
         console.error('Auth check failed:', error);
@@ -59,7 +59,7 @@ async function checkAuth() {
 async function showDashboard() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminDashboard').style.display = 'block';
-    
+
     // Load all data
     await Promise.all([
         loadStatistics(),
@@ -77,16 +77,16 @@ async function loadSiteSettings() {
             .from('settings')
             .select('*')
             .in('key', ['site_title', 'site_description', 'google_verification', 'naver_verification']);
-        
+
         const settings = {};
         if (data) data.forEach(item => settings[item.key] = item.value);
-        
+
         document.getElementById('siteTitleInput').value = settings.site_title || 'SMALLSM Archive';
         document.getElementById('siteDescInput').value = settings.site_description || '';
         document.getElementById('googleVerification').value = settings.google_verification || '';
         document.getElementById('naverVerification').value = settings.naver_verification || '';
         document.getElementById('adminEmailInput').value = window.ADMIN_EMAIL;
-        
+
     } catch (error) {
         console.error('Site settings loading failed:', error);
     }
@@ -97,7 +97,7 @@ async function saveSiteSettings() {
         { key: 'site_title', value: document.getElementById('siteTitleInput').value },
         { key: 'site_description', value: document.getElementById('siteDescInput').value }
     ];
-    
+
     try {
         for (const setting of settings) {
             await supabaseClient.from('settings').upsert({
@@ -117,7 +117,7 @@ async function saveSeoSettings() {
         { key: 'google_verification', value: document.getElementById('googleVerification').value },
         { key: 'naver_verification', value: document.getElementById('naverVerification').value }
     ];
-    
+
     try {
         for (const setting of settings) {
             await supabaseClient.from('settings').upsert({
@@ -135,7 +135,7 @@ async function saveSeoSettings() {
 // ═══════════════════════════════════════════════════
 // SECTION SWITCHING
 // ═══════════════════════════════════════════════════
-window.switchSection = function(sectionName) {
+window.switchSection = function (sectionName) {
     // Check unsaved changes
     if (hasUnsavedChanges) {
         if (!confirm('저장하지 않은 변경사항이 있습니다. 정말 이동하시겠습니까?')) {
@@ -143,11 +143,11 @@ window.switchSection = function(sectionName) {
         }
         hasUnsavedChanges = false;
     }
-    
+
     // Hide all sections
     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    
+
     // Show selected section
     document.getElementById(`section-${sectionName}`).classList.add('active');
     document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
@@ -160,18 +160,18 @@ async function loadStatistics() {
     try {
         const { data: posts } = await supabaseClient.from('archive_posts').select('id, is_private');
         const { data: categories } = await supabaseClient.from('categories').select('id');
-        
+
         const total = posts ? posts.length : 0;
         const publicPosts = posts ? posts.filter(p => !p.is_private).length : 0;
         const privatePosts = total - publicPosts;
         const catCount = categories ? categories.length : 0;
-        
+
         document.getElementById('statTotalPosts').textContent = total;
         document.getElementById('statPublicPosts').textContent = publicPosts;
         document.getElementById('statPrivatePosts').textContent = privatePosts;
         document.getElementById('statCategories').textContent = catCount;
         document.getElementById('postCount').textContent = total;
-        
+
     } catch (error) {
         console.error('Statistics loading failed:', error);
     }
@@ -187,14 +187,14 @@ async function loadRecentActivity() {
             .select('id, title, created_at, updated_at')
             .order('updated_at', { ascending: false })
             .limit(5);
-        
+
         const container = document.getElementById('recentActivity');
-        
+
         if (!posts || posts.length === 0) {
             container.innerHTML = '<p style="color: var(--admin-text-dim);">활동 내역이 없습니다.</p>';
             return;
         }
-        
+
         container.innerHTML = posts.map(post => {
             const time = getTimeAgo(post.updated_at);
             return `
@@ -207,7 +207,7 @@ async function loadRecentActivity() {
                 </div>
             `;
         }).join('');
-        
+
     } catch (error) {
         console.error('Activity loading failed:', error);
     }
@@ -220,7 +220,7 @@ function getTimeAgo(dateString) {
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
-    
+
     if (diffMins < 60) return `${diffMins}분 전`;
     if (diffHours < 24) return `${diffHours}시간 전`;
     return `${diffDays}일 전`;
@@ -235,19 +235,19 @@ async function loadHomeSettings() {
             .from('settings')
             .select('*')
             .in('key', ['home_title', 'home_subtitle', 'home_content', 'show_recent_posts', 'recent_posts_count']);
-        
+
         const settings = {};
         data.forEach(item => settings[item.key] = item.value);
-        
+
         document.getElementById('homeTitle').value = settings.home_title || '환영합니다';
         document.getElementById('homeSubtitle').value = settings.home_subtitle || 'SMALLSM Archive에 오신 것을 환영합니다';
         document.getElementById('homeContent').value = settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.';
         document.getElementById('showRecentPosts').checked = settings.show_recent_posts === 'true';
         document.getElementById('recentPostsCount').value = settings.recent_posts_count || '3';
-        
+
         updateHomePreview();
         toggleRecentPostsCount();
-        
+
     } catch (error) {
         console.error('Home settings loading failed:', error);
     }
@@ -257,14 +257,14 @@ function updateHomePreview() {
     const title = document.getElementById('homeTitle').value;
     const subtitle = document.getElementById('homeSubtitle').value;
     const content = document.getElementById('homeContent').value;
-    
+
     document.getElementById('previewTitle').textContent = title;
     document.getElementById('previewSubtitle').textContent = subtitle;
     document.getElementById('previewContent').innerHTML = content
         .split('\n')
         .map(line => `<p>${line}</p>`)
         .join('');
-    
+
     hasUnsavedChanges = true;
 }
 
@@ -282,7 +282,7 @@ async function saveHomeSettings() {
         { key: 'show_recent_posts', value: document.getElementById('showRecentPosts').checked.toString() },
         { key: 'recent_posts_count', value: document.getElementById('recentPostsCount').value }
     ];
-    
+
     try {
         for (const setting of settings) {
             await supabaseClient.from('settings').upsert({
@@ -291,10 +291,10 @@ async function saveHomeSettings() {
                 updated_at: new Date().toISOString()
             }, { onConflict: 'key' });
         }
-        
+
         alert('✅ 홈화면이 저장되었습니다!');
         hasUnsavedChanges = false;
-        
+
     } catch (error) {
         console.error('Save failed:', error);
         alert('❌ 저장 실패: ' + error.message);
@@ -317,29 +317,29 @@ async function loadPosts() {
                 category_id
             `)
             .order('updated_at', { ascending: false });
-        
+
         if (error) throw error;
 
         const { data: categories } = await supabaseClient.from('categories').select('id, name');
         const catMap = {};
         if (categories) categories.forEach(c => catMap[c.id] = c.name);
-        
+
         const container = document.getElementById('postsList');
-        
+
         if (!posts || posts.length === 0) {
             container.innerHTML = '<p style="color: var(--admin-text-dim); text-align: center; padding: 3rem;">게시물이 없습니다.</p>';
             return;
         }
-        
+
         container.innerHTML = posts.map(post => {
-            const statusBadge = post.is_private 
+            const statusBadge = post.is_private
                 ? '<span class="status-badge private">🔴 비공개</span>'
                 : '<span class="status-badge public">🟢 공개</span>';
-            
+
             const categoryName = catMap[post.category_id] || 'Uncategorized';
             const updatedTime = getTimeAgo(post.updated_at);
             const postUrl = `${window.location.origin}/post.html?id=${post.id}`;
-            
+
             return `
                 <div class="post-item">
                     <div class="post-header">
@@ -357,25 +357,22 @@ async function loadPosts() {
                 </div>
             `;
         }).join('');
-        
+
     } catch (error) {
         console.error('Posts loading failed:', error);
         document.getElementById('postsList').innerHTML = '<p style="color: var(--admin-danger);">데이터를 불러오지 못했습니다.</p>';
     }
 }
 
-window.showNewPostEditor = function() {
-    // Redirect to a new post page or show a modal
-    // For now, let's assume there's a post-editor.html or similar
-    // If not, we can implement a simple prompt or redirect to admin-new.js logic
-    window.location.href = 'admin.html?action=new'; 
+window.showNewPostEditor = function () {
+    window.location.href = 'admin-toastui.html?action=new';
 };
 
-window.editPost = function(id) {
+window.editPost = function (id) {
     window.location.href = `admin.html?action=edit&id=${id}`;
 };
 
-window.copyPostLink = function(url) {
+window.copyPostLink = function (url) {
     navigator.clipboard.writeText(url).then(() => {
         alert('✅ 링크가 복사되었습니다!');
     }).catch(() => {
@@ -383,16 +380,16 @@ window.copyPostLink = function(url) {
     });
 };
 
-window.editPost = function(id) {
+window.editPost = function (id) {
     // TODO: Open editor
     alert('편집 기능은 구현 예정입니다.');
 };
 
-window.deletePost = async function(id, title) {
+window.deletePost = async function (id, title) {
     if (!confirm(`"${title}"를 삭제하시겠습니까?\n\n휴지통으로 이동되며 30일 후 자동 삭제됩니다.`)) {
         return;
     }
-    
+
     try {
         // Get post data
         const { data: post } = await supabaseClient
@@ -400,21 +397,21 @@ window.deletePost = async function(id, title) {
             .select('*')
             .eq('id', id)
             .single();
-        
+
         // Move to trash
         await supabaseClient.from('trash').insert({
             item_type: 'post',
             item_id: id,
             item_data: post
         });
-        
+
         // Delete from posts
         await supabaseClient.from('archive_posts').delete().eq('id', id);
-        
+
         alert('✅ 휴지통으로 이동되었습니다.');
         loadPosts();
         loadStatistics();
-        
+
     } catch (error) {
         console.error('Delete failed:', error);
         alert('❌ 삭제 실패: ' + error.message);
@@ -432,11 +429,18 @@ async function loadCategories() {
             .from('categories')
             .select('*')
             .order('display_order', { ascending: true });
-        
+
         if (error) throw error;
         currentCategories = categories || [];
         renderCategories();
-        
+
+        // Populate Filter Dropdown
+        const filterSelect = document.getElementById('postFilterCategory');
+        if (filterSelect) {
+            filterSelect.innerHTML = '<option value="">모든 카테고리</option>' +
+                currentCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        }
+
     } catch (error) {
         console.error('Categories loading failed:', error);
     }
@@ -452,7 +456,7 @@ function renderCategories() {
     container.innerHTML = currentCategories.map(cat => {
         const isHidden = !cat.is_visible;
         const isSub = cat.is_sub || false;
-        
+
         return `
             <div class="category-item-card ${isSub ? 'sub-category' : ''}" data-id="${cat.id}">
                 <div class="drag-handle">≡</div>
@@ -484,17 +488,17 @@ function renderCategories() {
 function initSortable() {
     const el = document.getElementById('categoriesList');
     if (!el || !window.Sortable) return;
-    
+
     Sortable.create(el, {
         handle: '.drag-handle',
         animation: 150,
         ghostClass: 'sortable-ghost',
-        onEnd: function() {
+        onEnd: function () {
             const newOrder = [];
             el.querySelectorAll('.category-item-card').forEach(item => {
                 newOrder.push(item.dataset.id);
             });
-            
+
             // Reorder currentCategories based on DOM
             const reordered = [];
             newOrder.forEach(id => {
@@ -507,7 +511,7 @@ function initSortable() {
     });
 }
 
-window.updateLocalCategoryName = function(id, name) {
+window.updateLocalCategoryName = function (id, name) {
     const cat = currentCategories.find(c => c.id == id);
     if (cat) {
         cat.name = name;
@@ -515,7 +519,7 @@ window.updateLocalCategoryName = function(id, name) {
     }
 };
 
-window.toggleLocalIndent = function(id) {
+window.toggleLocalIndent = function (id) {
     const cat = currentCategories.find(c => c.id == id);
     if (cat) {
         cat.is_sub = !cat.is_sub;
@@ -524,7 +528,7 @@ window.toggleLocalIndent = function(id) {
     }
 };
 
-window.toggleLocalVisibility = function(id) {
+window.toggleLocalVisibility = function (id) {
     const cat = currentCategories.find(c => c.id == id);
     if (cat) {
         cat.is_visible = !cat.is_visible;
@@ -533,14 +537,14 @@ window.toggleLocalVisibility = function(id) {
     }
 };
 
-window.deleteLocalCategory = function(id) {
+window.deleteLocalCategory = function (id) {
     if (!confirm('정말 삭제하시겠습니까?')) return;
     currentCategories = currentCategories.filter(c => c.id != id);
     renderCategories();
     hasUnsavedChanges = true;
 };
 
-window.saveAllCategories = async function() {
+window.saveAllCategories = async function () {
     try {
         // Update all categories with their new order and properties
         for (let i = 0; i < currentCategories.length; i++) {
@@ -555,7 +559,7 @@ window.saveAllCategories = async function() {
             });
             if (error) throw error;
         }
-        
+
         alert('✅ 모든 카테고리 변경사항이 저장되었습니다!');
         hasUnsavedChanges = false;
         loadCategories();
@@ -566,7 +570,7 @@ window.saveAllCategories = async function() {
     }
 };
 
-window.updateCategoryName = async function(id, newName) {
+window.updateCategoryName = async function (id, newName) {
     try {
         await supabaseClient.from('categories').update({ name: newName }).eq('id', id);
         console.log('✅ Category name updated');
@@ -576,7 +580,7 @@ window.updateCategoryName = async function(id, newName) {
     }
 };
 
-window.toggleCategoryVisibility = async function(id, isVisible) {
+window.toggleCategoryVisibility = async function (id, isVisible) {
     try {
         await supabaseClient.from('categories').update({ is_visible: isVisible }).eq('id', id);
         loadCategories();
@@ -585,7 +589,7 @@ window.toggleCategoryVisibility = async function(id, isVisible) {
     }
 };
 
-window.updateCategoryDropdown = async function(id, hasDropdown) {
+window.updateCategoryDropdown = async function (id, hasDropdown) {
     try {
         await supabaseClient.from('categories').update({ has_dropdown: hasDropdown }).eq('id', id);
         const opts = document.getElementById(`dropdown_opts_${id}`);
@@ -595,7 +599,7 @@ window.updateCategoryDropdown = async function(id, hasDropdown) {
     }
 };
 
-window.updateCategoryDefaultOpen = async function(id, defaultOpen) {
+window.updateCategoryDefaultOpen = async function (id, defaultOpen) {
     try {
         await supabaseClient.from('categories').update({ default_open: defaultOpen }).eq('id', id);
     } catch (error) {
@@ -603,24 +607,24 @@ window.updateCategoryDefaultOpen = async function(id, defaultOpen) {
     }
 };
 
-window.deleteCategory = async function(id, name) {
+window.deleteCategory = async function (id, name) {
     if (!confirm(`"${name}" 카테고리를 삭제하시겠습니까?`)) return;
-    
+
     try {
         const { data: posts } = await supabaseClient.from('archive_posts').select('id').eq('category_id', id);
-        
+
         if (posts && posts.length > 0) {
             if (!confirm(`⚠️ ${posts.length}개의 게시물이 있습니다.\n\n게시물도 함께 삭제됩니까?`)) {
                 return;
             }
             await supabaseClient.from('archive_posts').delete().eq('category_id', id);
         }
-        
+
         await supabaseClient.from('categories').delete().eq('id', id);
         alert('✅ 삭제되었습니다.');
         loadCategories();
         loadStatistics();
-        
+
     } catch (error) {
         console.error('Delete failed:', error);
         alert('❌ 삭제 실패');
@@ -633,16 +637,16 @@ async function addCategory() {
         alert('카테고리 이름을 입력하세요.');
         return;
     }
-    
+
     try {
         const { data: categories } = await supabaseClient
             .from('categories')
             .select('display_order')
             .order('display_order', { ascending: false })
             .limit(1);
-        
+
         const maxOrder = categories && categories.length > 0 ? categories[0].display_order : 0;
-        
+
         await supabaseClient.from('categories').insert({
             name: name,
             is_visible: true,
@@ -650,12 +654,12 @@ async function addCategory() {
             default_open: false,
             display_order: maxOrder + 1
         });
-        
+
         document.getElementById('newCategoryName').value = '';
         alert('✅ 카테고리가 추가되었습니다!');
         loadCategories();
         loadStatistics();
-        
+
     } catch (error) {
         console.error('Add failed:', error);
         alert('❌ 추가 실패');
@@ -665,17 +669,17 @@ async function addCategory() {
 function initDragAndDrop() {
     const container = document.getElementById('categoriesList');
     let draggedElement = null;
-    
+
     container.querySelectorAll('.category-item-card').forEach(item => {
         item.addEventListener('dragstart', (e) => {
             draggedElement = item;
             item.style.opacity = '0.5';
         });
-        
+
         item.addEventListener('dragend', (e) => {
             item.style.opacity = '1';
         });
-        
+
         item.addEventListener('dragover', (e) => {
             e.preventDefault();
             const afterElement = getDragAfterElement(container, e.clientY);
@@ -685,7 +689,7 @@ function initDragAndDrop() {
                 container.insertBefore(draggedElement, afterElement);
             }
         });
-        
+
         item.addEventListener('drop', async (e) => {
             e.preventDefault();
             await updateCategoryOrder();
@@ -695,11 +699,11 @@ function initDragAndDrop() {
 
 function getDragAfterElement(container, y) {
     const draggableElements = [...container.querySelectorAll('.category-item-card:not(.dragging)')];
-    
+
     return draggableElements.reduce((closest, child) => {
         const box = child.getBoundingClientRect();
         const offset = y - box.top - box.height / 2;
-        
+
         if (offset < 0 && offset > closest.offset) {
             return { offset: offset, element: child };
         } else {
@@ -710,7 +714,7 @@ function getDragAfterElement(container, y) {
 
 async function updateCategoryOrder() {
     const items = document.querySelectorAll('.category-item-card');
-    
+
     try {
         for (let i = 0; i < items.length; i++) {
             const id = items[i].dataset.id;
@@ -729,7 +733,7 @@ function toggleTheme() {
     document.body.classList.toggle('dark-theme');
     const isDark = document.body.classList.contains('dark-theme');
     localStorage.setItem('admin_theme', isDark ? 'dark' : 'light');
-    
+
     const icon = document.querySelector('#themeToggle .icon');
     icon.textContent = isDark ? '☀️' : '🌙';
 }
@@ -737,7 +741,7 @@ function toggleTheme() {
 function togglePreviewTheme() {
     const preview = document.getElementById('homePreview');
     const btn = document.getElementById('previewThemeToggle');
-    
+
     preview.classList.toggle('dark');
     const isDark = preview.classList.contains('dark');
     btn.textContent = isDark ? '☀️ 라이트' : '🌙 다크';
@@ -752,20 +756,20 @@ async function loadTrash() {
             .from('trash')
             .select('*')
             .order('deleted_at', { ascending: false });
-        
+
         const container = document.getElementById('trashList');
         const count = items ? items.length : 0;
         document.getElementById('trashCount').textContent = count;
-        
+
         if (count === 0) {
             container.innerHTML = '<p style="color: var(--admin-text-dim); text-align: center; padding: 3rem;">휴지통이 비어있습니다.</p>';
             return;
         }
-        
+
         container.innerHTML = items.map(item => {
             const daysLeft = Math.ceil((new Date(item.expires_at) - new Date()) / (1000 * 60 * 60 * 24));
             const title = item.item_data.title || item.item_data.name;
-            
+
             return `
                 <div class="trash-item">
                     <div class="post-header">
@@ -782,41 +786,41 @@ async function loadTrash() {
                 </div>
             `;
         }).join('');
-        
+
     } catch (error) {
         console.error('Trash loading failed:', error);
     }
 }
 
-window.restoreItem = async function(trashId, itemType, itemId) {
+window.restoreItem = async function (trashId, itemType, itemId) {
     try {
         const { data: trashItem } = await supabaseClient.from('trash').select('*').eq('id', trashId).single();
-        
+
         if (itemType === 'post') {
             await supabaseClient.from('archive_posts').insert(trashItem.item_data);
         } else {
             await supabaseClient.from('categories').insert(trashItem.item_data);
         }
-        
+
         await supabaseClient.from('trash').delete().eq('id', trashId);
-        
+
         alert('✅ 복구되었습니다!');
         loadTrash();
         if (itemType === 'post') loadPosts();
         else loadCategories();
         loadStatistics();
-        
+
     } catch (error) {
         console.error('Restore failed:', error);
         alert('❌ 복구 실패');
     }
 };
 
-window.permanentDelete = async function(trashId) {
+window.permanentDelete = async function (trashId) {
     if (!confirm('⚠️ 영구적으로 삭제됩니다.\n\n복구할 수 없습니다. 계속하시겠습니까?')) {
         return;
     }
-    
+
     try {
         await supabaseClient.from('trash').delete().eq('id', trashId);
         alert('✅ 영구 삭제되었습니다.');
@@ -832,69 +836,69 @@ window.permanentDelete = async function(trashId) {
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('📱 DOM ready');
-    
+
     await waitForConfig();
-    
+
     supabaseClient = window.supabase.createClient(
         window.SUPABASE_CONFIG.url,
         window.SUPABASE_CONFIG.anonKey
     );
-    
+
     console.log('✅ Supabase initialized');
-    
+
     // Check if already logged in
     if (await checkAuth()) {
         await showDashboard();
     }
-    
+
     // Login button
     document.getElementById('loginBtn').addEventListener('click', async () => {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
-        
+
         if (!email || !password) {
             showError('이메일과 비밀번호를 입력하세요');
             return;
         }
-        
+
         if (email !== window.ADMIN_EMAIL) {
             showError('관리자 권한이 없습니다');
             return;
         }
-        
+
         try {
             const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) throw error;
-            
+
             await showDashboard();
         } catch (error) {
             showError(error.message || '로그인 실패');
         }
     });
-    
+
     // Logout button
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         if (!confirm('로그아웃하시겠습니까?')) return;
-        
+
         await supabaseClient.auth.signOut();
         window.location.reload();
     });
-    
+
     // Nav buttons
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.addEventListener('click', () => {
             const section = btn.dataset.section;
             switchSection(section);
-            
+
             if (section === 'trash') loadTrash();
         });
     });
-    
+
     // Home preview real-time
     ['homeTitle', 'homeSubtitle', 'homeContent'].forEach(id => {
         document.getElementById(id).addEventListener('input', updateHomePreview);
     });
-    
+
     document.getElementById('showRecentPosts').addEventListener('change', toggleRecentPostsCount);
     document.getElementById('saveHomeBtn').addEventListener('click', saveHomeSettings);
     document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
@@ -902,24 +906,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('previewThemeToggle').addEventListener('click', togglePreviewTheme);
     document.getElementById('saveSettingsBtn').addEventListener('click', saveSiteSettings);
     document.getElementById('saveSeoBtn').addEventListener('click', saveSeoSettings);
-    
+
     // Mobile menu toggle
     const menuBtn = document.createElement('button');
     menuBtn.className = 'mobile-menu-btn';
     menuBtn.innerHTML = '☰';
     document.querySelector('.header-left').prepend(menuBtn);
-    
+
     menuBtn.addEventListener('click', () => {
         document.querySelector('.dashboard-sidebar').classList.toggle('active');
     });
-    
+
     // Load saved theme
     const savedTheme = localStorage.getItem('admin_theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-theme');
         document.querySelector('#themeToggle .icon').textContent = '☀️';
     }
-    
+
     // Unsaved changes warning
     window.addEventListener('beforeunload', (e) => {
         if (hasUnsavedChanges) {
@@ -927,6 +931,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.returnValue = '';
         }
     });
-    
+
     console.log('🎉 Dashboard initialized');
 });
