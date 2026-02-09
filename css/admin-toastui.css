@@ -391,96 +391,55 @@
 .posts-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.post-item {
-    background: var(--admin-card);
-    border: 1px solid var(--admin-border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    transition: all 0.3s;
-}
-
-.post-item:hover {
-    border-color: var(--admin-primary);
-    box-shadow: 0 0 20px rgba(206, 177, 128, 0.15);
-}
-
-.post-header {
+.post-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-}
-
-.post-title-link {
-    color: var(--admin-primary);
-    text-decoration: none;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.post-title-link:hover {
-    text-decoration: underline;
-}
-
-.post-badges {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.status-badge {
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-.status-badge.public {
-    background: rgba(76, 175, 80, 0.2);
-    color: var(--admin-success);
+.post-row:hover {
+    background: rgba(255, 255, 255, 0.03);
 }
 
-.status-badge.private {
-    background: rgba(244, 67, 54, 0.2);
-    color: var(--admin-danger);
-}
-
-.post-meta {
-    color: var(--admin-text-dim);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-}
-
-.post-actions {
+.post-row-left {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
 }
 
-.action-btn {
-    padding: 0.4rem 0.8rem;
-    background: transparent;
-    border: 1px solid var(--admin-border);
-    color: var(--admin-text);
-    border-radius: 6px;
-    cursor: pointer;
+.post-row-title {
+    color: #FFB74D;
+    /* Orange/Gold from image */
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.private-tag {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.post-row-right {
+    text-align: right;
+}
+
+.post-row-date {
+    color: rgba(255, 255, 255, 0.4);
     font-size: 0.9rem;
-    transition: all 0.3s;
+    font-family: sans-serif;
 }
 
-.action-btn:hover {
-    border-color: var(--admin-primary);
-    background: var(--admin-hover);
-}
-
-.action-btn.danger:hover {
-    border-color: var(--admin-danger);
-    background: rgba(244, 67, 54, 0.1);
-    color: var(--admin-danger);
+/* Hide old styles if not used, or keep for other sections */
+.post-item {
+    display: none;
 }
 
 .loading {
