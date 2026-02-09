@@ -353,6 +353,10 @@ async function saveHomeSettings() {
 // ═══════════════════════════════════════════════════
 // POSTS MANAGEMENT
 // ═══════════════════════════════════════════════════
+let selectedPosts = new Set();
+let postEditorInstance = null;
+let currentEditingId = null;
+
 async function loadPosts() {
     try {
         const { data: posts, error } = await supabaseClient
@@ -371,13 +375,26 @@ async function loadPosts() {
 
         const container = document.getElementById('postsList');
         document.getElementById('postCount').textContent = posts ? posts.length : 0;
+        selectedPosts.clear();
+        updateDeleteButton();
 
         if (!posts || posts.length === 0) {
             container.innerHTML = '<p style="color: var(--admin-text-dim); text-align: center; padding: 3rem;">게시물이 없습니다.</p>';
             return;
         }
 
-        container.innerHTML = posts.map(post => {
+        let html = `
+            <div class="post-list-header">
+                <div class="post-col-checkbox">
+                    <input type="checkbox" id="selectAllPosts" onchange="toggleSelectAll(this)">
+                </div>
+                <div class="post-col-title">제목</div>
+                <div class="post-col-date">작성일</div>
+                <div class="post-col-actions">관리</div>
+            </div>
+        `;
+
+        html += posts.map(post => {
             const date = new Date(post.created_at).toLocaleDateString('ko-KR', {
                 year: 'numeric',
                 month: 'numeric',
@@ -386,6 +403,9 @@ async function loadPosts() {
 
             return `
                 <div class="post-row" onclick="editPost('${post.id}')">
+                    <div class="post-col-checkbox" onclick="event.stopPropagation()">
+                        <input type="checkbox" class="post-checkbox" value="${post.id}" onchange="togglePostSelection('${post.id}')">
+                    </div>
                     <div class="post-row-left">
                         <span class="post-row-title">${post.title}</span>
                         ${post.is_private ? '<span class="private-tag">🔒</span>' : ''}
@@ -393,9 +413,14 @@ async function loadPosts() {
                     <div class="post-row-right">
                         <span class="post-row-date">${date}</span>
                     </div>
+                     <div class="post-row-actions" onclick="event.stopPropagation()">
+                        <button class="action-btn danger" onclick="deletePost('${post.id}', '${post.title.replace(/'/g, "\\'")}')">🗑️</button>
+                    </div>
                 </div>
             `;
         }).join('');
+
+        container.innerHTML = html;
 
     } catch (error) {
         console.error('Posts loading failed:', error);
@@ -403,13 +428,217 @@ async function loadPosts() {
     }
 }
 
-window.showNewPostEditor = function () {
-    window.location.href = 'admin-toastui.html?action=new';
+window.toggleSelectAll = function (source) {
+    const checkboxes = document.querySelectorAll('.post-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = source.checked;
+        if (source.checked) selectedPosts.add(cb.value);
+        else selectedPosts.delete(cb.value);
+    });
+    updateDeleteButton();
 };
 
-window.editPost = function (id) {
-    window.location.href = `admin-toastui.html?action=edit&id=${id}`;
+window.togglePostSelection = function (id) {
+    if (selectedPosts.has(id)) {
+        selectedPosts.delete(id);
+    } else {
+        selectedPosts.add(id);
+    }
+    updateDeleteButton();
+
+    // Update select all checkbox
+    const all = document.querySelectorAll('.post-checkbox');
+    const checked = document.querySelectorAll('.post-checkbox:checked');
+    const selectAll = document.getElementById('selectAllPosts');
+    if (selectAll) {
+        selectAll.checked = all.length === checked.length;
+        selectAll.indeterminate = checked.length > 0 && checked.length < all.length;
+    }
 };
+
+function updateDeleteButton() {
+    const btn = document.getElementById('deleteSelectedBtn');
+    if (btn) {
+        btn.style.display = selectedPosts.size > 0 ? 'inline-block' : 'none';
+        btn.textContent = `🗑️ 선택 삭제 (${selectedPosts.size})`;
+    }
+}
+
+window.deleteSelectedPosts = async function () {
+    if (selectedPosts.size === 0) return;
+
+    if (!confirm(`선택한 ${selectedPosts.size}개의 게시글을 삭제하시겠습니까?\n\n휴지통으로 이동됩니다.`)) {
+        return;
+    }
+
+    try {
+        const ids = Array.from(selectedPosts);
+
+        // 1. Fetch posts data to save in trash
+        const { data: postsToDelete } = await supabaseClient
+            .from('archive_posts')
+            .select('*')
+            .in('id', ids);
+
+        if (postsToDelete && postsToDelete.length > 0) {
+            // 2. Insert into trash
+            const trashItems = postsToDelete.map(post => ({
+                item_type: 'post',
+                item_id: post.id,
+                item_data: post
+            }));
+
+            await supabaseClient.from('trash').insert(trashItems);
+
+            // 3. Delete from actual table
+            await supabaseClient.from('archive_posts').delete().in('id', ids);
+
+            alert('✅ 선택한 게시글이 휴지통으로 이동되었습니다.');
+            loadPosts();
+            loadStatistics();
+        }
+    } catch (error) {
+        console.error('Bulk delete failed:', error);
+        alert('❌ 일괄 삭제 실패: ' + error.message);
+    }
+};
+
+window.showNewPostEditor = function () {
+    currentEditingId = null;
+    document.getElementById('postEditorView').style.display = 'block';
+    document.getElementById('postsList').style.display = 'none';
+    document.getElementById('editorTitle').textContent = '새 글 작성';
+
+    // Reset form
+    document.getElementById('postTitle').value = '';
+    document.getElementById('postCategory').value = '';
+    document.getElementById('isPrivate').checked = false;
+    document.getElementById('originFree').checked = false;
+
+    initPostEditor('');
+
+    // Populate categories in editor dropdown
+    const categorySelect = document.getElementById('postCategory');
+    if (categorySelect && currentCategories.length > 0) {
+        const subCategories = currentCategories.filter(c => c.parent_id);
+
+        categorySelect.innerHTML = '<option value="">카테고리 선택</option>' +
+            subCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+    }
+};
+
+window.editPost = async function (id) {
+    try {
+        const { data: post, error } = await supabaseClient
+            .from('archive_posts')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        currentEditingId = id;
+        document.getElementById('postEditorView').style.display = 'block';
+        document.getElementById('postsList').style.display = 'none';
+        document.getElementById('editorTitle').textContent = '글 수정';
+
+        document.getElementById('postTitle').value = post.title;
+        document.getElementById('isPrivate').checked = post.is_private;
+        document.getElementById('originFree').checked = !post.origin_free;
+
+        // Populate categories
+        const categorySelect = document.getElementById('postCategory');
+        if (categorySelect && currentCategories.length > 0) {
+            const subCategories = currentCategories.filter(c => c.parent_id);
+            categorySelect.innerHTML = '<option value="">카테고리 선택</option>' +
+                subCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+            categorySelect.value = post.category_id || '';
+        }
+
+        initPostEditor(post.content);
+
+    } catch (error) {
+        console.error('Failed to load post for edit:', error);
+        alert('게시글 정보를 불러오는데 실패했습니다.');
+    }
+};
+
+function initPostEditor(content) {
+    if (!postEditorInstance) {
+        postEditorInstance = new toastui.Editor({
+            el: document.querySelector('#editor'),
+            height: '600px',
+            initialEditType: 'markdown',
+            previewStyle: 'vertical',
+            theme: 'dark',
+            initialValue: content
+        });
+    } else {
+        postEditorInstance.setMarkdown(content || '');
+    }
+}
+
+// Back button handler
+document.getElementById('backToListBtn').addEventListener('click', () => {
+    if (postEditorInstance && postEditorInstance.getMarkdown().length > 0) {
+        // Simple check if content exists, ideally check if changed. 
+        // For now, removing confirmation to avoid annoyance or keep it simple
+    }
+    document.getElementById('postEditorView').style.display = 'none';
+    document.getElementById('postsList').style.display = 'block';
+});
+
+// Save/Publish handlers
+document.getElementById('saveDraftBtn').addEventListener('click', () => savePost(true));
+document.getElementById('publishPostBtn').addEventListener('click', () => savePost(false));
+
+async function savePost(isDraft) {
+    const title = document.getElementById('postTitle').value.trim();
+    const categoryId = document.getElementById('postCategory').value;
+    const isPrivate = document.getElementById('isPrivate').checked;
+    const originFree = !document.getElementById('originFree').checked;
+    const content = postEditorInstance.getMarkdown();
+
+    if (!title) {
+        alert('제목을 입력하세요.');
+        return;
+    }
+    if (!categoryId) {
+        alert('카테고리를 선택하세요.');
+        return;
+    }
+
+    try {
+        const postData = {
+            title: title,
+            content: content,
+            category_id: categoryId,
+            is_private: isDraft ? true : isPrivate,
+            origin_free: originFree,
+            updated_at: new Date().toISOString()
+        };
+
+        if (!currentEditingId) {
+            // New Post
+            postData.created_at = new Date().toISOString();
+            await supabaseClient.from('archive_posts').insert(postData);
+            alert('✅ 게시글이 등록되었습니다!');
+        } else {
+            // Update Post
+            await supabaseClient.from('archive_posts').update(postData).eq('id', currentEditingId);
+            alert('✅ 게시글이 수정되었습니다!');
+        }
+
+        document.getElementById('postEditorView').style.display = 'none';
+        document.getElementById('postsList').style.display = 'block';
+        loadPosts();
+        loadStatistics();
+
+    } catch (error) {
+        console.error('Save failed:', error);
+        alert('❌ 저장 실패: ' + error.message);
+    }
+}
 
 window.copyPostLink = function (url) {
     navigator.clipboard.writeText(url).then(() => {

@@ -563,7 +563,6 @@ body.dark-theme {
         border-left: 3px solid var(--admin-primary);
     }
 
-    s;
 }
 
 .post-item:hover,
@@ -904,14 +903,48 @@ body.dark-theme {
 .posts-list {
     display: flex;
     flex-direction: column;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
     gap: 0;
-    /* Override previous gap */
+    margin-top: 1rem;
 }
 
-.post-row {
+/* Header */
+.post-list-header {
+    display: grid;
+    grid-template-columns: 50px 1fr 120px 80px;
+    /* Checkbox, Title, Date, Actions */
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--admin-border);
+    border-radius: 8px 8px 0 0;
+    color: var(--admin-text-dim);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.post-col-checkbox {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
+}
+
+.post-col-title {
+    padding-left: 0.5rem;
+}
+
+.post-col-date {
+    text-align: center;
+}
+
+.post-col-actions {
+    text-align: center;
+}
+
+/* Rows */
+.post-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 120px 80px;
+    /* Match header */
     align-items: center;
     padding: 1.2rem 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -928,13 +961,17 @@ body.dark-theme {
     display: flex;
     align-items: center;
     gap: 0.8rem;
+    padding-left: 0.5rem;
+    overflow: hidden;
 }
 
 .post-row-title {
     color: #FFB74D;
-    /* Orange/Gold */
     font-size: 1.1rem;
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .private-tag {
@@ -944,13 +981,18 @@ body.dark-theme {
 }
 
 .post-row-right {
-    text-align: right;
+    text-align: center;
 }
 
 .post-row-date {
     color: rgba(255, 255, 255, 0.4);
     font-size: 0.9rem;
     font-family: sans-serif;
+}
+
+.post-row-actions {
+    display: flex;
+    justify-content: center;
 }
 
 /* Ensure old card styles don't interfere */
