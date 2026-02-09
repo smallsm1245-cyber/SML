@@ -689,6 +689,8 @@ let deletedCategoryIds = new Set();
 
 async function loadCategories() {
     deletedCategoryIds.clear();
+    console.log('📥 loadCategories called - fetching from database...');
+
     try {
         const { data: categories, error } = await supabaseClient
             .from('categories')
@@ -696,6 +698,9 @@ async function loadCategories() {
             .order('display_order', { ascending: true });
 
         if (error) throw error;
+
+        console.log('📊 Categories loaded from DB:', categories);
+        console.log('📊 Total count:', categories ? categories.length : 0);
 
         // Map parent_id to is_sub for UI compatibility
         currentCategories = (categories || []).map(cat => ({
