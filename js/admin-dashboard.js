@@ -357,9 +357,20 @@ let selectedPosts = new Set();
 let postEditorInstance = null;
 let currentEditingId = null;
 
+// Pagination and Filter State
+let postCurrentPage = 1;
+const postPageSize = 10;
+let postSearchKeyword = '';
+let postSelectedCategory = '';
+let postSelectedStatus = '';
+
 async function loadPosts() {
     try {
-        const { data: posts, error } = await supabaseClient
+        const container = document.getElementById('postsList');
+        const paginationContainer = document.getElementById('postsPagination');
+        
+        // Build Supabase query
+        let query = supabaseClient
             .from('archive_posts')
             .select(`
                 id,
@@ -368,18 +379,42 @@ async function loadPosts() {
                 created_at,
                 updated_at,
                 category_id
-            `)
-            .order('created_at', { ascending: false });
+            `, { count: 'exact' });
+
+        // Apply Search
+        if (postSearchKeyword) {
+            query = query.ilike('title', `%${postSearchKeyword}%`);
+        }
+
+        // Apply Category Filter
+        if (postSelectedCategory) {
+            query = query.eq('category_id', postSelectedCategory);
+        }
+
+        // Apply Status Filter
+        if (postSelectedStatus === 'public') {
+            query = query.eq('is_private', false);
+        } else if (postSelectedStatus === 'private') {
+            query = query.eq('is_private', true);
+        }
+
+        // Pagination
+        const from = (postCurrentPage - 1) * postPageSize;
+        const to = from + postPageSize - 1;
+        
+        const { data: posts, error, count } = await query
+            .order('created_at', { ascending: false })
+            .range(from, to);
 
         if (error) throw error;
 
-        const container = document.getElementById('postsList');
-        document.getElementById('postCount').textContent = posts ? posts.length : 0;
+        document.getElementById('postCount').textContent = count || 0;
         selectedPosts.clear();
         updateDeleteButton();
 
         if (!posts || posts.length === 0) {
-            container.innerHTML = '<p style="color: var(--admin-text-dim); text-align: center; padding: 3rem;">게시물이 없습니다.</p>';
+            container.innerHTML = '<p style="color: var(--admin-text-dim); text-align: center; padding: 3rem;">검색 결과가 없습니다.</p>';
+            paginationContainer.innerHTML = '';
             return;
         }
 
@@ -421,12 +456,55 @@ async function loadPosts() {
         }).join('');
 
         container.innerHTML = html;
+        renderPagination(count);
 
     } catch (error) {
         console.error('Posts loading failed:', error);
         document.getElementById('postsList').innerHTML = '<p style="color: var(--admin-danger);">데이터를 불러오지 못했습니다.</p>';
     }
 }
+
+function renderPagination(totalCount) {
+    const container = document.getElementById('postsPagination');
+    if (!container) return;
+
+    const totalPages = Math.ceil(totalCount / postPageSize);
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = '<div class="pagination">';
+    
+    // Previous Button
+    html += `<button class="page-btn" ${postCurrentPage === 1 ? 'disabled' : ''} onclick="changePage(${postCurrentPage - 1})">이전</button>`;
+
+    // Page Numbers (Simple version: show all or limited)
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, postCurrentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    if (endPage - startPage + 1 < maxPagesToShow) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="page-btn ${i === postCurrentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+    }
+
+    // Next Button
+    html += `<button class="page-btn" ${postCurrentPage === totalPages ? 'disabled' : ''} onclick="changePage(${postCurrentPage + 1})">다음</button>`;
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+window.changePage = function(page) {
+    postCurrentPage = page;
+    loadPosts();
+    // Scroll to top of section
+    document.getElementById('section-posts').scrollIntoView({ behavior: 'smooth' });
+};
 
 window.toggleSelectAll = function (source) {
     const checkboxes = document.querySelectorAll('.post-checkbox');
@@ -1427,6 +1505,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (section === 'trash') loadTrash();
         });
     });
+
+    // Search and Filters for Posts
+    const postSearch = document.getElementById('postSearch');
+    const postCatFilter = document.getElementById('postFilterCategory');
+    const postStatusFilter = document.getElementById('postFilterStatus');
+
+    if (postSearch) {
+        let debounceTimer;
+        postSearch.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                postSearchKeyword = e.target.value.trim();
+                postCurrentPage = 1;
+                loadPosts();
+            }, 300);
+        });
+    }
+
+    if (postCatFilter) {
+        postCatFilter.addEventListener('change', (e) => {
+            postSelectedCategory = e.target.value;
+            postCurrentPage = 1;
+            loadPosts();
+        });
+    }
+
+    if (postStatusFilter) {
+        postStatusFilter.addEventListener('change', (e) => {
+            postSelectedStatus = e.target.value;
+            postCurrentPage = 1;
+            loadPosts();
+        });
+    }
 
     // Home preview real-time
     ['homeTitle', 'homeSubtitle', 'homeContent'].forEach(id => {

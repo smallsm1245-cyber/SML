@@ -999,3 +999,47 @@ body.dark-theme {
 .post-item {
     display: none;
 }
+
+/* ═══════════════════════════════════════════════════
+   PAGINATION
+   ═══════════════════════════════════════════════════ */
+.pagination-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.page-btn {
+    padding: 0.5rem 1rem;
+    background: var(--admin-panel);
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text-dim);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+    border-color: var(--admin-primary);
+    color: var(--admin-primary);
+    background: var(--admin-hover);
+}
+
+.page-btn.active {
+    background: var(--admin-primary);
+    color: var(--admin-bg);
+    border-color: var(--admin-primary);
+    font-weight: 600;
+}
+
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
