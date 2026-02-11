@@ -368,7 +368,7 @@ async function loadPosts() {
     try {
         const container = document.getElementById('postsList');
         const paginationContainer = document.getElementById('postsPagination');
-        
+
         // Build Supabase query
         let query = supabaseClient
             .from('archive_posts')
@@ -401,7 +401,7 @@ async function loadPosts() {
         // Pagination
         const from = (postCurrentPage - 1) * postPageSize;
         const to = from + postPageSize - 1;
-        
+
         const { data: posts, error, count } = await query
             .order('created_at', { ascending: false })
             .range(from, to);
@@ -475,7 +475,7 @@ function renderPagination(totalCount) {
     }
 
     let html = '<div class="pagination">';
-    
+
     // Previous Button
     html += `<button class="page-btn" ${postCurrentPage === 1 ? 'disabled' : ''} onclick="changePage(${postCurrentPage - 1})">이전</button>`;
 
@@ -483,7 +483,7 @@ function renderPagination(totalCount) {
     const maxPagesToShow = 5;
     let startPage = Math.max(1, postCurrentPage - Math.floor(maxPagesToShow / 2));
     let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-    
+
     if (endPage - startPage + 1 < maxPagesToShow) {
         startPage = Math.max(1, endPage - maxPagesToShow + 1);
     }
@@ -494,12 +494,12 @@ function renderPagination(totalCount) {
 
     // Next Button
     html += `<button class="page-btn" ${postCurrentPage === totalPages ? 'disabled' : ''} onclick="changePage(${postCurrentPage + 1})">다음</button>`;
-    
+
     html += '</div>';
     container.innerHTML = html;
 }
 
-window.changePage = function(page) {
+window.changePage = function (page) {
     postCurrentPage = page;
     loadPosts();
     // Scroll to top of section
@@ -1301,7 +1301,7 @@ function toggleTheme() {
     localStorage.setItem('admin_theme', isDark ? 'dark' : 'light');
 
     const icon = document.querySelector('#themeToggle .icon');
-    icon.textContent = isDark ? '☀️' : '🌙';
+    icon.textContent = isDark ? '🌿' : '🌙';
 }
 
 function togglePreviewTheme() {
@@ -1566,7 +1566,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const savedTheme = localStorage.getItem('admin_theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-theme');
-        document.querySelector('#themeToggle .icon').textContent = '☀️';
+        document.querySelector('#themeToggle .icon').textContent = '🌿';
     }
 
     // Unsaved changes warning

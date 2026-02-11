@@ -550,7 +550,7 @@
 
         if (isNightMode) {
             document.body.classList.add('night-mode');
-            modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
+            modeToggle.innerHTML = '<span>🌿</span><span>Green Library</span>';
         }
 
         modeToggle.addEventListener('click', () => {
@@ -558,7 +558,7 @@
             localStorage.setItem(NIGHT_MODE_KEY, nightMode);
 
             if (nightMode) {
-                modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
+                modeToggle.innerHTML = '<span>🌿</span><span>Green Library</span>';
             } else {
                 modeToggle.innerHTML = '<span>🌙</span><span>Night Library</span>';
             }
