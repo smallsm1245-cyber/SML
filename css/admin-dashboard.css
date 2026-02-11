@@ -6,31 +6,24 @@
    ROOT VARIABLES
    ═══════════════════════════════════════════════════ */
 :root {
-    --admin-bg: #F0F4F0;
-    --admin-panel: #FFFFFF;
-    --admin-card: rgba(255, 255, 255, 0.9);
-    --admin-border: rgba(46, 125, 50, 0.15);
-    --admin-primary: #2E7D32;
-    /* Deep Fresh Green */
-    --admin-primary-light: #A5D6A7;
-    --admin-text: #1B5E20;
-    --admin-text-dim: #66BB6A;
-    --admin-success: #43A047;
-    --admin-warning: #FFB300;
-    --admin-danger: #E53935;
-    --admin-hover: rgba(46, 125, 50, 0.08);
+    --admin-bg: #0F0F0E;
+    --admin-panel: #1A1A18;
+    --admin-card: rgba(25, 25, 23, 0.9);
+    --admin-border: rgba(206, 177, 128, 0.2);
+    --admin-primary: #CEB180;
+    --admin-text: #E8E6E3;
+    --admin-text-dim: #A89F91;
+    --admin-success: #4CAF50;
+    --admin-warning: #FF9800;
+    --admin-danger: #F44336;
+    --admin-hover: rgba(206, 177, 128, 0.1);
 }
 
-/* Dark Mode - Forest Greenery */
+/* Dark Mode */
 body.dark-theme {
-    --admin-bg: #0A140A;
-    --admin-panel: #121B12;
-    --admin-card: rgba(22, 33, 22, 0.95);
-    --admin-border: rgba(165, 214, 167, 0.15);
-    --admin-primary: #81C784;
-    --admin-text: #E8F5E9;
-    --admin-text-dim: #A5D6A7;
-    --admin-hover: rgba(129, 199, 132, 0.12);
+    --admin-bg: #0A0D12;
+    --admin-panel: #0F1419;
+    --admin-card: rgba(15, 20, 28, 0.95);
 }
 
 /* ═══════════════════════════════════════════════════

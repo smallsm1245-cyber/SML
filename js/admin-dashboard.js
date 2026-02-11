@@ -1301,7 +1301,7 @@ function toggleTheme() {
     localStorage.setItem('admin_theme', isDark ? 'dark' : 'light');
 
     const icon = document.querySelector('#themeToggle .icon');
-    icon.textContent = isDark ? '🌿' : '🌙';
+    icon.textContent = isDark ? '☀️' : '🌙';
 }
 
 function togglePreviewTheme() {
@@ -1566,7 +1566,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const savedTheme = localStorage.getItem('admin_theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-theme');
-        document.querySelector('#themeToggle .icon').textContent = '🌿';
+        document.querySelector('#themeToggle .icon').textContent = '☀️';
     }
 
     // Unsaved changes warning
