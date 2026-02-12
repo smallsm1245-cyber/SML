@@ -675,9 +675,11 @@
         `;
 
         detailPanel.classList.add('active');
+        detailPanel.scrollTop = 0; // Scroll detail to top
 
         if (window.innerWidth <= 768) {
             document.body.classList.add('mobile-active');
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
         }
     };
 
@@ -685,6 +687,7 @@
         const detailPanel = document.getElementById('detailPanel');
         if (detailPanel) detailPanel.classList.remove('active');
         document.body.classList.remove('mobile-active');
+        document.body.style.overflow = ''; // Restore scroll
         document.querySelectorAll('.tendency-cell').forEach(c => c.classList.remove('active-cell', 'active-pair'));
     };
 
