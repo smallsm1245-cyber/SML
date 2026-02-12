@@ -300,6 +300,18 @@
                 </li>
             `;
         }).join('');
+
+        // 🔗 Add special link for Tendency Comparison
+        const tendencyLink = `
+            <li class="category-item" style="margin-top: 1rem; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
+                <div class="category-header-wrap">
+                    <a href="tendency-compare.html" class="category-link special-link" style="color: var(--primary-brass); font-weight: 700;">
+                        <span class="cat-name">⚖️ Top / Bottom 세부 성향</span>
+                    </a>
+                </div>
+            </li>
+        `;
+        nav.insertAdjacentHTML('beforeend', tendencyLink);
     }
 
     window.toggleAccordion = function (id) {
