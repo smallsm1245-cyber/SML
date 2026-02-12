@@ -1062,16 +1062,39 @@
             const isAdmin = document.body.classList.contains('is-admin');
 
             accordions.forEach(acc => {
+                const content = acc.querySelector('.accordion-content');
                 if (isAdmin) {
                     acc.classList.add('expanded');
+                    if (content && !content.querySelector('textarea')) {
+                        const originalHtml = content.innerHTML;
+                        const text = content.innerText.trim();
+                        content.setAttribute('data-original-html', originalHtml);
+                        content.innerHTML = `<textarea class="admin-inline-edit" style="width:100%; height:150px; background:#1a1a1a; color:#fff; border:1px solid var(--primary-brass); padding:10px; font-family:var(--font-body);">${text}</textarea>
+                        <div style="margin-top:10px; text-align:right;"><button class="util-btn" onclick="saveInlineEdit(this)">[저장]</button></div>`;
+                    }
                 } else {
                     acc.classList.remove('expanded');
+                    if (content && content.hasAttribute('data-original-html')) {
+                        content.innerHTML = content.getAttribute('data-original-html');
+                        content.removeAttribute('data-original-html');
+                    }
                 }
             });
         };
 
         window.showHistory = function () { alert('역사 기록 (Coming Soon)'); };
         window.showDiscussion = function () { alert('토론 광장 (Coming Soon)'); };
+
+        window.saveInlineEdit = function (btn) {
+            const content = btn.closest('.accordion-content');
+            const textarea = content.querySelector('textarea');
+            if (textarea) {
+                const newText = textarea.value;
+                console.log('💾 Saving content:', newText);
+                content.innerHTML = newText.replace(/\n/g, '<br>');
+                alert('내용이 임시 저장되었습니다.');
+            }
+        };
 
         // Progress Bar Listener
         window.addEventListener('scroll', () => {

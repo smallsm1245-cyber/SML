@@ -22,10 +22,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- Manifest & PWA -->
+    <!-- Manifest & PWA icons -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#B68D40">
-    <link rel="apple-touch-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16x16.png">
 
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
@@ -121,17 +123,16 @@
         </main>
     </div>
 
-    <!-- Bottom Navigation Bar (Mobile / Minimalist) -->
+    <!-- Bottom Navigation Bar (Minimalist 3-Menu) -->
     <nav class="bottom-nav">
+        <button class="nav-item" onclick="document.getElementById('searchInput')?.focus()">
+            <span class="nav-label">[검색]</span>
+        </button>
+        <div class="nav-divider"></div>
         <button class="nav-item" onclick="window.location.reload()">
             <span class="nav-label">[홈]</span>
         </button>
-        <button class="nav-item" onclick="toggleMobileSidebar()">
-            <span class="nav-label">[성격]</span>
-        </button>
-        <button class="nav-item" onclick="openDualComparison()">
-            <span class="nav-label">[비교]</span>
-        </button>
+        <div class="nav-divider"></div>
         <button class="nav-item exit-item" onclick="quickExit()">
             <span class="nav-label">[탈출]</span>
         </button>
