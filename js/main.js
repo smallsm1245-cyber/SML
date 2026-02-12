@@ -629,22 +629,26 @@
 
                         <!-- Slot A -->
                         <div class="tendency-detail-panel slot-a" id="detailPanelA">
-                            <button class="slot-clear-btn" onclick="clearSlot('a')">✕ 초기화</button>
-                            <div class="detail-content" id="detailContentA">
-                                <div class="detail-placeholder">
-                                    <p>성향 A를 선택하세요.</p>
-                                </div>
+                            <div class="slot-header">
+                                <button class="slot-action-btn" onclick="openSelector('a')">📋 변경</button>
+                                <button class="slot-action-btn clear" onclick="clearSlot('a')">✕ 초기화</button>
                             </div>
+                            <div class="detail-content" id="detailContentA">
+                                ${getPlaceholderHtml('a')}
+                            </div>
+                            <div class="selector-overlay" id="selectorA"></div>
                         </div>
 
                         <!-- Slot B -->
                         <div class="tendency-detail-panel slot-b" id="detailPanelB">
-                            <button class="slot-clear-btn" onclick="clearSlot('b')">✕ 초기화</button>
-                            <div class="detail-content" id="detailContentB">
-                                <div class="detail-placeholder">
-                                    <p>성향 B를 선택하세요.</p>
-                                </div>
+                            <div class="slot-header">
+                                <button class="slot-action-btn" onclick="openSelector('b')">📋 변경</button>
+                                <button class="slot-action-btn clear" onclick="clearSlot('b')">✕ 초기화</button>
                             </div>
+                            <div class="detail-content" id="detailContentB">
+                                ${getPlaceholderHtml('b')}
+                            </div>
+                            <div class="selector-overlay" id="selectorB"></div>
                         </div>
 
                         <button class="mobile-close-btn" onclick="closeDualOverlay()">✕ 닫기</button>
@@ -662,6 +666,18 @@
             console.error('Tendencies load failed:', error);
             mainContent.innerHTML = `<p style="color:red">데이터 로딩 실패: ${error.message}</p>`;
         }
+    }
+
+    function getPlaceholderHtml(slot) {
+        return `
+            <div class="detail-placeholder">
+                <p class="placeholder-text">성향 ${slot.toUpperCase()}를 선택하세요.</p>
+                <div class="cta-group">
+                    <button class="cta-btn top" onclick="openSelector('${slot}', 'top')">⬆️ TOP 리스트</button>
+                    <button class="cta-btn bottom" onclick="openSelector('${slot}', 'bottom')">⬇️ BOTTOM 리스트</button>
+                </div>
+            </div>
+        `;
     }
 
     function formatDescription(text) {
@@ -730,6 +746,8 @@
             </div>
         `;
         panel.scrollTop = 0;
+        // Close selector if open
+        document.getElementById(`selector${slot.toUpperCase()}`).classList.remove('active');
     }
 
     function updateHighlights() {
@@ -753,13 +771,67 @@
 
         panel.classList.remove('has-content');
         if (tab) tab.textContent = `성향 ${slot.toUpperCase()}`;
+        content.innerHTML = getPlaceholderHtml(slot);
+        updateHighlights();
+        document.getElementById(`selector${slot.toUpperCase()}`).classList.remove('active');
+    };
 
-        content.innerHTML = `
-            <div class="detail-placeholder">
-                <p>성향 ${slot.toUpperCase()}를 선택하세요.</p>
+    window.openSelector = function (slot, filterType = null) {
+        const overlay = document.getElementById(`selector${slot.toUpperCase()}`);
+        if (!overlay) return;
+
+        // Smart Suggestion Logic
+        const otherSlot = slot === 'a' ? 'b' : 'a';
+        const otherData = window.dualSelected[otherSlot];
+
+        // If user didn't specify a filterType, let's suggest the opposite of the other slot
+        if (!filterType && otherData) {
+            filterType = (otherData.type === 'top') ? 'bottom' : 'top';
+        }
+
+        const tops = window.tendencyData.filter(t => t.type === 'top');
+        const bottoms = window.tendencyData.filter(t => t.type === 'bottom');
+
+        let html = `
+            <div class="selector-content">
+                <div class="selector-header">
+                    <h3>성향 선택 (${slot.toUpperCase()})</h3>
+                    <button class="close-selector" onclick="this.closest('.selector-overlay').classList.remove('active')">✕</button>
+                </div>
+                <div class="selector-groups">
+                    <div class="selector-group top-group ${(!filterType || filterType === 'top') ? 'expanded' : ''}" id="group-top-${slot}">
+                        <h4 class="group-title" onclick="toggleGroup('top-${slot}')">⬆️ TOP 성향</h4>
+                        <div class="group-items">
+                            ${tops.map(t => `
+                                <button class="select-item" onclick="showDetail('${t.id}', 'top')">
+                                    ${t.name}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="selector-group bottom-group ${(!filterType || filterType === 'bottom') ? 'expanded' : ''}" id="group-bottom-${slot}">
+                        <h4 class="group-title" onclick="toggleGroup('bottom-${slot}')">⬇️ BOTTOM 성향</h4>
+                        <div class="group-items">
+                            ${bottoms.map(t => `
+                                <button class="select-item" onclick="showDetail('${t.id}', 'bottom')">
+                                    ${t.name}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
-        updateHighlights();
+
+        overlay.innerHTML = html;
+        overlay.classList.add('active');
+    };
+
+    window.toggleGroup = function (groupId) {
+        const group = document.getElementById(`group-${groupId}`);
+        if (group) {
+            group.classList.toggle('expanded');
+        }
     };
 
     window.switchMobileSlot = function (slot) {
