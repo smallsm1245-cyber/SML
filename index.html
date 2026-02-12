@@ -48,18 +48,6 @@
         <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <!-- Age Verification Disclaimer -->
-    <div id="disclaimerOverlay" class="disclaimer-overlay">
-        <div class="disclaimer-content">
-            <h2>성인 인증</h2>
-            <p>본 사이트는 성인 지향 콘텐츠를 포함하고 있습니다.<br>
-                귀하는 만 19세 이상이십니까?</p>
-            <div class="disclaimer-buttons">
-                <button class="btn btn-primary" id="btnYes">예 (19세 이상)</button>
-                <button class="btn btn-secondary" id="btnNo">아니요</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Mobile Header (Visible only on mobile) -->
     <header class="mobile-header">
@@ -72,7 +60,7 @@
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
     <!-- Main App Container -->
-    <div class="app-container content-blur" id="appContainer">
+    <div class="app-container" id="appContainer">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -144,6 +132,19 @@
         <button class="fab-action" onclick="openSelector('a')">📋 대상 A</button>
         <button class="fab-action" onclick="openSelector('b')">📋 대상 B</button>
         <button class="fab-action" onclick="toggleTOC()">📑 목차</button>
+    </div>
+
+    <!-- Age Verification Disclaimer -->
+    <div id="disclaimerOverlay" class="disclaimer-overlay">
+        <div class="disclaimer-content">
+            <h2>성인 인증</h2>
+            <p>본 사이트는 성인 지향 콘텐츠를 포함하고 있습니다.<br>
+                귀하는 만 19세 이상이십니까?</p>
+            <div class="disclaimer-buttons">
+                <button class="btn btn-primary" id="btnYes">예 (19세 이상)</button>
+                <button class="btn btn-secondary" id="btnNo">아니요</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
