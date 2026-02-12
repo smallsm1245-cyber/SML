@@ -555,8 +555,10 @@
     }
 
     // ═══════════════════════════════════════════════════
-    // TENDENCY VIEW INTEGRATION
+    // TENDENCY VIEW INTEGRATION - DUAL COMPARISON SYSTEM
     // ═══════════════════════════════════════════════════
+    window.dualSelected = { a: null, b: null, activeSlot: 'a' };
+
     async function renderTendencyView() {
         if (!supabaseClient) return;
 
@@ -566,8 +568,8 @@
 
         if (!mainContent) return;
 
-        welcomeTitle.textContent = 'Top / Bottom 성향 비교';
-        if (metaDiv) metaDiv.innerHTML = '<span>서로 대비되는 관점의 1:1 비교 분석</span>';
+        welcomeTitle.textContent = 'Top / Bottom 성향 듀얼 비교';
+        if (metaDiv) metaDiv.innerHTML = '<span>두 가지 성향을 동시에 선택하여 대조 분석 (데스크탑: 병렬 / 모바일: 탭)</span>';
 
         mainContent.innerHTML = `<div class="loading-container"><div class="loading"></div></div>`;
 
@@ -583,13 +585,15 @@
             const bottoms = (tendencies || []).filter(t => t.type === 'bottom');
 
             let gridHtml = `
-                <div class="tendency-container">
-                    <div class="tendency-list-panel">
-                        <div class="grid-header">
-                            <div class="header-cell top">TOP</div>
-                            <div class="header-cell bottom">BOTTOM</div>
-                        </div>
-                        <div class="comparison-grid">
+                <div class="tendency-dual-wrapper">
+                    <button class="list-toggle-btn" id="listToggleBtn" onclick="toggleTendencyList()">◀ 리스트 접기</button>
+                    <div class="tendency-container" id="tendencyContainer">
+                        <div class="tendency-list-panel" id="tendencyListPanel">
+                            <div class="grid-header">
+                                <div class="header-cell top">TOP</div>
+                                <div class="header-cell bottom">BOTTOM</div>
+                            </div>
+                            <div class="comparison-grid">
             `;
 
             const maxRows = Math.max(tops.length, bottoms.length);
@@ -614,23 +618,45 @@
             }
 
             gridHtml += `
-                        </div>
-                    </div>
-                    <div class="tendency-detail-panel" id="detailPanel">
-                        <button class="mobile-close-btn" onclick="closeDetail()">✕</button>
-                        <div class="detail-content" id="detailContent">
-                            <div class="detail-placeholder">
-                                <p>성향을 선택하여 상세 내용을 확인하세요.</p>
                             </div>
                         </div>
+
+                        <!-- Mobile Content Switcher Tabs -->
+                        <div class="mobile-switcher" id="mobileSwitcher">
+                            <button class="switch-tab active" onclick="switchMobileSlot('a')" id="tab-a">성향 A</button>
+                            <button class="switch-tab" onclick="switchMobileSlot('b')" id="tab-b">성향 B</button>
+                        </div>
+
+                        <!-- Slot A -->
+                        <div class="tendency-detail-panel slot-a" id="detailPanelA">
+                            <button class="slot-clear-btn" onclick="clearSlot('a')">✕ 초기화</button>
+                            <div class="detail-content" id="detailContentA">
+                                <div class="detail-placeholder">
+                                    <p>성향 A를 선택하세요.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slot B -->
+                        <div class="tendency-detail-panel slot-b" id="detailPanelB">
+                            <button class="slot-clear-btn" onclick="clearSlot('b')">✕ 초기화</button>
+                            <div class="detail-content" id="detailContentB">
+                                <div class="detail-placeholder">
+                                    <p>성향 B를 선택하세요.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="mobile-close-btn" onclick="closeDualOverlay()">✕ 닫기</button>
                     </div>
                 </div>
             `;
 
             mainContent.innerHTML = gridHtml;
-
-            // Make it global for onclick
             window.tendencyData = tendencies;
+
+            // Reset state
+            window.dualSelected = { a: null, b: null, activeSlot: 'a' };
 
         } catch (error) {
             console.error('Tendencies load failed:', error);
@@ -640,55 +666,122 @@
 
     function formatDescription(text) {
         if (!text) return '';
-        // 1. 【 】 Bold
         let formatted = text.replace(/【(.*?)】/g, '<strong>【$1】</strong>');
-        // 2. Newline to <br>
         formatted = formatted.replace(/\n/g, '<br>');
         return formatted;
     }
 
-    window.showDetail = function (id, type, partnerCellId) {
-        const detailPanel = document.getElementById('detailPanel');
-        const detailContent = document.getElementById('detailContent');
-        if (!detailPanel || !detailContent || !id) return;
-
-        const item = window.tendencyData.find(t => t.id === id);
-        if (!item) return;
-
-        // Visual feedback
-        document.querySelectorAll('.tendency-cell').forEach(c => c.classList.remove('active-cell', 'active-pair'));
-
-        const currentCell = document.getElementById(`cell-${id}`);
-        const partnerCell = document.getElementById(partnerCellId);
-
-        if (currentCell) currentCell.classList.add('active-cell');
-        if (partnerCell) partnerCell.classList.add('active-pair');
-
-        detailContent.innerHTML = `
-            <div class="detail-view">
-                <span class="detail-type-badge ${type}">${type.toUpperCase()}</span>
-                <h2 class="detail-title">${item.name}</h2>
-                <div class="detail-description">
-                    ${formatDescription(item.description)}
-                </div>
-            </div>
-        `;
-
-        detailPanel.classList.add('active');
-        detailPanel.scrollTop = 0; // Scroll detail to top
-
-        if (window.innerWidth <= 768) {
-            document.body.classList.add('mobile-active');
-            document.body.style.overflow = 'hidden'; // Prevent background scroll
+    window.toggleTendencyList = function () {
+        const wrapper = document.querySelector('.tendency-dual-wrapper');
+        const btn = document.getElementById('listToggleBtn');
+        if (wrapper.classList.toggle('list-collapsed')) {
+            btn.textContent = '▶ 리스트 펼치기';
+        } else {
+            btn.textContent = '◀ 리스트 접기';
         }
     };
 
-    window.closeDetail = function () {
-        const detailPanel = document.getElementById('detailPanel');
-        if (detailPanel) detailPanel.classList.remove('active');
-        document.body.classList.remove('mobile-active');
-        document.body.style.overflow = ''; // Restore scroll
-        document.querySelectorAll('.tendency-cell').forEach(c => c.classList.remove('active-cell', 'active-pair'));
+    window.showDetail = function (id, type, partnerCellId) {
+        if (!id) return;
+        const item = window.tendencyData.find(t => t.id === id);
+        if (!item) return;
+
+        // Determine slot
+        let slot = 'a';
+        if (window.dualSelected.a && window.dualSelected.a.id !== id) {
+            slot = 'b';
+        }
+        // If already selected in a slot, just re-activate it (optional: toggle off)
+        if (window.dualSelected.a?.id === id) slot = 'a';
+        if (window.dualSelected.b?.id === id) slot = 'b';
+
+        window.dualSelected[slot] = { id, type, item, partnerCellId };
+        window.dualSelected.activeSlot = slot;
+
+        renderSlot(slot);
+        updateHighlights();
+
+        // Mobile Handling
+        if (window.innerWidth <= 768) {
+            document.getElementById('tendencyContainer').classList.add('mobile-overlay-active');
+            document.body.style.overflow = 'hidden';
+            switchMobileSlot(slot);
+        }
+    };
+
+    function renderSlot(slot) {
+        const data = window.dualSelected[slot];
+        const panel = document.getElementById(`detailPanel${slot.toUpperCase()}`);
+        const content = document.getElementById(`detailContent${slot.toUpperCase()}`);
+        const tab = document.getElementById(`tab-${slot}`);
+
+        if (!data || !content) return;
+
+        panel.classList.add('has-content');
+        if (tab) tab.textContent = data.item.name;
+
+        content.innerHTML = `
+            <div class="detail-view">
+                <span class="detail-type-badge ${data.type}">${data.type.toUpperCase()}</span>
+                <h2 class="detail-title">${data.item.name}</h2>
+                <div class="detail-description">
+                    ${formatDescription(data.item.description)}
+                </div>
+            </div>
+        `;
+        panel.scrollTop = 0;
+    }
+
+    function updateHighlights() {
+        document.querySelectorAll('.tendency-cell').forEach(c => c.classList.remove('active-a', 'active-b', 'pair-a', 'pair-b'));
+
+        if (window.dualSelected.a) {
+            document.getElementById(`cell-${window.dualSelected.a.id}`)?.classList.add('active-a');
+            document.getElementById(window.dualSelected.a.partnerCellId)?.classList.add('pair-a');
+        }
+        if (window.dualSelected.b) {
+            document.getElementById(`cell-${window.dualSelected.b.id}`)?.classList.add('active-b');
+            document.getElementById(window.dualSelected.b.partnerCellId)?.classList.add('pair-b');
+        }
+    }
+
+    window.clearSlot = function (slot) {
+        window.dualSelected[slot] = null;
+        const panel = document.getElementById(`detailPanel${slot.toUpperCase()}`);
+        const content = document.getElementById(`detailContent${slot.toUpperCase()}`);
+        const tab = document.getElementById(`tab-${slot}`);
+
+        panel.classList.remove('has-content');
+        if (tab) tab.textContent = `성향 ${slot.toUpperCase()}`;
+
+        content.innerHTML = `
+            <div class="detail-placeholder">
+                <p>성향 ${slot.toUpperCase()}를 선택하세요.</p>
+            </div>
+        `;
+        updateHighlights();
+    };
+
+    window.switchMobileSlot = function (slot) {
+        window.dualSelected.activeSlot = slot;
+        document.querySelectorAll('.switch-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(`tab-${slot}`)?.classList.add('active');
+
+        const panelA = document.getElementById('detailPanelA');
+        const panelB = document.getElementById('detailPanelB');
+
+        if (slot === 'a') {
+            panelA.style.display = 'flex';
+            panelB.style.display = 'none';
+        } else {
+            panelA.style.display = 'none';
+            panelB.style.display = 'flex';
+        }
+    };
+
+    window.closeDualOverlay = function () {
+        document.getElementById('tendencyContainer').classList.remove('mobile-overlay-active');
+        document.body.style.overflow = '';
     };
 
     function initNightMode() {
