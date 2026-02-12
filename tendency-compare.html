@@ -67,14 +67,21 @@
 
                     <!-- Right: Detail Panel -->
                     <div class="right-pane" id="detailPane">
+                        <button class="detail-close-btn" onclick="closeDetail()" title="닫기">✕</button>
+
                         <div class="detail-placeholder">
                             <div class="placeholder-icon">⚖️</div>
                             <p>궁금한 성향을 클릭하시면<br>상세 내용을 읽어보실 수 있습니다.</p>
                         </div>
+
                         <div class="detail-content" style="display: none;">
-                            <h2 class="detail-title">성향 이름</h2>
-                            <div class="detail-type-badge">TYPE</div>
-                            <div class="detail-description">상세 설명이 여기에 나타납니다.</div>
+                            <div class="detail-header-group">
+                                <h2 class="detail-title">성향 이름</h2>
+                                <div class="detail-type-badge">TYPE</div>
+                            </div>
+                            <div class="detail-scroll-area">
+                                <div class="detail-description">상세 설명이 여기에 나타납니다.</div>
+                            </div>
                         </div>
                     </div>
                 </div>

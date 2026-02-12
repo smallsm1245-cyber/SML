@@ -107,37 +107,95 @@
     opacity: 0.5;
 }
 
+.detail-header-group {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--primary-brass);
+}
+
 .detail-title {
     font-family: var(--font-title);
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     color: var(--primary-brass);
-    margin-bottom: 0.5rem;
-    border-bottom: 1px solid var(--primary-brass);
-    padding-bottom: 0.5rem;
+    margin: 0;
 }
 
 .detail-type-badge {
     display: inline-block;
     font-size: 0.75rem;
-    padding: 0.2rem 0.5rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
     border-radius: 4px;
-    background: rgba(206, 177, 128, 0.1);
+    background: rgba(206, 177, 128, 0.15);
     color: var(--primary-brass);
-    margin-bottom: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.detail-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Custom Scrollbar for detail area */
+.detail-scroll-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.detail-scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.detail-scroll-area::-webkit-scrollbar-thumb {
+    background: var(--primary-brass);
+    opacity: 0.3;
+    border-radius: 3px;
 }
 
 .detail-description {
-    line-height: 1.6;
+    line-height: 1.8;
     color: var(--text-primary);
-    white-space: pre-wrap;
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
-.tendency-cell.active-cell {
-    background: rgba(206, 177, 128, 0.15);
+.detail-description strong {
     color: var(--primary-brass);
-    font-weight: 600;
-    box-shadow: inset 0 0 10px rgba(206, 177, 128, 0.2);
+    display: inline-block;
+    margin-top: 1.2rem;
+    margin-bottom: 0.3rem;
+    font-size: 1.1rem;
+}
+
+.detail-description strong:first-child {
+    margin-top: 0;
+}
+
+/* Highlighting Logic */
+.tendency-cell.active-cell {
+    background: rgba(206, 177, 128, 0.25);
+    color: var(--primary-brass);
+    font-weight: 700;
+    box-shadow: inset 0 0 0 2px var(--primary-brass);
+}
+
+.tendency-cell.active-pair {
+    background: rgba(206, 177, 128, 0.1);
+    border: 1px dashed var(--primary-brass);
+    opacity: 0.8;
+}
+
+.detail-close-btn {
+    display: none;
+    /* Only mobile */
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 100;
 }
 
 /* Mobile Responsiveness */
@@ -158,6 +216,30 @@
         padding: 1rem !important;
     }
 
+    /* Fixed Full-screen Overlay for Mobile Detail */
+    .right-pane {
+        display: none;
+        /* Hidden until active on mobile */
+    }
+
+    .right-pane.mobile-active {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        border-radius: 0;
+        border: none;
+        padding: 2rem;
+        background: var(--bg-panel);
+    }
+
+    .detail-close-btn {
+        display: block;
+    }
+
     .header-col {
         font-size: 1rem;
         padding: 0.8rem;
@@ -167,51 +249,52 @@
         padding: 0.6rem;
         font-size: 0.85rem;
     }
+}
 
-    .compare-header-sticky {
-        grid-template-columns: 1fr;
-        /* Stack visually or hide one? User asked for multi-row cards on mobile */
-    }
+.compare-header-sticky {
+    grid-template-columns: 1fr;
+    /* Stack visually or hide one? User asked for multi-row cards on mobile */
+}
 
-    /* As per request: 모바일에서는 2열 혹은 3열의 작은 카드 형태로 배치 */
-    .tendency-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 0.5rem;
-    }
+/* As per request: 모바일에서는 2열 혹은 3열의 작은 카드 형태로 배치 */
+.tendency-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+}
 
-    .tendency-row {
-        display: contents;
-        /* Row container shouldn't affect grid on mobile */
-    }
+.tendency-row {
+    display: contents;
+    /* Row container shouldn't affect grid on mobile */
+}
 
-    .tendency-cell {
-        background: var(--bg-panel);
-        border: 1px solid var(--glass-border);
-        border-radius: 4px;
-        padding: 0.5rem;
-        font-size: 0.85rem;
-        aspect-ratio: 1;
-        flex-direction: column;
-    }
+.tendency-cell {
+    background: var(--bg-panel);
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    aspect-ratio: 1;
+    flex-direction: column;
+}
 
-    .tendency-cell.top::before {
-        content: 'Top';
-        font-size: 0.7rem;
-        color: var(--primary-brass);
-        margin-bottom: 0.2rem;
-    }
+.tendency-cell.top::before {
+    content: 'Top';
+    font-size: 0.7rem;
+    color: var(--primary-brass);
+    margin-bottom: 0.2rem;
+}
 
-    .tendency-cell.bottom::before {
-        content: 'Bottom';
-        font-size: 0.7rem;
-        color: var(--accent-amber);
-        margin-bottom: 0.2rem;
-    }
+.tendency-cell.bottom::before {
+    content: 'Bottom';
+    font-size: 0.7rem;
+    color: var(--accent-amber);
+    margin-bottom: 0.2rem;
+}
 
-    .compare-header-sticky {
-        display: none;
-    }
+.compare-header-sticky {
+    display: none;
+}
 }
 
 .loading-state {

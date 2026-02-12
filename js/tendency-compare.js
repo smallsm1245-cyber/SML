@@ -60,14 +60,26 @@
             topCell.className = 'tendency-cell top';
             if (pair.top) {
                 topCell.innerHTML = `<span class="name">${pair.top.name}</span>`;
-                topCell.onclick = () => showDetail(pair.top, topCell);
             }
 
             const bottomCell = document.createElement('div');
             bottomCell.className = 'tendency-cell bottom';
             if (pair.bottom) {
                 bottomCell.innerHTML = `<span class="name">${pair.bottom.name}</span>`;
-                bottomCell.onclick = () => showDetail(pair.bottom, bottomCell);
+            }
+
+            // Click handlers
+            if (pair.top) {
+                topCell.onclick = (e) => {
+                    e.stopPropagation();
+                    showDetail(pair.top, topCell, bottomCell);
+                };
+            }
+            if (pair.bottom) {
+                bottomCell.onclick = (e) => {
+                    e.stopPropagation();
+                    showDetail(pair.bottom, bottomCell, topCell);
+                };
             }
 
             row.appendChild(topCell);
@@ -80,7 +92,7 @@
         }
     }
 
-    function showDetail(item, cell) {
+    function showDetail(item, clickedCell, partnerCell) {
         const pane = document.getElementById('detailPane');
         const placeholder = pane.querySelector('.detail-placeholder');
         const content = pane.querySelector('.detail-content');
@@ -90,16 +102,42 @@
 
         content.querySelector('.detail-title').textContent = item.name;
         content.querySelector('.detail-type-badge').textContent = item.type.toUpperCase();
-        content.querySelector('.detail-description').textContent = item.description || '상세 설명이 등록되지 않았습니다.';
 
-        // Highlight active cell
-        document.querySelectorAll('.tendency-cell').forEach(c => c.classList.remove('active-cell'));
-        cell.classList.add('active-cell');
+        // Formatted Description (Line breaks + Bold tags)
+        content.querySelector('.detail-description').innerHTML = formatDescription(item.description);
 
-        // On mobile, scroll to detail
-        if (window.innerWidth <= 768) {
-            pane.scrollIntoView({ behavior: 'smooth' });
+        // Reset and Highlight active pair
+        document.querySelectorAll('.tendency-cell').forEach(c => {
+            c.classList.remove('active-cell', 'active-pair');
+        });
+        clickedCell.classList.add('active-cell');
+
+        // Only highlight partner if it exists
+        if (partnerCell && partnerCell.innerText.trim()) {
+            partnerCell.classList.add('active-pair');
         }
+
+        // Mobile Handling
+        if (window.innerWidth <= 768) {
+            pane.classList.add('mobile-active');
+            document.body.style.overflow = 'hidden';
+        } else {
+            const scrollArea = content.querySelector('.detail-scroll-area');
+            if (scrollArea) scrollArea.scrollTop = 0;
+        }
+    }
+
+    window.closeDetail = function () {
+        const pane = document.getElementById('detailPane');
+        pane.classList.remove('mobile-active');
+        document.body.style.overflow = '';
+    }
+
+    function formatDescription(text) {
+        if (!text) return '<p style="color: var(--text-secondary)">상세 설명이 등록되지 않았습니다.</p>';
+        let formatted = text.replace(/\n/g, '<br>');
+        formatted = formatted.replace(/(【.*?】)/g, '<strong>$1</strong>');
+        return formatted;
     }
 
     // Shared functions for sidebar (Simplified from main.js)
