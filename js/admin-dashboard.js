@@ -25,11 +25,14 @@ function waitForConfig() {
 // SHOW ERROR
 // ═══════════════════════════════════════════════════
 function showError(message) {
+    console.error('Error:', message);
     const loginError = document.getElementById('loginError');
-    if (loginError) {
+    if (loginError && document.getElementById('loginScreen').style.display !== 'none') {
         loginError.textContent = message;
         loginError.classList.add('show');
         setTimeout(() => loginError.classList.remove('show'), 3000);
+    } else {
+        alert(message);
     }
 }
 
@@ -1385,10 +1388,18 @@ function initTendencySortable() {
     });
 }
 
-function updateLocalTendencyName(id, name) {
+window.updateLocalTendencyName = function (id, name) {
     const item = currentTendencies.find(t => t.id === id);
     if (item) {
         item.name = name;
+        hasUnsavedChanges = true;
+    }
+}
+
+window.updateLocalTendencyDesc = function (id, desc) {
+    const item = currentTendencies.find(t => t.id === id);
+    if (item) {
+        item.description = desc;
         hasUnsavedChanges = true;
     }
 }
@@ -1416,13 +1427,19 @@ function updateLocalTendencyMatch(id, matchedId) {
     }
 }
 
-async function addTendency() {
+window.addTendency = async function () {
+    console.log('addTendency called');
     const type = document.getElementById('newTendencyType').value;
     const nameInput = document.getElementById('newTendencyName');
     const name = nameInput.value.trim();
 
     if (!name) {
         showError('성향 이름을 입력해주세요.');
+        return;
+    }
+
+    if (!supabaseClient) {
+        showError('시스템이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
         return;
     }
 
@@ -1453,7 +1470,7 @@ async function addTendency() {
     }
 }
 
-async function deleteTendency(id, name) {
+window.deleteTendency = async function (id, name) {
     if (!confirm(`'${name}'성향을 삭제하시겠습니까?`)) return;
 
     try {
@@ -1472,7 +1489,7 @@ async function deleteTendency(id, name) {
     }
 }
 
-async function saveTendencyAll() {
+window.saveTendencyAll = async function () {
     if (!supabaseClient) return;
 
     const topList = document.getElementById('topTendencyList');
@@ -1779,8 +1796,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('previewThemeToggle').addEventListener('click', togglePreviewTheme);
     document.getElementById('saveSettingsBtn').addEventListener('click', saveSiteSettings);
     document.getElementById('saveSeoBtn').addEventListener('click', saveSeoSettings);
-    document.getElementById('addTendencyBtn').addEventListener('click', addTendency);
-    document.getElementById('saveTendencyAllBtn').addEventListener('click', saveTendencyAll);
+    // Tendency buttons now use onclick in HTML for better reliability
 
     // Mobile menu toggle
     const menuBtn = document.createElement('button');
