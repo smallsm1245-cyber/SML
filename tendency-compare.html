@@ -47,16 +47,36 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="content-panel tendency-compare-panel">
-                <h1 class="post-title">Top / Bottom 세부 성향 비교</h1>
+                <header class="page-header">
+                    <h1 class="post-title">Top / Bottom 세부 성향 비교</h1>
+                    <p class="post-meta">리스트를 클릭하면 우측에서 상세 내용을 확인할 수 있습니다.</p>
+                </header>
 
-                <div class="compare-header-sticky">
-                    <div class="header-col top">- Top</div>
-                    <div class="header-col bottom">- Bottom</div>
-                </div>
+                <div class="split-view-container">
+                    <!-- Left: Comparison Grid -->
+                    <div class="left-pane">
+                        <div class="compare-header-sticky">
+                            <div class="header-col top">- Top</div>
+                            <div class="header-col bottom">- Bottom</div>
+                        </div>
 
-                <div id="tendencyGrid" class="tendency-grid">
-                    <!-- Dynamically loaded pairs -->
-                    <div class="loading-state">기록을 불러오는 중...</div>
+                        <div id="tendencyGrid" class="tendency-grid">
+                            <div class="loading-state">기록을 불러오는 중...</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Detail Panel -->
+                    <div class="right-pane" id="detailPane">
+                        <div class="detail-placeholder">
+                            <div class="placeholder-icon">⚖️</div>
+                            <p>궁금한 성향을 클릭하시면<br>상세 내용을 읽어보실 수 있습니다.</p>
+                        </div>
+                        <div class="detail-content" style="display: none;">
+                            <h2 class="detail-title">성향 이름</h2>
+                            <div class="detail-type-badge">TYPE</div>
+                            <div class="detail-description">상세 설명이 여기에 나타납니다.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

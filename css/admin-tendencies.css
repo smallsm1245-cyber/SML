@@ -34,12 +34,15 @@
     background: var(--admin-card);
     border: 1px solid var(--admin-border);
     border-radius: 8px;
-    padding: 0.8rem 1rem;
+    padding: 1rem;
     display: flex;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.8rem;
     cursor: grab;
     transition: all 0.2s;
+    min-height: 120px;
+    /* Force consistent height for alignment */
+    position: relative;
 }
 
 .tendency-item-admin:hover {
@@ -47,16 +50,38 @@
     background: var(--admin-hover);
 }
 
-.tendency-item-admin .name-input {
-    flex: 1;
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--admin-text);
-    font-size: 1rem;
-    padding: 0.2rem 0.5rem;
+.tendency-item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.tendency-item-admin .name-input:focus {
+.tendency-item-admin .name-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+}
+
+.tendency-item-admin .desc-input {
+    width: 100%;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text-dim);
+    font-size: 0.85rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    resize: none;
+    font-family: inherit;
+}
+
+.tendency-item-admin .name-input:focus,
+.tendency-item-admin .desc-input:focus {
     background: rgba(0, 0, 0, 0.3);
     border-color: var(--admin-primary);
     outline: none;

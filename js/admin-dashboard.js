@@ -1346,24 +1346,17 @@ function renderTendencyLists() {
         div.className = 'tendency-item-admin';
         div.dataset.id = item.id;
 
-        const oppositeItems = type === 'top' ? bottoms : tops;
-        const matchOptions = oppositeItems.map(opt =>
-            `<option value="${opt.id}" ${item.matched_id === opt.id ? 'selected' : ''}>${opt.name}</option>`
-        ).join('');
-
         div.innerHTML = `
-            <span class="drag-handle">⋮⋮</span>
-            <input type="text" class="name-input" value="${item.name}" onchange="updateLocalTendencyName('${item.id}', this.value)">
-            <div class="tendency-match-info">
-                <span>🔗 매칭:</span>
-                <select class="match-select" onchange="updateLocalTendencyMatch('${item.id}', this.value)">
-                    <option value="">없음</option>
-                    ${matchOptions}
-                </select>
-            </div>
-            <div class="tendency-actions">
+            <div class="tendency-item-header">
+                <span class="drag-handle">⋮⋮</span>
+                <input type="text" class="name-input" value="${item.name}" 
+                    onchange="updateLocalTendencyName('${item.id}', this.value)" 
+                    placeholder="성향 이름">
                 <button class="action-btn danger" onclick="deleteTendency('${item.id}', '${item.name}')">🗑️</button>
             </div>
+            <textarea class="desc-input" 
+                onchange="updateLocalTendencyDesc('${item.id}', this.value)" 
+                placeholder="상세 설명...">${item.description || ''}</textarea>
         `;
         return div;
     };
@@ -1371,6 +1364,8 @@ function renderTendencyLists() {
     tops.forEach(t => topList.appendChild(renderItem(t, 'top')));
     bottoms.forEach(b => bottomList.appendChild(renderItem(b, 'bottom')));
 
+    // Ensure empty slots if counts differ? No, just let them be.
+    // However, to help "1:1 matching by order", we should show they alignment.
     initTendencySortable();
 }
 
@@ -1423,9 +1418,19 @@ function updateLocalTendencyMatch(id, matchedId) {
 
 async function addTendency() {
     const type = document.getElementById('newTendencyType').value;
-    const name = document.getElementById('newTendencyName').value.trim();
+    const nameInput = document.getElementById('newTendencyName');
+    const name = nameInput.value.trim();
 
-    if (!name) return;
+    if (!name) {
+        showError('성향 이름을 입력해주세요.');
+        return;
+    }
+
+    // Check for duplicates locally
+    if (currentTendencies.some(t => t.name === name && t.type === type)) {
+        showError('이미 존재하는 성향 이름입니다.');
+        return;
+    }
 
     try {
         const { data, error } = await supabaseClient
@@ -1433,13 +1438,13 @@ async function addTendency() {
             .insert([{
                 type,
                 name,
-                display_order: currentTendencies.length + 1
+                display_order: currentTendencies.filter(t => t.type === type).length + 1
             }])
             .select();
 
         if (error) throw error;
 
-        document.getElementById('newTendencyName').value = '';
+        nameInput.value = '';
         await loadTendencies();
 
     } catch (error) {
@@ -1473,20 +1478,40 @@ async function saveTendencyAll() {
     const topList = document.getElementById('topTendencyList');
     const bottomList = document.getElementById('bottomTendencyList');
 
-    const getItemOrder = (listEl) => {
-        return Array.from(listEl.children).map((child, index) => ({
-            id: child.dataset.id,
-            display_order: index + 1
-        }));
-    };
-
-    const updates = [...getItemOrder(topList), ...getItemOrder(bottomList)];
+    const topOrder = Array.from(topList.children).map((child, index) => ({
+        id: child.dataset.id,
+        display_order: index + 1
+    }));
+    const bottomOrder = Array.from(bottomList.children).map((child, index) => ({
+        id: child.dataset.id,
+        display_order: index + 1
+    }));
 
     try {
-        // Update display_order based on UI sort
-        for (const update of updates) {
-            const item = currentTendencies.find(t => t.id === update.id);
-            if (item) item.display_order = update.display_order;
+        // Prepare updates
+        const allUpdates = [];
+
+        // Update display_order and find matches by index
+        const maxLen = Math.max(topOrder.length, bottomOrder.length);
+
+        for (let i = 0; i < maxLen; i++) {
+            const tId = topOrder[i] ? topOrder[i].id : null;
+            const bId = bottomOrder[i] ? bottomOrder[i].id : null;
+
+            if (tId) {
+                const tItem = currentTendencies.find(t => t.id === tId);
+                if (tItem) {
+                    tItem.display_order = i + 1;
+                    tItem.matched_id = bId; // Match with opposite at same index
+                }
+            }
+            if (bId) {
+                const bItem = currentTendencies.find(t => t.id === bId);
+                if (bItem) {
+                    bItem.display_order = i + 1;
+                    bItem.matched_id = tId; // Match with opposite at same index
+                }
+            }
         }
 
         // Perform bulk update (upsert)
@@ -1497,7 +1522,7 @@ async function saveTendencyAll() {
         if (error) throw error;
 
         hasUnsavedChanges = false;
-        alert('모든 변경사항이 저장되었습니다.');
+        alert('모든 변경사항이 저장되었습니다. (순서와 매칭이 동기화되었습니다)');
         await loadTendencies();
 
     } catch (error) {

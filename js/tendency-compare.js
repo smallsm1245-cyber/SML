@@ -38,34 +38,17 @@
         const grid = document.getElementById('tendencyGrid');
         grid.innerHTML = '';
 
-        const tops = data.filter(t => t.type === 'top');
-        const bottoms = data.filter(t => t.type === 'bottom');
+        const tops = data.sort((a, b) => a.display_order - b.display_order).filter(t => t.type === 'top');
+        const bottoms = data.sort((a, b) => a.display_order - b.display_order).filter(t => t.type === 'bottom');
 
-        // Create pairs based on matched_id
+        // Match by current order for strict 1:1 visualization
+        const maxLen = Math.max(tops.length, bottoms.length);
         let pairs = [];
-        let usedIds = new Set();
 
-        // 1. Matched pairs
-        tops.forEach(t => {
-            if (t.matched_id) {
-                const match = bottoms.find(b => b.id === t.matched_id);
-                if (match) {
-                    pairs.push({ top: t, bottom: match });
-                    usedIds.add(t.id);
-                    usedIds.add(match.id);
-                }
-            }
-        });
-
-        // 2. Unmatched items
-        const remainingTops = tops.filter(t => !usedIds.has(t.id));
-        const remainingBottoms = bottoms.filter(b => !usedIds.has(b.id));
-
-        const maxLen = Math.max(remainingTops.length, remainingBottoms.length);
         for (let i = 0; i < maxLen; i++) {
             pairs.push({
-                top: remainingTops[i] || null,
-                bottom: remainingBottoms[i] || null
+                top: tops[i] || null,
+                bottom: bottoms[i] || null
             });
         }
 
@@ -73,19 +56,49 @@
             const row = document.createElement('div');
             row.className = 'tendency-row';
 
-            row.innerHTML = `
-                <div class="tendency-cell top">
-                    <span class="name">${pair.top ? pair.top.name : ''}</span>
-                </div>
-                <div class="tendency-cell bottom">
-                    <span class="name">${pair.bottom ? pair.bottom.name : ''}</span>
-                </div>
-            `;
+            const topCell = document.createElement('div');
+            topCell.className = 'tendency-cell top';
+            if (pair.top) {
+                topCell.innerHTML = `<span class="name">${pair.top.name}</span>`;
+                topCell.onclick = () => showDetail(pair.top, topCell);
+            }
+
+            const bottomCell = document.createElement('div');
+            bottomCell.className = 'tendency-cell bottom';
+            if (pair.bottom) {
+                bottomCell.innerHTML = `<span class="name">${pair.bottom.name}</span>`;
+                bottomCell.onclick = () => showDetail(pair.bottom, bottomCell);
+            }
+
+            row.appendChild(topCell);
+            row.appendChild(bottomCell);
             grid.appendChild(row);
         });
 
         if (pairs.length === 0) {
             grid.innerHTML = '<div class="loading-state">등록된 성향이 없습니다.</div>';
+        }
+    }
+
+    function showDetail(item, cell) {
+        const pane = document.getElementById('detailPane');
+        const placeholder = pane.querySelector('.detail-placeholder');
+        const content = pane.querySelector('.detail-content');
+
+        placeholder.style.display = 'none';
+        content.style.display = 'block';
+
+        content.querySelector('.detail-title').textContent = item.name;
+        content.querySelector('.detail-type-badge').textContent = item.type.toUpperCase();
+        content.querySelector('.detail-description').textContent = item.description || '상세 설명이 등록되지 않았습니다.';
+
+        // Highlight active cell
+        document.querySelectorAll('.tendency-cell').forEach(c => c.classList.remove('active-cell'));
+        cell.classList.add('active-cell');
+
+        // On mobile, scroll to detail
+        if (window.innerWidth <= 768) {
+            pane.scrollIntoView({ behavior: 'smooth' });
         }
     }
 
