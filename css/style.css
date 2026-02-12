@@ -1521,3 +1521,271 @@ body.night-mode .post-content strong {
 .site-footer {
     position: relative;
 }
+/* ???????????????????????????????????????????????????
+   13. MOBILE OVERHAUL & PREMIUM NAVIGATION
+   ??????????????????????????????????????????????????? */
+
+/* 13.1 Global Navigation Aids */
+.scroll-progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    z-index: 2500;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary-brass), var(--accent-amber));
+    box-shadow: 0 0 10px var(--primary-brass);
+    transition: width 0.1s ease;
+}
+
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 65px;
+    background: rgba(18, 18, 18, 0.95);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid var(--glass-border);
+    z-index: 1000;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.nav-item {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.nav-item:active {
+    transform: scale(0.9);
+}
+
+.nav-icon {
+    font-size: 1.4rem;
+}
+
+.nav-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+.nav-item.exit-item {
+    opacity: 0.6;
+}
+
+.nav-item.exit-item:hover {
+    color: var(--accent-red);
+}
+
+/* FAB Styling */
+#mainFabBtn {
+    position: relative;
+    top: -15px;
+}
+
+.fab-circle {
+    width: 55px;
+    height: 55px;
+    background: linear-gradient(135deg, var(--primary-brass), #ceb180);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg-deep) !important;
+    font-size: 1.6rem;
+    box-shadow: 0 8px 25px rgba(206, 177, 128, 0.4);
+    border: 4px solid var(--bg-deep);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fab-circle.active {
+    transform: rotate(45deg);
+    background: var(--bg-panel);
+    color: var(--primary-brass) !important;
+    border-color: var(--primary-brass);
+}
+
+.fab-menu {
+    position: fixed;
+    bottom: 85px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg-panel);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.fab-menu.active {
+    display: flex;
+    animation: slideUpMobile 0.3s ease forwards;
+}
+
+.fab-action {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    padding: 12px 20px;
+    text-align: left;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.fab-action:active {
+    background: rgba(206, 177, 128, 0.1);
+}
+
+/* 13.2 Mobile Dual Vertical Split (Workspace) */
+@media (max-width: 768px) {
+    .bottom-nav { display: flex; }
+    .main-content { padding-bottom: 75px; }
+
+    .mobile-overlay-active {
+        display: flex !important;
+        flex-direction: column !important;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 2000;
+        background: var(--bg-deep);
+        gap: 0 !important;
+    }
+
+    .mobile-overlay-active .tendency-list-panel {
+        display: none !important;
+    }
+
+    .mobile-overlay-active .tendency-detail-panel {
+        flex: 1;
+        width: 100%;
+        min-height: 0;
+        height: 50%;
+        position: relative !important;
+        top: 0 !important;
+        border-radius: 0;
+        border: none;
+        overflow-y: auto;
+        padding: 1.2rem;
+        background: var(--bg-deep);
+    }
+
+    .mobile-overlay-active .slot-a {
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .mobile-splitter-handle {
+        height: 24px;
+        width: 100%;
+        background: var(--bg-panel);
+        border-top: 1px solid var(--glass-border);
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: row-resize;
+        z-index: 2100;
+        flex-shrink: 0;
+        touch-action: none;
+    }
+
+    .mobile-splitter-handle::after {
+        content: ';
+        width: 40px;
+        height: 4px;
+        background: var(--glass-border);
+        border-radius: 2px;
+    }
+
+    .mobile-overlay-active .mobile-switcher {
+        display: none !important;
+    }
+
+    .mobile-overlay-active .mobile-close-btn {
+        display: flex !important;
+        top: 10px;
+        right: 15px;
+        z-index: 2200;
+    }
+
+    .mobile-overlay-active .detail-title {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .mobile-overlay-active .detail-description {
+        font-size: 1rem;
+        line-height: 1.8;
+    }
+}
+
+@keyframes slideUpMobile {
+    from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+/* 13.3 Content Accordion Styles */
+.section-accordion {
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+}
+
+.accordion-header {
+    padding: 0.8rem 1rem;
+    background: rgba(206, 177, 128, 0.05);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--primary-brass);
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.accordion-header::after {
+    content: '¡å';
+    font-size: 0.7rem;
+    transition: transform 0.3s;
+}
+
+.section-accordion.expanded .accordion-header::after {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    display: none;
+    padding: 1rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.section-accordion.expanded .accordion-content {
+    display: block;
+}
+

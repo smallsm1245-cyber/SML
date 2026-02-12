@@ -682,10 +682,36 @@
 
     function formatDescription(text) {
         if (!text) return '';
-        let formatted = text.replace(/【(.*?)】/g, '<strong>【$1】</strong>');
-        formatted = formatted.replace(/\n/g, '<br>');
-        return formatted;
+
+        // Split by 【 소제목 】
+        const sections = text.split(/(?=【.*?】)/g);
+        if (sections.length <= 1) {
+            return text.replace(/【(.*?)】/g, '<strong>【$1】</strong>').replace(/\n/g, '<br>');
+        }
+
+        return sections.map(section => {
+            const match = section.match(/【(.*?)】/);
+            if (!match) return section.replace(/\n/g, '<br>');
+
+            const title = match[1];
+            const body = section.replace(match[0], '').trim().replace(/\n/g, '<br>');
+
+            return `
+                <div class="section-accordion">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        【 ${title} 】
+                    </div>
+                    <div class="accordion-content">
+                        ${body}
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
+
+    window.toggleAccordion = function (header) {
+        header.parentElement.classList.toggle('expanded');
+    };
 
     window.toggleTendencyList = function () {
         const wrapper = document.querySelector('.tendency-dual-wrapper');
@@ -854,6 +880,51 @@
     window.closeDualOverlay = function () {
         document.getElementById('tendencyContainer').classList.remove('mobile-overlay-active');
         document.body.style.overflow = '';
+        // Remove splitter handle if present
+        document.getElementById('mobileSplitter')?.remove();
+    };
+
+    // Vertical Splitter Logic (Mobile Only)
+    function initMobileSplitter() {
+        if (window.innerWidth > 768) return;
+        const container = document.getElementById('tendencyContainer');
+        const panelA = document.getElementById('detailPanelA');
+        const panelB = document.getElementById('detailPanelB');
+        if (!container || !panelA || !panelB) return;
+
+        // Create handle
+        const handle = document.createElement('div');
+        handle.className = 'mobile-splitter-handle';
+        handle.id = 'mobileSplitter';
+        panelA.after(handle);
+
+        let isDragging = false;
+        handle.addEventListener('touchstart', (e) => { isDragging = true; e.preventDefault(); });
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            const containerRect = container.getBoundingClientRect();
+            const relativeY = touch.clientY - containerRect.top;
+            let percentage = (relativeY / containerRect.height) * 100;
+
+            // Constrain
+            percentage = Math.max(20, Math.min(80, percentage));
+
+            panelA.style.height = percentage + '%';
+            panelB.style.height = (100 - percentage) + '%';
+            panelA.style.flex = `0 0 ${percentage}%`;
+            panelB.style.flex = `0 0 ${100 - percentage}%`;
+        });
+        document.addEventListener('touchend', () => { isDragging = false; });
+    }
+
+    // Call init when overlay opens
+    const originalShowDetail = window.showDetail;
+    window.showDetail = function (id, type, partnerCellId) {
+        originalShowDetail(id, type, partnerCellId);
+        if (window.innerWidth <= 768) {
+            initMobileSplitter();
+        }
     };
 
     function initNightMode() {

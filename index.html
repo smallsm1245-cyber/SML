@@ -29,6 +29,11 @@
 </head>
 
 <body>
+    <!-- Reading Progress Bar -->
+    <div id="scrollProgress" class="scroll-progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
     <!-- Age Verification Disclaimer -->
     <div id="disclaimerOverlay" class="disclaimer-overlay">
         <div class="disclaimer-content">
@@ -102,6 +107,37 @@
                 <p id="copyrightText">© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
             </footer>
         </main>
+    </div>
+
+    <!-- Bottom Navigation Bar (Mobile) -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="window.location.reload()">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">홈</span>
+        </button>
+        <button class="nav-item" onclick="document.getElementById('searchInput').focus()">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-label">검색</span>
+        </button>
+        <button class="nav-item" id="mainFabBtn">
+            <div class="fab-circle">✚</div>
+        </button>
+        <button class="nav-item" onclick="showMyPage()">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">마이</span>
+        </button>
+        <button class="nav-item exit-item" onclick="quickExit()">
+            <span class="nav-icon">🔒</span>
+            <span class="nav-label">종료</span>
+        </button>
+    </nav>
+
+    <!-- Floating Quick Menu (FAB Menu) -->
+    <div class="fab-menu" id="fabMenu">
+        <button class="fab-action" onclick="scrollToTop()">🔝 맨 위로</button>
+        <button class="fab-action" onclick="openSelector('a')">📋 대상 A</button>
+        <button class="fab-action" onclick="openSelector('b')">📋 대상 B</button>
+        <button class="fab-action" onclick="toggleTOC()">📑 목차</button>
     </div>
 
     <!-- Scripts -->
