@@ -22,6 +22,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
 
+    <!-- Manifest & PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#B68D40">
+    <link rel="apple-touch-icon" href="favicon.ico">
+
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <!-- Toast UI Viewer -->
@@ -29,6 +34,13 @@
 </head>
 
 <body>
+    <!-- Admin Utility Bar (Hidden by default) -->
+    <div class="admin-utility-bar" id="adminUtilityBar">
+        <button class="util-btn" onclick="toggleEditMode()">[편집]</button>
+        <button class="util-btn" onclick="showHistory()">[역사]</button>
+        <button class="util-btn" onclick="showDiscussion()">[토론]</button>
+    </div>
+
     <!-- Reading Progress Bar -->
     <div id="scrollProgress" class="scroll-progress-container">
         <div class="progress-bar" id="progressBar"></div>
@@ -109,26 +121,19 @@
         </main>
     </div>
 
-    <!-- Bottom Navigation Bar (Mobile) -->
+    <!-- Bottom Navigation Bar (Mobile / Minimalist) -->
     <nav class="bottom-nav">
         <button class="nav-item" onclick="window.location.reload()">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-label">홈</span>
+            <span class="nav-label">[홈]</span>
         </button>
-        <button class="nav-item" onclick="document.getElementById('searchInput').focus()">
-            <span class="nav-icon">🔍</span>
-            <span class="nav-label">검색</span>
+        <button class="nav-item" onclick="toggleMobileSidebar()">
+            <span class="nav-label">[성격]</span>
         </button>
-        <button class="nav-item" id="mainFabBtn">
-            <div class="fab-circle">✚</div>
-        </button>
-        <button class="nav-item" onclick="showMyPage()">
-            <span class="nav-icon">👤</span>
-            <span class="nav-label">마이</span>
+        <button class="nav-item" onclick="openDualComparison()">
+            <span class="nav-label">[비교]</span>
         </button>
         <button class="nav-item exit-item" onclick="quickExit()">
-            <span class="nav-icon">🔒</span>
-            <span class="nav-label">종료</span>
+            <span class="nav-label">[탈출]</span>
         </button>
     </nav>
 

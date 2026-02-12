@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Noto+Serif+KR:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Noto+Serif+KR:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   🎬 SMALLSM ARCHIVE - CINEMATIC SYSTEM STYLESHEET
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺
+   렗 SMALLSM ARCHIVE - CINEMATIC SYSTEM STYLESHEET
+   곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺*/
 
-/* ═══════════════════════════════════════════════════
-   0. ROOT VARIABLES - 색상 중앙 제어
-   ═══════════════════════════════════════════════════ */
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
+   0. ROOT VARIABLES - 됱긽 以묒븰 쒖뼱
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 :root {
     /* Color Palette - High Contrast Optimized */
     --primary-brass: #B68D40;
@@ -54,9 +54,9 @@ body.night-mode {
     /* Deep shadow */
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    1. BASE RESET & TYPOGRAPHY
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 * {
     margin: 0;
     padding: 0;
@@ -67,15 +67,16 @@ body {
     font-family: var(--font-body);
     background: var(--bg-deep);
     color: var(--text-primary);
-    line-height: 1.6;
-    /* Standard Wiki line height */
+    line-height: 1.8;
+    /* Premium readability */
     overflow-x: hidden;
     transition: background 0.3s ease;
     word-break: break-all;
-    /* Wiki style line breaking */
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    font-size: 17px;
+    /* Base 17px */
 }
 
 /* Texture Overlay - Grain Effect */
@@ -127,15 +128,15 @@ h3 {
 }
 
 p {
-    margin-bottom: 1.2em;
+    margin-bottom: 2rem;
     text-align: left;
-    /* Better readability than justify on web */
-    font-size: 1rem;
+    font-size: 1.05rem;
+    line-height: 1.8;
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    2. LAYOUT STRUCTURE - Flex-Grid Hybrid
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 .app-container {
     display: flex;
     min-height: 100vh;
@@ -143,9 +144,9 @@ p {
     z-index: 2;
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    3. SIDEBAR - Floating Navigation
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 .sidebar {
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
@@ -341,12 +342,12 @@ p {
     box-shadow: var(--glow-subtle);
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    4. MAIN CONTENT AREA
-   ═══════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    4. MAIN CONTENT AREA
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 .main-content {
     flex: 1;
     padding: 2rem;
@@ -465,12 +466,12 @@ body.night-mode .post-content strong {
     font-style: italic;
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    5. FOOTER
-   ═══════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    5. FOOTER
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 .site-footer {
     text-align: center;
     padding: 1.5rem;
@@ -484,9 +485,9 @@ body.night-mode .post-content strong {
     opacity: 0.7;
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    6. AGE VERIFICATION DISCLAIMER
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 .disclaimer-overlay {
     position: fixed;
     top: 0;
@@ -595,9 +596,9 @@ body.night-mode .post-content strong {
     pointer-events: none;
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    7. ADMIN PANEL
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 .admin-container {
     padding: 2rem;
     max-width: 1400px;
@@ -779,9 +780,9 @@ body.night-mode .post-content strong {
     transform: translateY(-2px);
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    8. 404 ERROR PAGE
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 .error-page {
     display: flex;
     align-items: center;
@@ -825,9 +826,9 @@ body.night-mode .post-content strong {
     line-height: 1.8;
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    9. RESPONSIVE DESIGN
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 
 /* Mobile Header & Overlay */
 .mobile-header {
@@ -932,9 +933,9 @@ body.night-mode .post-content strong {
     }
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    9.5 TENDENCY COMPARISON STYLES (DUAL SYSTEM)
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 .tendency-dual-wrapper {
     position: relative;
     width: 100%;
@@ -1432,9 +1433,9 @@ body.night-mode .post-content strong {
     }
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    10. ANIMATIONS
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -1464,9 +1465,9 @@ body.night-mode .post-content strong {
     }
 }
 
-/* ═══════════════════════════════════════════════════
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
    11. UTILITY CLASSES
-   ═══════════════════════════════════════════════════ */
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 .hidden {
     display: none !important;
 }
@@ -1493,13 +1494,13 @@ body.night-mode .post-content strong {
 
 /* Copy Protection Enhancement */
 .copy-protected::after {
-    content: '\A\A━━━━━━━━━━━━━━━━━━━━━━━━\A본 기록은 SMALLSM Archive의 자산입니다.\A출처: [사이트 주소]\A⚠️ 무단 수정 및 상업적 이용을 금합니다.\A━━━━━━━━━━━━━━━━━━━━━━━━';
+    content: '\A\A곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺\A蹂湲곕줉 SMALLSM Archive먯궛낅땲\A異쒖쿂: [ъ씠二쇱냼]\A좑툘 臾대떒 섏젙 諛곸뾽댁슜湲덊빀덈떎.\A곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺곣봺';
     white-space: pre;
 }
 
-/* ═══════════════════════════════════════════════════
-   12. ADMIN LINK - 푸터 관리자 링크
-   ═══════════════════════════════════════════════════ */
+/* 먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧
+   12. ADMIN LINK - 명꽣 愿由ъ옄 留곹겕
+   먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧먥븧*/
 .admin-link {
     position: absolute;
     right: 2rem;
@@ -1521,9 +1522,10 @@ body.night-mode .post-content strong {
 .site-footer {
     position: relative;
 }
-/* ???????????????????????????????????????????????????
+
+/* 
    13. MOBILE OVERHAUL & PREMIUM NAVIGATION
-   ??????????????????????????????????????????????????? */
+    */
 
 /* 13.1 Global Navigation Aids */
 .scroll-progress-container {
@@ -1634,7 +1636,7 @@ body.night-mode .post-content strong {
     display: none;
     flex-direction: column;
     gap: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     z-index: 999;
 }
 
@@ -1660,8 +1662,13 @@ body.night-mode .post-content strong {
 
 /* 13.2 Mobile Dual Vertical Split (Workspace) */
 @media (max-width: 768px) {
-    .bottom-nav { display: flex; }
-    .main-content { padding-bottom: 75px; }
+    .bottom-nav {
+        display: flex;
+    }
+
+    .main-content {
+        padding-bottom: 75px;
+    }
 
     .mobile-overlay-active {
         display: flex !important;
@@ -1714,7 +1721,7 @@ body.night-mode .post-content strong {
     }
 
     .mobile-splitter-handle::after {
-        content: ';
+        content: '';
         width: 40px;
         height: 4px;
         background: var(--glass-border);
@@ -1744,8 +1751,15 @@ body.night-mode .post-content strong {
 }
 
 @keyframes slideUpMobile {
-    from { transform: translateX(-50%) translateY(20px); opacity: 0; }
-    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    from {
+        transform: translateX(-50%) translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
 }
 
 /* 13.3 Content Accordion Styles */
@@ -1770,7 +1784,7 @@ body.night-mode .post-content strong {
 }
 
 .accordion-header::after {
-    content: '��';
+    content: '▼';
     font-size: 0.7rem;
     transition: transform 0.3s;
 }
@@ -1788,4 +1802,87 @@ body.night-mode .post-content strong {
 .section-accordion.expanded .accordion-content {
     display: block;
 }
+/* ═══════════════════════════════════════════════════
+   14. FINAL SPEC: ADMIN BAR & MINIMALIST NAV
+   ═══════════════════════════════════════════════════ */
+
+/* 14.1 Admin Utility Bar */
+.admin-utility-bar {
+    display: none; /* Only show in admin mode */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: #000;
+    color: var(--primary-brass);
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--primary-brass);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+
+body.is-admin .admin-utility-bar {
+    display: flex;
+}
+
+body.is-admin {
+    padding-top: 40px !important;
+}
+
+.util-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+.util-btn:hover {
+    text-shadow: 0 0 10px var(--primary-brass);
+}
+
+/* 14.2 Minimalist Bottom Nav (Icon-free) */
+.bottom-nav {
+    border-top: 2px solid var(--primary-brass);
+    background: #000;
+}
+
+.bottom-nav .nav-label {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.bottom-nav .nav-item:active .nav-label {
+    border: 1px solid var(--primary-brass);
+    background: rgba(206, 177, 128, 0.1);
+    color: var(--primary-brass);
+}
+
+/* 14.3 Workspace Controls */
+.slot-swap-btn {
+    background: var(--bg-deep);
+    border: 1px solid var(--primary-brass);
+    color: var(--primary-brass);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.slot-swap-btn:hover {
+    background: var(--primary-brass);
+    color: var(--bg-deep);
+}
+
 

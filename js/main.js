@@ -630,8 +630,8 @@
                         <!-- Slot A -->
                         <div class="tendency-detail-panel slot-a" id="detailPanelA">
                             <div class="slot-header">
-                                <button class="slot-action-btn" onclick="openSelector('a')">📋 변경</button>
-                                <button class="slot-action-btn clear" onclick="clearSlot('a')">✕ 초기화</button>
+                                <button class="slot-swap-btn" onclick="openSelector('a')">[교체 ▾]</button>
+                                <button class="slot-action-btn clear" onclick="clearSlot('a')">✕</button>
                             </div>
                             <div class="detail-content" id="detailContentA">
                                 ${getPlaceholderHtml('a')}
@@ -642,8 +642,8 @@
                         <!-- Slot B -->
                         <div class="tendency-detail-panel slot-b" id="detailPanelB">
                             <div class="slot-header">
-                                <button class="slot-action-btn" onclick="openSelector('b')">📋 변경</button>
-                                <button class="slot-action-btn clear" onclick="clearSlot('b')">✕ 초기화</button>
+                                <button class="slot-swap-btn" onclick="openSelector('b')">[교체 ▾]</button>
+                                <button class="slot-action-btn clear" onclick="clearSlot('b')">✕</button>
                             </div>
                             <div class="detail-content" id="detailContentB">
                                 ${getPlaceholderHtml('b')}
@@ -698,7 +698,7 @@
 
             return `
                 <div class="section-accordion">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-header" onclick="toggleSectionAccordion(this)">
                         【 ${title} 】
                     </div>
                     <div class="accordion-content">
@@ -1032,6 +1032,62 @@
         initNightMode();
         initAdminLongPress();
         initMobileMenu();
+
+        // Register Global Functions for Bottom Nav / Admin Bar
+        window.toggleMobileSidebar = function () {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
+        };
+
+        window.openDualComparison = function () {
+            renderTendencyView();
+            if (window.innerWidth <= 768) {
+                const container = document.getElementById('tendencyContainer');
+                if (container && !container.classList.contains('mobile-overlay-active')) {
+                    container.classList.add('mobile-overlay-active');
+                    document.body.style.overflow = 'hidden';
+                    // Small delay to ensure DOM is ready
+                    setTimeout(initMobileSplitter, 100);
+                }
+            }
+        };
+
+        window.toggleEditMode = function () {
+            document.body.classList.toggle('is-admin');
+            const accordions = document.querySelectorAll('.section-accordion');
+            const isAdmin = document.body.classList.contains('is-admin');
+
+            accordions.forEach(acc => {
+                if (isAdmin) {
+                    acc.classList.add('expanded');
+                } else {
+                    acc.classList.remove('expanded');
+                }
+            });
+        };
+
+        window.showHistory = function () { alert('역사 기록 (Coming Soon)'); };
+        window.showDiscussion = function () { alert('토론 광장 (Coming Soon)'); };
+
+        // Progress Bar Listener
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const bar = document.getElementById("progressBar");
+            if (bar) bar.style.width = scrolled + "%";
+        });
+
+        window.toggleSectionAccordion = function (header) {
+            const accordion = header.closest('.section-accordion');
+            if (accordion) {
+                accordion.classList.toggle('expanded');
+            }
+        };
 
         console.log('🎉 Initialization complete');
     });
