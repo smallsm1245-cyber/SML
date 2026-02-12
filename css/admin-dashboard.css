@@ -803,9 +803,22 @@ body.dark-theme {
     flex: 1;
 }
 
-/* ═══════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════ */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
 @media (max-width: 1024px) {
     .split-layout {
         grid-template-columns: 1fr;
@@ -827,16 +840,18 @@ body.dark-theme {
 
     .dashboard-sidebar {
         position: fixed;
-        left: -260px;
+        left: 0;
         top: 0;
-        height: 100vh;
+        bottom: 0;
+        width: 260px;
+        transform: translateX(-100%);
         z-index: 200;
-        transition: left 0.3s;
-        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
     }
 
     .dashboard-sidebar.active {
-        left: 0;
+        transform: translateX(0);
     }
 
     .dashboard-main {

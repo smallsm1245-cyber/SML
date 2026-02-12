@@ -27,6 +27,8 @@
 </head>
 
 <body class="admin-body">
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
         <div class="login-panel">
@@ -249,8 +251,22 @@
                                 <option value="private">비공개</option>
                             </select>
                             <button class="btn-primary" onclick="showNewPostEditor()">✍️ 새 글 작성</button>
-                            <button class="btn-danger" id="deleteSelectedBtn" onclick="deleteSelectedPosts()"
-                                style="margin-left: 0.5rem; display: none;">🗑️ 선택 삭제</button>
+                        </div>
+
+                        <!-- Bulk Action Bar (Hidden by default) -->
+                        <div id="bulkActionBar" class="bulk-toolbar"
+                            style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--admin-border);">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span id="selectedCountText" style="color: var(--admin-primary); font-weight: 600;">0개
+                                    선택됨</span>
+                                <div style="flex: 1;"></div>
+                                <select id="bulkMoveCategory" class="filter-select" style="max-width: 200px;">
+                                    <option value="">이동할 카테고리 선택...</option>
+                                </select>
+                                <button class="btn-secondary" onclick="bulkMovePosts()">📦 일괄 이동</button>
+                                <button class="btn-danger" id="deleteSelectedBtn" onclick="deleteSelectedPosts()">🗑️ 선택
+                                    삭제</button>
+                            </div>
                         </div>
                     </div>
 
@@ -376,10 +392,9 @@
                     </div>
 
                     <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
-                        <a href="tendency-compare.html" target="_blank" class="btn-primary"
+                        <a href="index.html" class="btn-primary"
                             style="text-decoration: none; background: var(--text-dim); border-color: var(--text-dim);">👀
-                            사용자
-                            페이지 확인</a>
+                            사용자 페이지에서 확인</a>
                         <button class="btn-primary" id="saveTendencyAllBtn" onclick="saveTendencyAll()">💾 모든 변경사항
                             저장</button>
                     </div>

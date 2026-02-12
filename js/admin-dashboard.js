@@ -413,7 +413,7 @@ async function loadPosts() {
 
         document.getElementById('postCount').textContent = count || 0;
         selectedPosts.clear();
-        updateDeleteButton();
+        updateBulkToolbar();
 
         if (!posts || posts.length === 0) {
             container.innerHTML = '<p style="color: var(--admin-text-dim); text-align: center; padding: 3rem;">검색 결과가 없습니다.</p>';
@@ -516,7 +516,7 @@ window.toggleSelectAll = function (source) {
         if (source.checked) selectedPosts.add(cb.value);
         else selectedPosts.delete(cb.value);
     });
-    updateDeleteButton();
+    updateBulkToolbar();
 };
 
 window.togglePostSelection = function (id) {
@@ -525,7 +525,7 @@ window.togglePostSelection = function (id) {
     } else {
         selectedPosts.add(id);
     }
-    updateDeleteButton();
+    updateBulkToolbar();
 
     // Update select all checkbox
     const all = document.querySelectorAll('.post-checkbox');
@@ -537,11 +537,44 @@ window.togglePostSelection = function (id) {
     }
 };
 
-function updateDeleteButton() {
-    const btn = document.getElementById('deleteSelectedBtn');
-    if (btn) {
-        btn.style.display = selectedPosts.size > 0 ? 'inline-block' : 'none';
-        btn.textContent = `🗑️ 선택 삭제 (${selectedPosts.size})`;
+window.updateBulkToolbar = function () {
+    const bar = document.getElementById('bulkActionBar');
+    const countText = document.getElementById('selectedCountText');
+    if (bar) {
+        bar.style.display = selectedPosts.size > 0 ? 'block' : 'none';
+        if (countText) countText.textContent = `${selectedPosts.size}개 선택됨`;
+    }
+}
+
+window.bulkMovePosts = async function () {
+    if (selectedPosts.size === 0) return;
+
+    const targetId = document.getElementById('bulkMoveCategory').value;
+    if (!targetId) {
+        alert('이동할 카테고리를 선택해주세요.');
+        return;
+    }
+
+    if (!confirm(`${selectedPosts.size}개의 게시글을 선택한 카테고리로 이동하시겠습니까?`)) {
+        return;
+    }
+
+    try {
+        const ids = Array.from(selectedPosts);
+        const { error } = await supabaseClient
+            .from('archive_posts')
+            .update({ category_id: targetId })
+            .in('id', ids);
+
+        if (error) throw error;
+
+        alert('✅ 일괄 이동이 완료되었습니다.');
+        selectedPosts.clear();
+        loadPosts();
+        loadStatistics();
+    } catch (error) {
+        console.error('Bulk move failed:', error);
+        alert('❌ 일괄 이동 실패: ' + error.message);
     }
 }
 
@@ -798,14 +831,12 @@ async function loadCategories() {
                 currentCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         }
 
-        // Populate Parent Category Selector
-        const parentSelect = document.getElementById('newCategoryParent');
-        if (parentSelect) {
-            const roots = currentCategories.filter(c => !c.parent_id);
-            parentSelect.innerHTML = '<option value="">📁 대분류로 추가</option>' +
-                roots.map(root => `<option value="${root.id}">📄 ${root.name}의 소분류로 추가</option>`).join('');
+        // Populate Bulk Move Dropdown
+        const bulkMoveSelect = document.getElementById('bulkMoveCategory');
+        if (bulkMoveSelect) {
+            bulkMoveSelect.innerHTML = '<option value="">이동할 카테고리 선택...</option>' +
+                currentCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         }
-
     } catch (error) {
         console.error('Categories loading failed:', error);
     }
@@ -1804,8 +1835,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     menuBtn.innerHTML = '☰';
     document.querySelector('.header-left').prepend(menuBtn);
 
-    menuBtn.addEventListener('click', () => {
-        document.querySelector('.dashboard-sidebar').classList.toggle('active');
+    const overlay = document.getElementById('sidebarOverlay');
+    const sidebar = document.querySelector('.dashboard-sidebar');
+
+    const toggleSidebar = () => {
+        const isActive = sidebar.classList.toggle('active');
+        if (overlay) overlay.classList.toggle('active', isActive);
+        document.body.style.overflow = isActive ? 'hidden' : '';
+    };
+
+    menuBtn.addEventListener('click', toggleSidebar);
+    if (overlay) overlay.addEventListener('click', toggleSidebar);
+
+    // Close sidebar on nav click (mobile)
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
+        });
     });
 
     // Load saved theme

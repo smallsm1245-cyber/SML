@@ -828,13 +828,78 @@ body.night-mode .post-content strong {
 /* ═══════════════════════════════════════════════════
    9. RESPONSIVE DESIGN
    ═══════════════════════════════════════════════════ */
+
+/* Mobile Header & Overlay */
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 1001;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+}
+
+.menu-toggle {
+    background: transparent;
+    border: none;
+    color: var(--primary-brass);
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.mobile-logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--primary-brass);
+    letter-spacing: 0.1em;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
 @media (max-width: 768px) {
+    .mobile-header {
+        display: flex;
+    }
+
+    .app-container {
+        flex-direction: column;
+        padding-top: 60px;
+        /* Space for mobile header */
+    }
+
     .sidebar {
         position: fixed;
         left: 0;
+        top: 0;
+        bottom: 0;
         transform: translateX(-100%);
         z-index: 1000;
-        width: 80%;
+        width: 280px;
+        background: var(--bg-deep);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding-top: 2rem;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
     }
 
     .sidebar.active {
@@ -842,24 +907,225 @@ body.night-mode .post-content strong {
     }
 
     .main-content {
-        padding: 2rem 1.5rem;
+        padding: 1rem 0.8rem;
     }
 
     .content-panel {
-        padding: 2rem 1.5rem;
+        padding: 1.5rem 1rem;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
     }
 
     .post-title {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
 
-    .split-editor {
-        grid-template-columns: 1fr;
+    .site-footer {
+        padding: 2rem 1rem;
     }
 
+    /* Admin specific in style.css if any */
     .admin-header {
         flex-direction: column;
         gap: 1rem;
+    }
+}
+
+/* ═══════════════════════════════════════════════════
+   9.5 TENDENCY COMPARISON STYLES
+   ═══════════════════════════════════════════════════ */
+.tendency-container {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    margin-top: 1rem;
+}
+
+.tendency-list-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+.grid-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--bg-panel);
+    border-bottom: 2px solid var(--primary-brass);
+    margin-bottom: 0.5rem;
+}
+
+.header-cell {
+    padding: 1rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary-brass);
+    text-align: center;
+}
+
+.comparison-grid {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.comparison-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.comparison-row:last-child {
+    border-bottom: none;
+}
+
+.tendency-cell {
+    padding: 0.7rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.tendency-cell:hover {
+    background: rgba(206, 177, 128, 0.1);
+    color: var(--primary-brass);
+}
+
+.tendency-cell.top-cell {
+    border-right: 1px solid var(--glass-border);
+}
+
+.active-cell {
+    background: rgba(206, 177, 128, 0.25) !important;
+    color: var(--primary-brass) !important;
+    font-weight: 700;
+    box-shadow: inset 0 0 0 2px var(--primary-brass);
+}
+
+.active-pair {
+    background: rgba(206, 177, 128, 0.1) !important;
+    border: 1px dashed var(--primary-brass) !important;
+    opacity: 0.8;
+}
+
+.tendency-detail-panel {
+    width: 400px;
+    position: sticky;
+    top: 2rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 2rem;
+    min-height: 500px;
+}
+
+.detail-view {
+    animation: fadeIn 0.3s ease;
+}
+
+.detail-type-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.detail-type-badge.top {
+    background: rgba(206, 177, 128, 0.2);
+    color: var(--primary-brass);
+}
+
+.detail-type-badge.bottom {
+    background: rgba(212, 165, 116, 0.2);
+    color: var(--accent-amber);
+}
+
+.detail-title {
+    font-size: 1.8rem;
+    color: var(--primary-brass);
+    margin-bottom: 1.5rem;
+}
+
+.detail-description {
+    line-height: 1.8;
+    color: var(--text-primary);
+}
+
+.detail-description strong {
+    color: var(--primary-brass);
+    display: inline-block;
+    margin-top: 1.2rem;
+    margin-bottom: 0.4rem;
+}
+
+.mobile-close-btn {
+    display: none;
+}
+
+@media (max-width: 1200px) {
+    .tendency-detail-panel {
+        width: 320px;
+    }
+}
+
+@media (max-width: 992px) {
+    .tendency-container {
+        flex-direction: column;
+    }
+
+    .tendency-detail-panel {
+        width: 100%;
+        position: static;
+        min-height: auto;
+        margin-top: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .tendency-container {
+        margin-top: 0;
+    }
+
+    .tendency-detail-panel {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2000;
+        border-radius: 0;
+        padding-top: 4rem;
+        overflow-y: auto;
+    }
+
+    .tendency-detail-panel.active {
+        display: block;
+    }
+
+    .mobile-close-btn {
+        display: block;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+    }
+
+    .comparison-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
     }
 }
 

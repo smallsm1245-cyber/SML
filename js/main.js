@@ -300,18 +300,6 @@
                 </li>
             `;
         }).join('');
-
-        // 🔗 Add special link for Tendency Comparison
-        const tendencyLink = `
-            <li class="category-item" style="margin-top: 1rem; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
-                <div class="category-header-wrap">
-                    <a href="tendency-compare.html" class="category-link special-link" style="color: var(--primary-brass); font-weight: 700;">
-                        <span class="cat-name">⚖️ Top / Bottom 세부 성향</span>
-                    </a>
-                </div>
-            </li>
-        `;
-        nav.insertAdjacentHTML('beforeend', tendencyLink);
     }
 
     window.toggleAccordion = function (id) {
@@ -340,6 +328,18 @@
         if (!supabaseClient) return;
 
         try {
+            // Check category name first
+            const { data: category } = await supabaseClient
+                .from('categories')
+                .select('name')
+                .eq('id', categoryId)
+                .single();
+
+            if (category && category.name === 'Top / Bottom 세부 성향') {
+                renderTendencyView();
+                return;
+            }
+
             const { data: { user } } = await supabaseClient.auth.getUser();
             const isAdmin = user && user.email === window.ADMIN_EMAIL;
 
@@ -368,7 +368,7 @@
                 return;
             }
 
-            const { data: category } = await supabaseClient
+            const { data: postCategoryData } = await supabaseClient
                 .from('categories')
                 .select('name')
                 .eq('id', categoryId)
@@ -390,7 +390,7 @@
                         month: 'long',
                         day: 'numeric'
                     });
-                    const categoryName = category ? category.name : '';
+                    const categoryName = postCategoryData ? postCategoryData.name : '';
                     metaDiv.innerHTML = `<span>${categoryName}</span> • <span>${dateStr}</span>`;
                 }
 
@@ -554,6 +554,140 @@
         copyright.style.webkitUserSelect = 'none';
     }
 
+    // ═══════════════════════════════════════════════════
+    // TENDENCY VIEW INTEGRATION
+    // ═══════════════════════════════════════════════════
+    async function renderTendencyView() {
+        if (!supabaseClient) return;
+
+        const mainContent = document.getElementById('mainContent');
+        const welcomeTitle = document.getElementById('welcomeTitle');
+        const metaDiv = document.querySelector('.post-meta');
+
+        if (!mainContent) return;
+
+        welcomeTitle.textContent = 'Top / Bottom 성향 비교';
+        if (metaDiv) metaDiv.innerHTML = '<span>서로 대비되는 관점의 1:1 비교 분석</span>';
+
+        mainContent.innerHTML = `<div class="loading-container"><div class="loading"></div></div>`;
+
+        try {
+            const { data: tendencies, error } = await supabaseClient
+                .from('tendencies')
+                .select('*')
+                .order('display_order', { ascending: true });
+
+            if (error) throw error;
+
+            const tops = (tendencies || []).filter(t => t.type === 'top');
+            const bottoms = (tendencies || []).filter(t => t.type === 'bottom');
+
+            let gridHtml = `
+                <div class="tendency-container">
+                    <div class="tendency-list-panel">
+                        <div class="grid-header">
+                            <div class="header-cell top">TOP</div>
+                            <div class="header-cell bottom">BOTTOM</div>
+                        </div>
+                        <div class="comparison-grid">
+            `;
+
+            const maxRows = Math.max(tops.length, bottoms.length);
+            for (let i = 0; i < maxRows; i++) {
+                const topItem = tops[i];
+                const bottomItem = bottoms[i];
+
+                gridHtml += `
+                    <div class="comparison-row">
+                        <div class="tendency-cell top-cell ${topItem ? '' : 'empty'}" 
+                             id="cell-${topItem?.id}"
+                             onclick="showDetail('${topItem?.id}', 'top', 'cell-${bottomItem?.id}')">
+                            <span class="cell-name">${topItem ? topItem.name : ''}</span>
+                        </div>
+                        <div class="tendency-cell bottom-cell ${bottomItem ? '' : 'empty'}" 
+                             id="cell-${bottomItem?.id}"
+                             onclick="showDetail('${bottomItem?.id}', 'bottom', 'cell-${topItem?.id}')">
+                            <span class="cell-name">${bottomItem ? bottomItem.name : ''}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            gridHtml += `
+                        </div>
+                    </div>
+                    <div class="tendency-detail-panel" id="detailPanel">
+                        <button class="mobile-close-btn" onclick="closeDetail()">✕</button>
+                        <div class="detail-content" id="detailContent">
+                            <div class="detail-placeholder">
+                                <p>성향을 선택하여 상세 내용을 확인하세요.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            mainContent.innerHTML = gridHtml;
+
+            // Make it global for onclick
+            window.tendencyData = tendencies;
+
+        } catch (error) {
+            console.error('Tendencies load failed:', error);
+            mainContent.innerHTML = `<p style="color:red">데이터 로딩 실패: ${error.message}</p>`;
+        }
+    }
+
+    function formatDescription(text) {
+        if (!text) return '';
+        // 1. 【 】 Bold
+        let formatted = text.replace(/【(.*?)】/g, '<strong>【$1】</strong>');
+        // 2. Newline to <br>
+        formatted = formatted.replace(/\n/g, '<br>');
+        return formatted;
+    }
+
+    window.showDetail = function (id, type, partnerCellId) {
+        const detailPanel = document.getElementById('detailPanel');
+        const detailContent = document.getElementById('detailContent');
+        if (!detailPanel || !detailContent || !id) return;
+
+        const item = window.tendencyData.find(t => t.id === id);
+        if (!item) return;
+
+        // Visual feedback
+        document.querySelectorAll('.tendency-cell').forEach(c => c.classList.remove('active-cell', 'active-pair'));
+
+        const currentCell = document.getElementById(`cell-${id}`);
+        const partnerCell = document.getElementById(partnerCellId);
+
+        if (currentCell) currentCell.classList.add('active-cell');
+        if (partnerCell) partnerCell.classList.add('active-pair');
+
+        detailContent.innerHTML = `
+            <div class="detail-view">
+                <span class="detail-type-badge ${type}">${type.toUpperCase()}</span>
+                <h2 class="detail-title">${item.name}</h2>
+                <div class="detail-description">
+                    ${formatDescription(item.description)}
+                </div>
+            </div>
+        `;
+
+        detailPanel.classList.add('active');
+
+        if (window.innerWidth <= 768) {
+            document.body.classList.add('mobile-active');
+        }
+    };
+
+    window.closeDetail = function () {
+        const detailPanel = document.getElementById('detailPanel');
+        if (detailPanel) detailPanel.classList.remove('active');
+        document.body.classList.remove('mobile-active');
+        document.querySelectorAll('.tendency-cell').forEach(c => c.classList.remove('active-cell', 'active-pair'));
+    };
+
     function initNightMode() {
         const modeToggle = document.getElementById('modeToggle');
         if (!modeToggle) return;
@@ -573,6 +707,30 @@
                 modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
             } else {
                 modeToggle.innerHTML = '<span>🌙</span><span>Night Library</span>';
+            }
+        });
+    }
+
+    function initMobileMenu() {
+        const menuToggle = document.getElementById('menuToggleBtn');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        if (!menuToggle || !sidebar || !overlay) return;
+
+        const toggleMenu = () => {
+            const isActive = sidebar.classList.toggle('active');
+            overlay.classList.toggle('active', isActive);
+            document.body.style.overflow = isActive ? 'hidden' : '';
+        };
+
+        menuToggle.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+
+        // Close sidebar on navigation (mobile)
+        document.getElementById('categoryNav').addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && (e.target.tagName === 'A' || e.target.closest('a'))) {
+                toggleMenu();
             }
         });
     }
@@ -634,6 +792,7 @@
 
         initNightMode();
         initAdminLongPress();
+        initMobileMenu();
 
         console.log('🎉 Initialization complete');
     });

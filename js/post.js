@@ -292,6 +292,33 @@ function initNightMode() {
     });
 }
 
+function initMobileMenu() {
+    const menuToggle = document.getElementById('menuToggleBtn');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (!menuToggle || !sidebar || !overlay) return;
+
+    const toggleMenu = () => {
+        const isActive = sidebar.classList.toggle('active');
+        overlay.classList.toggle('active', isActive);
+        document.body.style.overflow = isActive ? 'hidden' : '';
+    };
+
+    menuToggle.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+
+    // Close sidebar on navigation (mobile)
+    const nav = document.getElementById('categoryNav');
+    if (nav) {
+        nav.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && (e.target.tagName === 'A' || e.target.closest('a'))) {
+                toggleMenu();
+            }
+        });
+    }
+}
+
 // ═══════════════════════════════════════════════════
 // 6. COPY PROTECTION (Same as main.js)
 // ═══════════════════════════════════════════════════
@@ -362,6 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initNightMode();
     initAdminLongPress();
+    initMobileMenu();
 
     // Home Link
     const titleConfig = document.querySelector('.sidebar-header');
