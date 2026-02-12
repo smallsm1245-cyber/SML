@@ -16,6 +16,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/admin-tendencies.css">
     <link rel="stylesheet" href="css/admin-toastui-hierarchy.css">
     <!-- Toast UI Editor -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
@@ -83,6 +84,10 @@
                     <button class="nav-item" data-section="categories">
                         <span class="icon">📂</span>
                         <span class="text">카테고리</span>
+                    </button>
+                    <button class="nav-item" data-section="tendencies">
+                        <span class="icon">⚖️</span>
+                        <span class="text">성향 관리</span>
                     </button>
                     <button class="nav-item" data-section="trash">
                         <span class="icon">🗑️</span>
@@ -334,6 +339,44 @@
                     <!-- Categories List -->
                     <div id="categoriesList" class="categories-list">
                         <!-- Dynamically loaded -->
+                    </div>
+                </section>
+
+                <!-- Tendencies Management Section -->
+                <section id="section-tendencies" class="content-section">
+                    <h2 class="section-title">⚖️ 성향 관리 (Top / Bottom)</h2>
+                    <p class="section-desc">Top과 Bottom 성향을 1:1로 매칭하거나 순서를 관리할 수 있습니다.</p>
+
+                    <div class="card">
+                        <h3 class="card-title">➕ 새 성향 추가</h3>
+                        <div class="add-category-form">
+                            <select id="newTendencyType" class="form-select" style="flex: 0 0 150px;">
+                                <option value="top">⬆️ Top</option>
+                                <option value="bottom">⬇️ Bottom</option>
+                            </select>
+                            <input type="text" id="newTendencyName" class="form-input"
+                                placeholder="성향 이름 (예: SP, DS...)">
+                            <button class="btn-primary" id="addTendencyBtn">추가하기</button>
+                        </div>
+                    </div>
+
+                    <div class="tendency-manage-container">
+                        <div class="tendency-column-group">
+                            <div class="column-header">⬆️ Top 리스트</div>
+                            <div id="topTendencyList" class="tendency-list sortable-list" data-type="top">
+                                <!-- Dynamically loaded -->
+                            </div>
+                        </div>
+                        <div class="tendency-column-group">
+                            <div class="column-header">⬇️ Bottom 리스트</div>
+                            <div id="bottomTendencyList" class="tendency-list sortable-list" data-type="bottom">
+                                <!-- Dynamically loaded -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; text-align: right;">
+                        <button class="btn-primary" id="saveTendencyAllBtn">💾 모든 변경사항 저장</button>
                     </div>
                 </section>
 

@@ -1304,6 +1304,208 @@ function toggleTheme() {
     icon.textContent = isDark ? '☀️' : '🌙';
 }
 
+// ═══════════════════════════════════════════════════
+// TENDENCY MANAGEMENT
+// ═══════════════════════════════════════════════════
+let currentTendencies = [];
+
+async function loadTendencies() {
+    if (!supabaseClient) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('tendencies')
+            .select('*')
+            .order('display_order', { ascending: true });
+
+        if (error) throw error;
+
+        currentTendencies = data || [];
+        renderTendencyLists();
+
+    } catch (error) {
+        console.error('Tendencies load failed:', error);
+        showError('성향 데이터를 불러오는데 실패했습니다.');
+    }
+}
+
+function renderTendencyLists() {
+    const topList = document.getElementById('topTendencyList');
+    const bottomList = document.getElementById('bottomTendencyList');
+
+    if (!topList || !bottomList) return;
+
+    topList.innerHTML = '';
+    bottomList.innerHTML = '';
+
+    const tops = currentTendencies.filter(t => t.type === 'top');
+    const bottoms = currentTendencies.filter(t => t.type === 'bottom');
+
+    const renderItem = (item, type) => {
+        const div = document.createElement('div');
+        div.className = 'tendency-item-admin';
+        div.dataset.id = item.id;
+
+        const oppositeItems = type === 'top' ? bottoms : tops;
+        const matchOptions = oppositeItems.map(opt =>
+            `<option value="${opt.id}" ${item.matched_id === opt.id ? 'selected' : ''}>${opt.name}</option>`
+        ).join('');
+
+        div.innerHTML = `
+            <span class="drag-handle">⋮⋮</span>
+            <input type="text" class="name-input" value="${item.name}" onchange="updateLocalTendencyName('${item.id}', this.value)">
+            <div class="tendency-match-info">
+                <span>🔗 매칭:</span>
+                <select class="match-select" onchange="updateLocalTendencyMatch('${item.id}', this.value)">
+                    <option value="">없음</option>
+                    ${matchOptions}
+                </select>
+            </div>
+            <div class="tendency-actions">
+                <button class="action-btn danger" onclick="deleteTendency('${item.id}', '${item.name}')">🗑️</button>
+            </div>
+        `;
+        return div;
+    };
+
+    tops.forEach(t => topList.appendChild(renderItem(t, 'top')));
+    bottoms.forEach(b => bottomList.appendChild(renderItem(b, 'bottom')));
+
+    initTendencySortable();
+}
+
+function initTendencySortable() {
+    ['topTendencyList', 'bottomTendencyList'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        Sortable.create(el, {
+            animation: 150,
+            handle: '.drag-handle',
+            ghostClass: 'sortable-ghost',
+            onEnd: () => {
+                hasUnsavedChanges = true;
+            }
+        });
+    });
+}
+
+function updateLocalTendencyName(id, name) {
+    const item = currentTendencies.find(t => t.id === id);
+    if (item) {
+        item.name = name;
+        hasUnsavedChanges = true;
+    }
+}
+
+function updateLocalTendencyMatch(id, matchedId) {
+    const item = currentTendencies.find(t => t.id === id);
+    if (item) {
+        item.matched_id = matchedId || null;
+
+        // 1:1 Matching: Update the other side too
+        if (matchedId) {
+            const opposite = currentTendencies.find(t => t.id === matchedId);
+            if (opposite) {
+                opposite.matched_id = id;
+            }
+        } else {
+            // Find what was previously matched and clear it
+            currentTendencies.forEach(t => {
+                if (t.matched_id === id) t.matched_id = null;
+            });
+        }
+
+        hasUnsavedChanges = true;
+        renderTendencyLists(); // Re-render to show updated matches
+    }
+}
+
+async function addTendency() {
+    const type = document.getElementById('newTendencyType').value;
+    const name = document.getElementById('newTendencyName').value.trim();
+
+    if (!name) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('tendencies')
+            .insert([{
+                type,
+                name,
+                display_order: currentTendencies.length + 1
+            }])
+            .select();
+
+        if (error) throw error;
+
+        document.getElementById('newTendencyName').value = '';
+        await loadTendencies();
+
+    } catch (error) {
+        console.error('Tendency add failed:', error);
+        showError('성향 추가에 실패했습니다.');
+    }
+}
+
+async function deleteTendency(id, name) {
+    if (!confirm(`'${name}'성향을 삭제하시겠습니까?`)) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('tendencies')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        await loadTendencies();
+
+    } catch (error) {
+        console.error('Tendency delete failed:', error);
+        showError('성향 삭제에 실패했습니다.');
+    }
+}
+
+async function saveTendencyAll() {
+    if (!supabaseClient) return;
+
+    const topList = document.getElementById('topTendencyList');
+    const bottomList = document.getElementById('bottomTendencyList');
+
+    const getItemOrder = (listEl) => {
+        return Array.from(listEl.children).map((child, index) => ({
+            id: child.dataset.id,
+            display_order: index + 1
+        }));
+    };
+
+    const updates = [...getItemOrder(topList), ...getItemOrder(bottomList)];
+
+    try {
+        // Update display_order based on UI sort
+        for (const update of updates) {
+            const item = currentTendencies.find(t => t.id === update.id);
+            if (item) item.display_order = update.display_order;
+        }
+
+        // Perform bulk update (upsert)
+        const { error } = await supabaseClient
+            .from('tendencies')
+            .upsert(currentTendencies);
+
+        if (error) throw error;
+
+        hasUnsavedChanges = false;
+        alert('모든 변경사항이 저장되었습니다.');
+        await loadTendencies();
+
+    } catch (error) {
+        console.error('Tendency save failed:', error);
+        showError('저장에 실패했습니다.');
+    }
+}
+
 function togglePreviewTheme() {
     const preview = document.getElementById('homePreview');
     const btn = document.getElementById('previewThemeToggle');
@@ -1503,6 +1705,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             switchSection(section);
 
             if (section === 'trash') loadTrash();
+            if (section === 'tendencies') loadTendencies();
         });
     });
 
@@ -1551,6 +1754,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('previewThemeToggle').addEventListener('click', togglePreviewTheme);
     document.getElementById('saveSettingsBtn').addEventListener('click', saveSiteSettings);
     document.getElementById('saveSeoBtn').addEventListener('click', saveSeoSettings);
+    document.getElementById('addTendencyBtn').addEventListener('click', addTendency);
+    document.getElementById('saveTendencyAllBtn').addEventListener('click', saveTendencyAll);
 
     // Mobile menu toggle
     const menuBtn = document.createElement('button');

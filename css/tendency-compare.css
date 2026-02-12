@@ -1,0 +1,116 @@
+/* Tendency Comparison Layout (Compact Grid) */
+.tendency-compare-panel {
+    padding: 2rem 3rem !important;
+}
+
+.compare-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--bg-panel);
+    border-bottom: 2px solid var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.header-col {
+    padding: 1rem;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--primary-brass);
+    text-align: center;
+}
+
+.tendency-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.tendency-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--glass-border);
+    transition: background 0.2s;
+}
+
+.tendency-row:hover {
+    background: rgba(206, 177, 128, 0.05);
+}
+
+.tendency-cell {
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    text-align: center;
+}
+
+.tendency-cell.top {
+    border-right: 1px solid var(--glass-border);
+}
+
+.tendency-cell .name {
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .tendency-compare-panel {
+        padding: 1rem !important;
+    }
+
+    .compare-header-sticky {
+        grid-template-columns: 1fr;
+        /* Stack visually or hide one? User asked for multi-row cards on mobile */
+    }
+
+    /* As per request: 모바일에서는 2열 혹은 3열의 작은 카드 형태로 배치 */
+    .tendency-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .tendency-row {
+        display: contents;
+        /* Row container shouldn't affect grid on mobile */
+    }
+
+    .tendency-cell {
+        background: var(--bg-panel);
+        border: 1px solid var(--glass-border);
+        border-radius: 4px;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+        aspect-ratio: 1;
+        flex-direction: column;
+    }
+
+    .tendency-cell.top::before {
+        content: 'Top';
+        font-size: 0.7rem;
+        color: var(--primary-brass);
+        margin-bottom: 0.2rem;
+    }
+
+    .tendency-cell.bottom::before {
+        content: 'Bottom';
+        font-size: 0.7rem;
+        color: var(--accent-amber);
+        margin-bottom: 0.2rem;
+    }
+
+    .compare-header-sticky {
+        display: none;
+    }
+}
+
+.loading-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+}
