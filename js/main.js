@@ -574,10 +574,19 @@
         mainContent.innerHTML = `<div class="loading-container"><div class="loading"></div></div>`;
 
         try {
+            const { data: categories } = await supabaseClient
+                .from('categories')
+                .select('*')
+                .eq('is_visible', true)
+                .order('display_order', { ascending: true });
+
             const { data: tendencies, error } = await supabaseClient
                 .from('tendencies')
                 .select('*')
                 .order('display_order', { ascending: true });
+
+            window.categoryData = categories || [];
+            window.tendencyData = tendencies || [];
 
             if (error) throw error;
 
@@ -709,12 +718,34 @@
     function renderSelectorContent(slot, typeFilter) {
         const overlay = document.getElementById(`selector${slot.toUpperCase()}`);
         const tendencies = window.tendencyData || [];
+        const categories = window.categoryData || [];
 
-        const grouped = {
-            top: tendencies.filter(t => t.type === 'top'),
-            bottom: tendencies.filter(t => t.type === 'bottom'),
-            etc: tendencies.filter(t => t.type !== 'top' && t.type !== 'bottom')
-        };
+        // Filter tendencies by type if needed (e.g. only TOP or only BOTTOM)
+        // But the user asked for "Category Grouping". If we filter by type, we only show categories that contain that type.
+        const filteredTendencies = typeFilter
+            ? tendencies.filter(t => t.type === typeFilter)
+            : tendencies;
+
+        // Group by category_id
+        const tendencyMap = {};
+        const orphanTendencies = [];
+
+        filteredTendencies.forEach(t => {
+            if (t.category_id) {
+                if (!tendencyMap[t.category_id]) tendencyMap[t.category_id] = [];
+                tendencyMap[t.category_id].push(t);
+            } else {
+                orphanTendencies.push(t);
+            }
+        });
+
+        // Hierarchy logic
+        const rootCategories = categories.filter(c => !c.parent_id);
+        const childMap = {};
+        categories.filter(c => c.parent_id).forEach(c => {
+            if (!childMap[c.parent_id]) childMap[c.parent_id] = [];
+            childMap[c.parent_id].push(c);
+        });
 
         let html = `
             <div class="selector-header">
@@ -724,25 +755,60 @@
             <div class="selector-list">
         `;
 
-        const renderGroup = (label, items, type) => {
-            if (items.length === 0) return '';
-            if (typeFilter && typeFilter !== type) return '';
-
-            return `
-                <div class="selector-group ${type}">
-                    <div class="group-label">${label}</div>
-                    ${items.map(item => `
-                        <div class="selector-item" onclick="selectFromSelector('${slot}', '${item.id}', '${item.type}')">
-                            ${item.name}
-                        </div>
-                    `).join('')}
+        // Render function for a list of tendencies
+        const renderTendencyItems = (items) => {
+            if (!items || items.length === 0) return '';
+            return items.map(item => `
+                <div class="selector-item ${item.type}" onclick="selectFromSelector('${slot}', '${item.id}', '${item.type}')">
+                    <span class="item-type-dot ${item.type}"></span>
+                    ${item.name}
                 </div>
-            `;
+            `).join('');
         };
 
-        html += renderGroup('⬆️ TOP 성향', grouped.top, 'top');
-        html += renderGroup('⬇️ BOTTOM 성향', grouped.bottom, 'bottom');
-        html += renderGroup('📁 기타 성향', grouped.etc, 'etc');
+        // 1. Root Categories
+        rootCategories.forEach(root => {
+            const rootTendencies = tendencyMap[root.id] || [];
+            const children = childMap[root.id] || [];
+
+            // Check if this root or its children have relevant tendencies
+            const hasDirect = rootTendencies.length > 0;
+            const hasChildContent = children.some(child => (tendencyMap[child.id] || []).length > 0);
+
+            if (!hasDirect && !hasChildContent) return;
+
+            html += `<div class="selector-section">`;
+            html += `<div class="category-header root">${root.name}</div>`;
+
+            // Direct tendencies in root (rare but possible)
+            if (hasDirect) {
+                html += `<div class="tendency-group direct">${renderTendencyItems(rootTendencies)}</div>`;
+            }
+
+            // Child categories
+            children.forEach(child => {
+                const childTendencies = tendencyMap[child.id] || [];
+                if (childTendencies.length === 0) return;
+
+                html += `<div class="category-subsection">`;
+                html += `<div class="category-header child">↳ ${child.name}</div>`;
+                html += `<div class="tendency-group">${renderTendencyItems(childTendencies)}</div>`;
+                html += `</div>`;
+            });
+            html += `</div>`;
+        });
+
+        // 2. Orphans (No Category)
+        if (orphanTendencies.length > 0) {
+            html += `<div class="selector-section">`;
+            html += `<div class="category-header root">미분류</div>`;
+            html += `<div class="tendency-group direct">${renderTendencyItems(orphanTendencies)}</div>`;
+            html += `</div>`;
+        }
+
+        if (filteredTendencies.length === 0) {
+            html += `<div class="selector-empty">해당하는 성향이 없습니다.</div>`;
+        }
 
         html += `</div>`;
         overlay.innerHTML = html;

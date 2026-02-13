@@ -83,6 +83,11 @@
                         <span class="text">게시글 관리</span>
                         <span class="badge" id="postCount">0</span>
                     </button>
+                    <button class="nav-item" data-section="counseling">
+                        <span class="icon">📬</span>
+                        <span class="text">고민 상담소</span>
+                        <span class="badge warning" id="counselingCount">0</span>
+                    </button>
                     <button class="nav-item" data-section="categories">
                         <span class="icon">📂</span>
                         <span class="text">카테고리</span>
@@ -327,6 +332,66 @@
                             <div class="action-buttons">
                                 <button class="btn-secondary" id="saveDraftBtn">💾 임시 저장</button>
                                 <button class="btn-primary" id="publishPostBtn">🚀 발행하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Counseling Console Section -->
+                <section id="section-counseling" class="content-section">
+                    <h2 class="section-title">📬 고민 상담소</h2>
+
+                    <div class="cms-layout">
+                        <!-- Left: Message List -->
+                        <div class="cms-sidebar">
+                            <div class="cms-tabs">
+                                <button class="cms-tab active" onclick="loadCounselingMessages('waiting')">대기중</button>
+                                <button class="cms-tab" onclick="loadCounselingMessages('answered')">답변완료</button>
+                                <button class="cms-tab" onclick="loadCounselingMessages('all')">전체</button>
+                            </div>
+                            <div id="counselingList" class="cms-message-list">
+                                <!-- Messages loaded dynamically -->
+                                <div class="loading-spinner"></div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Detail & Reply -->
+                        <div class="cms-main-panel">
+                            <div id="counselingDetailPlaceholder" class="cms-placeholder">
+                                <span class="placeholder-icon">📩</span>
+                                <p>상담 메시지를 선택하면 내용이 표시됩니다.</p>
+                            </div>
+
+                            <div id="counselingDetailContent" class="cms-detail-content" style="display: none;">
+                                <div class="message-header-card">
+                                    <div class="msg-meta">
+                                        <span class="msg-date" id="msgDate">2024.01.01</span>
+                                        <span class="msg-nickname" id="msgNickname">익명</span>
+                                    </div>
+                                    <div class="msg-content-box">
+                                        <p id="msgContent">고민 내용...</p>
+                                    </div>
+                                </div>
+
+                                <div class="reply-editor-area">
+                                    <div class="editor-toolbar">
+                                        <span class="toolbar-label">답변 작성</span>
+                                        <select id="replyTemplateSelect" class="template-select"
+                                            onchange="insertTemplate(this.value)">
+                                            <option value="">📋 템플릿 선택...</option>
+                                        </select>
+                                    </div>
+                                    <textarea id="replyTextarea" class="reply-textarea"
+                                        placeholder="따뜻한 답변을 작성해주세요..."></textarea>
+
+                                    <div class="reply-actions">
+                                        <label class="checkbox-label" style="font-size: 0.9rem;">
+                                            <input type="checkbox" id="replyIsPublic">
+                                            <span>공개 답변으로 설정 (사용자 동의 필요)</span>
+                                        </label>
+                                        <button class="btn-primary" onclick="sendReply()">답변 보내기 💌</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
