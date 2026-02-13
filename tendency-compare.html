@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top / Bottom 세부 성향 비교 - SMALLSM Archive</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tendency-compare.css">
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation (Same as index.html) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="site-title">
+                    <a href="index.html" style="text-decoration: none; color: inherit;">SMALLSM</a>
+                </h1>
+                <p class="site-subtitle">CINEMATIC ARCHIVE</p>
+            </div>
+            <nav>
+                <ul class="category-nav" id="categoryNav">
+                    <!-- Dynamically loaded -->
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="mode-toggle" id="modeToggle">
+                    <span>🌙</span>
+                    <span>Night Library</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-panel tendency-compare-panel">
+                <header class="page-header">
+                    <h1 class="post-title">Top / Bottom 세부 성향 비교</h1>
+                    <p class="post-meta">리스트를 클릭하면 우측에서 상세 내용을 확인할 수 있습니다.</p>
+                </header>
+
+                <div class="split-view-container">
+                    <!-- Left: Comparison Grid -->
+                    <div class="left-pane">
+                        <div class="compare-header-sticky">
+                            <div class="header-col top">- Top</div>
+                            <div class="header-col bottom">- Bottom</div>
+                        </div>
+
+                        <div id="tendencyGrid" class="tendency-grid">
+                            <div class="loading-state">기록을 불러오는 중...</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Detail Panel -->
+                    <div class="right-pane" id="detailPane">
+                        <button class="detail-close-btn" onclick="closeDetail()" title="닫기">✕</button>
+
+                        <div class="detail-placeholder">
+                            <div class="placeholder-icon">⚖️</div>
+                            <p>궁금한 성향을 클릭하시면<br>상세 내용을 읽어보실 수 있습니다.</p>
+                        </div>
+
+                        <div class="detail-content" style="display: none;">
+                            <div class="detail-header-group">
+                                <h2 class="detail-title">성향 이름</h2>
+                                <div class="detail-type-badge">TYPE</div>
+                            </div>
+                            <div class="detail-scroll-area">
+                                <div class="detail-description">상세 설명이 여기에 나타납니다.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="site-footer">
+                <p id="copyrightText">© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/api/config"></script>
+    <script src="js/tendency-compare.js"></script>
+</body>
+
+</html>
