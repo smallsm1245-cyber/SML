@@ -6,6 +6,7 @@ console.log('🚀 Wiki Dashboard loading...');
 
 let supabaseClient = null;
 let hasUnsavedChanges = false;
+let globalCategories = []; // Added for tendency category mapping
 
 // ═══════════════════════════════════════════════════
 // WAIT FOR CONFIG
@@ -1349,7 +1350,7 @@ async function loadTendencies() {
     try {
         const { data, error } = await supabaseClient
             .from('tendencies')
-            .select('*')
+            .select('*, categories(name)')
             .order('display_order', { ascending: true });
 
         if (error) throw error;
@@ -1386,6 +1387,15 @@ function renderTendencyLists() {
                 <input type="text" class="name-input" value="${item.name}" 
                     onchange="updateLocalTendencyName('${item.id}', this.value)" 
                     placeholder="성향 이름">
+                <select class="category-select-admin" onchange="updateLocalTendencyCategory('${item.id}', this.value)">
+                    <option value="">카테고리 없음</option>
+                    ${globalCategories.filter(c => !c.parent_id).map(root => `
+                        <option value="${root.id}" ${item.category_id === root.id ? 'selected' : ''}>${root.name}</option>
+                        ${globalCategories.filter(c => c.parent_id === root.id).map(child => `
+                            <option value="${child.id}" ${item.category_id === child.id ? 'selected' : ''}>&nbsp;&nbsp;ㄴ ${child.name}</option>
+                        `).join('')}
+                    `).join('')}
+                </select>
                 <button class="action-btn danger" onclick="deleteTendency('${item.id}', '${item.name}')">🗑️</button>
             </div>
             <textarea class="desc-input" 
@@ -1435,6 +1445,14 @@ window.updateLocalTendencyDesc = function (id, desc) {
     }
 }
 
+window.updateLocalTendencyCategory = function (id, categoryId) {
+    const item = currentTendencies.find(t => t.id === id);
+    if (item) {
+        item.category_id = categoryId || null;
+        hasUnsavedChanges = true;
+    }
+}
+
 function updateLocalTendencyMatch(id, matchedId) {
     const item = currentTendencies.find(t => t.id === id);
     if (item) {
@@ -1461,6 +1479,7 @@ function updateLocalTendencyMatch(id, matchedId) {
 window.addTendency = async function () {
     console.log('addTendency called');
     const type = document.getElementById('newTendencyType').value;
+    const catId = document.getElementById('newTendencyCategory').value;
     const nameInput = document.getElementById('newTendencyName');
     const name = nameInput.value.trim();
 
@@ -1486,6 +1505,7 @@ window.addTendency = async function () {
             .insert([{
                 type,
                 name,
+                category_id: catId || null,
                 display_order: currentTendencies.filter(t => t.type === type).length + 1
             }])
             .select();
@@ -1563,9 +1583,15 @@ window.saveTendencyAll = async function () {
         }
 
         // Perform bulk update (upsert)
+        // Clean up internal properties before upsert
+        const cleanupData = currentTendencies.map(t => {
+            const { categories, ...rest } = t;
+            return rest;
+        });
+
         const { error } = await supabaseClient
             .from('tendencies')
-            .upsert(currentTendencies);
+            .upsert(cleanupData);
 
         if (error) throw error;
 
