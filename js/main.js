@@ -629,26 +629,22 @@
 
                         <!-- Slot A -->
                         <div class="tendency-detail-panel slot-a" id="detailPanelA">
-                            <div class="slot-header">
-                                <button class="slot-swap-btn" onclick="openSelector('a')">[교체 ▾]</button>
-                                <button class="slot-action-btn clear" onclick="clearSlot('a')">✕</button>
-                            </div>
+                            <button class="slot-clear-btn" onclick="clearSlot('a')">✕ 초기화</button>
                             <div class="detail-content" id="detailContentA">
-                                ${getPlaceholderHtml('a')}
+                                <div class="detail-placeholder">
+                                    <p>성향 A를 선택하세요.</p>
+                                </div>
                             </div>
-                            <div class="selector-overlay" id="selectorA"></div>
                         </div>
 
                         <!-- Slot B -->
                         <div class="tendency-detail-panel slot-b" id="detailPanelB">
-                            <div class="slot-header">
-                                <button class="slot-swap-btn" onclick="openSelector('b')">[교체 ▾]</button>
-                                <button class="slot-action-btn clear" onclick="clearSlot('b')">✕</button>
-                            </div>
+                            <button class="slot-clear-btn" onclick="clearSlot('b')">✕ 초기화</button>
                             <div class="detail-content" id="detailContentB">
-                                ${getPlaceholderHtml('b')}
+                                <div class="detail-placeholder">
+                                    <p>성향 B를 선택하세요.</p>
+                                </div>
                             </div>
-                            <div class="selector-overlay" id="selectorB"></div>
                         </div>
 
                         <button class="mobile-close-btn" onclick="closeDualOverlay()">✕ 닫기</button>
@@ -672,9 +668,9 @@
         return `
             <div class="detail-placeholder">
                 <p class="placeholder-text">성향 ${slot.toUpperCase()}를 선택하세요.</p>
-                <div class="cta-group">
-                    <button class="cta-btn top" onclick="openSelector('${slot}', 'top')">⬆️ TOP 리스트</button>
-                    <button class="cta-btn bottom" onclick="openSelector('${slot}', 'bottom')">⬇️ BOTTOM 리스트</button>
+                <div class="cta-rows">
+                    <button class="cta-btn top" onclick="openSelector('${slot}', 'top')">⬆️ TOP 리스트 보기</button>
+                    <button class="cta-btn bottom" onclick="openSelector('${slot}', 'bottom')">⬇️ BOTTOM 리스트 보기</button>
                 </div>
             </div>
         `;
@@ -682,36 +678,10 @@
 
     function formatDescription(text) {
         if (!text) return '';
-
-        // Split by 【 소제목 】
-        const sections = text.split(/(?=【.*?】)/g);
-        if (sections.length <= 1) {
-            return text.replace(/【(.*?)】/g, '<strong>【$1】</strong>').replace(/\n/g, '<br>');
-        }
-
-        return sections.map(section => {
-            const match = section.match(/【(.*?)】/);
-            if (!match) return section.replace(/\n/g, '<br>');
-
-            const title = match[1];
-            const body = section.replace(match[0], '').trim().replace(/\n/g, '<br>');
-
-            return `
-                <div class="section-accordion">
-                    <div class="accordion-header" onclick="toggleSectionAccordion(this)">
-                        【 ${title} 】
-                    </div>
-                    <div class="accordion-content">
-                        ${body}
-                    </div>
-                </div>
-            `;
-        }).join('');
+        let formatted = text.replace(/【(.*?)】/g, '<strong>【$1】</strong>');
+        formatted = formatted.replace(/\n/g, '<br>');
+        return formatted;
     }
-
-    window.toggleAccordion = function (header) {
-        header.parentElement.classList.toggle('expanded');
-    };
 
     window.toggleTendencyList = function () {
         const wrapper = document.querySelector('.tendency-dual-wrapper');
@@ -723,17 +693,82 @@
         }
     };
 
-    window.showDetail = function (id, type, partnerCellId) {
+    window.openSelector = function (slot, typeFilter = null) {
+        const overlay = document.getElementById(`selector${slot.toUpperCase()}`);
+        if (!overlay) return;
+
+        overlay.classList.add('active');
+        renderSelectorContent(slot, typeFilter);
+    };
+
+    window.closeSelector = function (slot) {
+        const overlay = document.getElementById(`selector${slot.toUpperCase()}`);
+        if (overlay) overlay.classList.remove('active');
+    };
+
+    function renderSelectorContent(slot, typeFilter) {
+        const overlay = document.getElementById(`selector${slot.toUpperCase()}`);
+        const tendencies = window.tendencyData || [];
+
+        const grouped = {
+            top: tendencies.filter(t => t.type === 'top'),
+            bottom: tendencies.filter(t => t.type === 'bottom'),
+            etc: tendencies.filter(t => t.type !== 'top' && t.type !== 'bottom')
+        };
+
+        let html = `
+            <div class="selector-header">
+                <h3>성향 선택 (${slot.toUpperCase()})</h3>
+                <button class="close-selector" onclick="closeSelector('${slot}')">✕</button>
+            </div>
+            <div class="selector-list">
+        `;
+
+        const renderGroup = (label, items, type) => {
+            if (items.length === 0) return '';
+            if (typeFilter && typeFilter !== type) return '';
+
+            return `
+                <div class="selector-group ${type}">
+                    <div class="group-label">${label}</div>
+                    ${items.map(item => `
+                        <div class="selector-item" onclick="selectFromSelector('${slot}', '${item.id}', '${item.type}')">
+                            ${item.name}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        };
+
+        html += renderGroup('⬆️ TOP 성향', grouped.top, 'top');
+        html += renderGroup('⬇️ BOTTOM 성향', grouped.bottom, 'bottom');
+        html += renderGroup('📁 기타 성향', grouped.etc, 'etc');
+
+        html += `</div>`;
+        overlay.innerHTML = html;
+    }
+
+    window.selectFromSelector = function (slot, id, type) {
+        showDetail(id, type, '', slot);
+        closeSelector(slot);
+    };
+
+    window.showDetail = function (id, type, partnerCellId, forcedSlot = null) {
         if (!id) return;
         const item = window.tendencyData.find(t => t.id === id);
         if (!item) return;
 
         // Determine slot
-        let slot = 'a';
-        if (window.dualSelected.a && window.dualSelected.a.id !== id) {
-            slot = 'b';
+        let slot = forcedSlot;
+        if (!slot) {
+            if (window.dualSelected.a && window.dualSelected.a.id !== id) {
+                slot = 'b';
+            } else {
+                slot = 'a';
+            }
         }
-        // If already selected in a slot, just re-activate it (optional: toggle off)
+
+        // If already selected in a slot, just re-activate it
         if (window.dualSelected.a?.id === id) slot = 'a';
         if (window.dualSelected.b?.id === id) slot = 'b';
 
@@ -742,6 +777,17 @@
 
         renderSlot(slot);
         updateHighlights();
+
+        // Smart Logic: Suggest opposite if other slot is empty
+        if (slot === 'a' && !window.dualSelected.b) {
+            const oppositeType = type === 'top' ? 'bottom' : 'top';
+            // Automatically open Slot B selector for the opposite type
+            setTimeout(() => {
+                if (!window.dualSelected.b) {
+                    openSelector('b', oppositeType);
+                }
+            }, 600); // Slight delay for smooth flow
+        }
 
         // Mobile Handling
         if (window.innerWidth <= 768) {
@@ -757,7 +803,14 @@
         const content = document.getElementById(`detailContent${slot.toUpperCase()}`);
         const tab = document.getElementById(`tab-${slot}`);
 
-        if (!data || !content) return;
+        if (!content) return;
+
+        if (!data) {
+            panel.classList.remove('has-content');
+            content.innerHTML = getPlaceholderHtml(slot);
+            if (tab) tab.textContent = `성향 ${slot.toUpperCase()}`;
+            return;
+        }
 
         panel.classList.add('has-content');
         if (tab) tab.textContent = data.item.name;
@@ -772,8 +825,6 @@
             </div>
         `;
         panel.scrollTop = 0;
-        // Close selector if open
-        document.getElementById(`selector${slot.toUpperCase()}`).classList.remove('active');
     }
 
     function updateHighlights() {
@@ -791,73 +842,8 @@
 
     window.clearSlot = function (slot) {
         window.dualSelected[slot] = null;
-        const panel = document.getElementById(`detailPanel${slot.toUpperCase()}`);
-        const content = document.getElementById(`detailContent${slot.toUpperCase()}`);
-        const tab = document.getElementById(`tab-${slot}`);
-
-        panel.classList.remove('has-content');
-        if (tab) tab.textContent = `성향 ${slot.toUpperCase()}`;
-        content.innerHTML = getPlaceholderHtml(slot);
+        renderSlot(slot);
         updateHighlights();
-        document.getElementById(`selector${slot.toUpperCase()}`).classList.remove('active');
-    };
-
-    window.openSelector = function (slot, filterType = null) {
-        const overlay = document.getElementById(`selector${slot.toUpperCase()}`);
-        if (!overlay) return;
-
-        // Smart Suggestion Logic
-        const otherSlot = slot === 'a' ? 'b' : 'a';
-        const otherData = window.dualSelected[otherSlot];
-
-        // If user didn't specify a filterType, let's suggest the opposite of the other slot
-        if (!filterType && otherData) {
-            filterType = (otherData.type === 'top') ? 'bottom' : 'top';
-        }
-
-        const tops = window.tendencyData.filter(t => t.type === 'top');
-        const bottoms = window.tendencyData.filter(t => t.type === 'bottom');
-
-        let html = `
-            <div class="selector-content">
-                <div class="selector-header">
-                    <h3>성향 선택 (${slot.toUpperCase()})</h3>
-                    <button class="close-selector" onclick="this.closest('.selector-overlay').classList.remove('active')">✕</button>
-                </div>
-                <div class="selector-groups">
-                    <div class="selector-group top-group ${(!filterType || filterType === 'top') ? 'expanded' : ''}" id="group-top-${slot}">
-                        <h4 class="group-title" onclick="toggleGroup('top-${slot}')">⬆️ TOP 성향</h4>
-                        <div class="group-items">
-                            ${tops.map(t => `
-                                <button class="select-item" onclick="showDetail('${t.id}', 'top')">
-                                    ${t.name}
-                                </button>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div class="selector-group bottom-group ${(!filterType || filterType === 'bottom') ? 'expanded' : ''}" id="group-bottom-${slot}">
-                        <h4 class="group-title" onclick="toggleGroup('bottom-${slot}')">⬇️ BOTTOM 성향</h4>
-                        <div class="group-items">
-                            ${bottoms.map(t => `
-                                <button class="select-item" onclick="showDetail('${t.id}', 'bottom')">
-                                    ${t.name}
-                                </button>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        overlay.innerHTML = html;
-        overlay.classList.add('active');
-    };
-
-    window.toggleGroup = function (groupId) {
-        const group = document.getElementById(`group-${groupId}`);
-        if (group) {
-            group.classList.toggle('expanded');
-        }
     };
 
     window.switchMobileSlot = function (slot) {
@@ -880,51 +866,6 @@
     window.closeDualOverlay = function () {
         document.getElementById('tendencyContainer').classList.remove('mobile-overlay-active');
         document.body.style.overflow = '';
-        // Remove splitter handle if present
-        document.getElementById('mobileSplitter')?.remove();
-    };
-
-    // Vertical Splitter Logic (Mobile Only)
-    function initMobileSplitter() {
-        if (window.innerWidth > 768) return;
-        const container = document.getElementById('tendencyContainer');
-        const panelA = document.getElementById('detailPanelA');
-        const panelB = document.getElementById('detailPanelB');
-        if (!container || !panelA || !panelB) return;
-
-        // Create handle
-        const handle = document.createElement('div');
-        handle.className = 'mobile-splitter-handle';
-        handle.id = 'mobileSplitter';
-        panelA.after(handle);
-
-        let isDragging = false;
-        handle.addEventListener('touchstart', (e) => { isDragging = true; e.preventDefault(); });
-        document.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            const touch = e.touches[0];
-            const containerRect = container.getBoundingClientRect();
-            const relativeY = touch.clientY - containerRect.top;
-            let percentage = (relativeY / containerRect.height) * 100;
-
-            // Constrain
-            percentage = Math.max(20, Math.min(80, percentage));
-
-            panelA.style.height = percentage + '%';
-            panelB.style.height = (100 - percentage) + '%';
-            panelA.style.flex = `0 0 ${percentage}%`;
-            panelB.style.flex = `0 0 ${100 - percentage}%`;
-        });
-        document.addEventListener('touchend', () => { isDragging = false; });
-    }
-
-    // Call init when overlay opens
-    const originalShowDetail = window.showDetail;
-    window.showDetail = function (id, type, partnerCellId) {
-        originalShowDetail(id, type, partnerCellId);
-        if (window.innerWidth <= 768) {
-            initMobileSplitter();
-        }
     };
 
     function initNightMode() {
@@ -1032,85 +973,6 @@
         initNightMode();
         initAdminLongPress();
         initMobileMenu();
-
-        // Register Global Functions for Bottom Nav / Admin Bar
-        window.toggleMobileSidebar = function () {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (sidebar && overlay) {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-        };
-
-        window.openDualComparison = function () {
-            renderTendencyView();
-            if (window.innerWidth <= 768) {
-                const container = document.getElementById('tendencyContainer');
-                if (container && !container.classList.contains('mobile-overlay-active')) {
-                    container.classList.add('mobile-overlay-active');
-                    document.body.style.overflow = 'hidden';
-                    // Small delay to ensure DOM is ready
-                    setTimeout(initMobileSplitter, 100);
-                }
-            }
-        };
-
-        window.toggleEditMode = function () {
-            document.body.classList.toggle('is-admin');
-            const accordions = document.querySelectorAll('.section-accordion');
-            const isAdmin = document.body.classList.contains('is-admin');
-
-            accordions.forEach(acc => {
-                const content = acc.querySelector('.accordion-content');
-                if (isAdmin) {
-                    acc.classList.add('expanded');
-                    if (content && !content.querySelector('textarea')) {
-                        const originalHtml = content.innerHTML;
-                        const text = content.innerText.trim();
-                        content.setAttribute('data-original-html', originalHtml);
-                        content.innerHTML = `<textarea class="admin-inline-edit" style="width:100%; height:150px; background:#1a1a1a; color:#fff; border:1px solid var(--primary-brass); padding:10px; font-family:var(--font-body);">${text}</textarea>
-                        <div style="margin-top:10px; text-align:right;"><button class="util-btn" onclick="saveInlineEdit(this)">[저장]</button></div>`;
-                    }
-                } else {
-                    acc.classList.remove('expanded');
-                    if (content && content.hasAttribute('data-original-html')) {
-                        content.innerHTML = content.getAttribute('data-original-html');
-                        content.removeAttribute('data-original-html');
-                    }
-                }
-            });
-        };
-
-        window.showHistory = function () { alert('역사 기록 (Coming Soon)'); };
-        window.showDiscussion = function () { alert('토론 광장 (Coming Soon)'); };
-
-        window.saveInlineEdit = function (btn) {
-            const content = btn.closest('.accordion-content');
-            const textarea = content.querySelector('textarea');
-            if (textarea) {
-                const newText = textarea.value;
-                console.log('💾 Saving content:', newText);
-                content.innerHTML = newText.replace(/\n/g, '<br>');
-                alert('내용이 임시 저장되었습니다.');
-            }
-        };
-
-        // Progress Bar Listener
-        window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            const bar = document.getElementById("progressBar");
-            if (bar) bar.style.width = scrolled + "%";
-        });
-
-        window.toggleSectionAccordion = function (header) {
-            const accordion = header.closest('.section-accordion');
-            if (accordion) {
-                accordion.classList.toggle('expanded');
-            }
-        };
 
         console.log('🎉 Initialization complete');
     });

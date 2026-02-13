@@ -22,13 +22,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- Manifest & PWA icons -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#B68D40">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16x16.png">
-
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <!-- Toast UI Viewer -->
@@ -36,18 +29,18 @@
 </head>
 
 <body>
-    <!-- Admin Utility Bar (Hidden by default) -->
-    <div class="admin-utility-bar" id="adminUtilityBar">
-        <button class="util-btn" onclick="toggleEditMode()">[편집]</button>
-        <button class="util-btn" onclick="showHistory()">[역사]</button>
-        <button class="util-btn" onclick="showDiscussion()">[토론]</button>
+    <!-- Age Verification Disclaimer -->
+    <div id="disclaimerOverlay" class="disclaimer-overlay">
+        <div class="disclaimer-content">
+            <h2>성인 인증</h2>
+            <p>본 사이트는 성인 지향 콘텐츠를 포함하고 있습니다.<br>
+                귀하는 만 19세 이상이십니까?</p>
+            <div class="disclaimer-buttons">
+                <button class="btn btn-primary" id="btnYes">예 (19세 이상)</button>
+                <button class="btn btn-secondary" id="btnNo">아니요</button>
+            </div>
+        </div>
     </div>
-
-    <!-- Reading Progress Bar -->
-    <div id="scrollProgress" class="scroll-progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-
 
     <!-- Mobile Header (Visible only on mobile) -->
     <header class="mobile-header">
@@ -60,7 +53,7 @@
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
     <!-- Main App Container -->
-    <div class="app-container" id="appContainer">
+    <div class="app-container content-blur" id="appContainer">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -109,42 +102,6 @@
                 <p id="copyrightText">© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
             </footer>
         </main>
-    </div>
-
-    <!-- Bottom Navigation Bar (Minimalist 3-Menu) -->
-    <nav class="bottom-nav">
-        <button class="nav-item" onclick="document.getElementById('searchInput')?.focus()">
-            <span class="nav-label">[검색]</span>
-        </button>
-        <div class="nav-divider"></div>
-        <button class="nav-item" onclick="window.location.reload()">
-            <span class="nav-label">[홈]</span>
-        </button>
-        <div class="nav-divider"></div>
-        <button class="nav-item exit-item" onclick="quickExit()">
-            <span class="nav-label">[탈출]</span>
-        </button>
-    </nav>
-
-    <!-- Floating Quick Menu (FAB Menu) -->
-    <div class="fab-menu" id="fabMenu">
-        <button class="fab-action" onclick="scrollToTop()">🔝 맨 위로</button>
-        <button class="fab-action" onclick="openSelector('a')">📋 대상 A</button>
-        <button class="fab-action" onclick="openSelector('b')">📋 대상 B</button>
-        <button class="fab-action" onclick="toggleTOC()">📑 목차</button>
-    </div>
-
-    <!-- Age Verification Disclaimer -->
-    <div id="disclaimerOverlay" class="disclaimer-overlay">
-        <div class="disclaimer-content">
-            <h2>성인 인증</h2>
-            <p>본 사이트는 성인 지향 콘텐츠를 포함하고 있습니다.<br>
-                귀하는 만 19세 이상이십니까?</p>
-            <div class="disclaimer-buttons">
-                <button class="btn btn-primary" id="btnYes">예 (19세 이상)</button>
-                <button class="btn btn-secondary" id="btnNo">아니요</button>
-            </div>
-        </div>
     </div>
 
     <!-- Scripts -->
