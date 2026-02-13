@@ -155,11 +155,6 @@ window.switchSection = function (sectionName) {
     // Show selected section
     document.getElementById(`section-${sectionName}`).classList.add('active');
     document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
-
-    if (sectionName === 'counseling') {
-        loadCounselingMessages('waiting');
-        loadTemplates();
-    }
 };
 
 // ═══════════════════════════════════════════════════
@@ -822,10 +817,6 @@ async function loadCategories() {
         console.log('📊 Categories loaded from DB:', categories);
         console.log('📊 Total count:', categories ? categories.length : 0);
 
-        // Save for tendency mapping
-        globalCategories = categories || [];
-        updateTendencyCategorySelectors();
-
         // Map parent_id to is_sub for UI compatibility
         currentCategories = (categories || []).map(cat => ({
             ...cat,
@@ -1070,47 +1061,7 @@ window.saveAllCategories = async function () {
     }
 };
 
-async function addCategory() {
-    const name = document.getElementById('newCategoryName').value.trim();
-    const parentId = document.getElementById('newCategoryParent').value;
 
-    if (!name) {
-        alert('카테고리 이름을 입력하세요.');
-        return;
-    }
-
-    try {
-        const maxOrder = currentCategories.length > 0
-            ? Math.max(...currentCategories.map(c => c.display_order || 0))
-            : 0;
-
-        const newCategory = {
-            name: name,
-            is_visible: true,
-            has_dropdown: true,
-            default_open: false,
-            display_order: maxOrder + 1
-        };
-
-        // Add parent_id if selected
-        if (parentId) {
-            newCategory.parent_id = parentId;
-        }
-
-        await supabaseClient.from('categories').insert(newCategory);
-
-        document.getElementById('newCategoryName').value = '';
-        document.getElementById('newCategoryParent').value = '';
-
-        const categoryType = parentId ? '소분류' : '대분류';
-        alert(`✅ ${categoryType} 카테고리가 추가되었습니다!`);
-        await loadCategories();
-
-    } catch (error) {
-        console.error('Add failed:', error);
-        alert('❌ 추가 실패');
-    }
-}
 
 
 
@@ -1422,24 +1373,6 @@ function renderTendencyLists() {
     initTendencySortable();
 }
 
-function updateTendencyCategorySelectors() {
-    const newSelect = document.getElementById('newTendencyCategory');
-
-    let html = '<option value="">카테고리 없음</option>';
-
-    const rootCategories = (globalCategories || []).filter(c => !c.parent_id).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-
-    rootCategories.forEach(root => {
-        html += `<option value="${root.id}">📁 ${root.name}</option>`;
-        const children = (globalCategories || []).filter(c => c.parent_id === root.id).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-        children.forEach(child => {
-            html += `<option value="${child.id}">&nbsp;&nbsp;&nbsp;&nbsp;📄 ${child.name}</option>`;
-        });
-    });
-
-    if (newSelect) newSelect.innerHTML = html;
-}
-
 function initTendencySortable() {
     ['topTendencyList', 'bottomTendencyList'].forEach(id => {
         const el = document.getElementById(id);
@@ -1460,14 +1393,6 @@ window.updateLocalTendencyName = function (id, name) {
     const item = currentTendencies.find(t => t.id === id);
     if (item) {
         item.name = name;
-        hasUnsavedChanges = true;
-    }
-}
-
-window.updateLocalTendencyCategory = function (id, categoryId) {
-    const item = currentTendencies.find(t => t.id === id);
-    if (item) {
-        item.category_id = categoryId || null;
         hasUnsavedChanges = true;
     }
 }
@@ -1934,196 +1859,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     console.log('🎉 Dashboard initialized');
 });
-
-// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
-// COUNSELING CONSOLE (CMS)
-// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
-let currentCounselingFilter = 'waiting';
-let currentMessageId = null;
-let answerTemplates = [];
-
-async function loadCounselingMessages(filter) {
-    if (filter) currentCounselingFilter = filter;
-
-    // Update active tab
-    document.querySelectorAll('.cms-tab').forEach(t => {
-        t.classList.toggle('active', t.textContent.includes(
-            currentCounselingFilter === 'waiting' ? '?��? :
-                currentCounselingFilter === 'answered' ? '?�료' : '?�체'
-        ));
-    });
-
-    const container = document.getElementById('counselingList');
-    container.innerHTML = '<div class="loading-spinner"></div>';
-
-    try {
-        let query = supabaseClient
-            .from('mailbox_messages')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (currentCounselingFilter === 'waiting') {
-            query = query.eq('status', 'waiting');
-        } else if (currentCounselingFilter === 'answered') {
-            query = query.eq('status', 'answered');
-        }
-
-        const { data: messages, error } = await query;
-
-        if (error) throw error;
-
-        // Update badge
-        const waitingCount = messages.filter(m => m.status === 'waiting').length; // If filter is all, this counts correctly. If filter is waiting, matches length.
-        // Actually, to get true waiting count for badge, we need a separate query or just ignore for now. 
-        // Let's doing a separate lightweight count if we want to keep badge updated.
-        updateCounselingBadge();
-
-        if (!messages || messages.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:var(--admin-text-dim); padding:2rem;">메시지가 ?�습?�다.</p>';
-            return;
-        }
-
-        container.innerHTML = messages.map(msg => {
-            const date = new Date(msg.created_at).toLocaleDateString('ko-KR');
-            const isWaiting = msg.status === 'waiting';
-            return `
-                <div class="cms-message-card ${isWaiting ? 'waiting' : ''}" onclick="viewCounselingMessage('${msg.id}')" id="msg-card-${msg.id}">
-                    <div class="msg-card-header">
-                        <span>${msg.nickname || '?�명'}</span>
-                        <span>${date}</span>
-                    </div>
-                    <div class="msg-card-preview">
-                        ${msg.content}
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-    } catch (error) {
-        console.error('Counseling load error:', error);
-        container.innerHTML = '<p class="error-text">로드 ?�패</p>';
-    }
-}
-
-async function updateCounselingBadge() {
-    try {
-        const { count } = await supabaseClient
-            .from('mailbox_messages')
-            .select('*', { count: 'exact', head: true })
-            .eq('status', 'waiting');
-
-        const badge = document.getElementById('counselingCount');
-        if (badge) badge.textContent = count || 0;
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-async function viewCounselingMessage(id) {
-    currentMessageId = id;
-
-    // Highlight active card
-    document.querySelectorAll('.cms-message-card').forEach(c => c.classList.remove('active'));
-    document.getElementById(`msg-card-${id}`)?.classList.add('active');
-
-    // Show Detail Panel
-    document.getElementById('counselingDetailPlaceholder').style.display = 'none';
-    const contentPanel = document.getElementById('counselingDetailContent');
-    contentPanel.style.display = 'flex';
-
-    try {
-        const { data: msg, error } = await supabaseClient
-            .from('mailbox_messages')
-            .select('*')
-            .eq('id', id)
-            .single();
-
-        if (error) throw error;
-
-        document.getElementById('msgDate').textContent = new Date(msg.created_at).toLocaleString('ko-KR');
-        document.getElementById('msgNickname').textContent = msg.nickname || '?�명';
-        document.getElementById('msgContent').textContent = msg.content;
-
-        // Setup Editor
-        const textarea = document.getElementById('replyTextarea');
-        textarea.value = msg.admin_reply || '';
-        document.getElementById('replyIsPublic').checked = msg.is_public;
-
-        // If answered, maybe indicate it?
-
-    } catch (error) {
-        alert('메시지 로드 ?�패: ' + error.message);
-    }
-}
-
-async function sendReply() {
-    if (!currentMessageId) return;
-
-    const replyText = document.getElementById('replyTextarea').value;
-    const isPublic = document.getElementById('replyIsPublic').checked;
-
-    if (!replyText.trim()) {
-        alert('?��? ?�용???�력?�주?�요.');
-        return;
-    }
-
-    if (!confirm('?��????�록?�시겠습?�까? (?�용?�에�?공개?????�습?�다)')) return;
-
-    try {
-        const { error } = await supabaseClient
-            .from('mailbox_messages')
-            .update({
-                admin_reply: replyText,
-                status: 'answered',
-                is_public: isPublic,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', currentMessageId);
-
-        if (error) throw error;
-
-        alert('???��????�록?�었?�니??');
-        loadCounselingMessages(); // Refresh list to update status
-
-    } catch (error) {
-        alert('?��? ?�록 ?�패: ' + error.message);
-    }
-}
-
-// Templates
-async function loadTemplates() {
-    try {
-        const { data: templates } = await supabaseClient
-            .from('answer_templates')
-            .select('*')
-            .order('display_order', { ascending: true });
-
-        answerTemplates = templates || [];
-
-        const select = document.getElementById('replyTemplateSelect');
-        select.innerHTML = '<option value="">?�� ?�플�??�택...</option>' +
-            answerTemplates.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
-
-    } catch (e) {
-        console.error('Template load fail', e);
-    }
-}
-
-function insertTemplate(templateId) {
-    if (!templateId) return;
-
-    const template = answerTemplates.find(t => t.id === templateId);
-    if (template) {
-        const textarea = document.getElementById('replyTextarea');
-        // Insert at cursor position or append? Let's just append or replace if empty.
-        if (textarea.value.trim() === '') {
-            textarea.value = template.content;
-        } else {
-            if (confirm('?�재 ?�성 중인 ?�용 ?�에 ?�플릿을 추�??�시겠습?�까?')) {
-                textarea.value += '\n\n' + template.content;
-            }
-        }
-    }
-    // Reset select
-    document.getElementById('replyTemplateSelect').value = '';
-}
