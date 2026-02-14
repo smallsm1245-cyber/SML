@@ -1,4 +1,4 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+﻿// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🎬 SMALLSM ARCHIVE - PDF REPORT MODULE
 // Supabase 데이터를 PDF로 변환하는 관리자 전용 모듈
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -250,10 +250,10 @@ function createPDFDocument(posts, stats) {
         doc.text(`#${index + 1}`, margin, yPos);
         yPos += 6;
 
-        // 제목
-        doc.setFontSize(12);
+        // 제목 (폰트 크기를 키워서 강조)
+        doc.setFont('NotoSansKR', 'normal');
+        doc.setFontSize(13);
         doc.setTextColor(40, 40, 40);
-        doc.setFont(undefined, 'bold');
 
         // 제목이 너무 길면 자르기
         const title = post.title || 'Untitled';
@@ -261,7 +261,8 @@ function createPDFDocument(posts, stats) {
         doc.text(titleLines, margin + 5, yPos);
         yPos += titleLines.length * 6;
 
-        doc.setFont(undefined, 'normal');
+        // 일반 폰트 크기로 복원
+        doc.setFont('NotoSansKR', 'normal');
 
         // 메타 정보
         doc.setFontSize(9);
