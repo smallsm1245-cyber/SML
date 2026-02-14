@@ -1859,3 +1859,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     console.log('🎉 Dashboard initialized');
 });
+
+// ═══════════════════════════════════════════════════
+// PDF REPORT DOWNLOAD
+// ═══════════════════════════════════════════════════
+
+/**
+ * PDF 리포트 다운로드 버튼 클릭 핸들러
+ * pdf-module.js의 generatePostsReport 함수를 호출합니다
+ */
+window.downloadPostsReport = async function () {
+    if (!supabaseClient) {
+        alert('❌ Supabase 클라이언트가 초기화되지 않았습니다.');
+        return;
+    }
+
+    if (!window.generatePostsReport) {
+        alert('❌ PDF 생성 모듈을 불러오지 못했습니다.');
+        return;
+    }
+
+    try {
+        console.log('📄 PDF 리포트 다운로드 시작...');
+        await window.generatePostsReport(supabaseClient);
+        // generatePostsReport 함수 내부에서 성공 메시지 출력
+    } catch (error) {
+        console.error('PDF 다운로드 실패:', error);
+        alert('❌ PDF 생성 중 오류가 발생했습니다.\n\n' + error.message);
+    }
+};
