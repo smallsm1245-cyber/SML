@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Noto+Serif+KR:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Noto+Serif+KR:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🎬 SMALLSM ARCHIVE - CINEMATIC SYSTEM STYLESHEET
@@ -63,28 +63,19 @@ body.night-mode {
     box-sizing: border-box;
 }
 
-/* ═══════════════════════════════════════════════════
-   MOBILE FIRST APPROACH - 기본 스타일은 모바일 기준
-   ═══════════════════════════════════════════════════ */
-
 body {
     font-family: var(--font-body);
     background: var(--bg-deep);
     color: var(--text-primary);
-    font-size: 16px;
-    /* 모바일 가독성 최적화 */
-    line-height: 1.7;
-    /* 모바일 줄 간격 개선 */
+    line-height: 1.6;
+    /* Standard Wiki line height */
     overflow-x: hidden;
     transition: background 0.3s ease;
-    word-break: keep-all;
-    /* 한글 단어 단위 줄바꿈 */
-    word-wrap: break-word;
+    word-break: break-all;
+    /* Wiki style line breaking */
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding: 0;
-    /* 모바일 기본 패딩 제거 */
 }
 
 /* Texture Overlay - Grain Effect */
@@ -101,9 +92,9 @@ body::before {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     mix-blend-mode: overlay;
     display: block;
+    /* Re-enable texture */
 }
 
-/* 모바일 타이포그래피 */
 h1,
 h2,
 h3,
@@ -114,76 +105,60 @@ h6 {
     font-weight: 700;
     color: var(--text-primary);
     margin-top: 1.5em;
+    /* Explicit margin */
     margin-bottom: 0.5em;
-    line-height: 1.3;
-    /* 모바일 헤딩 줄 간격 */
+    line-height: 1.2;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--glass-border);
+    /* Section divider */
 }
 
 h1 {
-    font-size: 1.75rem;
-    /* 모바일 기본 크기 */
+    font-size: 2.2rem;
     border-bottom: 2px solid var(--text-primary);
 }
 
 h2 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
 }
 
 h3 {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
 }
 
 p {
     margin-bottom: 1.2em;
     text-align: left;
-    font-size: 16px;
-    /* 명시적 모바일 폰트 크기 */
-    line-height: 1.8;
-    /* 모바일 본문 줄 간격 */
+    /* Better readability than justify on web */
+    font-size: 1rem;
 }
 
 /* ═══════════════════════════════════════════════════
-   2. LAYOUT STRUCTURE - MOBILE FIRST
+   2. LAYOUT STRUCTURE - Flex-Grid Hybrid
    ═══════════════════════════════════════════════════ */
-/* 모바일: 세로 배치, 사이드바 숨김 */
 .app-container {
     display: flex;
-    flex-direction: column;
     min-height: 100vh;
     position: relative;
     z-index: 2;
-    padding-top: 60px;
-    /* 모바일 헤더 공간 */
 }
 
 /* ═══════════════════════════════════════════════════
-   3. SIDEBAR - MOBILE: 드로어, DESKTOP: 고정
+   3. SIDEBAR - Floating Navigation
    ═══════════════════════════════════════════════════ */
-/* 모바일: 드로어 스타일 (기본 숨김) */
 .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 280px;
-    background: var(--bg-deep);
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--bg-panel);
     backdrop-filter: blur(20px);
     border-right: 1px solid var(--glass-border);
     padding: 2rem 1.5rem;
-    padding-top: 2rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
     overflow-y: auto;
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
-    transform: translateX(-100%);
-    /* 기본 숨김 */
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1000;
-}
-
-.sidebar.active {
-    transform: translateX(0);
-    /* 열림 */
+    box-shadow: var(--glow-subtle);
+    transition: transform 0.4s ease;
 }
 
 .sidebar-header {
@@ -277,10 +252,7 @@ p {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    /* 터치 영역 최소 44px 확보 */
-    min-height: 44px;
-    /* 모바일 터치 영역 */
+    padding: 0.8rem 1rem;
     background: rgba(206, 177, 128, 0.05);
     border-left: 3px solid transparent;
     color: var(--text-primary);
@@ -370,29 +342,30 @@ p {
 }
 
 /* ═══════════════════════════════════════════════════
-   4. MAIN CONTENT AREA - MOBILE FIRST
+   4. MAIN CONTENT AREA
    ═══════════════════════════════════════════════════ */
-/* 모바일: 최소 패딩, 가로 여백 16-20px */
+/* ═══════════════════════════════════════════════════
+   4. MAIN CONTENT AREA
+   ═══════════════════════════════════════════════════ */
 .main-content {
     flex: 1;
-    padding: 1rem;
-    /* 모바일 기본 패딩 16px */
+    padding: 2rem;
+    /* Reduced outer padding */
+    max-width: var(--content-max);
+    margin: 0 auto;
     width: 100%;
     display: flex;
     flex-direction: column;
 }
 
-/* Panel - 모바일 최적화 */
+/* Panel - Clean Style with Depth */
 .content-panel {
     background: var(--bg-panel);
     border: 1px solid var(--glass-border);
-    border-radius: 0;
-    /* 모바일: 모서리 제거 */
-    border-left: none;
-    /* 모바일: 좌우 테두리 제거 */
-    border-right: none;
-    padding: 1.5rem 1rem;
-    /* 모바일 패딩 */
+    border-radius: 4px;
+    /* Slight rounded corner */
+    padding: 3rem 4rem;
+    /* Specific internal padding */
     box-shadow: var(--shadow-card);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -407,17 +380,16 @@ p {
     }
 }
 
-/* Post Title - 모바일 최적화 */
+/* Post Title */
 .post-title {
-    font-size: 1.6rem;
-    /* 모바일 기본 크기 */
+    font-size: 2.2rem;
     margin-bottom: 0.5rem;
     text-align: left;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid var(--text-primary);
+    /* Thick logic divider */
     color: var(--text-primary);
     font-family: var(--font-body);
-    line-height: 1.3;
 }
 
 .post-title::after {
@@ -435,24 +407,12 @@ p {
     color: var(--text-secondary);
 }
 
-/* Post Content - 모바일 가독성 최적화 */
+/* Post Content */
 .post-content {
     font-size: 16px;
-    /* 모바일 기본 크기 */
-    line-height: 1.8;
-    /* 모바일 줄 간격 */
+    /* Explicit readable size */
+    line-height: 1.6;
     color: var(--text-primary);
-}
-
-/* 코드 블록 및 테이블 반응형 처리 */
-.post-content pre,
-.post-content code,
-.post-content table {
-    max-width: 100%;
-    overflow-x: auto;
-    /* 모바일: 가로 스크롤 허용 */
-    -webkit-overflow-scrolling: touch;
-    /* iOS 스크롤 부드럽게 */
 }
 
 /* Toast UI Viewer Override for Dark Mode & Font */
@@ -870,7 +830,9 @@ body.night-mode .post-content strong {
    ═══════════════════════════════════════════════════ */
 
 /* Mobile Header & Overlay */
-.mobile-header {`r`n    display: flex; /* 紐⑤컮??湲곕낯 ?쒖떆 */
+.mobile-header {
+    display: flex;
+    /* 모바일 기본 표시 */
     position: fixed;
     top: 0;
     left: 0;
@@ -890,7 +852,10 @@ body.night-mode .post-content strong {
     color: var(--primary-brass);
     font-size: 1.8rem;
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 12px;
+    /* 터치 영역 확보 */
+    min-width: 44px;
+    min-height: 44px;
 }
 
 .mobile-logo {
@@ -916,22 +881,23 @@ body.night-mode .post-content strong {
     display: block;
 }
 
-/* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
-   DESKTOP EXPANSION - 1024px ?댁긽
-   ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??*/
+/* ═══════════════════════════════════════════════════
+   DESKTOP EXPANSION - 1024px 이상
+   ═══════════════════════════════════════════════════ */
 @media (min-width: 1024px) {
-    /* ?곗뒪?ы깙: 紐⑤컮???ㅻ뜑 ?④? */
+
+    /* 데스크탑: 모바일 헤더 숨김 */
     .mobile-header {
         display: none;
     }
-    
-    /* ?곗뒪?ы깙: 2???덉씠?꾩썐 */
+
+    /* 데스크탑: 2단 레이아웃 */
     .app-container {
         flex-direction: row;
         padding-top: 0;
     }
-    
-    /* ?곗뒪?ы깙: ?ъ씠?쒕컮 怨좎젙 ?쒖떆 */
+
+    /* 데스크탑: 사이드바 고정 표시 */
     .sidebar {
         position: sticky;
         transform: translateX(0);
@@ -942,58 +908,63 @@ body.night-mode .post-content strong {
         height: 100vh;
         box-shadow: none;
     }
-    
-    /* ?곗뒪?ы깙: 硫붿씤 肄섑뀗痢??뺤옣 */
+
+    /* 데스크탑: 메인 콘텐츠 확장 */
     .main-content {
         padding: 2rem;
     }
-    
-    /* ?곗뒪?ы깙: 肄섑뀗痢??⑤꼸 ?ㅽ???*/
+
+    /* 데스크탑: 콘텐츠 패널 스타일 */
     .content-panel {
         border-radius: 4px;
         border-left: 1px solid var(--glass-border);
         border-right: 1px solid var(--glass-border);
         padding: 3rem 4rem;
     }
-    
-    /* ?곗뒪?ы깙: ??댄룷洹몃옒???뺣? */
+
+    /* 데스크탑: 타이포그래피 확대 */
     h1 {
         font-size: 2.2rem;
     }
-    
+
     h2 {
         font-size: 1.8rem;
     }
-    
+
     h3 {
         font-size: 1.5rem;
     }
-    
+
     .post-title {
         font-size: 2.2rem;
     }
-    
+
     .post-content {
         font-size: 17px;
         line-height: 1.9;
     }
-    
-    /* ?곗뒪?ы깙: ?몃쾭 ?④낵 */
+
+    /* 데스크탑: 호버 효과 */
     .category-link:hover {
         border-left-color: var(--primary-brass);
         background: rgba(206, 177, 128, 0.15);
         padding-left: 1.5rem;
     }
-    
+
     .btn:hover {
         transform: translateY(-2px);
     }
-    
-    /* ?곗뒪?ы깙: ?ъ씠?쒕컮 ?ㅻ쾭?덉씠 ?④? */
+
+    /* 데스크탑: 사이드바 오버레이 숨김 */
     .sidebar-overlay {
         display: none !important;
     }
 }
+
+@media (max-width: 768px) {
+    .mobile-header {
+        display: flex;
+    }
 
     .app-container {
         flex-direction: column;
@@ -1274,84 +1245,19 @@ body.night-mode .post-content strong {
     }
 }
 
-/* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
-   DESKTOP EXPANSION - 1024px ?댁긽
-   ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??*/
-@media (min-width: 1024px) {
-    /* ?곗뒪?ы깙: 紐⑤컮???ㅻ뜑 ?④? */
-    .mobile-header {
-        display: none;
-    }
-    
-    /* ?곗뒪?ы깙: 2???덉씠?꾩썐 */
-    .app-container {
-        flex-direction: row;
-        padding-top: 0;
-    }
-    
-    /* ?곗뒪?ы깙: ?ъ씠?쒕컮 怨좎젙 ?쒖떆 */
-    .sidebar {
-        position: sticky;
-        transform: translateX(0);
-        width: var(--sidebar-width);
-        min-width: var(--sidebar-width);
-        background: var(--bg-panel);
-        top: 0;
-        height: 100vh;
-        box-shadow: none;
-    }
-    
-    /* ?곗뒪?ы깙: 硫붿씤 肄섑뀗痢??뺤옣 */
-    .main-content {
-        padding: 2rem;
-    }
-    
-    /* ?곗뒪?ы깙: 肄섑뀗痢??⑤꼸 ?ㅽ???*/
-    .content-panel {
-        border-radius: 4px;
-        border-left: 1px solid var(--glass-border);
-        border-right: 1px solid var(--glass-border);
-        padding: 3rem 4rem;
-    }
-    
-    /* ?곗뒪?ы깙: ??댄룷洹몃옒???뺣? */
-    h1 {
-        font-size: 2.2rem;
-    }
-    
-    h2 {
-        font-size: 1.8rem;
-    }
-    
-    h3 {
-        font-size: 1.5rem;
-    }
-    
-    .post-title {
-        font-size: 2.2rem;
-    }
-    
-    .post-content {
-        font-size: 17px;
-        line-height: 1.9;
-    }
-    
-    /* ?곗뒪?ы깙: ?몃쾭 ?④낵 */
-    .category-link:hover {
-        border-left-color: var(--primary-brass);
-        background: rgba(206, 177, 128, 0.15);
-        padding-left: 1.5rem;
-    }
-    
-    .btn:hover {
-        transform: translateY(-2px);
-    }
-    
-    /* ?곗뒪?ы깙: ?ъ씠?쒕컮 ?ㅻ쾭?덉씠 ?④? */
-    .sidebar-overlay {
+@media (max-width: 768px) {
+    .tendency-container {
         display: none !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2000;
+        background: var(--bg-deep);
+        padding: 0;
+        flex-direction: column;
     }
-}
 
     .tendency-container.mobile-overlay-active {
         display: flex !important;
