@@ -79,8 +79,23 @@ body {
     min-height: 100vh;
 }
 
+@media (max-width: 768px) {
+    body {
+        display: block !important;
+        /* 모바일에서는 중앙 정렬 flex 해제 */
+        background: var(--bg-deep) !important;
+        /* 모바일은 원래 배경색 */
+    }
+}
+
 body.night-mode {
     background: #050505;
+}
+
+@media (max-width: 768px) {
+    body.night-mode {
+        background: #000000 !important;
+    }
 }
 
 /* Texture Overlay - Grain Effect */
@@ -160,39 +175,41 @@ p {
 
 @media (max-width: 768px) {
     .app-container {
-        max-width: 100%;
-        box-shadow: none;
-        /* 모바일에서는 그림자 제거 */
+        max-width: 100% !important;
+        width: 100% !important;
+        box-shadow: none !important;
     }
 }
 
 .main-content {
     flex: 1;
+    width: 100%;
     padding: 1rem 12px;
-    /* 좌우 여백 최적화 */
 }
 
 @media (max-width: 768px) {
     .main-content {
-        padding: 0.5rem 0;
-        /* 모바일: 수직 패딩 최소화, 좌우 0 */
+        padding: 0 !important;
+        /* 좌우 여백 원천 봉쇄 */
+        width: 100% !important;
     }
 }
 
 .content-panel {
     padding: 1.2rem 14px;
     background: var(--bg-panel);
+    width: 100%;
 }
 
 @media (max-width: 768px) {
     .content-panel {
-        padding: 1rem 12px;
-        /* 모바일: 텍스트가 화면 끝에 더 가깝게 */
-        border-radius: 0;
-        /* 엣지 투 엣지: 둥근 모서리 제거 */
-        border: none;
-        /* 테두리 제거 */
-        box-shadow: none;
+        padding: 15px 12px !important;
+        /* 최소 여백만 유지 */
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
     }
 }
 
