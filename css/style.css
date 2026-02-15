@@ -145,6 +145,8 @@ p {
     position: relative;
     padding-top: 60px;
     /* 모바일 헤더 공간 */
+    width: 100%;
+    /* 전체 너비 기본 */
 }
 
 /* ═══════════════════════════════════════════════════
@@ -902,15 +904,26 @@ body.night-mode .post-content strong {
    ═══════════════════════════════════════════════════ */
 @media (min-width: 1024px) {
 
+    /* 데스크탑: body를 flex로 만들어 사이드바와 컨테이너 정렬 */
+    body {
+        display: flex;
+        flex-direction: row;
+    }
+
     /* 데스크탑: 모바일 헤더 숨김 */
     .mobile-header {
         display: none;
     }
 
-    /* 데스크탑: 2단 레이아웃 */
+    /* 데스크탑: 레이아웃 구조 보정 */
     .app-container {
-        flex-direction: row;
+        flex: 1;
+        /* 가변 너비 */
+        flex-direction: column;
+        /* 내부 요소는 세로 배치 */
         padding-top: 0;
+        min-width: 0;
+        /* flex 자식의 최소 너비 버그 방지 */
     }
 
     /* 데스크탑: 사이드바 고정 표시 */

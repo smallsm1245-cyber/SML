@@ -47,38 +47,38 @@
     <!-- Sidebar Overlay -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
+    <!-- Sidebar Navigation (Moved outside app-container to fix stacking context) -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="site-title">
+                <a href="index.html" style="text-decoration: none; color: inherit;">SMALLSM</a>
+            </h1>
+            <p class="site-subtitle">CINEMATIC ARCHIVE</p>
+        </div>
+
+        <!-- Search -->
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="검색어를 입력하세요...">
+        </div>
+
+        <!-- Categories -->
+        <nav>
+            <ul class="category-nav" id="categoryNav">
+                <!-- Dynamically loaded -->
+            </ul>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <button class="mode-toggle" id="modeToggle">
+                <span>🌙</span>
+                <span>Night Library</span>
+            </button>
+        </div>
+    </aside>
+
     <!-- Main App Container -->
-    <div class="app-container content-blur" id="appContainer">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1 class="site-title">
-                    <a href="index.html" style="text-decoration: none; color: inherit;">SMALLSM</a>
-                </h1>
-                <p class="site-subtitle">CINEMATIC ARCHIVE</p>
-            </div>
-
-            <!-- Search -->
-            <div class="search-box">
-                <input type="text" class="search-input" id="searchInput" placeholder="검색어를 입력하세요...">
-            </div>
-
-            <!-- Categories -->
-            <nav>
-                <ul class="category-nav" id="categoryNav">
-                    <!-- Dynamically loaded -->
-                </ul>
-            </nav>
-
-            <!-- Sidebar Footer -->
-            <div class="sidebar-footer">
-                <button class="mode-toggle" id="modeToggle">
-                    <span>🌙</span>
-                    <span>Night Library</span>
-                </button>
-            </div>
-        </aside>
-
+    <div class="app-container" id="appContainer">
         <!-- Main Content -->
         <main class="main-content">
             <div class="content-panel">
