@@ -990,60 +990,6 @@ body.night-mode .post-content strong {
     }
 }
 
-@media (max-width: 768px) {
-    .mobile-header {
-        display: flex;
-    }
-
-    .app-container {
-        flex-direction: column;
-        padding-top: 60px;
-        /* Space for mobile header */
-    }
-
-    .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        transform: translateX(-100%);
-        z-index: 1000;
-        width: 280px;
-        background: var(--bg-deep);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding-top: 2rem;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .sidebar.active {
-        transform: translateX(0);
-    }
-
-    .main-content {
-        padding: 1rem 0.8rem;
-    }
-
-    .content-panel {
-        padding: 1.5rem 1rem;
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-    }
-
-    .post-title {
-        font-size: 1.6rem;
-    }
-
-    .site-footer {
-        padding: 2rem 1rem;
-    }
-
-    /* Admin specific in style.css if any */
-    .admin-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
-}
 
 /* ═══════════════════════════════════════════════════
    9.5 TENDENCY COMPARISON STYLES (DUAL SYSTEM)
