@@ -149,6 +149,26 @@ p {
     /* 전체 너비 기본 */
 }
 
+/* 768px 이하: 모바일 레이아웃 최적화 (의뢰사항 반영) */
+@media (max-width: 768px) {
+    .app-container {
+        padding-top: 55px;
+        /* 헤더 공간 살짝 축소 */
+    }
+
+    .main-content {
+        padding: 0.8rem 12px;
+        /* 좌우 여백 최소화 (12px) */
+    }
+
+    .content-panel {
+        padding: 1rem 14px;
+        /* 본문 여백 최적화 */
+        border-radius: 0;
+        box-shadow: none;
+    }
+}
+
 /* ═══════════════════════════════════════════════════
    3. SIDEBAR - MOBILE: 드로어, DESKTOP: 고정
    ═══════════════════════════════════════════════════ */
@@ -800,13 +820,70 @@ body.night-mode .post-content strong {
 /* ═══════════════════════════════════════════════════
    8. 404 ERROR PAGE
    ═══════════════════════════════════════════════════ */
-.error-page {
+/* Age Verification Disclaimer */
+.disclaimer-overlay {
     display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    backdrop-filter: blur(10px);
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    text-align: center;
-    padding: 2rem;
+    padding: 1.5rem;
+}
+
+/* 모바일 텍스트 최적화 (768px 이하) */
+@media (max-width: 768px) {
+    .post-title {
+        font-size: 1.6rem;
+        margin-bottom: 0.8rem;
+        line-height: 1.3;
+        letter-spacing: -0.03em;
+        /* 자간 축소 */
+    }
+
+    .post-content {
+        font-size: 15.5px !important;
+        /* 16px -> 15.5px 미세 축소 */
+        line-height: 1.45 !important;
+        /* 줄 간격 최적화 */
+        letter-spacing: -0.025em !important;
+        /* 자간 축소 */
+        word-break: break-all;
+        /* 우측 여백 불규칙성 개선 */
+        color: var(--text-primary);
+    }
+
+    .post-content p {
+        margin-bottom: 1rem;
+    }
+
+    /* 컴포넌트 간소화 */
+    hr {
+        margin: 1.2rem 0 !important;
+        opacity: 0.2;
+    }
+
+    .post-content ul,
+    .post-content ol {
+        padding-left: 1.2rem !important;
+        /* 들여쓰기 최적화 */
+        margin-bottom: 1rem;
+    }
+
+    .post-content li {
+        margin-bottom: 0.4rem;
+    }
+
+    /* 제목 영역 상하 여백 축소 */
+    .content-panel h1:first-child,
+    .content-panel h2:first-child {
+        margin-top: 0;
+    }
 }
 
 .error-content {
