@@ -63,22 +63,19 @@ body.night-mode {
     box-sizing: border-box;
 }
 
-html,
-body {
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-}
-
 body {
     font-family: var(--font-body);
     background: var(--bg-deep);
     color: var(--text-primary);
     line-height: 1.6;
+    /* Standard Wiki line height */
+    overflow-x: hidden;
     transition: background 0.3s ease;
     word-break: break-all;
+    /* Wiki style line breaking */
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
 /* Texture Overlay - Grain Effect */
@@ -144,14 +141,12 @@ p {
     display: flex;
     flex-direction: column;
     /* 모바일 세로 배치 */
-    height: 100%;
-    /* 100vh 상속 */
+    min-height: 100vh;
     position: relative;
     padding-top: 60px;
     /* 모바일 헤더 공간 */
     width: 100%;
     /* 전체 너비 기본 */
-    overflow: hidden;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -176,6 +171,7 @@ p {
     /* 모바일: 기본 숨김 */
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1100;
+    /* 오버레이(1050) 및 헤더(1001)보다 높게 설정 */
 }
 
 .sidebar.active {
@@ -912,8 +908,6 @@ body.night-mode .post-content strong {
     body {
         display: flex;
         flex-direction: row;
-        height: 100vh;
-        height: 100dvh;
     }
 
     /* 데스크탑: 모바일 헤더 숨김 */
@@ -946,12 +940,7 @@ body.night-mode .post-content strong {
 
     /* 데스크탑: 메인 콘텐츠 확장 */
     .main-content {
-        flex: 1;
         padding: 2rem;
-        overflow-y: auto;
-        /* 독립 스크롤 */
-        height: 100%;
-        min-height: 0;
     }
 
     /* 데스크탑: 콘텐츠 패널 스타일 */
@@ -982,34 +971,6 @@ body.night-mode .post-content strong {
     .post-content {
         font-size: 17px;
         line-height: 1.9;
-        /* 멀티 컬럼 가로 탐색 적용 */
-        column-width: 450px;
-        column-gap: 4rem;
-        column-rule: 1px solid var(--glass-border);
-        height: 60vh;
-        /* 높이 고정하여 가로로 흐르게 유도 */
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding-bottom: 2rem;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .post-content img,
-    .post-content iframe,
-    .post-content video {
-        max-width: 100%;
-        height: auto;
-        break-inside: avoid;
-        /* 컬럼 잘림 방지 */
-        margin-bottom: 2rem;
-        border-radius: 8px;
-    }
-
-    .post-content p,
-    .post-content blockquote,
-    .post-content pre {
-        break-inside: avoid;
-        /* 가독성을 위한 잘림 방지 */
     }
 
     /* 데스크탑: 호버 효과 */
@@ -1343,77 +1304,7 @@ body.night-mode .post-content strong {
 }
 
 /* ═══════════════════════════════════════════════════
-   10. POST GRID & CARDS (Scroll-less Optimized)
-   ═══════════════════════════════════════════════════ */
-.section-title {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    color: var(--primary-brass);
-    margin-bottom: 2rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 1px solid var(--glass-border);
-    letter-spacing: 0.05em;
-}
-
-.posts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-    padding-bottom: 3rem;
-}
-
-.post-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-}
-
-.post-card:hover {
-    background: rgba(206, 177, 128, 0.08);
-    border-color: var(--primary-brass);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.post-card-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    height: 100%;
-}
-
-.post-card-content {
-    padding: 1.5rem;
-}
-
-.post-card-title {
-    font-size: 1.15rem;
-    margin: 0;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-    line-height: 1.4;
-    font-weight: 500;
-    border: none;
-    /* Override h3 default */
-}
-
-.post-card-date {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    opacity: 0.6;
-}
-
-.private-lock {
-    color: var(--accent-amber);
-    font-size: 0.9em;
-    margin-left: 0.5rem;
-}
-
-/* ═══════════════════════════════════════════════════
-   11. ANIMATIONS
+   10. ANIMATIONS
    ═══════════════════════════════════════════════════ */
 @keyframes fadeInUp {
     from {

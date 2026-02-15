@@ -188,19 +188,14 @@
                 const recentSection = document.createElement('div');
                 recentSection.style.marginTop = '3rem';
                 recentSection.innerHTML = `
-                    <h2 class="section-title">최근 기록</h2>
-                    <div class="posts-grid">
-                        ${posts.map(post => `
-                            <div class="post-card">
-                                <a href="post.html?id=${post.id}" class="post-card-link">
-                                    <div class="post-card-content">
-                                        <h3 class="post-card-title">${post.title}</h3>
-                                        <span class="post-card-date">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
-                                    </div>
-                                </a>
-                            </div>
-                        `).join('')}
-                    </div>
+                    <h2 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--primary-brass); border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">최근 기록</h2>
+                    ${posts.map(post => `
+                        <div style="margin-bottom: 1rem;">
+                            <a href="post.html?id=${post.id}" style="color: var(--text-primary); text-decoration: none; font-size: 0.95rem;">
+                                • ${post.title} <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 0.5rem;">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
+                            </a>
+                        </div>
+                    `).join('')}
                 `;
                 content.appendChild(recentSection);
             }
@@ -427,23 +422,19 @@
             const metaDiv = document.querySelector('.post-meta');
             if (metaDiv) metaDiv.innerHTML = `<span>총 ${posts.length}개의 게시물</span>`;
 
-            content.innerHTML = `
-                <div class="posts-grid">
-                    ${posts.map(post => `
-                        <div class="post-card">
-                            <a href="post.html?id=${post.id}" class="post-card-link">
-                                <div class="post-card-content">
-                                    <h3 class="post-card-title">
-                                        ${post.title}
-                                        ${post.is_private ? '<span class="private-lock"> 🔒</span>' : ''}
-                                    </h3>
-                                    <span class="post-card-date">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
-                                </div>
-                            </a>
-                        </div>
-                    `).join('')}
+            content.innerHTML = posts.map(post => `
+                <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
+                    <h3>
+                        <a href="post.html?id=${post.id}" style="color: var(--primary-brass); text-decoration: none;">
+                            ${post.title}
+                            ${post.is_private ? '<span style="font-size: 0.8em; color: var(--accent-amber);"> 🔒</span>' : ''}
+                        </a>
+                    </h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                        ${new Date(post.created_at).toLocaleDateString('ko-KR')}
+                    </p>
                 </div>
-            `;
+            `).join('');
 
         } catch (error) {
             console.error('❌ Post loading failed:', error);
@@ -508,20 +499,18 @@
             return;
         }
 
-        content.innerHTML = `
-            <div class="posts-grid">
-                ${results.map(post => `
-                    <div class="post-card">
-                        <a href="post.html?id=${post.id}" class="post-card-link">
-                            <div class="post-card-content">
-                                <h3 class="post-card-title">${post.title}</h3>
-                                <span class="post-card-date">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
-                            </div>
-                        </a>
-                    </div>
-                `).join('')}
+        content.innerHTML = results.map(post => `
+            <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
+                <h3>
+                    <a href="post.html?id=${post.id}" style="color: var(--primary-brass); text-decoration: none;">
+                        ${post.title}
+                    </a>
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                    ${new Date(post.created_at).toLocaleDateString('ko-KR')}
+                </p>
             </div>
-        `;
+        `).join('');
     }
 
     // ═══════════════════════════════════════════════════
