@@ -99,12 +99,54 @@
                 </div>
             </div>
 
+            <!-- Settings Content (Hidden by default) -->
+            <div id="settingsView" class="settings-view" style="display: none;">
+                <h1 class="post-title">Settings</h1>
+                <div class="settings-group">
+                    <h3>비상탈출 설정</h3>
+                    <div class="setting-item">
+                        <label>위장 URL</label>
+                        <input type="text" id="escapeUrlInput" placeholder="https://www.google.com">
+                    </div>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" data-url="https://www.google.com">Google</button>
+                        <button class="preset-btn" data-url="https://ko.wikipedia.org">Wikipedia</button>
+                        <button class="preset-btn" data-url="https://news.naver.com">News</button>
+                    </div>
+                    <div class="setting-item">
+                        <label>버튼 투명도 (<span id="opacityVal">20</span>%)</label>
+                        <input type="range" id="opacitySlider" min="0" max="100" value="20">
+                    </div>
+                </div>
+            </div>
+
             <!-- Footer -->
             <footer class="site-footer">
                 <p id="copyrightText">© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
             </footer>
         </main>
     </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active" id="navHome">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">홈</span>
+        </a>
+        <a href="javascript:void(0);" class="nav-item" id="navSearch">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-label">검색</span>
+        </a>
+        <a href="javascript:void(0);" class="nav-item" id="navSettings">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">설정</span>
+        </a>
+    </nav>
+
+    <!-- Emergency FAB -->
+    <button id="emergencyFab" class="emergency-fab">
+        🏃
+    </button>
 
     <!-- Scripts -->
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>

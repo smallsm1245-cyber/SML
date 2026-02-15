@@ -98,6 +98,248 @@ body.night-mode {
     }
 }
 
+/* ═══════════════════════════════════════════════════
+   10. MOBILE NAVIGATION & FAB
+   ═══════════════════════════════════════════════════ */
+
+.app-container {
+    padding-bottom: 70px !important;
+    /* 하단 탭 바 여백 */
+}
+
+/* Bottom Nav */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 650px;
+    height: 65px;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1002;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: color 0.3s;
+    flex: 1;
+}
+
+.nav-item.active {
+    color: var(--primary-brass);
+}
+
+.nav-icon {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+}
+
+.nav-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Emergency FAB */
+.emergency-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 85px;
+    /* 탭 바 위에 위치 */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary-brass);
+    color: #000;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    z-index: 1003;
+    opacity: 0.2;
+    transition: opacity 0.3s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.emergency-fab:active {
+    opacity: 1 !important;
+    transform: scale(0.9);
+}
+
+/* Category Advanced Styles */
+.category-item {
+    margin-bottom: 0.5rem;
+}
+
+.category-header-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.category-link {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 0;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cat-name-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chevron {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-link.active .chevron {
+    transform: rotate(90deg);
+}
+
+.cat-count {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-family: monospace;
+}
+
+/* Submenu Slide Animation */
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-left: 1.5rem;
+    list-style: none;
+}
+
+.submenu.active {
+    max-height: 1000px;
+    /* 충분히 큰 값 */
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.submenu-link {
+    display: block;
+    padding: 0.6rem 0;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.submenu-link:hover {
+    color: var(--primary-brass);
+}
+
+/* Settings View */
+.settings-view {
+    padding: 1.5rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.settings-group {
+    background: var(--bg-panel);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid var(--glass-border);
+}
+
+.settings-group h3 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-brass);
+    font-size: 1.1rem;
+}
+
+.setting-item {
+    margin-bottom: 1.5rem;
+}
+
+.setting-item label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.setting-item input[type="text"] {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    padding: 0.8rem;
+    color: #fff;
+    border-radius: 8px;
+}
+
+.preset-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.preset-btn:hover {
+    border-color: var(--primary-brass);
+}
+
+.setting-item input[type="range"] {
+    width: 100%;
+    accent-color: var(--primary-brass);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        height: calc(100% - 65px);
+        /* 하단 바 여백 */
+    }
+}
+
 /* Texture Overlay - Grain Effect */
 body::before {
     content: "";

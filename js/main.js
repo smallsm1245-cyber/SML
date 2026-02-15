@@ -273,7 +273,12 @@
             const hasChildren = children.length > 0;
             const count = counts[root.id] || 0;
 
-            // Accordion HTML
+            const chevronSvg = `
+                <svg class="chevron" viewBox="0 0 24 24">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            `;
+
             return `
                 <li class="category-item">
                     <div class="category-header-wrap">
@@ -281,19 +286,21 @@
                            onclick="${hasChildren ? `toggleAccordion('${root.id}')` : `filterByCategory('${root.id}', this)`}" 
                            class="category-link ${hasChildren ? 'has-children' : ''}" 
                            data-id="${root.id}">
-                            <span class="cat-name">${root.name}</span>
-                            <span class="cat-count">(${count})</span>
-                            ${hasChildren ? '<span class="accordion-indicator" id="ind-' + root.id + '">▸</span>' : ''}
+                            <div class="cat-name-block">
+                                ${hasChildren ? chevronSvg : ''}
+                                <span class="cat-name">${root.name}</span>
+                            </div>
+                            <span class="cat-count">${count}</span>
                         </a>
                     </div>
                     ${hasChildren ? `
-                        <ul class="submenu" id="sub-${root.id}" style="display: none;">
+                        <ul class="submenu" id="sub-${root.id}">
                             ${children.map(child => {
                 const childCount = counts[child.id] || 0;
                 return `
                                     <li class="submenu-item">
                                         <a href="javascript:void(0);" onclick="filterByCategory('${child.id}', this)" class="submenu-link" data-id="${child.id}">
-                                            - ${child.name} <span class="cat-count">(${childCount})</span>
+                                            - ${child.name} <span class="cat-count" style="float:right">${childCount}</span>
                                         </a>
                                     </li>
                                 `;
@@ -307,14 +314,11 @@
 
     window.toggleAccordion = function (id) {
         const submenu = document.getElementById(`sub-${id}`);
-        const indicator = document.getElementById(`ind-${id}`);
         const link = document.querySelector(`.category-link[data-id="${id}"]`);
 
         if (submenu) {
-            const isHidden = submenu.style.display === 'none';
-            submenu.style.display = isHidden ? 'block' : 'none';
-            if (indicator) indicator.textContent = isHidden ? '▾' : '▸';
-            if (link) link.classList.toggle('active', isHidden);
+            const isActive = submenu.classList.toggle('active');
+            if (link) link.classList.toggle('active', isActive);
         }
     };
 
@@ -952,12 +956,121 @@
 
         overlay.addEventListener('click', closeMenu);
 
-        // 카테고리 클릭 시 메뉴 닫기 (모바일 전용 레이아웃이므로 모든 기기에서 적용)
+        // 카테고리 클릭 시 메뉴 닫기
         const categoryNav = document.getElementById('categoryNav');
         if (categoryNav) {
             categoryNav.addEventListener('click', (e) => {
-                if (e.target.tagName === 'A' || e.target.closest('a')) {
+                const link = e.target.closest('a');
+                if (link && !link.classList.contains('has-children')) {
                     setTimeout(closeMenu, 150);
+                }
+            });
+        }
+    }
+
+    // ═══════════════════════════════════════════════════
+    // 9. EMERGENCY & BOTTOM NAV SYSTEM
+    // ═══════════════════════════════════════════════════
+    const EMERGENCY_URL_KEY = 'emergency_url';
+    const EMERGENCY_OPACITY_KEY = 'emergency_opacity';
+
+    function initEmergencySystem() {
+        const fab = document.getElementById('emergencyFab');
+        const urlInput = document.getElementById('escapeUrlInput');
+        const opacitySlider = document.getElementById('opacitySlider');
+        const opacityVal = document.getElementById('opacityVal');
+        const presetBtns = document.querySelectorAll('.preset-btn');
+
+        if (!fab) return;
+
+        // Load settings
+        const savedUrl = localStorage.getItem(EMERGENCY_URL_KEY) || 'https://www.google.com';
+        const savedOpacity = localStorage.getItem(EMERGENCY_OPACITY_KEY) || '20';
+
+        if (urlInput) urlInput.value = savedUrl;
+        if (opacitySlider) opacitySlider.value = savedOpacity;
+        if (opacityVal) opacityVal.textContent = savedOpacity;
+        fab.style.opacity = savedOpacity / 100;
+
+        // FAB Logic
+        fab.addEventListener('click', () => {
+            const url = localStorage.getItem(EMERGENCY_URL_KEY) || 'https://www.google.com';
+            window.location.replace(url);
+        });
+
+        // Settings Logic
+        if (urlInput) {
+            urlInput.addEventListener('change', (e) => {
+                let url = e.target.value;
+                if (url && !url.startsWith('http')) url = 'https://' + url;
+                localStorage.setItem(EMERGENCY_URL_KEY, url);
+            });
+        }
+
+        if (opacitySlider) {
+            opacitySlider.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (opacityVal) opacityVal.textContent = val;
+                fab.style.opacity = val / 100;
+                localStorage.setItem(EMERGENCY_OPACITY_KEY, val);
+            });
+        }
+
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const url = btn.dataset.url;
+                if (urlInput) urlInput.value = url;
+                localStorage.setItem(EMERGENCY_URL_KEY, url);
+            });
+        });
+    }
+
+    function initBottomNav() {
+        const navHome = document.getElementById('navHome');
+        const navSearch = document.getElementById('navSearch');
+        const navSettings = document.getElementById('navSettings');
+        const mainEls = document.querySelectorAll('.content-panel, .site-footer');
+        const settingsView = document.getElementById('settingsView');
+
+        if (!navHome || !navSettings) return;
+
+        const showView = (view) => {
+            if (view === 'settings') {
+                mainEls.forEach(el => el.style.display = 'none');
+                if (settingsView) settingsView.style.display = 'block';
+                navSettings.classList.add('active');
+                navHome.classList.remove('active');
+            } else {
+                mainEls.forEach(el => el.style.display = 'block');
+                if (settingsView) settingsView.style.display = 'none';
+                navHome.classList.add('active');
+                navSettings.classList.remove('active');
+            }
+            window.scrollTo(0, 0);
+        };
+
+        navHome.addEventListener('click', (e) => {
+            if (window.location.pathname.includes('post.html')) return; // Allow natural navigation
+            e.preventDefault();
+            showView('home');
+        });
+
+        navSettings.addEventListener('click', (e) => {
+            e.preventDefault();
+            showView('settings');
+        });
+
+        if (navSearch) {
+            navSearch.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Focusing search in sidebar as a fallback or if we want a separate search view
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    const sidebar = document.querySelector('.sidebar');
+                    const overlay = document.getElementById('sidebarOverlay');
+                    sidebar.classList.add('active');
+                    overlay.classList.add('active');
+                    setTimeout(() => searchInput.focus(), 300);
                 }
             });
         }
@@ -1022,6 +1135,8 @@
         initAdminLongPress();
         initMobileMenu();
         initHeaderScroll();
+        initEmergencySystem();
+        initBottomNav();
 
         console.log('🎉 Initialization complete');
     });
