@@ -891,6 +891,30 @@
         });
     }
 
+    function initHeaderScroll() {
+        const header = document.querySelector('.mobile-header');
+        if (!header) return;
+
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+
+            // 50px 이상 스크롤했을 때만 동작 (감도 조절)
+            if (Math.abs(currentScrollY - lastScrollY) < 10) return;
+
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // 아래로 스크롤 중이며 어느 정도 내려왔을 때 숨김
+                header.classList.add('header-hidden');
+            } else {
+                // 위로 스크롤 중일 때 다시 표시
+                header.classList.remove('header-hidden');
+            }
+
+            lastScrollY = currentScrollY;
+        }, { passive: true });
+    }
+
     function initMobileMenu() {
         const menuToggle = document.getElementById('menuToggleBtn');
         const sidebar = document.querySelector('.sidebar');
@@ -898,7 +922,6 @@
 
         if (!menuToggle || !sidebar || !overlay) return;
 
-        // 명시적으로 닫는 기능 추가
         const closeMenu = () => {
             sidebar.classList.remove('active');
             overlay.classList.remove('active');
@@ -918,12 +941,11 @@
 
         overlay.addEventListener('click', closeMenu);
 
-        // 카테고리 클릭 시 메뉴 닫기 (모바일 환경 1024px 미만)
+        // 카테고리 클릭 시 메뉴 닫기 (모바일 전용 레이아웃이므로 모든 기기에서 적용)
         const categoryNav = document.getElementById('categoryNav');
         if (categoryNav) {
             categoryNav.addEventListener('click', (e) => {
-                if (window.innerWidth < 1024 && (e.target.tagName === 'A' || e.target.closest('a'))) {
-                    // 약간의 시간을 두어 사용자가 클릭 효과를 볼 수 있게 함
+                if (e.target.tagName === 'A' || e.target.closest('a')) {
                     setTimeout(closeMenu, 150);
                 }
             });
@@ -988,6 +1010,7 @@
         initNightMode();
         initAdminLongPress();
         initMobileMenu();
+        initHeaderScroll();
 
         console.log('🎉 Initialization complete');
     });
