@@ -134,31 +134,47 @@ p {
 }
 
 /* ═══════════════════════════════════════════════════
-   2. LAYOUT STRUCTURE - Flex-Grid Hybrid
+   2. LAYOUT STRUCTURE - MOBILE FIRST
    ═══════════════════════════════════════════════════ */
+/* 모바일 기본: 세로 배치, 헤더 공간 확보 */
 .app-container {
     display: flex;
+    flex-direction: column;
+    /* 모바일 세로 배치 */
     min-height: 100vh;
     position: relative;
     z-index: 2;
+    padding-top: 60px;
+    /* 모바일 헤더 공간 */
 }
 
 /* ═══════════════════════════════════════════════════
-   3. SIDEBAR - Floating Navigation
+   3. SIDEBAR - MOBILE: 드로어, DESKTOP: 고정
    ═══════════════════════════════════════════════════ */
+/* 모바일 기본: 드로어 스타일 (왼쪽에서 슬라이드) */
 .sidebar {
-    width: var(--sidebar-width);
-    min-width: var(--sidebar-width);
-    background: var(--bg-panel);
+    position: fixed;
+    /* 모바일: 고정 위치 */
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    background: var(--bg-deep);
     backdrop-filter: blur(20px);
     border-right: 1px solid var(--glass-border);
     padding: 2rem 1.5rem;
-    position: sticky;
-    top: 0;
-    height: 100vh;
+    padding-top: 2rem;
     overflow-y: auto;
-    box-shadow: var(--glow-subtle);
-    transition: transform 0.4s ease;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    transform: translateX(-100%);
+    /* 모바일: 기본 숨김 */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+}
+
+.sidebar.active {
+    transform: translateX(0);
+    /* 모바일: 열림 */
 }
 
 .sidebar-header {
