@@ -276,8 +276,11 @@
             // Accordion HTML
             return `
                 <li class="category-item">
-                    <div class="category-header-wrap" onclick="toggleAccordion('${root.id}')">
-                        <a href="javascript:void(0);" onclick="filterByCategory('${root.id}', this)" class="category-link ${hasChildren ? 'has-children' : ''}" data-id="${root.id}">
+                    <div class="category-header-wrap">
+                        <a href="javascript:void(0);" 
+                           onclick="${hasChildren ? `toggleAccordion('${root.id}')` : `filterByCategory('${root.id}', this)`}" 
+                           class="category-link ${hasChildren ? 'has-children' : ''}" 
+                           data-id="${root.id}">
                             <span class="cat-name">${root.name}</span>
                             <span class="cat-count">(${count})</span>
                             ${hasChildren ? '<span class="accordion-indicator" id="ind-' + root.id + '">▸</span>' : ''}
@@ -305,11 +308,13 @@
     window.toggleAccordion = function (id) {
         const submenu = document.getElementById(`sub-${id}`);
         const indicator = document.getElementById(`ind-${id}`);
+        const link = document.querySelector(`.category-link[data-id="${id}"]`);
 
         if (submenu) {
             const isHidden = submenu.style.display === 'none';
             submenu.style.display = isHidden ? 'block' : 'none';
             if (indicator) indicator.textContent = isHidden ? '▾' : '▸';
+            if (link) link.classList.toggle('active', isHidden);
         }
     };
 
@@ -869,26 +874,32 @@
     };
 
     function initNightMode() {
-        const modeToggle = document.getElementById('modeToggle');
-        if (!modeToggle) return;
+        const sidebarToggle = document.getElementById('modeToggle');
+        const headerToggle = document.getElementById('headerModeToggle');
+        if (!sidebarToggle && !headerToggle) return;
 
         const isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === 'true';
 
-        if (isNightMode) {
-            document.body.classList.add('night-mode');
-            modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
-        }
+        const updateUI = (nightMode) => {
+            document.body.classList.toggle('night-mode', nightMode);
+            const icon = nightMode ? '☀️' : '🌙';
+            const text = nightMode ? 'Day Mode' : 'Night Library';
 
-        modeToggle.addEventListener('click', () => {
-            const nightMode = document.body.classList.toggle('night-mode');
-            localStorage.setItem(NIGHT_MODE_KEY, nightMode);
+            if (sidebarToggle) sidebarToggle.innerHTML = `<span>${icon}</span><span>${text}</span>`;
+            if (headerToggle) headerToggle.innerHTML = `<span class="mode-icon">${icon}</span>`;
+        };
 
-            if (nightMode) {
-                modeToggle.innerHTML = '<span>☀️</span><span>Day Mode</span>';
-            } else {
-                modeToggle.innerHTML = '<span>🌙</span><span>Night Library</span>';
-            }
-        });
+        if (isNightMode) updateUI(true);
+
+        const toggleMode = () => {
+            const currentMode = document.body.classList.contains('night-mode');
+            const nextMode = !currentMode;
+            localStorage.setItem(NIGHT_MODE_KEY, nextMode);
+            updateUI(nextMode);
+        };
+
+        if (sidebarToggle) sidebarToggle.addEventListener('click', toggleMode);
+        if (headerToggle) headerToggle.addEventListener('click', toggleMode);
     }
 
     function initHeaderScroll() {

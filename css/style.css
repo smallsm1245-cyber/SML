@@ -1018,7 +1018,8 @@ hr {
     z-index: 1001;
     align-items: center;
     justify-content: space-between;
-    padding: 0 1.5rem;
+    padding: 0 1rem;
+    /* 패딩 소폭 축소 */
 }
 
 .menu-toggle {
@@ -1027,10 +1028,36 @@ hr {
     color: var(--primary-brass);
     font-size: 1.8rem;
     cursor: pointer;
-    padding: 12px;
+    padding: 10px;
     /* 터치 영역 확보 */
     min-width: 44px;
     min-height: 44px;
+}
+
+.header-mode-toggle {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 10px !important;
+    min-width: 44px;
+    min-height: 44px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.accordion-indicator {
+    float: right;
+    font-size: 0.8rem;
+    margin-left: 5px;
+    color: var(--text-secondary);
+    transition: transform 0.3s;
+}
+
+.category-link.active .accordion-indicator {
+    transform: rotate(90deg);
 }
 
 .mobile-logo {
