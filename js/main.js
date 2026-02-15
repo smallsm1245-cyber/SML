@@ -898,21 +898,36 @@
 
         if (!menuToggle || !sidebar || !overlay) return;
 
+        // 명시적으로 닫는 기능 추가
+        const closeMenu = () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
         const toggleMenu = () => {
             const isActive = sidebar.classList.toggle('active');
             overlay.classList.toggle('active', isActive);
             document.body.style.overflow = isActive ? 'hidden' : '';
         };
 
-        menuToggle.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
-
-        // Close sidebar on navigation (mobile)
-        document.getElementById('categoryNav').addEventListener('click', (e) => {
-            if (window.innerWidth <= 768 && (e.target.tagName === 'A' || e.target.closest('a'))) {
-                toggleMenu();
-            }
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu();
         });
+
+        overlay.addEventListener('click', closeMenu);
+
+        // 카테고리 클릭 시 메뉴 닫기 (모바일 환경 1024px 미만)
+        const categoryNav = document.getElementById('categoryNav');
+        if (categoryNav) {
+            categoryNav.addEventListener('click', (e) => {
+                if (window.innerWidth < 1024 && (e.target.tagName === 'A' || e.target.closest('a'))) {
+                    // 약간의 시간을 두어 사용자가 클릭 효과를 볼 수 있게 함
+                    setTimeout(closeMenu, 150);
+                }
+            });
+        }
     }
 
     // ═══════════════════════════════════════════════════
