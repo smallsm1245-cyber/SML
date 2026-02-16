@@ -116,120 +116,101 @@
             <main class="dashboard-main">
                 <!-- Overview Section -->
                 <section id="section-overview" class="content-section active">
-                    <h2 class="section-title">📊 대시보드</h2>
+                    <!-- Quick Actions (Top Placement for Speed) -->
+                    <div class="quick-actions-bar">
+                        <button class="quick-action-btn" onclick="showNewPostEditor()">
+                            <span class="icon">✍️</span> <span class="label">새 글</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="switchSection('home')">
+                            <span class="icon">🏠</span> <span class="label">홈 수정</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="switchSection('categories')">
+                            <span class="icon">📂</span> <span class="label">카테고리</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="window.open('../index.html', '_blank')">
+                            <span class="icon">👀</span> <span class="label">사이트</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="downloadPostsReport()">
+                            <span class="icon">📄</span> <span class="label">리포트</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="switchSection('settings')">
+                            <span class="icon">⚙️</span> <span class="label">설정</span>
+                        </button>
+                    </div>
 
-                    <!-- Stats Cards -->
-                    <div class="stats-grid">
-                        <!-- 1. 게시물 현황 -->
-                        <div class="stat-card">
-                            <div class="stat-icon">📝</div>
-                            <div class="stat-info">
-                                <p class="stat-label">총 게시물</p>
-                                <p class="stat-value" id="statTotalPosts">0</p>
+                    <!-- Micro Stats Grid (4 Columns) -->
+                    <div class="micro-grid">
+                        <!-- 1. Total Posts -->
+                        <div class="micro-card">
+                            <div class="micro-icon">📝</div>
+                            <div class="micro-content">
+                                <span class="micro-label">총 게시물</span>
+                                <span class="micro-value" id="statTotalPosts">0</span>
                             </div>
                         </div>
 
-                        <!-- 2. 방문자 현황 (New) -->
-                        <div class="stat-card">
-                            <div class="stat-icon">👥</div>
-                            <div class="stat-info">
-                                <p class="stat-label">오늘 방문자</p>
-                                <div class="stat-value-group">
-                                    <span class="stat-value" id="statTodayVisitors">0</span>
-                                    <span class="stat-trend up" id="statVisitorTrend">▲ 12%</span>
+                        <!-- 2. Today Visitors -->
+                        <div class="micro-card">
+                            <div class="micro-icon">👥</div>
+                            <div class="micro-content">
+                                <span class="micro-label">오늘 방문자</span>
+                                <div class="micro-value-group">
+                                    <span class="micro-value" id="statTodayVisitors">0</span>
+                                    <span class="micro-trend up" id="statVisitorTrend">▲12%</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. DB 건강 상태 (New) -->
-                        <div class="stat-card">
-                            <div class="stat-icon">❤️</div>
-                            <div class="stat-info">
-                                <p class="stat-label">DB 건강 상태</p>
-                                <div class="db-health-group">
-                                    <span class="stat-value" id="dbHealthScore">98</span>
-                                    <button class="btn-xs-primary" onclick="optimizeDB()">⚡ 최적화</button>
+                        <!-- 3. DB Health -->
+                        <div class="micro-card">
+                            <div class="micro-icon">❤️</div>
+                            <div class="micro-content">
+                                <span class="micro-label">DB 상태</span>
+                                <div class="micro-value-group">
+                                    <span class="micro-value" id="dbHealthScore">98</span>
+                                    <button class="micro-btn-action" onclick="optimizeDB()">⚡</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 4. 카테고리 -->
-                        <div class="stat-card">
-                            <div class="stat-icon">📂</div>
-                            <div class="stat-info">
-                                <p class="stat-label">카테고리</p>
-                                <p class="stat-value" id="statCategories">0</p>
+                        <!-- 4. Categories -->
+                        <div class="micro-card">
+                            <div class="micro-icon">📂</div>
+                            <div class="micro-content">
+                                <span class="micro-label">카테고리</span>
+                                <span class="micro-value" id="statCategories">0</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- System Monitoring (New Section) -->
-                    <div class="card system-monitor-card">
-                        <h3 class="card-title">🖥️ 시스템 리소스 모니터링</h3>
-                        <div class="monitor-grid">
-                            <!-- Server Capacity -->
-                            <div class="monitor-item">
-                                <div class="monitor-header">
-                                    <span>서버 스토리지 용량</span>
-                                    <span class="monitor-value" id="storageValue">45%</span>
-                                </div>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar" id="storageProgressBar" style="width: 45%;"></div>
-                                </div>
-                                <p class="monitor-desc">전체 5GB 중 2.25GB 사용 중</p>
+                    <!-- Slim System Monitor (Single Line) -->
+                    <div class="slim-monitor-section">
+                        <div class="monitor-row">
+                            <div class="monitor-label">🖥️ 서버 스토리지</div>
+                            <div class="slim-progress-container">
+                                <div class="slim-progress-bar" id="storageProgressBar" style="width: 45%;"></div>
                             </div>
-
-                            <!-- Media Breakdown -->
-                            <div class="monitor-item">
-                                <div class="monitor-header">
-                                    <span>미디어 파일 비중</span>
-                                </div>
-                                <div class="stacked-bar-container">
-                                    <div class="stacked-bar-segment img" style="width: 60%;" title="이미지 (60%)"></div>
-                                    <div class="stacked-bar-segment doc" style="width: 25%;" title="문서 (25%)"></div>
-                                    <div class="stacked-bar-segment other" style="width: 15%;" title="기타 (15%)"></div>
-                                </div>
-                                <div class="monitor-legend">
-                                    <span class="legend-item"><span class="dot img"></span>이미지</span>
-                                    <span class="legend-item"><span class="dot doc"></span>문서</span>
-                                    <span class="legend-item"><span class="dot other"></span>기타</span>
-                                </div>
+                            <div class="monitor-val-text" id="storageValue">45%</div>
+                        </div>
+                        <div class="monitor-row">
+                            <div class="monitor-label">📁 미디어 비중</div>
+                            <div class="slim-stacked-container">
+                                <div class="stacked-bar-segment img" style="width: 60%;" title="이미지"></div>
+                                <div class="stacked-bar-segment doc" style="width: 25%;" title="문서"></div>
+                                <div class="stacked-bar-segment other" style="width: 15%;" title="기타"></div>
+                            </div>
+                            <div class="monitor-legend-mini">
+                                <span class="dot img"></span>IMG
+                                <span class="dot doc"></span>DOC
                             </div>
                         </div>
                     </div>
 
                     <!-- Recent Activity -->
-                    <div class="card">
-                        <h3 class="card-title">🕐 최근 활동</h3>
-                        <div id="recentActivity" class="activity-list">
+                    <div class="card compact-card">
+                        <h3 class="card-title-sm">🕐 최근 활동</h3>
+                        <div id="recentActivity" class="activity-list compact-list">
                             <!-- Dynamically loaded -->
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="card">
-                        <h3 class="card-title">⚡ 빠른 작업</h3>
-                        <div class="quick-actions">
-                            <button class="quick-btn" onclick="switchSection('posts')">
-                                <span class="icon">✍️</span>
-                                <span class="text">새 글 작성</span>
-                            </button>
-                            <button class="quick-btn" onclick="switchSection('home')">
-                                <span class="icon">🏠</span>
-                                <span class="text">홈 수정</span>
-                            </button>
-                            <button class="quick-btn" onclick="switchSection('categories')">
-                                <span class="icon">📂</span>
-                                <span class="text">카테고리 추가</span>
-                            </button>
-                            <button class="quick-btn" onclick="window.open('../index.html', '_blank')">
-                                <span class="icon">🔗</span>
-                                <span class="text">사이트 보기</span>
-                            </button>
-                            <button class="quick-btn" onclick="downloadPostsReport()">
-                                <span class="icon">📄</span>
-                                <span class="text">PDF 리포트</span>
-                            </button>
                         </div>
                     </div>
                 </section>
