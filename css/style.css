@@ -36,6 +36,16 @@
 
     /* Effects */
     --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+
+    /* High Density Visuals (New) */
+    --base-font-size: 15px;
+    /* Reduced from 16px default */
+    --line-height: 1.5;
+    /* Compact line height */
+    --container-padding: 16px;
+    /* Reduced padding */
+    --card-padding: 1rem;
+    --border-radius: 8px;
 }
 
 /* Night Library Mode */
@@ -68,7 +78,8 @@ body {
     background: #111;
     /* 데스크탑에서 모바일 기기처럼 보이도록 어두운 배경 */
     color: var(--text-primary);
-    line-height: 1.5;
+    font-size: var(--base-font-size);
+    line-height: var(--line-height);
     /* 줄 간격 최적화 */
     overflow-x: hidden;
     transition: background 0.3s ease;
@@ -941,6 +952,56 @@ body.night-mode .post-content strong {
 
 .admin-title {
     font-size: 2rem;
+}
+
+/* Typography & Spacing (High Density Optimized) */
+:root {
+    --base-font-size: 15px;
+    /* Reduced from 16px */
+    --line-height: 1.5;
+    /* Reduced from 1.7 */
+    /* Typography & Spacing (High Density Optimized) */
+    --base-font-size: 15px;
+    /* Reduced from 16px */
+    --line-height: 1.5;
+    /* Reduced from 1.7 */
+    --container-padding: 16px;
+    /* Reduced padding */
+    --card-padding: 1rem;
+    --border-radius: 8px;
+    /* Slightly sharper */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Noto Serif KR', serif;
+    font-size: var(--base-font-size);
+    line-height: var(--line-height);
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    word-break: keep-all;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Base Layout for Density */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--container-padding);
+}
+
+header {
+    padding: 1rem 0;
+    /* Compact Header */
+}
+
+/* Compact Card Style */
+.post-item {
+    padding: var(--card-padding);
+    margin-bottom: 0.8rem;
+    /* Reduced margin */
 }
 
 .logout-btn {

@@ -1746,43 +1746,66 @@ function showError(message) {
 }
 
 // ═══════════════════════════════════════════════════
+// GLOBAL LOGIN HANDLER
+// ═══════════════════════════════════════════════════
+window.handleLogin = async function () {
+    console.log('👆 Login button clicked');
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    const btn = document.getElementById('loginBtn');
+
+    if (!email || !password) {
+        showError('이메일과 비밀번호를 입력하세요');
+        return;
+    }
+
+    if (!supabaseClient) {
+        showError('⚠️ 시스템 초기화 중입니다. 잠시 후 다시 시도하세요.');
+        console.warn('Supabase client not ready');
+        return;
+    }
+
+    // Admin Email Check
+    if (window.ADMIN_EMAIL && email !== window.ADMIN_EMAIL) {
+        showError('관리자 권한이 없습니다.');
+        console.warn('Email mismatch:', email);
+        return;
+    }
+
+    try {
+        btn.disabled = true;
+        btn.textContent = '로그인 중...';
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+        if (error) throw error;
+
+        console.log('✅ Login successful', data);
+        await showDashboard();
+
+    } catch (error) {
+        console.error('Login failed:', error);
+        showError(error.message || '로그인 실패');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '로그인';
+        }
+    }
+};
+
+// ═══════════════════════════════════════════════════
 // INITIALIZATION
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('📱 DOM ready');
 
-    // Login button (Attached immediately)
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', async () => {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-
-            if (!email || !password) {
-                showError('이메일과 비밀번호를 입력하세요');
-                return;
-            }
-
-            if (!supabaseClient) {
-                showError('⚠️ 시스템 초기화 중입니다. 잠시 후 다시 시도하세요.');
-                return;
-            }
-
-            if (email !== window.ADMIN_EMAIL) {
-                showError('관리자 권한이 없습니다');
-                return;
-            }
-
-            try {
-                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-
-                await showDashboard();
-            } catch (error) {
-                showError(error.message || '로그인 실패');
-            }
-        });
-    }
+    // Home preview setup
+    ['homeTitle', 'homeSubtitle', 'homeContent'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateHomePreview);
+    });
 
     try {
         await waitForConfig();
