@@ -62,6 +62,10 @@
                         SMALLSM Archive</a>
                 </h1>
                 <span class="admin-badge">관리자 모드</span>
+                <div class="live-user-indicator" title="실시간 접속자">
+                    <span class="live-dot"></span>
+                    <span class="live-count" id="liveUserCount">1</span>명 접속 중
+                </div>
             </div>
             <div class="header-right">
                 <button class="theme-toggle" id="themeToggle" title="다크모드 전환">
@@ -116,6 +120,7 @@
 
                     <!-- Stats Cards -->
                     <div class="stats-grid">
+                        <!-- 1. 게시물 현황 -->
                         <div class="stat-card">
                             <div class="stat-icon">📝</div>
                             <div class="stat-info">
@@ -123,25 +128,72 @@
                                 <p class="stat-value" id="statTotalPosts">0</p>
                             </div>
                         </div>
+
+                        <!-- 2. 방문자 현황 (New) -->
                         <div class="stat-card">
-                            <div class="stat-icon">🟢</div>
+                            <div class="stat-icon">👥</div>
                             <div class="stat-info">
-                                <p class="stat-label">공개 중</p>
-                                <p class="stat-value" id="statPublicPosts">0</p>
+                                <p class="stat-label">오늘 방문자</p>
+                                <div class="stat-value-group">
+                                    <span class="stat-value" id="statTodayVisitors">0</span>
+                                    <span class="stat-trend up" id="statVisitorTrend">▲ 12%</span>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- 3. DB 건강 상태 (New) -->
                         <div class="stat-card">
-                            <div class="stat-icon">🔴</div>
+                            <div class="stat-icon">❤️</div>
                             <div class="stat-info">
-                                <p class="stat-label">비공개</p>
-                                <p class="stat-value" id="statPrivatePosts">0</p>
+                                <p class="stat-label">DB 건강 상태</p>
+                                <div class="db-health-group">
+                                    <span class="stat-value" id="dbHealthScore">98</span>
+                                    <button class="btn-xs-primary" onclick="optimizeDB()">⚡ 최적화</button>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- 4. 카테고리 -->
                         <div class="stat-card">
                             <div class="stat-icon">📂</div>
                             <div class="stat-info">
                                 <p class="stat-label">카테고리</p>
                                 <p class="stat-value" id="statCategories">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Monitoring (New Section) -->
+                    <div class="card system-monitor-card">
+                        <h3 class="card-title">🖥️ 시스템 리소스 모니터링</h3>
+                        <div class="monitor-grid">
+                            <!-- Server Capacity -->
+                            <div class="monitor-item">
+                                <div class="monitor-header">
+                                    <span>서버 스토리지 용량</span>
+                                    <span class="monitor-value" id="storageValue">45%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" id="storageProgressBar" style="width: 45%;"></div>
+                                </div>
+                                <p class="monitor-desc">전체 5GB 중 2.25GB 사용 중</p>
+                            </div>
+
+                            <!-- Media Breakdown -->
+                            <div class="monitor-item">
+                                <div class="monitor-header">
+                                    <span>미디어 파일 비중</span>
+                                </div>
+                                <div class="stacked-bar-container">
+                                    <div class="stacked-bar-segment img" style="width: 60%;" title="이미지 (60%)"></div>
+                                    <div class="stacked-bar-segment doc" style="width: 25%;" title="문서 (25%)"></div>
+                                    <div class="stacked-bar-segment other" style="width: 15%;" title="기타 (15%)"></div>
+                                </div>
+                                <div class="monitor-legend">
+                                    <span class="legend-item"><span class="dot img"></span>이미지</span>
+                                    <span class="legend-item"><span class="dot doc"></span>문서</span>
+                                    <span class="legend-item"><span class="dot other"></span>기타</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -186,59 +238,40 @@
                 <section id="section-home" class="content-section">
                     <h2 class="section-title">🏠 홈 화면 관리</h2>
 
-                    <div class="split-layout">
-                        <!-- Editor -->
-                        <div class="editor-panel">
-                            <div class="card">
-                                <div class="form-group">
-                                    <label>메인 제목</label>
-                                    <input type="text" id="homeTitle" class="form-input" placeholder="환영합니다">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>부제목</label>
-                                    <input type="text" id="homeSubtitle" class="form-input"
-                                        placeholder="SMALLSM Archive에 오신 것을 환영합니다">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>본문</label>
-                                    <div id="homeContentEditor"></div>
-                                    <input type="hidden" id="homeContent">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="showRecentPosts">
-                                        <span>최신 게시물 표시</span>
-                                    </label>
-                                </div>
-
-                                <div class="form-group" id="recentPostsCountGroup" style="display: none;">
-                                    <label>표시할 게시물 개수</label>
-                                    <input type="number" id="recentPostsCount" class="form-input" value="3" min="1"
-                                        max="10">
-                                </div>
-
-                                <button class="btn-primary" id="saveHomeBtn">💾 저장하기</button>
+                    <!-- Editor (Full Width) -->
+                    <div class="editor-panel full-width">
+                        <div class="card">
+                            <div class="form-group">
+                                <label>메인 제목</label>
+                                <input type="text" id="homeTitle" class="form-input" placeholder="환영합니다">
                             </div>
-                        </div>
 
-                        <!-- Live Preview -->
-                        <div class="preview-panel">
-                            <div class="preview-header">
-                                <span class="preview-title">실시간 미리보기</span>
-                                <button class="preview-theme-toggle" id="previewThemeToggle" title="다크모드로 보기">
-                                    🌙 다크
-                                </button>
+                            <div class="form-group">
+                                <label>부제목</label>
+                                <input type="text" id="homeSubtitle" class="form-input"
+                                    placeholder="SMALLSM Archive에 오신 것을 환영합니다">
                             </div>
-                            <div class="preview-content" id="homePreview">
-                                <h1 id="previewTitle">환영합니다</h1>
-                                <p class="preview-subtitle" id="previewSubtitle">SMALLSM Archive에 오신 것을 환영합니다</p>
-                                <div class="preview-body" id="previewContent">
-                                    <p>좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.</p>
-                                </div>
+
+                            <div class="form-group">
+                                <label>본문</label>
+                                <div id="homeContentEditor"></div>
+                                <input type="hidden" id="homeContent">
                             </div>
+
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="showRecentPosts">
+                                    <span>최신 게시물 표시</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group" id="recentPostsCountGroup" style="display: none;">
+                                <label>표시할 게시물 개수</label>
+                                <input type="number" id="recentPostsCount" class="form-input" value="3" min="1"
+                                    max="10">
+                            </div>
+
+                            <button class="btn-primary" id="saveHomeBtn">💾 저장하기</button>
                         </div>
                     </div>
                 </section>

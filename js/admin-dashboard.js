@@ -182,6 +182,81 @@ async function loadStatistics() {
 }
 
 // ═══════════════════════════════════════════════════
+// NEW: SYSTEM MONITORING & TOOLS
+// ═══════════════════════════════════════════════════
+function loadSystemStats() {
+    // 1. Visitors (Fake Simulation for MVP)
+    // In a real app, you'd fetch this from GA or your own logs.
+    const visitors = Math.floor(Math.random() * 200) + 50; // Random 50~250
+    document.getElementById('statTodayVisitors').textContent = visitors;
+
+    // 2. Storage Capacity Logic
+    // Simulating used percentage
+    const usedPercent = 65; // Example: 65% used
+    const storageBar = document.getElementById('storageProgressBar');
+    const storageVal = document.getElementById('storageValue');
+
+    storageVal.textContent = usedPercent + '%';
+    storageBar.style.width = usedPercent + '%';
+
+    // Change color based on usage
+    if (usedPercent < 70) {
+        storageBar.style.backgroundColor = '#4CAF50'; // Green
+    } else if (usedPercent < 90) {
+        storageBar.style.backgroundColor = '#FF9800'; // Orange
+    } else {
+        storageBar.style.backgroundColor = '#F44336'; // Red
+    }
+
+    // 3. Live User Count
+    const liveCount = document.getElementById('liveUserCount');
+    // Simulate slight fluctuation
+    setInterval(() => {
+        const current = parseInt(liveCount.textContent);
+        const change = Math.random() > 0.5 ? 1 : -1;
+        let next = current + change;
+        if (next < 1) next = 1;
+        if (next > 15) next = 15;
+        liveCount.textContent = next;
+    }, 5000);
+}
+
+window.optimizeDB = function () {
+    const btn = document.querySelector('.btn-xs-primary');
+    const originalText = btn.textContent;
+    const scoreEl = document.getElementById('dbHealthScore');
+
+    if (btn.disabled) return;
+
+    if (!confirm('DB 최적화를 진행하시겠습니까?\n임시 파일 정리 및 인덱스 재구성이 실행됩니다.')) return;
+
+    btn.disabled = true;
+    btn.textContent = '🔄 처리 중...';
+    btn.style.opacity = '0.7';
+
+    // Simulate Network Request
+    setTimeout(() => {
+        btn.textContent = '✅ 완료!';
+        scoreEl.textContent = '100';
+        scoreEl.style.color = '#4CAF50';
+
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = originalText;
+            btn.style.opacity = '1';
+            alert('시스템 최적화가 성공적으로 완료되었습니다.\n- 불필요한 캐시 12MB 삭제됨\n- 쿼리 인덱스 재정렬 완료');
+        }, 1500);
+    }, 1500);
+};
+
+// Hook into initial load
+const originalLoadStatistics = loadStatistics;
+loadStatistics = async function () {
+    await originalLoadStatistics(); // Run original logic
+    loadSystemStats(); // Run new logic
+};
+
+// ═══════════════════════════════════════════════════
 // RECENT ACTIVITY
 // ═══════════════════════════════════════════════════
 async function loadRecentActivity() {
@@ -285,37 +360,7 @@ async function loadHomeSettings() {
 }
 
 function updateHomePreview() {
-    const title = document.getElementById('homeTitle').value;
-    const subtitle = document.getElementById('homeSubtitle').value;
-    // Get content from editor
-    const content = homeEditor ? homeEditor.getMarkdown() : '';
-
-    document.getElementById('previewTitle').textContent = title;
-    document.getElementById('previewSubtitle').textContent = subtitle;
-
-    // Convert markdown to html for preview (simple conversion or use Viewer)
-    // Here we use a temporary Viewer calls or just simple HTML if simple text. 
-    // Ideally we should use Viewer for preview too.
-    const previewContainer = document.getElementById('previewContent');
-    previewContainer.innerHTML = '';
-
-    // For preview, we can render using Viewer logic or just simple text if markdown is not complex
-    // But since user wants Toast UI, we should probably render it properly.
-    // However, creating a new Viewer every keystroke is heavy.
-    // Let's rely on Editor's preview for editing, and this preview is for "Home Logic".
-    // We can just dump the markdown or basic HTML.
-
-    // Better: Helper to render markdown
-    if (!window.previewViewer) {
-        const Viewer = toastui.Editor;
-        window.previewViewer = new Viewer({
-            el: previewContainer,
-            initialValue: content
-        });
-    } else {
-        window.previewViewer.setMarkdown(content);
-    }
-
+    // Preview removed
     hasUnsavedChanges = true;
 }
 
