@@ -1723,9 +1723,9 @@ function waitForConfig() {
             if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
                 clearInterval(interval);
                 resolve();
-            } else if (Date.now() - startTime > 5000) {
+            } else if (Date.now() - startTime > 10000) { // Increased timeout to 10s
                 clearInterval(interval);
-                reject(new Error('Config loading timeout'));
+                reject(new Error('설정 로드 시간 초과 (/api/config 응답 없음)'));
             }
         }, 100);
     });
@@ -1808,14 +1808,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     try {
+        console.log('⏳ Waiting for config...');
         await waitForConfig();
+        console.log('✅ Config loaded:', window.SUPABASE_CONFIG);
+
+        if (!window.SUPABASE_CONFIG.url || !window.SUPABASE_CONFIG.anonKey) {
+            throw new Error('Supabase 설정이 비어있습니다. 환경 변수를 확인하세요.');
+        }
 
         supabaseClient = window.supabase.createClient(
             window.SUPABASE_CONFIG.url,
             window.SUPABASE_CONFIG.anonKey
         );
 
-        console.log('✅ Supabase initialized');
+        console.log('✅ Supabase client initialized');
 
         // Check if already logged in
         if (await checkAuth()) {
@@ -1824,7 +1830,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Initialization failed:', error);
-        showError('시스템 초기화 실패: 설정 파일을 불러올 수 없습니다.');
+        showError('시스템 초기화 실패: ' + (error.message || '설정 파일을 불러올 수 없습니다.'));
+
+        // Debug advice
+        const debugMsg = document.createElement('p');
+        debugMsg.style.color = '#ff6b6b';
+        debugMsg.style.fontSize = '0.8rem';
+        debugMsg.style.marginTop = '1rem';
+        debugMsg.innerHTML = `⚠️ <b>디버깅 가이드:</b><br>
+        1. Vercel 환경 변수(SUPABASE_URL, SUPABASE_ANON_KEY)가 설정되었는지 확인하세요.<br>
+        2. /api/config가 200 OK를 반환하는지 네트워크 탭을 확인하세요.<br>
+        3. 로컬 테스트 중이라면 config.js가 올바르게 로드되었는지 확인하세요.`;
+        document.querySelector('.login-panel').appendChild(debugMsg);
     }
 
     // Logout button
