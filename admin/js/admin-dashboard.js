@@ -13,9 +13,16 @@ let globalCategories = []; // Added for tendency category mapping
 // ═══════════════════════════════════════════════════
 function waitForConfig() {
     return new Promise((resolve) => {
+        let attempts = 0;
         const interval = setInterval(() => {
+            attempts++;
             if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
                 clearInterval(interval);
+                resolve();
+            } else if (attempts > 50) { // 5 seconds timeout
+                console.error('Config load timeout. Env vars missing?');
+                clearInterval(interval);
+                // Resolve anyway to let the UI show errors instead of hanging
                 resolve();
             }
         }, 100);
@@ -1761,8 +1768,10 @@ window.handleLogin = async function () {
     }
 
     if (!supabaseClient) {
-        showError('⚠️ 시스템 초기화 중입니다. 잠시 후 다시 시도하세요.');
-        console.warn('Supabase client not ready');
+        const msg = '⚠️ 시스템 설정(Config)을 불러오지 못했습니다.\n새로고침 하거나 관리자에게 문의하세요.';
+        showError(msg);
+        alert(msg); // 확실한 피드백을 위해 alert 추가
+        console.warn('Supabase client not ready. window.SUPABASE_CONFIG:', window.SUPABASE_CONFIG);
         return;
     }
 
