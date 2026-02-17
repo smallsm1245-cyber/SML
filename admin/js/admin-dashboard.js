@@ -1881,16 +1881,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Home preview real-time
     ['homeTitle', 'homeSubtitle', 'homeContent'].forEach(id => {
-        document.getElementById(id).addEventListener('input', updateHomePreview);
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateHomePreview);
     });
 
-    document.getElementById('showRecentPosts').addEventListener('change', toggleRecentPostsCount);
-    document.getElementById('saveHomeBtn').addEventListener('click', saveHomeSettings);
-    document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
-    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-    document.getElementById('previewThemeToggle').addEventListener('click', togglePreviewTheme);
-    document.getElementById('saveSettingsBtn').addEventListener('click', saveSiteSettings);
-    document.getElementById('saveSeoBtn').addEventListener('click', saveSeoSettings);
+    document.getElementById('showRecentPosts')?.addEventListener('change', toggleRecentPostsCount);
+    document.getElementById('saveHomeBtn')?.addEventListener('click', saveHomeSettings);
+    document.getElementById('addCategoryBtn')?.addEventListener('click', addCategory);
+    document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+    document.getElementById('previewThemeToggle')?.addEventListener('click', togglePreviewTheme);
+    document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSiteSettings);
+    document.getElementById('saveSeoBtn')?.addEventListener('click', saveSeoSettings);
     // Tendency buttons now use onclick in HTML for better reliability
 
     // Mobile menu toggle
