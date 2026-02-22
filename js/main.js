@@ -65,8 +65,9 @@
 
             // Expose globally to prevent duplicate GoTrue instances
             window.supabaseClient = supabaseClient;
+            window.supabaseClientInitialized = true;
 
-            console.log('✅ Supabase initialized');
+            console.log('✅ Supabase initialized and set to window.supabaseClient');
             return true;
         } catch (error) {
             console.error('❌ Supabase init failed:', error);
@@ -807,6 +808,7 @@
         let contentHtml = '';
 
         if (activeTab === 'Relation') {
+            console.log(`[KinkDict] Rendering Relation tab.`);
             // Build pairs: for each top, find its pair from kinkPairs setting, else fallback to name match, else fallback to index
             const buildPairs = () => {
                 const tops = tendenciesData.filter(t => t.type === 'top');
@@ -868,13 +870,17 @@
             });
             contentHtml += `</div></div>`;
         } else {
-            const listData = activeTab === 'Top' ? doms : subs;
+            const listData = (activeTab === 'Top' ? doms : subs) || [];
+            console.log(`[KinkDict] Rendering ${activeTab} tab. items count: ${listData.length}`);
+
             contentHtml = `<div class="kink-list-container">`;
-            listData.forEach(item => {
+            listData.forEach((item, idx) => {
                 try {
                     // Create a brief summary of the markdown content for the list view
                     const plainText = (item.description || '').replace(/[#*_~>]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
                     const brief = plainText.length > 50 ? plainText.substring(0, 50) + '...' : plainText;
+
+                    console.log(`[KinkDict]  - Rendering item ${idx + 1}/${listData.length}: ${item.name} (${item.id})`);
 
                     contentHtml += `
                         <div class="kink-list-item" onclick="showRoleDetail('${item.id}')">
@@ -891,7 +897,7 @@
                         </div>
                     `;
                 } catch (e) {
-                    console.error('Error rendering kink item:', item, e);
+                    console.error(`[KinkDict] ❌ Error rendering item ${idx + 1}:`, item, e);
                 }
             });
             contentHtml += `</div>`;
