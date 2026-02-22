@@ -839,7 +839,7 @@
             contentHtml = `<div class="kink-list-container">`;
             listData.forEach(item => {
                 // Create a brief summary of the markdown content for the list view
-                const plainText = item.description.replace(/[#*_~>]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
+                const plainText = (item.description || '').replace(/[#*_~>]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
                 const brief = plainText.length > 50 ? plainText.substring(0, 50) + '...' : plainText;
 
                 contentHtml += `
@@ -847,7 +847,7 @@
                         <div class="kink-item-content">
                             <div class="kink-item-header">
                                 <h3 class="kink-item-name">${item.name}</h3>
-                                <span class="kink-item-subname">(${item.sub_name || ''})</span>
+                                ${item.subName ? `<span class="kink-item-subname">(${item.subName})</span>` : ''}
                             </div>
                             <p class="kink-item-desc">${brief}</p>
                         </div>
@@ -883,7 +883,7 @@
                         <button class="kink-tab ${activeTab === 'Relation' ? 'active' : ''}" onclick="switchTendencyTab('Relation')">
                             <div class="kink-tab-icon"><i data-lucide="users"></i></div>
                             <span class="kink-tab-name">RELATION</span>
-                            <span class="kink-tab-count">${Math.min(doms.length, subs.length)}</span>
+                            <span class="kink-tab-count">${Object.keys(window.kinkDictionaryPairs || {}).length}</span>
                         </button>
                     </div>
                 </div>

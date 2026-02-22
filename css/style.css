@@ -1451,22 +1451,37 @@ header {
 }
 
 .kink-list-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
     animation: fadeIn 0.4s ease forwards;
+}
+
+@media (min-width: 768px) {
+    .kink-list-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
 }
 
 .kink-list-item {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    padding: 1.2rem;
+    border-radius: 20px;
+    padding: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 640px) {
+    .kink-list-item {
+        padding: 1.2rem;
+        border-radius: 16px;
+    }
 }
 
 .kink-list-item:hover {
@@ -1500,13 +1515,24 @@ header {
 }
 
 .kink-item-desc {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-dim);
-    line-height: 1.4;
+    line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    margin-top: 0.2rem;
+}
+
+@media (max-width: 640px) {
+    .kink-item-name {
+        font-size: 1rem;
+    }
+
+    .kink-item-desc {
+        font-size: 0.85rem;
+    }
 }
 
 .kink-item-arrow {
