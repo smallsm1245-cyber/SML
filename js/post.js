@@ -24,6 +24,13 @@ function waitForConfig(callback) {
 // 1. SUPABASE INITIALIZATION
 // ═══════════════════════════════════════════════════
 function initializeSupabase() {
+    // 1) First priority: already initialized global client
+    if (window.supabaseClient) {
+        supabaseClient = window.supabaseClient;
+        console.log('✅ Supabase reused from global instance');
+        return;
+    }
+
     if (!window.supabase) {
         console.error('❌ Supabase library not loaded');
         return;
@@ -33,6 +40,7 @@ function initializeSupabase() {
         window.SUPABASE_CONFIG.url,
         window.SUPABASE_CONFIG.anonKey
     );
+    window.supabaseClient = supabaseClient; // Sync back
     console.log('✅ Supabase initialized for post');
 }
 

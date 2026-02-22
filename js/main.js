@@ -20,6 +20,13 @@
     // ═══════════════════════════════════════════════════
     function initializeSupabase() {
         try {
+            // Check if global client already exists
+            if (window.supabaseClient) {
+                supabaseClient = window.supabaseClient;
+                console.log('✅ Supabase reused from global instance');
+                return true;
+            }
+
             if (!window.supabase) {
                 console.error('❌ Supabase library not loaded');
                 return false;
@@ -34,6 +41,9 @@
                 window.SUPABASE_CONFIG.url,
                 window.SUPABASE_CONFIG.anonKey
             );
+
+            // Expose globally to prevent duplicate GoTrue instances
+            window.supabaseClient = supabaseClient;
 
             console.log('✅ Supabase initialized');
             return true;

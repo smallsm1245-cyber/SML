@@ -35,11 +35,21 @@
     function waitForSupabase() {
         return new Promise((resolve) => {
             const interval = setInterval(() => {
+                // 1) First priority: use already initialized global client
+                if (window.supabaseClient) {
+                    supabaseClient = window.supabaseClient;
+                    clearInterval(interval);
+                    resolve();
+                    return;
+                }
+
+                // 2) Second priority: initialize if libs are ready but global client isn't
                 if (window.supabase && window.SUPABASE_CONFIG) {
                     supabaseClient = window.supabase.createClient(
                         window.SUPABASE_CONFIG.url,
                         window.SUPABASE_CONFIG.anonKey
                     );
+                    window.supabaseClient = supabaseClient; // Sync back
                     clearInterval(interval);
                     resolve();
                 }
