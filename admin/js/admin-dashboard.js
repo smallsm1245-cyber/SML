@@ -79,7 +79,8 @@ async function showDashboard() {
         loadHomeSettings(),
         loadCategories(),
         loadPosts(),
-        loadSiteSettings()
+        loadSiteSettings(),
+        loadKinkPairs()
     ]);
 
     // Mobile Menu Toggle Logic
@@ -1712,3 +1713,166 @@ window.downloadPostsReport = async function () {
         alert('❌ PDF 생성 중 오류가 발생했습니다.\n\n' + error.message);
     }
 };
+
+// ═══════════════════════════════════════════════════
+// KINK PAIR MANAGEMENT
+// ═══════════════════════════════════════════════════
+let kinkDictionaryPairs = {}; // { topId: bottomId }
+let allKinkTops = [];
+let allKinkBottoms = [];
+let pairSortables = [];
+
+window.loadKinkPairs = async function () {
+    try {
+        // Fetch specific Category ID for Kink Dictionary
+        const { data: catData } = await supabaseClient.from('categories').select('id, name').eq('name', '성향 백과').single();
+        if (!catData) return;
+
+        const { data: posts } = await supabaseClient.from('archive_posts').select('id, title').eq('category_id', catData.id);
+
+        allKinkTops = [];
+        allKinkBottoms = [];
+
+        (posts || []).forEach(post => {
+            let rawTitle = post.title;
+            let type = 'top';
+            const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
+            if (tagMatch) {
+                type = tagMatch[1].toLowerCase();
+                rawTitle = rawTitle.slice(tagMatch[0].length).trim();
+            } else {
+                const bottomKeywords = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|bottom|submissive/i;
+                if (bottomKeywords.test(rawTitle)) type = 'bottom';
+            }
+            const cleanName = rawTitle.replace(/\s*\(.*?\)$/, '').trim();
+
+            const item = { id: post.id, name: cleanName, title: post.title };
+            if (type === 'top') allKinkTops.push(item);
+            else if (type === 'bottom') allKinkBottoms.push(item);
+        });
+
+        // Fetch saved pairs
+        const { data: pairData } = await supabaseClient.from('settings').select('value').eq('key', 'kink_dictionary_pairs').single();
+        kinkDictionaryPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
+
+        renderKinkPairUI();
+
+    } catch (e) {
+        console.error('Error loading kink pairs:', e);
+    }
+}
+
+function renderKinkPairUI() {
+    const pairedList = document.getElementById('pairedList');
+    const unpairedList = document.getElementById('unpairedBottoms');
+    if (!pairedList || !unpairedList) return;
+
+    pairedList.innerHTML = '';
+    unpairedList.innerHTML = '';
+
+    if (pairSortables.length) {
+        pairSortables.forEach(s => s.destroy());
+    }
+    pairSortables = [];
+
+    // Track assigned bottoms
+    const assignedBottomIds = new Set(Object.values(kinkDictionaryPairs));
+
+    // Render Tops
+    allKinkTops.forEach(top => {
+        const topEl = document.createElement('div');
+        topEl.className = 'kink-pair-row';
+        topEl.style.cssText = 'display: flex; align-items: center; gap: 1rem; padding: 0.5rem; background: var(--admin-bg-alt); border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.2);';
+
+        const topLabel = document.createElement('div');
+        topLabel.innerHTML = `<strong>TOP</strong><br><span style="color: #ff4d4d;">${top.name}</span>`;
+        topLabel.style.cssText = 'flex: 1; font-size: 0.95rem; line-height: 1.4;';
+
+        const bottomSlot = document.createElement('div');
+        bottomSlot.className = 'bottom-slot';
+        bottomSlot.dataset.topId = top.id;
+        bottomSlot.style.cssText = 'flex: 1; min-height: 48px; border: 2px dashed #666; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.1); padding: 4px; transition: border-color 0.2s ease;';
+
+        // If has assigned bottom
+        const bottomId = kinkDictionaryPairs[top.id];
+        if (bottomId) {
+            const bottom = allKinkBottoms.find(b => b.id === bottomId);
+            if (bottom) {
+                const bEl = createBottomCard(bottom);
+                bottomSlot.appendChild(bEl);
+            }
+        }
+
+        topEl.appendChild(topLabel);
+        topEl.appendChild(bottomSlot);
+        pairedList.appendChild(topEl);
+
+        // Make slot sortable
+        pairSortables.push(new Sortable(bottomSlot, {
+            group: 'kink-pairs',
+            animation: 150,
+            onAdd: function (evt) {
+                // Return old item to unpaired if replacing
+                if (bottomSlot.children.length > 1) {
+                    const oldItem = Array.from(bottomSlot.children).find(c => c !== evt.item);
+                    if (oldItem) unpairedList.appendChild(oldItem);
+                }
+            }
+        }));
+    });
+
+    // Render Unpaired Bottoms
+    allKinkBottoms.forEach(bottom => {
+        if (!assignedBottomIds.has(bottom.id)) {
+            unpairedList.appendChild(createBottomCard(bottom));
+        }
+    });
+
+    pairSortables.push(new Sortable(unpairedList, {
+        group: 'kink-pairs',
+        animation: 150
+    }));
+}
+
+function createBottomCard(bottom) {
+    const el = document.createElement('div');
+    el.className = 'bottom-card';
+    el.dataset.bottomId = bottom.id;
+    el.innerHTML = `<strong>BOTTOM</strong><br><span style="color: #4da6ff;">${bottom.name}</span>`;
+    el.style.cssText = 'background: #2a2a35; padding: 0.5rem; border-radius: 4px; cursor: grab; width: 100%; text-align: center; border: 1px solid #445; font-size: 0.9rem; user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2);';
+    return el;
+}
+
+window.saveKinkPairs = async function () {
+    const slots = document.querySelectorAll('.bottom-slot');
+    const newPairs = {};
+
+    slots.forEach(slot => {
+        const topId = slot.dataset.topId;
+        const bottomCard = slot.querySelector('.bottom-card');
+        if (bottomCard) {
+            newPairs[topId] = bottomCard.dataset.bottomId;
+        }
+    });
+
+    try {
+        await supabaseClient.from('settings').upsert({
+            key: 'kink_dictionary_pairs',
+            value: JSON.stringify(newPairs),
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+
+        kinkDictionaryPairs = newPairs;
+        alert('✅ 성향 매칭이 저장되었습니다! 사이트에 즉시 반영됩니다.');
+    } catch (error) {
+        alert('❌ 저장 실패: ' + error.message);
+    }
+};
+
+// Event hook for the button instead of inline onclick if preferred
+document.addEventListener('DOMContentLoaded', () => {
+    const saveBtn = document.getElementById('saveKinkPairsBtn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', window.saveKinkPairs);
+    }
+});

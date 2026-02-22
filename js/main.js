@@ -657,6 +657,11 @@
 
             if (error) throw error;
 
+            // Fetch kink dictionary pairs
+            const { data: pairData } = await supabaseClient.from('settings').select('value').eq('key', 'kink_dictionary_pairs').single();
+            const kinkPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
+            window.kinkDictionaryPairs = kinkPairs;
+
             // Process posts and convert them to "tendencies" format
             const tendenciesData = (posts || []).map(post => {
                 // 1) Check for explicit [top] / [bottom] / [relation] tag at start of title
@@ -745,26 +750,35 @@
         let contentHtml = '';
 
         if (activeTab === 'Relation') {
-            // Build pairs: for each top, find its pair by name (from pair tag), else fallback to index
+            // Build pairs: for each top, find its pair from kinkPairs setting, else fallback to name match, else fallback to index
             const buildPairs = () => {
                 const tops = tendenciesData.filter(t => t.type === 'top');
                 const bottoms = tendenciesData.filter(t => t.type === 'bottom');
                 const pairs = [];
                 const usedBottomIds = new Set();
+                const kinkPairs = window.kinkDictionaryPairs || {};
 
                 tops.forEach((top, idx) => {
                     let matched = null;
-                    if (top.pair) {
-                        // Find bottom by name matching the pair tag
+
+                    // 1) Use admin-defined pair if available
+                    if (kinkPairs[top.id]) {
+                        matched = bottoms.find(b => b.id === kinkPairs[top.id]);
+                    }
+
+                    // 2) Fallback: pair tag
+                    if (!matched && top.pair) {
                         matched = bottoms.find(b =>
                             b.name.toLowerCase().includes(top.pair.toLowerCase()) ||
                             top.pair.toLowerCase().includes(b.name.toLowerCase())
                         );
                     }
+
+                    // 3) Fallback: pair by index
                     if (!matched) {
-                        // Fallback: pair by index, skip already used
                         matched = bottoms.filter(b => !usedBottomIds.has(b.id))[0] || null;
                     }
+
                     if (matched) usedBottomIds.add(matched.id);
                     pairs.push({ top, bottom: matched });
                 });
@@ -775,7 +789,7 @@
             contentHtml = `
                 <div class="kink-relation-container">
                     <div class="kink-relation-info">
-                        <p>Top 게시글 본문 첫 줄에 <code>&lt;!--pair: 파트너이름--&gt;</code>을 추가하면 매칭됩니다.</p>
+                        <p>관리자 페이지 설정 또는 Top 게시글 태그(<code>&lt;!--pair: 이름--&gt;</code>)에 따라 매칭됩니다.</p>
                     </div>
                     <div class="kink-relation-list">
             `;

@@ -106,6 +106,10 @@
                         <span class="text">휴지통</span>
                         <span class="badge warning" id="trashCount">0</span>
                     </button>
+                    <button class="nav-item" data-section="kink-pairs">
+                        <span class="icon">🔗</span>
+                        <span class="text">성향 매칭</span>
+                    </button>
                     <button class="nav-item" data-section="settings">
                         <span class="icon">⚙️</span>
                         <span class="text">설정</span>
@@ -387,6 +391,45 @@
 
                     <div id="trashList" class="trash-list">
                         <!-- Dynamically loaded -->
+                    </div>
+                </section>
+
+                <!-- Kink Pairs Section -->
+                <section id="section-kink-pairs" class="content-section" style="display: none;">
+                    <h2 class="section-title">🔗 성향 매칭 관리</h2>
+
+                    <div class="card">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <p class="section-desc" style="margin: 0;">성향 백과에 표시될 TOP과 BOTTOM의 짝을 설정합니다. <br>우측 대기 중인
+                                항목을 왼쪽의 빈 슬롯으로 드래그하세요.</p>
+                            <button class="btn-primary" id="saveKinkPairsBtn">💾 매칭 저장</button>
+                        </div>
+
+                        <div class="kink-pair-layout"
+                            style="display: flex; gap: 2rem; margin-top: 1rem; flex-wrap: wrap;">
+                            <div class="kink-pair-main"
+                                style="flex: 2; min-width: 300px; background: var(--admin-bg); padding: 1rem; border: 1px solid var(--admin-border); border-radius: 8px;">
+                                <h3>✔️ 매칭된 상위 성향들 (TOP)</h3>
+                                <p style="font-size: 0.85rem; color: var(--admin-text-dim); margin-bottom: 1rem;">각 TOP
+                                    성향의 우측 빈 칸에 매칭될 BOTTOM 성향을 드래그하세요. 매칭을 해제하려면 다시 대기열로 드래그하세요.</p>
+                                <div id="pairedList" class="kink-pair-list"
+                                    style="display: flex; flex-direction: column; gap: 1rem;">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+
+                            <div class="kink-pair-sidebar"
+                                style="flex: 1; min-width: 200px; background: var(--admin-bg); padding: 1rem; border: 1px solid var(--admin-border); border-radius: 8px;">
+                                <h3>❌ 대기 중인 성향 (BOTTOM)</h3>
+                                <p style="font-size: 0.85rem; color: var(--admin-text-dim); margin-bottom: 1rem;">매칭되지
+                                    않은 BOTTOM 성향들입니다.</p>
+                                <div id="unpairedBottoms" class="kink-pair-list"
+                                    style="min-height: 200px; display: flex; flex-direction: column; gap: 0.5rem; background: var(--admin-bg-alt); padding: 1rem; border-radius: 4px; border: 1px dashed var(--admin-border);">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
