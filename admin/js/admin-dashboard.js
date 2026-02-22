@@ -710,10 +710,9 @@ window.showNewPostEditor = function () {
     // Populate categories in editor dropdown
     const categorySelect = document.getElementById('postCategory');
     if (categorySelect && currentCategories.length > 0) {
-        const subCategories = currentCategories.filter(c => c.parent_id);
-
+        // Now allowing all categories instead of just subCategories
         categorySelect.innerHTML = '<option value="">카테고리 선택</option>' +
-            subCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+            currentCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
     }
 };
 
@@ -739,9 +738,9 @@ window.editPost = async function (id) {
         // Populate categories
         const categorySelect = document.getElementById('postCategory');
         if (categorySelect && currentCategories.length > 0) {
-            const subCategories = currentCategories.filter(c => c.parent_id);
+            // Now allowing all categories instead of just subCategories
             categorySelect.innerHTML = '<option value="">카테고리 선택</option>' +
-                subCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+                currentCategories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
             categorySelect.value = post.category_id || '';
         }
 

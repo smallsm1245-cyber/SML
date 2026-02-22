@@ -659,20 +659,28 @@
 
             // Process posts and convert them to "tendencies" format
             const tendenciesData = (posts || []).map(post => {
-                // Try to extract English sub name from parenthesis, e.g., "마스터 (Master)"
-                const titleMatch = post.title.match(/(.*?)\s*\((.*?)\)$/);
-                let name = post.title;
-                let sub_name = '';
+                // 1) Check for explicit [top] / [bottom] / [relation] tag at start of title
+                let rawTitle = post.title;
+                let type = 'top'; // default
 
+                const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
+                if (tagMatch) {
+                    type = tagMatch[1].toLowerCase();
+                    rawTitle = rawTitle.slice(tagMatch[0].length).trim();
+                } else {
+                    // 2) Fallback: keyword matching in title
+                    const bottomKeywords = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|bottom|submissive/i;
+                    if (bottomKeywords.test(rawTitle)) type = 'bottom';
+                }
+
+                // 3) Try to extract English sub name from parenthesis e.g. "마스터 (Master)"
+                const titleMatch = rawTitle.match(/(.*?)\s*\((.*?)\)$/);
+                let name = rawTitle;
+                let sub_name = '';
                 if (titleMatch) {
                     name = titleMatch[1].trim();
                     sub_name = titleMatch[2].trim();
                 }
-
-                // Temporary logic to guess Top/Bottom based on title keywords.
-                // In a robust system, you might tag posts, but for now we regex map common words.
-                const isBottom = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|Bottom|Submissive/i.test(post.title);
-                const type = isBottom ? 'bottom' : 'top';
 
                 return {
                     id: post.id,
@@ -707,6 +715,23 @@
         const subs = tendenciesData.filter(t => t.type === 'bottom');
 
         const activeTab = window.tendencyActiveTab || 'Top';
+
+        // Show empty state if no posts yet
+        if (tendenciesData.length === 0) {
+            mainContent.innerHTML = `
+                <div class="kink-dict-wrapper">
+                    <div class="kink-dict-header">
+                        <h1 class="kink-dict-title">성향 백과</h1>
+                        <p class="kink-dict-subtitle">아직 등록된 성향이 없습니다.</p>
+                    </div>
+                    <div style="text-align:center; padding: 3rem 1rem; color: var(--text-secondary);">
+                        <p>관리자 페이지에서 게시글을 작성하고 <strong>성향 백과</strong> 카테고리를 선택하면 여기에 표시됩니다.</p>
+                        <p style="margin-top:1rem; font-size:0.85rem; opacity:0.7;">제목 앞에 <code>[top]</code> 또는 <code>[bottom]</code>을 붙이면 자동 분류됩니다.<br>예: <code>[top] 마스터 (Master)</code></p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
 
         let contentHtml = '';
 
