@@ -1643,7 +1643,7 @@ header {
     background: #1a1a1a;
     border: 1px solid rgba(255, 255, 255, 0.1);
     width: 100%;
-    max-width: 500px;
+    max-width: 700px;
     max-height: 90vh;
     border-radius: 32px;
     overflow: hidden;
@@ -1767,7 +1767,13 @@ header {
 .role-description .toastui-editor-contents ol {
     margin-top: 0.5rem !important;
     margin-bottom: 0.5rem !important;
+    margin-left: 0 !important;
     padding-left: 1.2rem !important;
+}
+
+.role-description .toastui-editor-contents li {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
 }
 
 .role-description .toastui-editor-contents h1,
@@ -1808,11 +1814,13 @@ header {
 
 @media (max-width: 640px) {
     .role-detail-overlay {
-        padding: 1rem 0.5rem;
+        padding: 0.5rem;
     }
 
     .role-detail-modal {
-        border-radius: 24px;
+        border-radius: 20px;
+        max-width: 100%;
+        width: 100%;
     }
 
     .gallery-title {
