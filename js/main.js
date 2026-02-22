@@ -840,24 +840,28 @@
             const listData = activeTab === 'Top' ? doms : subs;
             contentHtml = `<div class="kink-list-container">`;
             listData.forEach(item => {
-                // Create a brief summary of the markdown content for the list view
-                const plainText = (item.description || '').replace(/[#*_~>]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
-                const brief = plainText.length > 50 ? plainText.substring(0, 50) + '...' : plainText;
+                try {
+                    // Create a brief summary of the markdown content for the list view
+                    const plainText = (item.description || '').replace(/[#*_~>]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
+                    const brief = plainText.length > 50 ? plainText.substring(0, 50) + '...' : plainText;
 
-                contentHtml += `
-                    <div class="kink-list-item" onclick="showRoleDetail('${item.id}')">
-                        <div class="kink-item-content">
-                            <div class="kink-item-header">
-                                <h3 class="kink-item-name">${item.name}</h3>
-                                ${item.subName ? `<span class="kink-item-subname">(${item.subName})</span>` : ''}
+                    contentHtml += `
+                        <div class="kink-list-item" onclick="showRoleDetail('${item.id}')">
+                            <div class="kink-item-content">
+                                <div class="kink-item-header">
+                                    <h3 class="kink-item-name">${item.name}</h3>
+                                    ${item.subName ? `<span class="kink-item-subname">(${item.subName})</span>` : ''}
+                                </div>
+                                <p class="kink-item-desc">${brief}</p>
                             </div>
-                            <p class="kink-item-desc">${brief}</p>
+                            <div class="kink-item-arrow">
+                                <i data-lucide="chevron-right"></i>
+                            </div>
                         </div>
-                        <div class="kink-item-arrow">
-                            <i data-lucide="chevron-right"></i>
-                        </div>
-                    </div>
-                `;
+                    `;
+                } catch (e) {
+                    console.error('Error rendering kink item:', item, e);
+                }
             });
             contentHtml += `</div>`;
         }
