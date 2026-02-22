@@ -1862,6 +1862,9 @@ function renderKinkPairUI() {
         pairSortables.push(new Sortable(bottomSlot, {
             group: 'kink-pairs',
             animation: 150,
+            forceFallback: true,
+            fallbackOnBody: true,
+            swapThreshold: 0.65,
             onAdd: function (evt) {
                 // Return old item to unpaired if replacing
                 if (bottomSlot.children.length > 1) {
@@ -1883,6 +1886,10 @@ function renderKinkPairUI() {
     new Sortable(pairedList, {
         animation: 150,
         ghostClass: 'sortable-ghost',
+        scroll: true,
+        scrollSensitivity: 100,
+        scrollSpeed: 20,
+        bubble: true,
         onEnd: (evt) => {
             console.log('Top items reordered');
         }
@@ -1893,6 +1900,10 @@ function renderKinkPairUI() {
         group: 'kink-pairs',
         animation: 150,
         ghostClass: 'sortable-ghost',
+        scroll: true,
+        scrollSensitivity: 100,
+        scrollSpeed: 20,
+        bubble: true,
         onEnd: (evt) => {
             console.log('Bottom queue reordered');
         }
