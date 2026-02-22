@@ -1,32 +1,26 @@
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 🎬 SMALLSM ARCHIVE - MAIN SCRIPT (Clean Version)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+﻿// ?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺??// ?렗 SMALLSM ARCHIVE - MAIN SCRIPT (Clean Version)
+// ?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺?곣봺??
 (function () {
     'use strict';
 
-    console.log('🚀 SMALLSM Archive initializing...');
+    console.log('?? SMALLSM Archive initializing...');
 
-    // ═══════════════════════════════════════════════════
-    // 1. GLOBALS
-    // ═══════════════════════════════════════════════════
-    let supabaseClient = null;
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 1. GLOBALS
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    let supabaseClient = null;
     const VERIFICATION_KEY = 'age_verified';
     const VERIFICATION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
     const NIGHT_MODE_KEY = 'night_mode';
 
-    // ═══════════════════════════════════════════════════
-    // 2. SUPABASE INITIALIZATION
-    // ═══════════════════════════════════════════════════
-    function initializeSupabase() {
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 2. SUPABASE INITIALIZATION
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    function initializeSupabase() {
         try {
             if (!window.supabase) {
-                console.error('❌ Supabase library not loaded');
+                console.error('??Supabase library not loaded');
                 return false;
             }
 
             if (!window.SUPABASE_CONFIG || !window.SUPABASE_CONFIG.url) {
-                console.error('❌ Supabase config not found');
+                console.error('??Supabase config not found');
                 return false;
             }
 
@@ -35,18 +29,16 @@
                 window.SUPABASE_CONFIG.anonKey
             );
 
-            console.log('✅ Supabase initialized');
+            console.log('??Supabase initialized');
             return true;
         } catch (error) {
-            console.error('❌ Supabase init failed:', error);
+            console.error('??Supabase init failed:', error);
             return false;
         }
     }
 
-    // ═══════════════════════════════════════════════════
-    // 3. AGE VERIFICATION
-    // ═══════════════════════════════════════════════════
-    function checkAgeVerification() {
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 3. AGE VERIFICATION
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    function checkAgeVerification() {
         const verified = localStorage.getItem(VERIFICATION_KEY);
 
         if (verified) {
@@ -79,13 +71,9 @@
         if (container) container.classList.remove('content-blur');
     }
 
-    // ═══════════════════════════════════════════════════
-    // 4. CATEGORY LOADING
-    // ═══════════════════════════════════════════════════
-    // ═══════════════════════════════════════════════════
-    // 4. HOME SETTINGS LOADING
-    // ═══════════════════════════════════════════════════
-    async function loadHomeSettings() {
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 4. CATEGORY LOADING
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 4. HOME SETTINGS LOADING
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    async function loadHomeSettings() {
         if (!supabaseClient) return;
 
         try {
@@ -109,29 +97,29 @@
                 if (titleTag) titleTag.textContent = settings.site_title;
                 const siteTitleEl = document.querySelector('.site-title');
                 if (siteTitleEl) siteTitleEl.textContent = settings.site_title;
-                console.log('✅ Site Title Updated:', settings.site_title);
+                console.log('??Site Title Updated:', settings.site_title);
             }
             if (settings.site_description) {
                 const descTag = document.getElementById('siteDescTag');
                 if (descTag) descTag.content = settings.site_description;
-                console.log('✅ Site Description Updated');
+                console.log('??Site Description Updated');
             }
             if (settings.google_site_verification) {
                 const gTag = document.querySelector('meta[name="google-site-verification"]');
                 if (gTag) {
                     gTag.content = settings.google_site_verification;
-                    console.log('✅ Google Verification Tag Updated:', settings.google_site_verification);
+                    console.log('??Google Verification Tag Updated:', settings.google_site_verification);
                 } else {
-                    console.warn('⚠️ Google Meta Tag not found in HTML');
+                    console.warn('?좑툘 Google Meta Tag not found in HTML');
                 }
             }
             if (settings.naver_verification) {
                 const nTag = document.querySelector('meta[name="naver-site-verification"]');
                 if (nTag) {
                     nTag.content = settings.naver_verification;
-                    console.log('✅ Naver Verification Tag Updated:', settings.naver_verification);
+                    console.log('??Naver Verification Tag Updated:', settings.naver_verification);
                 } else {
-                    console.warn('⚠️ Naver Meta Tag not found in HTML');
+                    console.warn('?좑툘 Naver Meta Tag not found in HTML');
                 }
             }
 
@@ -175,10 +163,10 @@
                 await loadRecentPosts(count);
             }
 
-            console.log('✅ Home settings loaded');
+            console.log('??Home settings loaded');
 
         } catch (error) {
-            console.error('❌ Home settings loading failed:', error);
+            console.error('??Home settings loading failed:', error);
         }
     }
 
@@ -205,11 +193,11 @@
                 const recentSection = document.createElement('div');
                 recentSection.style.marginTop = '3rem';
                 recentSection.innerHTML = `
-                    <h2 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--primary-brass); border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">최근 기록</h2>
+                    <h2 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--primary-brass); border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">理쒓렐 湲곕줉</h2>
                     ${posts.map(post => `
                         <div style="margin-bottom: 1rem;">
                             <a href="post.html?id=${post.id}" style="color: var(--text-primary); text-decoration: none; font-size: 0.95rem;">
-                                • ${post.title} <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 0.5rem;">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
+                                ??${post.title} <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 0.5rem;">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
                             </a>
                         </div>
                     `).join('')}
@@ -217,13 +205,13 @@
                 content.appendChild(recentSection);
             }
         } catch (error) {
-            console.error('❌ Recent posts loading failed:', error);
+            console.error('??Recent posts loading failed:', error);
         }
     }
 
     async function loadCategories() {
         if (!supabaseClient) {
-            console.warn('⚠️ Supabase not initialized');
+            console.warn('?좑툘 Supabase not initialized');
             return;
         }
 
@@ -237,8 +225,8 @@
 
             if (error) throw error;
 
-            // '성향 백과' 카테고리 자동 생성 (없을 경우 관리자로 로그인 시)
-            const hasWiki = (categories || []).some(c => c.name === '성향 백과' && !c.parent_id);
+            // '?깊뼢 諛깃낵' 移댄뀒怨좊━ ?먮룞 ?앹꽦 (?놁쓣 寃쎌슦 愿由ъ옄濡?濡쒓렇????
+            const hasWiki = (categories || []).some(c => c.name === '?깊뼢 諛깃낵' && !c.parent_id);
             if (!hasWiki) {
                 try {
                     const { data: { user } } = await supabaseClient.auth.getUser();
@@ -248,14 +236,14 @@
                             .reduce((max, c) => Math.max(max, c.display_order || 0), 0);
                         const { data: newCat } = await supabaseClient
                             .from('categories')
-                            .insert({ name: '성향 백과', parent_id: null, display_order: maxOrder + 1, is_visible: true })
+                            .insert({ name: '?깊뼢 諛깃낵', parent_id: null, display_order: maxOrder + 1, is_visible: true })
                             .select()
                             .single();
                         if (newCat) categories.push(newCat);
-                        console.log('✅ 성향 백과 카테고리 자동 생성됨');
+                        console.log('???깊뼢 諛깃낵 移댄뀒怨좊━ ?먮룞 ?앹꽦??);
                     }
                 } catch (e) {
-                    console.warn('성향 백과 카테고리 생성 스킵:', e.message);
+                    console.warn('?깊뼢 諛깃낵 移댄뀒怨좊━ ?앹꽦 ?ㅽ궢:', e.message);
                 }
             }
 
@@ -288,10 +276,10 @@
 
             renderCategories(categories || [], counts);
 
-            console.log('✅ Categories loaded');
+            console.log('??Categories loaded');
 
         } catch (error) {
-            console.error('❌ Categories loading failed:', error);
+            console.error('??Categories loading failed:', error);
         }
     }
 
@@ -371,10 +359,8 @@
         loadPostsByCategory(categoryId);
     };
 
-    // ═══════════════════════════════════════════════════
-    // 5. POST LOADING BY CATEGORY (Modified for Direct View)
-    // ═══════════════════════════════════════════════════
-    async function loadPostsByCategory(categoryId) {
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 5. POST LOADING BY CATEGORY (Modified for Direct View)
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    async function loadPostsByCategory(categoryId) {
         if (!supabaseClient) return;
 
         try {
@@ -385,8 +371,8 @@
                 .eq('id', categoryId)
                 .single();
 
-            // 성향 백과 카테고리 클릭 시 갤러리 표시
-            if (category && category.name === '성향 백과') {
+            // ?깊뼢 諛깃낵 移댄뀒怨좊━ ?대┃ ??媛ㅻ윭由??쒖떆
+            if (category && category.name === '?깊뼢 諛깃낵') {
                 renderTendencyView();
                 return;
             }
@@ -418,8 +404,8 @@
             if (!content || !title) return;
 
             if (posts.length === 0) {
-                title.textContent = '게시물 없음';
-                content.innerHTML = '<p>이 카테고리에는 아직 게시물이 없습니다.</p>';
+                title.textContent = '寃뚯떆臾??놁쓬';
+                content.innerHTML = '<p>??移댄뀒怨좊━?먮뒗 ?꾩쭅 寃뚯떆臾쇱씠 ?놁뒿?덈떎.</p>';
                 return;
             }
 
@@ -446,7 +432,7 @@
                         day: 'numeric'
                     });
                     const categoryName = postCategoryData ? postCategoryData.name : '';
-                    metaDiv.innerHTML = `<span>${categoryName}</span> • <span>${dateStr}</span>`;
+                    metaDiv.innerHTML = `<span>${categoryName}</span> ??<span>${dateStr}</span>`;
                 }
 
                 // Initialize Toast UI Viewer for the content
@@ -475,14 +461,14 @@
             // Multiple posts - Show List
             title.textContent = category.name;
             const metaDiv = document.querySelector('.post-meta');
-            if (metaDiv) metaDiv.innerHTML = `<span>총 ${posts.length}개의 게시물</span>`;
+            if (metaDiv) metaDiv.innerHTML = `<span>珥?${posts.length}媛쒖쓽 寃뚯떆臾?/span>`;
 
             content.innerHTML = posts.map(post => `
                 <div class="admin-post-item" style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border); position: relative;">
                     <h3>
                         <a href="post.html?id=${post.id}" style="color: var(--primary-brass); text-decoration: none;" data-admin-editable="text" data-admin-id="${post.id}" data-admin-field="title">
                             ${post.title}
-                            ${post.is_private ? '<span style="font-size: 0.8em; color: var(--accent-amber);"> 🔒</span>' : ''}
+                            ${post.is_private ? '<span style="font-size: 0.8em; color: var(--accent-amber);"> ?뵏</span>' : ''}
                         </a>
                     </h3>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
@@ -491,8 +477,8 @@
                         </p>
                         ${isAdmin ? `
                             <div class="admin-post-actions">
-                                <button class="admin-action-btn delete" onclick="event.preventDefault(); deletePostInline('${post.id}', '${post.title.replace(/'/g, "\\'")}')" title="Delete">🗑️</button>
-                                <button class="admin-action-btn edit" onclick="event.preventDefault(); window.location.href='admin.html?edit=${post.id}'" title="Full Edit">⚙️</button>
+                                <button class="admin-action-btn delete" onclick="event.preventDefault(); deletePostInline('${post.id}', '${post.title.replace(/'/g, "\\'")}')" title="Delete">?뿊截?/button>
+                                <button class="admin-action-btn edit" onclick="event.preventDefault(); window.location.href='admin.html?edit=${post.id}'" title="Full Edit">?숋툘</button>
                             </div>
                         ` : ''}
                     </div>
@@ -500,14 +486,12 @@
             `).join('');
 
         } catch (error) {
-            console.error('❌ Post loading failed:', error);
+            console.error('??Post loading failed:', error);
         }
     }
 
-    // ═══════════════════════════════════════════════════
-    // 6. SEARCH FUNCTIONALITY
-    // ═══════════════════════════════════════════════════
-    let searchTimeout;
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 6. SEARCH FUNCTIONALITY
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    let searchTimeout;
 
     function initSearch() {
         const searchInput = document.getElementById('searchInput');
@@ -543,7 +527,7 @@
                     displaySearchResults(results);
 
                 } catch (error) {
-                    console.error('❌ Search failed:', error);
+                    console.error('??Search failed:', error);
                 }
             }, 300);
         });
@@ -555,10 +539,10 @@
 
         if (!content || !title) return;
 
-        title.textContent = '검색 결과';
+        title.textContent = '寃??寃곌낵';
 
         if (results.length === 0) {
-            content.innerHTML = '<p>검색 결과가 없습니다.</p>';
+            content.innerHTML = '<p>寃??寃곌낵媛 ?놁뒿?덈떎.</p>';
             return;
         }
 
@@ -576,13 +560,9 @@
         `).join('');
     }
 
-    // ═══════════════════════════════════════════════════
-    // 7. NIGHT MODE
-    // ═══════════════════════════════════════════════════
-    // ═══════════════════════════════════════════════════
-    // 7. LONG PRESS FOR ADMIN
-    // ═══════════════════════════════════════════════════
-    function initAdminLongPress() {
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 7. NIGHT MODE
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 7. LONG PRESS FOR ADMIN
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    function initAdminLongPress() {
         const copyright = document.getElementById('copyrightText');
         if (!copyright) return;
 
@@ -617,10 +597,8 @@
         copyright.style.webkitUserSelect = 'none';
     }
 
-    // ═══════════════════════════════════════════════════
-    // TENDENCY VIEW INTEGRATION - KINK DICTIONARY
-    // ═══════════════════════════════════════════════════
-    window.tendencyActiveTab = 'Top';
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // TENDENCY VIEW INTEGRATION - KINK DICTIONARY
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    window.tendencyActiveTab = 'Top';
 
     async function renderTendencyView() {
         window.renderTendencyView = renderTendencyView;
@@ -638,14 +616,14 @@
         mainContent.innerHTML = `<div class="loading-container"><div class="loading"></div></div>`;
 
         try {
-            // Find "성향 백과" category ID dynamically
+            // Find "?깊뼢 諛깃낵" category ID dynamically
             const { data: categoryData, error: catError } = await supabaseClient
                 .from('categories')
                 .select('id')
-                .eq('name', '성향 백과')
+                .eq('name', '?깊뼢 諛깃낵')
                 .single();
 
-            if (catError) throw new Error('성향 백과 카테고리를 찾을 수 없습니다.');
+            if (catError) throw new Error('?깊뼢 諛깃낵 移댄뀒怨좊━瑜?李얠쓣 ???놁뒿?덈떎.');
             const kinkDictCategoryId = categoryData.id;
 
             // Fetch archive_posts under this category
@@ -659,28 +637,20 @@
 
             // Process posts and convert them to "tendencies" format
             const tendenciesData = (posts || []).map(post => {
-                // 1) Check for explicit [top] / [bottom] / [relation] tag at start of title
-                let rawTitle = post.title;
-                let type = 'top'; // default
-
-                const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
-                if (tagMatch) {
-                    type = tagMatch[1].toLowerCase();
-                    rawTitle = rawTitle.slice(tagMatch[0].length).trim();
-                } else {
-                    // 2) Fallback: keyword matching in title
-                    const bottomKeywords = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|bottom|submissive/i;
-                    if (bottomKeywords.test(rawTitle)) type = 'bottom';
-                }
-
-                // 3) Try to extract English sub name from parenthesis e.g. "마스터 (Master)"
-                const titleMatch = rawTitle.match(/(.*?)\s*\((.*?)\)$/);
-                let name = rawTitle;
+                // Try to extract English sub name from parenthesis, e.g., "留덉뒪??(Master)"
+                const titleMatch = post.title.match(/(.*?)\s*\((.*?)\)$/);
+                let name = post.title;
                 let sub_name = '';
+
                 if (titleMatch) {
                     name = titleMatch[1].trim();
                     sub_name = titleMatch[2].trim();
                 }
+
+                // Temporary logic to guess Top/Bottom based on title keywords.
+                // In a robust system, you might tag posts, but for now we regex map common words.
+                const isBottom = /留ㅼ“|???щ젅?대툕|?꾨젅??留덉“?덉뒪???쒕툕誘몄떆釉?諛뷀?|Bottom|Submissive/i.test(post.title);
+                const type = isBottom ? 'bottom' : 'top';
 
                 return {
                     id: post.id,
@@ -688,7 +658,7 @@
                     sub_name: sub_name,
                     description: post.content, // we map content to description
                     type: type,
-                    icon_class: type === 'bottom' ? 'heart' : 'crown' // Default icons
+                    icon_class: isBottom ? 'heart' : 'crown' // Default icons
                 };
             });
 
@@ -702,7 +672,7 @@
 
         } catch (error) {
             console.error('Gallery load failed:', error);
-            mainContent.innerHTML = `<p style="color:red; text-align:center; padding: 2rem;">데이터 로딩 실패: ${error.message}</p>`;
+            mainContent.innerHTML = `<p style="color:red; text-align:center; padding: 2rem;">?곗씠??濡쒕뵫 ?ㅽ뙣: ${error.message}</p>`;
         }
     }
 
@@ -716,30 +686,13 @@
 
         const activeTab = window.tendencyActiveTab || 'Top';
 
-        // Show empty state if no posts yet
-        if (tendenciesData.length === 0) {
-            mainContent.innerHTML = `
-                <div class="kink-dict-wrapper">
-                    <div class="kink-dict-header">
-                        <h1 class="kink-dict-title">성향 백과</h1>
-                        <p class="kink-dict-subtitle">아직 등록된 성향이 없습니다.</p>
-                    </div>
-                    <div style="text-align:center; padding: 3rem 1rem; color: var(--text-secondary);">
-                        <p>관리자 페이지에서 게시글을 작성하고 <strong>성향 백과</strong> 카테고리를 선택하면 여기에 표시됩니다.</p>
-                        <p style="margin-top:1rem; font-size:0.85rem; opacity:0.7;">제목 앞에 <code>[top]</code> 또는 <code>[bottom]</code>을 붙이면 자동 분류됩니다.<br>예: <code>[top] 마스터 (Master)</code></p>
-                    </div>
-                </div>
-            `;
-            return;
-        }
-
         let contentHtml = '';
 
         if (activeTab === 'Relation') {
             contentHtml = `
                 <div class="kink-relation-container">
                     <div class="kink-relation-info">
-                        <p>서로 매칭되는 성향끼리 묶어서 보여줍니다.</p>
+                        <p>?쒕줈 留ㅼ묶?섎뒗 ?깊뼢?쇰━ 臾띠뼱??蹂댁뿬以띾땲??</p>
                     </div>
                     <div class="kink-relation-list">
             `;
@@ -794,8 +747,8 @@
         mainContent.innerHTML = `
             <div class="kink-dict-wrapper">
                 <div class="kink-dict-header">
-                    <h1 class="kink-dict-title">성향 백과</h1>
-                    <p class="kink-dict-subtitle">총 ${tendenciesData.length}개의 기록이 존재합니다.</p>
+                    <h1 class="kink-dict-title">?깊뼢 諛깃낵</h1>
+                    <p class="kink-dict-subtitle">珥?${tendenciesData.length}媛쒖쓽 湲곕줉??議댁옱?⑸땲??</p>
                 </div>
 
                 <div class="kink-tabs-container">
@@ -826,7 +779,7 @@
                 <div class="role-detail-overlay" id="roleDetailOverlay" onclick="closeRoleDetail()">
                     <div class="role-detail-modal" id="roleDetailModal" onclick="event.stopPropagation()">
                         <div class="modal-accent-bar" id="modalAccentBar"></div>
-                        <button class="modal-close-btn" onclick="closeRoleDetail()">✕</button>
+                        <button class="modal-close-btn" onclick="closeRoleDetail()">??/button>
                         <div class="modal-content">
                             <div class="modal-header">
                                 <div class="modal-icon-wrapper" id="modalIconWrapper">
@@ -842,7 +795,7 @@
                                     <div class="role-description" id="roleDescription"></div>
                                 </div>
                                 <div style="margin-top: 1.5rem;">
-                                    <a class="btn-primary" href="/post.html?id=\${window.currentDetailId}" style="display: block; text-align: center; text-decoration: none;">자세히 읽기 →</a>
+                                    <a class="btn-primary" href="/post.html?id=\${window.currentDetailId}" style="display: block; text-align: center; text-decoration: none;">?먯꽭???쎄린 ??/a>
                                 </div>
                             </div>
                         </div>
@@ -850,7 +803,7 @@
                 </div>
 
                 <div class="kink-dict-hint">
-                    <div class="hint-badge">목록을 클릭하여 상세 정보를 확인하세요</div>
+                    <div class="hint-badge">紐⑸줉???대┃?섏뿬 ?곸꽭 ?뺣낫瑜??뺤씤?섏꽭??/div>
                 </div>
             </div>
         `;
@@ -927,7 +880,7 @@
 
         const updateUI = (nightMode) => {
             document.body.classList.toggle('night-mode', nightMode);
-            const icon = nightMode ? '☀️' : '🌙';
+            const icon = nightMode ? '?截? : '?뙔';
             const text = nightMode ? 'Day Mode' : 'Night Library';
 
             if (sidebarToggle) sidebarToggle.innerHTML = `<span>${icon}</span><span>${text}</span>`;
@@ -956,14 +909,14 @@
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
 
-            // 50px 이상 스크롤했을 때만 동작 (감도 조절)
+            // 50px ?댁긽 ?ㅽ겕濡ㅽ뻽???뚮쭔 ?숈옉 (媛먮룄 議곗젅)
             if (Math.abs(currentScrollY - lastScrollY) < 10) return;
 
             if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                // 아래로 스크롤 중이며 어느 정도 내려왔을 때 숨김
+                // ?꾨옒濡??ㅽ겕濡?以묒씠硫??대뒓 ?뺣룄 ?대젮?붿쓣 ???④?
                 header.classList.add('header-hidden');
             } else {
-                // 위로 스크롤 중일 때 다시 표시
+                // ?꾨줈 ?ㅽ겕濡?以묒씪 ???ㅼ떆 ?쒖떆
                 header.classList.remove('header-hidden');
             }
 
@@ -997,7 +950,7 @@
 
         overlay.addEventListener('click', closeMenu);
 
-        // 카테고리 클릭 시 메뉴 닫기
+        // 移댄뀒怨좊━ ?대┃ ??硫붾돱 ?リ린
         const categoryNav = document.getElementById('categoryNav');
         if (categoryNav) {
             categoryNav.addEventListener('click', (e) => {
@@ -1009,10 +962,8 @@
         }
     }
 
-    // ═══════════════════════════════════════════════════
-    // 9. EMERGENCY & BOTTOM NAV SYSTEM
-    // ═══════════════════════════════════════════════════
-    const EMERGENCY_URL_KEY = 'emergency_url';
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 9. EMERGENCY & BOTTOM NAV SYSTEM
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    const EMERGENCY_URL_KEY = 'emergency_url';
     const EMERGENCY_OPACITY_KEY = 'emergency_opacity';
 
     function initEmergencySystem() {
@@ -1117,10 +1068,8 @@
         }
     }
 
-    // ═══════════════════════════════════════════════════
-    // 8. INITIALIZATION
-    // ═══════════════════════════════════════════════════
-    function waitForConfig(callback, maxWait = 5000) {
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    // 8. INITIALIZATION
+    // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??    function waitForConfig(callback, maxWait = 5000) {
         const startTime = Date.now();
         const interval = setInterval(() => {
             if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
@@ -1128,19 +1077,19 @@
                 callback();
             } else if (Date.now() - startTime > maxWait) {
                 clearInterval(interval);
-                console.error('⏱️ Config loading timeout');
+                console.error('?깍툘 Config loading timeout');
             }
         }, 100);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('📱 DOM ready');
+        console.log('?벑 DOM ready');
 
         // Yes button
         const btnYes = document.getElementById('btnYes');
         if (btnYes) {
             btnYes.addEventListener('click', () => {
-                console.log('✅ Yes clicked');
+                console.log('??Yes clicked');
                 localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
                 hideDisclaimer();
 
@@ -1157,7 +1106,7 @@
         const btnNo = document.getElementById('btnNo');
         if (btnNo) {
             btnNo.addEventListener('click', () => {
-                console.log('❌ No clicked');
+                console.log('??No clicked');
                 window.location.href = 'https://www.google.com';
             });
         }
@@ -1179,7 +1128,7 @@
         initEmergencySystem();
         initBottomNav();
 
-        console.log('🎉 Initialization complete');
+        console.log('?럦 Initialization complete');
     });
 
 })();
