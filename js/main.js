@@ -16,6 +16,27 @@
     const NIGHT_MODE_KEY = 'night_mode';
 
     // ═══════════════════════════════════════════════════
+    // 1.5 UTILITIES
+    // ═══════════════════════════════════════════════════
+    function waitForConfig(callback) {
+        if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
+            callback();
+            return;
+        }
+        const startTime = Date.now();
+        const maxWait = 5000;
+        const interval = setInterval(() => {
+            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) {
+                clearInterval(interval);
+                callback();
+            } else if (Date.now() - startTime > maxWait) {
+                clearInterval(interval);
+                console.error('⏱️ Config loading timeout');
+            }
+        }, 100);
+    }
+
+    // ═══════════════════════════════════════════════════
     // 2. SUPABASE INITIALIZATION
     // ═══════════════════════════════════════════════════
     function initializeSupabase() {
