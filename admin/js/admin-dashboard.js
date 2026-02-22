@@ -1719,6 +1719,7 @@ window.downloadPostsReport = async function () {
 // ═══════════════════════════════════════════════════
 let kinkDictionaryPairs = {}; // { topId: bottomId }
 let kinkRoleOverrides = {}; // { itemId: 'top' | 'bottom' }
+let kinkDisplayOrder = []; // Array of IDs in order
 let allKinkTops = [];
 let allKinkBottoms = [];
 let pairSortables = [];
@@ -1733,21 +1734,41 @@ window.loadKinkPairs = async function () {
         const { data: posts } = await supabaseClient.from('archive_posts').select('id, title').eq('category_id', catData.id);
         allRawKinkPosts = posts || [];
 
-        // Fetch saved pairs and overrides
-        const { data: pairSettings } = await supabaseClient.from('settings').select('*').in('key', ['kink_dictionary_pairs', 'kink_role_overrides']);
+        // Fetch saved pairs, overrides, and order
+        const { data: kinkSettingsData } = await supabaseClient.from('settings').select('*').in('key', ['kink_dictionary_pairs', 'kink_role_overrides', 'kink_display_order']);
 
-        const pairData = (pairSettings || []).find(s => s.key === 'kink_dictionary_pairs');
+        const pairData = (kinkSettingsData || []).find(s => s.key === 'kink_dictionary_pairs');
         kinkDictionaryPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
 
-        const overrideData = (pairSettings || []).find(s => s.key === 'kink_role_overrides');
+        const overrideData = (kinkSettingsData || []).find(s => s.key === 'kink_role_overrides');
         kinkRoleOverrides = overrideData && overrideData.value ? JSON.parse(overrideData.value) : {};
 
+        const orderData = (kinkSettingsData || []).find(s => s.key === 'kink_display_order');
+        kinkDisplayOrder = orderData && orderData.value ? JSON.parse(orderData.value) : [];
+
         processKinkItems();
+        sortKinkItems();
         renderKinkPairUI();
 
     } catch (e) {
         console.error('Error loading kink pairs:', e);
     }
+}
+
+function sortKinkItems() {
+    if (!kinkDisplayOrder || kinkDisplayOrder.length === 0) return;
+
+    const orderMap = {};
+    kinkDisplayOrder.forEach((id, idx) => orderMap[id] = idx);
+
+    const sortFn = (a, b) => {
+        const orderA = orderMap[a.id] !== undefined ? orderMap[a.id] : 9999;
+        const orderB = orderMap[b.id] !== undefined ? orderMap[b.id] : 9999;
+        return orderA - orderB;
+    };
+
+    allKinkTops.sort(sortFn);
+    allKinkBottoms.sort(sortFn);
 }
 
 function processKinkItems() {
@@ -1803,7 +1824,8 @@ function renderKinkPairUI() {
     allKinkTops.forEach(top => {
         const topEl = document.createElement('div');
         topEl.className = 'kink-pair-row';
-        topEl.style.cssText = 'display: flex; align-items: center; gap: 1rem; padding: 0.5rem; background: var(--admin-bg-alt); border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.2);';
+        topEl.dataset.id = top.id;
+        topEl.style.cssText = 'display: flex; align-items: center; gap: 1rem; padding: 0.5rem; background: var(--admin-bg-alt); border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); cursor: grab;';
 
         const topLabel = document.createElement('div');
         topLabel.innerHTML = `
@@ -1857,10 +1879,24 @@ function renderKinkPairUI() {
         }
     });
 
-    pairSortables.push(new Sortable(unpairedList, {
-        group: 'kink-pairs',
-        animation: 150
-    }));
+    // Initialize reordering for Top items
+    new Sortable(pairedList, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: (evt) => {
+            console.log('Top items reordered');
+        }
+    });
+
+    // Initialize reordering for Bottom queue
+    new Sortable(unpairedList, {
+        group: 'kink-bottoms',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: (evt) => {
+            console.log('Bottom queue reordered');
+        }
+    });
 }
 
 function createBottomCard(bottom) {
@@ -1887,15 +1923,28 @@ window.toggleKinkRole = function (itemId, newType) {
 }
 
 window.saveKinkPairs = async function () {
-    const slots = document.querySelectorAll('.bottom-slot');
-    const newPairs = {};
+    const pairedRows = document.querySelectorAll('.kink-pair-row');
+    const unpairedRows = document.querySelectorAll('#unpairedBottoms .bottom-card');
 
-    slots.forEach(slot => {
-        const topId = slot.dataset.topId;
+    const newPairs = {};
+    const newOrder = [];
+
+    // Capture order and pairs from TOP list
+    pairedRows.forEach(row => {
+        const topId = row.dataset.id;
+        newOrder.push(topId);
+
+        const slot = row.querySelector('.bottom-slot');
         const bottomCard = slot.querySelector('.bottom-card');
         if (bottomCard) {
             newPairs[topId] = bottomCard.dataset.bottomId;
+            newOrder.push(bottomCard.dataset.bottomId);
         }
+    });
+
+    // Capture remaining order from unpaired list
+    unpairedRows.forEach(card => {
+        newOrder.push(card.dataset.bottomId);
     });
 
     try {
@@ -1913,8 +1962,16 @@ window.saveKinkPairs = async function () {
             updated_at: new Date().toISOString()
         }, { onConflict: 'key' });
 
+        // Save display order
+        await supabaseClient.from('settings').upsert({
+            key: 'kink_display_order',
+            value: JSON.stringify(newOrder),
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+
         kinkDictionaryPairs = newPairs;
-        alert('✅ 성향 매칭 및 역할 설정이 저장되었습니다!');
+        kinkDisplayOrder = newOrder;
+        alert('✅ 성향 매칭 및 순서 설정이 저장되었습니다!');
     } catch (error) {
         alert('❌ 저장 실패: ' + error.message);
     }

@@ -655,8 +655,8 @@
                 .eq('category_id', kinkDictCategoryId)
                 .order('created_at', { ascending: true }); // Using created_at or title for ordering
 
-            // Fetch kink dictionary pairs and role overrides
-            const { data: kinkSettings } = await supabaseClient.from('settings').select('*').in('key', ['kink_dictionary_pairs', 'kink_role_overrides']);
+            // Fetch kink dictionary settings
+            const { data: kinkSettings } = await supabaseClient.from('settings').select('*').in('key', ['kink_dictionary_pairs', 'kink_role_overrides', 'kink_display_order']);
 
             const pairData = (kinkSettings || []).find(s => s.key === 'kink_dictionary_pairs');
             const kinkPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
@@ -665,8 +665,11 @@
             const overrideData = (kinkSettings || []).find(s => s.key === 'kink_role_overrides');
             const kinkRoleOverrides = overrideData && overrideData.value ? JSON.parse(overrideData.value) : {};
 
+            const orderData = (kinkSettings || []).find(s => s.key === 'kink_display_order');
+            const kinkDisplayOrder = orderData && orderData.value ? JSON.parse(orderData.value) : [];
+
             // Process posts and convert them to "tendencies" format
-            const tendenciesData = (posts || []).map(post => {
+            let tendenciesData = (posts || []).map(post => {
                 // Determine type: prioritze manual override, then tag, then keyword
                 let type = kinkRoleOverrides[post.id];
                 let rawTitle = post.title;
@@ -702,18 +705,30 @@
                 if (pairMatch) pairTarget = pairMatch[1].trim();
 
                 // 5) Strip <!--pair:...--> and metadata from content before storing
-                const cleanContent = (post.content || '').replace(/<!--.*?-->/gs, '').trim();
+                // const cleanContent = (post.content || '').replace(/<!--.*?-->/gs, '').trim(); // No longer needed as description uses full content
 
                 return {
                     id: post.id,
                     name: name,
-                    sub_name: sub_name,
-                    description: cleanContent,
+                    subName: sub_name,
+                    description: post.content,
+                    icon: null, // No specific icons in archive_posts
                     type: type,
-                    pair: pairTarget, // name of paired item (for Relation tab)
-                    icon_class: type === 'bottom' ? 'heart' : 'crown' // Default icons
+                    pair: pairTarget
                 };
             });
+
+            // Apply custom display order if it exists
+            if (kinkDisplayOrder && kinkDisplayOrder.length > 0) {
+                const orderMap = {};
+                kinkDisplayOrder.forEach((id, idx) => orderMap[id] = idx);
+
+                tendenciesData.sort((a, b) => {
+                    const orderA = orderMap[a.id] !== undefined ? orderMap[a.id] : 9999;
+                    const orderB = orderMap[b.id] !== undefined ? orderMap[b.id] : 9999;
+                    return orderA - orderB;
+                });
+            }
 
             window.tendencyData = tendenciesData;
 
