@@ -658,7 +658,8 @@
             if (error) throw error;
 
             // Fetch kink dictionary pairs
-            const { data: pairData } = await supabaseClient.from('settings').select('value').eq('key', 'kink_dictionary_pairs').maybeSingle();
+            const { data: pairDataArr } = await supabaseClient.from('settings').select('value').eq('key', 'kink_dictionary_pairs').limit(1);
+            const pairData = pairDataArr && pairDataArr.length > 0 ? pairDataArr[0] : null;
             const kinkPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
             window.kinkDictionaryPairs = kinkPairs;
 

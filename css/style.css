@@ -1684,8 +1684,7 @@ header {
 }
 
 .modal-content {
-    padding: 2.5rem;
-    padding-top: 1.5rem;
+    padding: 1.5rem 1.5rem;
     overflow-y: auto;
     flex: 1;
 }
@@ -1818,7 +1817,7 @@ header {
     }
 
     .modal-content {
-        padding: 2rem;
+        padding: 1.5rem 1rem;
     }
 
     .modal-title {
