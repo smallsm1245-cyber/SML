@@ -888,9 +888,6 @@
                                 <div class="description-container">
                                     <div class="role-description" id="roleDescription"></div>
                                 </div>
-                                <div style="margin-top: 1.5rem;">
-                                    <a class="btn-primary" href="/post.html?id=\${window.currentDetailId}" style="display: block; text-align: center; text-decoration: none;">자세히 읽기 →</a>
-                                </div>
                             </div>
                         </div>
                     </div>
