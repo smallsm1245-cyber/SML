@@ -1403,15 +1403,25 @@ header {
     border-radius: 12px;
     padding: 4px;
     gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.kink-tabs::-webkit-scrollbar {
+    display: none;
 }
 
 .kink-tab {
     flex: 1;
+    min-width: fit-content;
+    white-space: nowrap;
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
-    padding: 0.8rem 0.5rem;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
     background: transparent;
     border: none;
     border-radius: 8px;
@@ -1420,6 +1430,13 @@ header {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+@media (max-width: 480px) {
+    .kink-tab {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.75rem;
+    }
 }
 
 .kink-tab.active {
@@ -1799,7 +1816,8 @@ header {
 
 .role-description .toastui-editor-contents li {
     margin-left: 0 !important;
-    padding-left: 0 !important;
+    padding-left: 0.5rem !important;
+    margin-bottom: 0.4rem !important;
 }
 
 .role-description .toastui-editor-contents h1,
