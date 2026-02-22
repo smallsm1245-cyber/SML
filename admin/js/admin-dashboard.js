@@ -1752,7 +1752,7 @@ window.loadKinkPairs = async function () {
         });
 
         // Fetch saved pairs
-        const { data: pairData } = await supabaseClient.from('settings').select('value').eq('key', 'kink_dictionary_pairs').single();
+        const { data: pairData } = await supabaseClient.from('settings').select('value').eq('key', 'kink_dictionary_pairs').maybeSingle();
         kinkDictionaryPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
 
         renderKinkPairUI();

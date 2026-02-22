@@ -1685,6 +1685,7 @@ header {
 
 .modal-content {
     padding: 2.5rem;
+    padding-top: 1.5rem;
     overflow-y: auto;
     flex: 1;
 }
@@ -1711,7 +1712,7 @@ header {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .modal-icon-wrapper {
@@ -1739,8 +1740,9 @@ header {
 .description-container {
     background: transparent;
     border: none;
-    padding: 1rem 0;
-    margin-bottom: 2.5rem;
+    padding: 0;
+    margin-bottom: 1.5rem;
+    margin-top: 0;
 }
 
 .role-description {
@@ -1757,7 +1759,16 @@ header {
 .role-description .toastui-editor-contents li {
     font-size: 1.1rem;
     color: #ffffff !important;
-    line-height: 1.8;
+    line-height: 1.7;
+    margin-top: 0.3rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.role-description .toastui-editor-contents ul,
+.role-description .toastui-editor-contents ol {
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+    padding-left: 1.2rem !important;
 }
 
 .role-description .toastui-editor-contents h1,
@@ -1767,8 +1778,8 @@ header {
 .role-description strong {
     color: #ffffff !important;
     border-bottom: none !important;
-    margin-top: 2.5rem;
-    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
     padding-bottom: 0;
 }
 
