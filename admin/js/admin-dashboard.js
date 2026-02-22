@@ -1890,7 +1890,7 @@ function renderKinkPairUI() {
 
     // Initialize reordering for Bottom queue
     new Sortable(unpairedList, {
-        group: 'kink-bottoms',
+        group: 'kink-pairs',
         animation: 150,
         ghostClass: 'sortable-ghost',
         onEnd: (evt) => {
