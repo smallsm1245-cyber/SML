@@ -878,8 +878,15 @@
             listData.forEach((item, idx) => {
                 try {
                     // Create a brief summary of the markdown content for the list view
-                    const plainText = (item.description || '').replace(/[#*_~>]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
-                    const brief = plainText.length > 50 ? plainText.substring(0, 50) + '...' : plainText;
+                    // IMPORTANT: Strip HTML comments FIRST (<!--...-->) before stripping tags,
+                    // otherwise <!--pair:name--> loses its '>' and becomes an unclosed comment in innerHTML
+                    const plainText = (item.description || '')
+                        .replace(/<!--[\s\S]*?-->/g, '')   // 1) Remove HTML comments (e.g. <!--pair:...-->)
+                        .replace(/<[^>]*>/g, '')            // 2) Remove all remaining HTML tags
+                        .replace(/[#*_~`]/g, '')            // 3) Remove markdown syntax chars
+                        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 4) Convert markdown links to text
+                        .trim();
+                    const brief = plainText.length > 60 ? plainText.substring(0, 60) + '...' : plainText;
 
                     console.log(`[KinkDict]  - Rendering item ${idx + 1}/${listData.length}: ${item.name} (${item.id})`);
 
