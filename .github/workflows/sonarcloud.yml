@@ -1,0 +1,26 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 전체 히스토리 가져오기 (정확한 분석을 위해 필요)
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

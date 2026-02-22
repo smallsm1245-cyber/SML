@@ -704,6 +704,7 @@
             let tendenciesData = (posts || []).map(post => {
                 // Determine type: prioritze manual override, then tag, then keyword
                 let type = kinkRoleOverrides[post.id];
+                if (type) type = type.toLowerCase();
                 let rawTitle = post.title;
 
                 if (!type) {

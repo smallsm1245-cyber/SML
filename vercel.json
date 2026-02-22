@@ -1,6 +1,12 @@
 {
   "cleanUrls": true,
-  "trailingSlash": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/((?!js/|css/|assets/|api/|admin/|.*\\.html$|.*\\.js$|.*\\.css$|.*\\.xml$|.*\\.json$|.*\\.webp$|.*\\.png$|.*\\.jpg$|.*\\.ico$|.*\\.ttf$|.*\\.woff$|.*\\.woff2$|.*\\.svg$|.*\\.txt$).*)",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
