@@ -1718,9 +1718,11 @@ window.downloadPostsReport = async function () {
 // KINK PAIR MANAGEMENT
 // ═══════════════════════════════════════════════════
 let kinkDictionaryPairs = {}; // { topId: bottomId }
+let kinkRoleOverrides = {}; // { itemId: 'top' | 'bottom' }
 let allKinkTops = [];
 let allKinkBottoms = [];
 let pairSortables = [];
+let allRawKinkPosts = []; // Store raw post data for role switches
 
 window.loadKinkPairs = async function () {
     try {
@@ -1729,13 +1731,36 @@ window.loadKinkPairs = async function () {
         if (!catData) return;
 
         const { data: posts } = await supabaseClient.from('archive_posts').select('id, title').eq('category_id', catData.id);
+        allRawKinkPosts = posts || [];
 
-        allKinkTops = [];
-        allKinkBottoms = [];
+        // Fetch saved pairs and overrides
+        const { data: pairSettings } = await supabaseClient.from('settings').select('*').in('key', ['kink_dictionary_pairs', 'kink_role_overrides']);
 
-        (posts || []).forEach(post => {
-            let rawTitle = post.title;
-            let type = 'top';
+        const pairData = (pairSettings || []).find(s => s.key === 'kink_dictionary_pairs');
+        kinkDictionaryPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
+
+        const overrideData = (pairSettings || []).find(s => s.key === 'kink_role_overrides');
+        kinkRoleOverrides = overrideData && overrideData.value ? JSON.parse(overrideData.value) : {};
+
+        processKinkItems();
+        renderKinkPairUI();
+
+    } catch (e) {
+        console.error('Error loading kink pairs:', e);
+    }
+}
+
+function processKinkItems() {
+    allKinkTops = [];
+    allKinkBottoms = [];
+
+    allRawKinkPosts.forEach(post => {
+        let type = kinkRoleOverrides[post.id];
+        let rawTitle = post.title;
+
+        if (!type) {
+            // Auto detect if no manual override
+            type = 'top';
             const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
             if (tagMatch) {
                 type = tagMatch[1].toLowerCase();
@@ -1744,23 +1769,18 @@ window.loadKinkPairs = async function () {
                 const bottomKeywords = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|bottom|submissive|브랫|brat|펫|pet|리틀|little|디그레이디|degradee/i;
                 if (bottomKeywords.test(rawTitle)) type = 'bottom';
             }
-            const cleanName = rawTitle.replace(/\s*\(.*?\)$/, '').trim();
+        } else {
+            // If manual override exists, clean the title of tags if they exist
+            const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
+            if (tagMatch) rawTitle = rawTitle.slice(tagMatch[0].length).trim();
+        }
 
-            const item = { id: post.id, name: cleanName, title: post.title };
-            if (type === 'top') allKinkTops.push(item);
-            else if (type === 'bottom') allKinkBottoms.push(item);
-        });
+        const cleanName = rawTitle.replace(/\s*\(.*?\)$/, '').trim();
+        const item = { id: post.id, name: cleanName, title: post.title, assignedType: type };
 
-        // Fetch saved pairs
-        const { data: pairDataArr } = await supabaseClient.from('settings').select('value').eq('key', 'kink_dictionary_pairs').limit(1);
-        const pairData = pairDataArr && pairDataArr.length > 0 ? pairDataArr[0] : null;
-        kinkDictionaryPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
-
-        renderKinkPairUI();
-
-    } catch (e) {
-        console.error('Error loading kink pairs:', e);
-    }
+        if (type === 'top') allKinkTops.push(item);
+        else allKinkBottoms.push(item);
+    });
 }
 
 function renderKinkPairUI() {
@@ -1786,7 +1806,15 @@ function renderKinkPairUI() {
         topEl.style.cssText = 'display: flex; align-items: center; gap: 1rem; padding: 0.5rem; background: var(--admin-bg-alt); border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.2);';
 
         const topLabel = document.createElement('div');
-        topLabel.innerHTML = `<strong>TOP</strong><br><span style="color: #ff4d4d;">${top.name}</span>`;
+        topLabel.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:start;">
+                <div>
+                    <strong style="font-size:0.7rem; opacity:0.7;">TOP</strong><br>
+                    <span style="color: #ff4d4d; font-weight: bold;">${top.name}</span>
+                </div>
+                <button class="btn-secondary" onclick="toggleKinkRole('${top.id}', 'bottom')" style="padding: 2px 4px; font-size: 0.7rem;">바텀으로</button>
+            </div>
+        `;
         topLabel.style.cssText = 'flex: 1; font-size: 0.95rem; line-height: 1.4;';
 
         const bottomSlot = document.createElement('div');
@@ -1839,9 +1867,23 @@ function createBottomCard(bottom) {
     const el = document.createElement('div');
     el.className = 'bottom-card';
     el.dataset.bottomId = bottom.id;
-    el.innerHTML = `<strong>BOTTOM</strong><br><span style="color: #4da6ff;">${bottom.name}</span>`;
+    el.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="text-align:left;">
+                <strong style="font-size:0.7rem; opacity:0.7;">BOTTOM</strong><br>
+                <span style="color: #4da6ff;">${bottom.name}</span>
+            </div>
+            <button class="btn-secondary" onclick="toggleKinkRole('${bottom.id}', 'top')" style="padding: 2px 4px; font-size: 0.7rem; margin-left:8px;">탑으로</button>
+        </div>
+    `;
     el.style.cssText = 'background: #2a2a35; padding: 0.5rem; border-radius: 4px; cursor: grab; width: 100%; text-align: center; border: 1px solid #445; font-size: 0.9rem; user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2);';
     return el;
+}
+
+window.toggleKinkRole = function (itemId, newType) {
+    kinkRoleOverrides[itemId] = newType;
+    processKinkItems();
+    renderKinkPairUI();
 }
 
 window.saveKinkPairs = async function () {
@@ -1857,14 +1899,22 @@ window.saveKinkPairs = async function () {
     });
 
     try {
+        // Save mapping pairs
         await supabaseClient.from('settings').upsert({
             key: 'kink_dictionary_pairs',
             value: JSON.stringify(newPairs),
             updated_at: new Date().toISOString()
         }, { onConflict: 'key' });
 
+        // Save role overrides
+        await supabaseClient.from('settings').upsert({
+            key: 'kink_role_overrides',
+            value: JSON.stringify(kinkRoleOverrides),
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+
         kinkDictionaryPairs = newPairs;
-        alert('✅ 성향 매칭이 저장되었습니다! 사이트에 즉시 반영됩니다.');
+        alert('✅ 성향 매칭 및 역할 설정이 저장되었습니다!');
     } catch (error) {
         alert('❌ 저장 실패: ' + error.message);
     }

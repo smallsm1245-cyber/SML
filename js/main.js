@@ -655,28 +655,36 @@
                 .eq('category_id', kinkDictCategoryId)
                 .order('created_at', { ascending: true }); // Using created_at or title for ordering
 
-            if (error) throw error;
+            // Fetch kink dictionary pairs and role overrides
+            const { data: kinkSettings } = await supabaseClient.from('settings').select('*').in('key', ['kink_dictionary_pairs', 'kink_role_overrides']);
 
-            // Fetch kink dictionary pairs
-            const { data: pairDataArr } = await supabaseClient.from('settings').select('value').eq('key', 'kink_dictionary_pairs').limit(1);
-            const pairData = pairDataArr && pairDataArr.length > 0 ? pairDataArr[0] : null;
+            const pairData = (kinkSettings || []).find(s => s.key === 'kink_dictionary_pairs');
             const kinkPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
             window.kinkDictionaryPairs = kinkPairs;
 
+            const overrideData = (kinkSettings || []).find(s => s.key === 'kink_role_overrides');
+            const kinkRoleOverrides = overrideData && overrideData.value ? JSON.parse(overrideData.value) : {};
+
             // Process posts and convert them to "tendencies" format
             const tendenciesData = (posts || []).map(post => {
-                // 1) Check for explicit [top] / [bottom] / [relation] tag at start of title
+                // Determine type: prioritze manual override, then tag, then keyword
+                let type = kinkRoleOverrides[post.id];
                 let rawTitle = post.title;
-                let type = 'top'; // default
 
-                const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
-                if (tagMatch) {
-                    type = tagMatch[1].toLowerCase();
-                    rawTitle = rawTitle.slice(tagMatch[0].length).trim();
+                if (!type) {
+                    const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
+                    if (tagMatch) {
+                        type = tagMatch[1].toLowerCase();
+                        rawTitle = rawTitle.slice(tagMatch[0].length).trim();
+                    } else {
+                        const bottomKeywords = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|bottom|submissive|브랫|brat|펫|pet|리틀|little|디그레이디|degradee/i;
+                        if (bottomKeywords.test(rawTitle)) type = 'bottom';
+                        else type = 'top';
+                    }
                 } else {
-                    // 2) Fallback: keyword matching in title
-                    const bottomKeywords = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|bottom|submissive|브랫|brat|펫|pet|리틀|little|디그레이디|degradee/i;
-                    if (bottomKeywords.test(rawTitle)) type = 'bottom';
+                    // If override exists, still clean title of tags for display
+                    const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
+                    if (tagMatch) rawTitle = rawTitle.slice(tagMatch[0].length).trim();
                 }
 
                 // 3) Try to extract English sub name from parenthesis e.g. "마스터 (Master)"
