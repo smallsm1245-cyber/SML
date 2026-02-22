@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+
+    <title id="pageTitle">게시물 - SMALLSM Archive</title>
+    <meta name="description" content="SMALLSM Archive의 기록">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Toast UI Viewer -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css" />
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // Check age verification immediately to prevent flash
+        (function () {
+            const verified = localStorage.getItem('age_verified');
+            if (verified) {
+                const timestamp = parseInt(verified);
+                const VERIFICATION_DURATION = 24 * 60 * 60 * 1000;
+                if (Date.now() - timestamp < VERIFICATION_DURATION) {
+                    document.write('<style>#disclaimerOverlay { display: none !important; } .content-blur { filter: none !important; pointer-events: auto !important; }</style>');
+                }
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <!-- Age Verification Disclaimer -->
+    <div id="disclaimerOverlay" class="disclaimer-overlay">
+        <div class="disclaimer-content">
+            <h2>성인 인증</h2>
+            <p>본 사이트는 성인 지향 콘텐츠를 포함하고 있습니다.<br>
+                귀하는 만 19세 이상이십니까?</p>
+            <div class="disclaimer-buttons">
+                <button class="btn btn-primary" id="btnYes">예 (19세 이상)</button>
+                <button class="btn btn-secondary" id="btnNo">아니요</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="menuToggleBtn">☰</button>
+        <div class="mobile-logo">SMALLSM</div>
+        <button class="mode-toggle header-mode-toggle" id="headerModeToggle">
+            <span class="mode-icon">🌙</span>
+        </button>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Sidebar Navigation (Moved outside app-container to fix stacking context) -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="site-title">
+                <a href="index.html" style="text-decoration: none; color: inherit;">SMALLSM</a>
+            </h1>
+            <p class="site-subtitle">CINEMATIC ARCHIVE</p>
+        </div>
+
+        <!-- Search -->
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="검색어를 입력하세요...">
+        </div>
+
+        <!-- Categories -->
+        <nav>
+            <ul class="category-nav" id="categoryNav">
+                <!-- Dynamically loaded -->
+            </ul>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <button class="mode-toggle" id="modeToggle">
+                <span>🌙</span>
+                <span>Night Library</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main App Container -->
+    <div class="app-container" id="appContainer">
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-panel">
+                <h1 class="post-title" id="postTitle">로딩 중...</h1>
+                <div class="post-meta" id="postMeta">
+                    <span id="postCategory"></span> • <span id="postDate"></span>
+                </div>
+                <div class="post-content" id="postContent">
+                    <p>게시물을 불러오는 중입니다...</p>
+                </div>
+            </div>
+
+            <!-- Settings Content (Hidden by default) -->
+            <div id="settingsView" class="settings-view" style="display: none;">
+                <h1 class="post-title">Settings</h1>
+                <div class="settings-group">
+                    <h3>비상탈출 설정</h3>
+                    <div class="setting-item">
+                        <label>위장 URL</label>
+                        <input type="text" id="escapeUrlInput" placeholder="https://www.google.com">
+                    </div>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" data-url="https://www.google.com">Google</button>
+                        <button class="preset-btn" data-url="https://ko.wikipedia.org">Wikipedia</button>
+                        <button class="preset-btn" data-url="https://news.naver.com">News</button>
+                    </div>
+                    <div class="setting-item">
+                        <label>버튼 투명도 (<span id="opacityVal">20</span>%)</label>
+                        <input type="range" id="opacitySlider" min="0" max="100" value="20">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="site-footer">
+                <p id="copyrightText">© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item" id="navHome">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">홈</span>
+        </a>
+        <a href="javascript:void(0);" class="nav-item" id="navSearch">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-label">검색</span>
+        </a>
+        <a href="javascript:void(0);" class="nav-item" id="navSettings">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">설정</span>
+        </a>
+    </nav>
+
+    <!-- Emergency FAB -->
+    <button id="emergencyFab" class="emergency-fab">
+        🏃
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.js"></script>
+    <script src="/api/config"></script>
+    <script src="js/post.js"></script>
+    <script src="js/admin-inline.js"></script>
+</body>
+
+</html>

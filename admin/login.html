@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>Admin Dashboard (FINAL) - SMALLSM Archive</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/style.css?v=final">
+    <link rel="stylesheet" href="/admin/css/admin-dashboard.css?v=final">
+    <link rel="stylesheet" href="/admin/css/admin-tendencies.css?v=final">
+    <link rel="stylesheet" href="/admin/css/admin-toastui-hierarchy.css?v=final">
+    <!-- Toast UI Editor -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css" />
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body class="admin-body">
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-panel">
+            <h2 class="login-title">🎬 관리자 로그인 (FINAL)</h2>
+            <form id="loginForm" onsubmit="event.preventDefault(); window.handleLogin();">
+                <div class="form-group">
+                    <label for="loginEmail">이메일</label>
+                    <input type="email" id="loginEmail" placeholder="admin@example.com" autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">비밀번호</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <button type="submit" id="loginBtn" class="btn-primary">로그인</button>
+            </form>
+            <p id="loginError" class="error-message"></p>
+            <p class="back-link"><a href="/" onclick="event.stopPropagation();">← 메인으로 돌아가기</a></p>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="admin-dashboard" style="display: none;">
+        <!-- Top Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 class="dashboard-title">
+                    <a href="javascript:switchSection('overview')" style="text-decoration: none; color: inherit;">📚
+                        SMALLSM Archive</a>
+                </h1>
+                <span class="admin-badge">관리자 모드</span>
+                <div class="live-user-indicator" title="실시간 접속자">
+                    <span class="live-dot"></span>
+                    <span class="live-count" id="liveUserCount">1</span>명 접속 중
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" title="다크모드 전환">
+                    <span class="icon">🌙</span>
+                </button>
+                <button class="btn-secondary" id="logoutBtn">로그아웃</button>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <!-- Left Sidebar Menu -->
+            <aside class="dashboard-sidebar">
+                <nav class="sidebar-nav">
+                    <button class="nav-item active" data-section="overview">
+                        <span class="icon">📊</span>
+                        <span class="text">대시보드</span>
+                    </button>
+                    <button class="nav-item" data-section="home">
+                        <span class="icon">🏠</span>
+                        <span class="text">홈 화면 관리</span>
+                    </button>
+                    <button class="nav-item" data-section="posts">
+                        <span class="icon">📝</span>
+                        <span class="text">게시글 관리</span>
+                        <span class="badge" id="postCount">0</span>
+                    </button>
+                    <button class="nav-item" data-section="categories">
+                        <span class="icon">📂</span>
+                        <span class="text">카테고리</span>
+                    </button>
+                    <button class="nav-item" data-section="tendencies">
+                        <span class="icon">⚖️</span>
+                        <span class="text">성향 관리</span>
+                    </button>
+                    <button class="nav-item" data-section="trash">
+                        <span class="icon">🗑️</span>
+                        <span class="text">휴지통</span>
+                        <span class="badge warning" id="trashCount">0</span>
+                    </button>
+                    <button class="nav-item" data-section="settings">
+                        <span class="icon">⚙️</span>
+                        <span class="text">설정</span>
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="dashboard-main">
+                <!-- Overview Section -->
+                <section id="section-overview" class="content-section active">
+                    <!-- Quick Actions (Top Placement for Speed) -->
+                    <div class="quick-actions-bar">
+                        <button class="quick-action-btn" onclick="showNewPostEditor()">
+                            <span class="icon">✍️</span> <span class="label">새 글</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="switchSection('home')">
+                            <span class="icon">🏠</span> <span class="label">홈 수정</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="switchSection('categories')">
+                            <span class="icon">📂</span> <span class="label">카테고리</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="window.open('/', '_blank')">
+                            <span class="icon">👀</span> <span class="label">사이트</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="downloadPostsReport()">
+                            <span class="icon">📄</span> <span class="label">리포트</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="switchSection('settings')">
+                            <span class="icon">⚙️</span> <span class="label">설정</span>
+                        </button>
+                    </div>
+
+                    <!-- Micro Stats Grid (4 Columns) -->
+                    <div class="micro-grid">
+                        <!-- 1. Total Posts -->
+                        <div class="micro-card">
+                            <div class="micro-icon">📝</div>
+                            <div class="micro-content">
+                                <span class="micro-label">총 게시물</span>
+                                <span class="micro-value" id="statTotalPosts">0</span>
+                            </div>
+                        </div>
+
+                        <!-- 2. Today Visitors -->
+                        <div class="micro-card">
+                            <div class="micro-icon">👥</div>
+                            <div class="micro-content">
+                                <span class="micro-label">오늘 방문자</span>
+                                <div class="micro-value-group">
+                                    <span class="micro-value" id="statTodayVisitors">0</span>
+                                    <span class="micro-trend up" id="statVisitorTrend">▲12%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. DB Health -->
+                        <div class="micro-card">
+                            <div class="micro-icon">❤️</div>
+                            <div class="micro-content">
+                                <span class="micro-label">DB 상태</span>
+                                <div class="micro-value-group">
+                                    <span class="micro-value" id="dbHealthScore">98</span>
+                                    <button class="micro-btn-action" onclick="optimizeDB()">⚡</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Categories -->
+                        <div class="micro-card">
+                            <div class="micro-icon">📂</div>
+                            <div class="micro-content">
+                                <span class="micro-label">카테고리</span>
+                                <span class="micro-value" id="statCategories">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slim System Monitor (Single Line) -->
+                    <div class="slim-monitor-section">
+                        <div class="monitor-row">
+                            <div class="monitor-label">🖥️ 서버 스토리지</div>
+                            <div class="slim-progress-container">
+                                <div class="slim-progress-bar" id="storageProgressBar" style="width: 45%;"></div>
+                            </div>
+                            <div class="monitor-val-text" id="storageValue">45%</div>
+                        </div>
+                        <div class="monitor-row">
+                            <div class="monitor-label">📁 미디어 비중</div>
+                            <div class="slim-stacked-container">
+                                <div class="stacked-bar-segment img" style="width: 60%;" title="이미지"></div>
+                                <div class="stacked-bar-segment doc" style="width: 25%;" title="문서"></div>
+                                <div class="stacked-bar-segment other" style="width: 15%;" title="기타"></div>
+                            </div>
+                            <div class="monitor-legend-mini">
+                                <span class="dot img"></span>IMG
+                                <span class="dot doc"></span>DOC
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card compact-card">
+                        <h3 class="card-title-sm">🕐 최근 활동</h3>
+                        <div id="recentActivity" class="activity-list compact-list">
+                            <!-- Dynamically loaded -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Home Screen Management Section -->
+                <section id="section-home" class="content-section">
+                    <h2 class="section-title">🏠 홈 화면 관리</h2>
+
+                    <!-- Editor (Full Width) -->
+                    <div class="editor-panel full-width">
+                        <div class="card">
+                            <div class="form-group">
+                                <label>메인 제목</label>
+                                <input type="text" id="homeTitle" class="form-input" placeholder="환영합니다">
+                            </div>
+
+                            <div class="form-group">
+                                <label>부제목</label>
+                                <input type="text" id="homeSubtitle" class="form-input"
+                                    placeholder="SMALLSM Archive에 오신 것을 환영합니다">
+                            </div>
+
+                            <div class="form-group">
+                                <label>본문</label>
+                                <div id="homeContentEditor"></div>
+                                <input type="hidden" id="homeContent">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="showRecentPosts">
+                                    <span>최신 게시물 표시</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group" id="recentPostsCountGroup" style="display: none;">
+                                <label>표시할 게시물 개수</label>
+                                <input type="number" id="recentPostsCount" class="form-input" value="3" min="1"
+                                    max="10">
+                            </div>
+
+                            <button class="btn-primary" id="saveHomeBtn">💾 저장하기</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Posts Management Section -->
+                <section id="section-posts" class="content-section">
+                    <h2 class="section-title">📝 게시글 관리</h2>
+
+                    <!-- Search and Filter -->
+                    <div class="card">
+                        <div class="toolbar">
+                            <input type="text" id="postSearch" class="search-input" placeholder="🔍 제목으로 검색...">
+                            <select id="postFilterCategory" class="filter-select">
+                                <option value="">모든 카테고리</option>
+                            </select>
+                            <select id="postFilterStatus" class="filter-select">
+                                <option value="">모든 상태</option>
+                                <option value="public">공개</option>
+                                <option value="private">비공개</option>
+                            </select>
+                            <button class="btn-primary" onclick="showNewPostEditor()">✍️ 새 글 작성</button>
+                        </div>
+
+                        <!-- Bulk Action Bar (Hidden by default) -->
+                        <div id="bulkActionBar" class="bulk-toolbar"
+                            style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--admin-border);">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span id="selectedCountText" style="color: var(--admin-primary); font-weight: 600;">0개
+                                    선택됨</span>
+                                <div style="flex: 1;"></div>
+                                <select id="bulkMoveCategory" class="filter-select" style="max-width: 200px;">
+                                    <option value="">이동할 카테고리 선택...</option>
+                                </select>
+                                <button class="btn-secondary" onclick="bulkMovePosts()">📦 일괄 이동</button>
+                                <button class="btn-danger" id="deleteSelectedBtn" onclick="deleteSelectedPosts()">🗑️ 선택
+                                    삭제</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Posts List -->
+                    <div id="postsList" class="posts-list">
+                        <!-- Dynamically loaded -->
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="postsPagination" class="pagination-container">
+                        <!-- Dynamically loaded -->
+                    </div>
+
+                    <!-- Post Editor View (Hidden by default) -->
+                    <div id="postEditorView" style="display: none;">
+                        <div class="card">
+                            <div class="editor-header">
+                                <button class="btn-secondary" id="backToListBtn">← 목록으로</button>
+                                <h3 id="editorTitle">새 글 작성</h3>
+                            </div>
+
+                            <!-- Post Meta -->
+                            <div class="form-group">
+                                <label for="postTitle">제목</label>
+                                <input type="text" id="postTitle" class="form-input" placeholder="게시물 제목을 입력하세요">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="postCategory">카테고리</label>
+                                    <select id="postCategory" class="form-select">
+                                        <option value="">카테고리 선택</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="isPrivate">
+                                        <span>비밀글로 설정</span>
+                                    </label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="originFree">
+                                        <span>복사 출처 비활성화</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Toast UI Editor -->
+                            <div class="form-group">
+                                <label>본문</label>
+                                <div id="editor"></div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <button class="btn-secondary" id="saveDraftBtn">💾 임시 저장</button>
+                                <button class="btn-primary" id="publishPostBtn">🚀 발행하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Categories Management Section -->
+                <section id="section-categories" class="content-section">
+                    <h2 class="section-title">📂 카테고리 관리</h2>
+
+                    <!-- Add Category -->
+                    <div class="card">
+                        <h3 class="card-title">➕ 새 카테고리 추가</h3>
+                        <div class="add-category-form">
+                            <select id="newCategoryParent" class="form-select" style="flex: 0 0 200px;">
+                                <option value="">📁 대분류로 추가</option>
+                            </select>
+                            <input type="text" id="newCategoryName" class="form-input"
+                                placeholder="카테고리 이름 (예: BDSM이란?)">
+                            <button class="btn-primary" id="addCategoryBtn">추가하기</button>
+                        </div>
+                        <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--admin-text-dim);">
+                            💡 대분류는 그룹 역할만 하며 글을 작성할 수 없습니다. 글 작성은 소분류에서만 가능합니다.
+                        </p>
+                    </div>
+
+                    <!-- Categories List -->
+                    <div id="categoriesList" class="categories-list">
+                        <!-- Dynamically loaded -->
+                    </div>
+                </section>
+
+                <!-- Tendencies Management Section -->
+                <section id="section-tendencies" class="content-section">
+                    <h2 class="section-title">⚖️ 성향 관리 (Top / Bottom)</h2>
+                    <p class="section-desc">Top과 Bottom 성향을 1:1로 매칭하거나 순서를 관리할 수 있습니다.</p>
+
+                    <div class="card">
+                        <h3 class="card-title">➕ 새 성향 추가</h3>
+                        <div class="add-category-form">
+                            <select id="newTendencyType" class="form-select" style="flex: 0 0 120px;">
+                                <option value="top">⬆️ Top</option>
+                                <option value="bottom">⬇️ Bottom</option>
+                            </select>
+                            <select id="newTendencyCategory" class="form-select" style="flex: 1;">
+                                <option value="">카테고리 없음</option>
+                            </select>
+                            <input type="text" id="newTendencyName" class="form-input"
+                                placeholder="성향 이름 (예: SP, DS...)">
+                            <button class="btn-primary" id="addTendencyBtn" onclick="addTendency()">추가하기</button>
+                        </div>
+                    </div>
+
+                    <div class="tendency-manage-container">
+                        <div class="tendency-column-group">
+                            <div class="column-header">⬆️ Top 리스트</div>
+                            <div id="topTendencyList" class="tendency-list sortable-list" data-type="top">
+                                <!-- Dynamically loaded -->
+                            </div>
+                        </div>
+                        <div class="tendency-column-group">
+                            <div class="column-header">⬇️ Bottom 리스트</div>
+                            <div id="bottomTendencyList" class="tendency-list sortable-list" data-type="bottom">
+                                <!-- Dynamically loaded -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                        <a href="../index.html" class="btn-primary"
+                            style="text-decoration: none; background: var(--text-dim); border-color: var(--text-dim);">👀
+                            사용자 페이지에서 확인</a>
+                        <button class="btn-primary" id="saveTendencyAllBtn" onclick="saveTendencyAll()">💾 모든 변경사항
+                            저장</button>
+                    </div>
+                </section>
+
+                <!-- Trash Section -->
+                <section id="section-trash" class="content-section">
+                    <h2 class="section-title">🗑️휴지통</h2>
+                    <p class="section-desc">삭제된 항목은 30일간 보관됩니다.</p>
+
+                    <div id="trashList" class="trash-list">
+                        <!-- Dynamically loaded -->
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="section-settings" class="content-section">
+                    <h2 class="section-title">⚙️ 설정</h2>
+
+                    <div class="card">
+                        <h3 class="card-title">사이트 정보</h3>
+                        <div class="form-group">
+                            <label>사이트 이름</label>
+                            <input type="text" id="siteTitleInput" class="form-input" placeholder="SMALLSM Archive">
+                        </div>
+                        <div class="form-group">
+                            <label>사이트 설명</label>
+                            <input type="text" id="siteDescInput" class="form-input"
+                                placeholder="시네마틱 아카이브 - 성향과 실천의 기록">
+                        </div>
+                        <div class="form-group">
+                            <label>관리자 이메일</label>
+                            <input type="email" id="adminEmailInput" class="form-input" disabled>
+                            <p style="font-size: 0.8rem; color: var(--admin-text-dim); margin-top: 0.5rem;">이메일 변경은 시스템
+                                설정 파일에서 가능합니다.</p>
+                        </div>
+                        <button class="btn-primary" id="saveSettingsBtn">💾 설정 저장</button>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">검색 엔진 최적화 (SEO)</h3>
+                        <p class="section-desc">Google 및 Naver 검색 결과에 노출되기 위한 메타 태그 설정입니다.</p>
+                        <div class="form-group">
+                            <label>Google Site Verification</label>
+                            <input type="text" id="googleVerification" class="form-input"
+                                placeholder="google-site-verification 코드">
+                        </div>
+                        <div class="form-group">
+                            <label>Naver Site Advisor Verification</label>
+                            <input type="text" id="naverVerification" class="form-input"
+                                placeholder="naver-site-verification 코드">
+                        </div>
+                        <button class="btn-primary" id="saveSeoBtn">💾 SEO 설정 저장</button>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- 1. Essential Libraries -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <!-- 2. Config & Supabase -->
+    <script src="/api/config?v=final"></script>
+
+    <!-- 3. CRITICAL: Inline Login Logic (No external file dependency for login) -->
+    <script>
+        console.log('🚀 Admin System Initializing (Inline Mode)...');
+
+        // 전역 변수 초기화
+        window.supabaseClient = null;
+
+        // 초기화 함수
+        async function initAdminSystem() {
+            try {
+                // 1. Config 확인
+                if (!window.CONFIG || !window.CONFIG.SUPABASE_URL) {
+                    throw new Error("환경 변수(CONFIG)가 로드되지 않았습니다.");
+                }
+
+                // 2. Supabase 초기화
+                if (typeof supabase === 'undefined') {
+                    throw new Error("Supabase 라이브러리가 로드되지 않았습니다.");
+                }
+
+                window.supabaseClient = supabase.createClient(
+                    window.CONFIG.SUPABASE_URL,
+                    window.CONFIG.SUPABASE_KEY
+                );
+                console.log('✅ Supabase initialized successfully (Inline).');
+
+                // 3. 세션 확인
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                if (session) {
+                    console.log('✅ Found existing session, showing dashboard.');
+                    showDashboard();
+                } else {
+                    console.log('ℹ️ No session, showing login screen.');
+                    document.getElementById('loginScreen').style.display = 'flex';
+                    document.getElementById('adminDashboard').style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('❌ Initialization Error:', error);
+                alert('시스템 초기화 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        // 로그인 핸들러 (Global)
+        window.handleLogin = async function () {
+            const emailInput = document.getElementById('loginEmail');
+            const passwordInput = document.getElementById('loginPassword');
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('loginError');
+
+            if (!emailInput || !passwordInput) return;
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            // UI Reset
+            errorMsg.textContent = '';
+            errorMsg.style.display = 'none';
+            loginBtn.disabled = true;
+            loginBtn.textContent = '로그인 중...';
+
+            try {
+                if (!window.supabaseClient) {
+                    throw new Error("Supabase 클라이언트가 준비되지 않았습니다. 새로고침 해주세요.");
+                }
+
+                const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                console.log('✅ Login successful:', data.user);
+                showDashboard();
+
+            } catch (error) {
+                console.error('Login failed:', error);
+                errorMsg.textContent = '로그인 실패: ' + (error.message || '이메일 또는 비밀번호를 확인해주세요.');
+                errorMsg.style.display = 'block';
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = '로그인';
+            }
+        };
+
+        // 대시보드 표시 함수
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            const dashboard = document.getElementById('adminDashboard');
+            dashboard.style.display = 'flex'; // flex로 변경하여 레이아웃 유지
+
+            // 대시보드 JS 로드 (Lazy Load)
+            loadDashboardScripts();
+        }
+
+        // 대시보드 스크립트 동적 로드 (로그인 성공 후에만 로드하여 충돌 방지)
+        function loadDashboardScripts() {
+            if (window.dashboardScriptsLoaded) return;
+            window.dashboardScriptsLoaded = true;
+
+            console.log('📦 Loading heavy dashboard scripts...');
+
+            const scripts = [
+                '/js/modules/pdf-core.js?v=final',
+                '/admin/js/admin-core.js?v=final'
+            ];
+
+            scripts.forEach(src => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = true; // 비동기 로드
+                document.body.appendChild(script);
+            });
+        }
+
+        // 실행
+        window.addEventListener('DOMContentLoaded', initAdminSystem);
+    </script>
+</body>
+
+</html>
