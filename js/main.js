@@ -679,7 +679,7 @@
                     if (tagMatch) {
                         type = tagMatch[1].toLowerCase();
                         rawTitle = rawTitle.slice(tagMatch[0].length).trim();
-                        // If it's relation, treat it as top for list categorization but keep the relation trait
+                        // If it's relation, treat it as top for list categorization
                         if (type === 'relation') type = 'top';
                     } else {
                         const bottomKeywords = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|bottom|submissive|브랫|brat|펫|pet|리틀|little|디그레이디|degradee/i;
