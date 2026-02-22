@@ -928,7 +928,7 @@
                     try { window._kinkViewer.destroy(); } catch (e) { }
                     window._kinkViewer = null;
                 }
-                window._kinkViewer = window.toastui.Editor.factory({
+                window._kinkViewer = new window.toastui.Editor({
                     el: description,
                     viewer: true,
                     initialValue: item.description || '',
