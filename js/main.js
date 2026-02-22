@@ -682,12 +682,21 @@
                     sub_name = titleMatch[2].trim();
                 }
 
+                // 4) Extract <!--pair: name--> tag from content for Relation tab
+                let pairTarget = null;
+                const pairMatch = (post.content || '').match(/<!--\s*pair:\s*(.+?)\s*-->/i);
+                if (pairMatch) pairTarget = pairMatch[1].trim();
+
+                // 5) Strip <!--pair:...--> and metadata from content before storing
+                const cleanContent = (post.content || '').replace(/<!--.*?-->/gs, '').trim();
+
                 return {
                     id: post.id,
                     name: name,
                     sub_name: sub_name,
-                    description: post.content, // we map content to description
+                    description: cleanContent,
                     type: type,
+                    pair: pairTarget, // name of paired item (for Relation tab)
                     icon_class: type === 'bottom' ? 'heart' : 'crown' // Default icons
                 };
             });
@@ -736,33 +745,56 @@
         let contentHtml = '';
 
         if (activeTab === 'Relation') {
+            // Build pairs: for each top, find its pair by name (from pair tag), else fallback to index
+            const buildPairs = () => {
+                const tops = tendenciesData.filter(t => t.type === 'top');
+                const bottoms = tendenciesData.filter(t => t.type === 'bottom');
+                const pairs = [];
+                const usedBottomIds = new Set();
+
+                tops.forEach((top, idx) => {
+                    let matched = null;
+                    if (top.pair) {
+                        // Find bottom by name matching the pair tag
+                        matched = bottoms.find(b =>
+                            b.name.toLowerCase().includes(top.pair.toLowerCase()) ||
+                            top.pair.toLowerCase().includes(b.name.toLowerCase())
+                        );
+                    }
+                    if (!matched) {
+                        // Fallback: pair by index, skip already used
+                        matched = bottoms.filter(b => !usedBottomIds.has(b.id))[0] || null;
+                    }
+                    if (matched) usedBottomIds.add(matched.id);
+                    pairs.push({ top, bottom: matched });
+                });
+                return pairs;
+            };
+
+            const pairs = buildPairs();
             contentHtml = `
                 <div class="kink-relation-container">
                     <div class="kink-relation-info">
-                        <p>서로 매칭되는 성향끼리 묶어서 보여줍니다.</p>
+                        <p>Top 게시글 본문 첫 줄에 <code>&lt;!--pair: 파트너이름--&gt;</code>을 추가하면 매칭됩니다.</p>
                     </div>
                     <div class="kink-relation-list">
             `;
-            // Simple mapping for demo matching. 
-            // We assume index mapping matches them one-by-one or loops
-            const matchLength = Math.min(doms.length, subs.length);
-            for (let idx = 0; idx < matchLength; idx++) {
-                const top = doms[idx];
-                const bottom = subs[idx];
+            pairs.forEach(({ top, bottom }) => {
+                const bottomName = bottom ? bottom.name : '?';
                 contentHtml += `
                     <div class="kink-relation-item">
-                        <div class="kink-relation-card top">
+                        <div class="kink-relation-card top" onclick="showRoleDetail('${top.id}')" style="cursor:pointer">
                             <div class="relation-badge top-badge">TOP</div>
                             <div class="relation-name">${top.name}</div>
                         </div>
                         <div class="relation-icon"><i data-lucide="zap"></i></div>
-                        <div class="kink-relation-card bottom">
+                        <div class="kink-relation-card bottom" ${bottom ? `onclick="showRoleDetail('${bottom.id}')" style="cursor:pointer"` : ''} >
                             <div class="relation-badge bottom-badge">BOTTOM</div>
-                            <div class="relation-name">${bottom.name}</div>
+                            <div class="relation-name">${bottomName}</div>
                         </div>
                     </div>
                 `;
-            }
+            });
             contentHtml += `</div></div>`;
         } else {
             const listData = activeTab === 'Top' ? doms : subs;
@@ -888,20 +920,32 @@
         subName.textContent = item.sub_name || '';
 
         if (description) {
-            // Very simple markdown to HTML parser for the preview
-            let descHtml = (item.description || '')
-                .replace(/### (.*?)\n/g, '<h4>$1</h4>')
-                .replace(/## (.*?)\n/g, '<h3>$1</h3>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/\n\n/g, '<br><br>');
-
-            // Limit preview length
-            if (descHtml.length > 300) {
-                descHtml = descHtml.substring(0, 300) + '...';
+            // Use ToastUI Viewer for proper markdown rendering
+            description.innerHTML = ''; // Clear previous content
+            if (window.toastui && window.toastui.Editor) {
+                // Destroy previous viewer if any
+                if (window._kinkViewer) {
+                    try { window._kinkViewer.destroy(); } catch (e) { }
+                    window._kinkViewer = null;
+                }
+                window._kinkViewer = window.toastui.Editor.factory({
+                    el: description,
+                    viewer: true,
+                    initialValue: item.description || '',
+                    theme: 'dark'
+                });
+            } else {
+                // Fallback: basic markdown to HTML
+                let descHtml = (item.description || '')
+                    .replace(/^# (.+)/gm, '<h1>$1</h1>')
+                    .replace(/^## (.+)/gm, '<h2>$1</h2>')
+                    .replace(/^### (.+)/gm, '<h3>$1</h3>')
+                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                    .replace(/^---$/gm, '<hr>')
+                    .replace(/\n\n/g, '<br><br>');
+                description.innerHTML = descHtml;
             }
-
-            description.innerHTML = descHtml;
         }
 
         overlay.classList.add('active');
