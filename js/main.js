@@ -1055,10 +1055,64 @@
                     html += `<h3 class="md-h3">${inlineRender(line.replace(/^### /, ''))}</h3>`;
                     continue;
                 }
-                // HR
+                // HR  (--- 만 있는 줄 - 테이블 구분행과 구분)
                 if (/^---$/.test(line.trim())) {
                     closeList();
                     html += '<hr class="md-hr">';
+                    continue;
+                }
+                // ── TABLE ──────────────────────────────────────
+                // | 로 시작하는 줄이면 테이블 모드로 진입
+                if (/^\|/.test(line)) {
+                    closeList();
+                    // 연속된 | 줄들을 모두 수집
+                    const tableLines = [];
+                    while (i < lines.length && /^\|/.test(lines[i])) {
+                        tableLines.push(lines[i]);
+                        i++;
+                    }
+                    i--; // 루프 i++ 대비
+
+                    // 줄 분리: 첫 행=헤더, 두 번째 행=구분(---)인지 확인
+                    const parseRow = (rowLine) =>
+                        rowLine
+                            .replace(/^\||\|$/g, '')  // 양쪽 끝 | 제거
+                            .split('|')
+                            .map(cell => inlineRender(cell.trim()));
+
+                    const isDivider = (rowLine) =>
+                        /^\|[\s\-:|\s]+\|$/.test(rowLine.trim());
+
+                    let headerRow = null;
+                    let bodyRows = [];
+                    let hasDivider = false;
+
+                    tableLines.forEach((tl, idx) => {
+                        if (idx === 0) {
+                            headerRow = parseRow(tl);
+                        } else if (idx === 1 && isDivider(tl)) {
+                            hasDivider = true; // skip as separator
+                        } else {
+                            bodyRows.push(parseRow(tl));
+                        }
+                    });
+
+                    // 구분행이 없으면 전부 tbody로
+                    if (!hasDivider && headerRow) {
+                        bodyRows.unshift(headerRow);
+                        headerRow = null;
+                    }
+
+                    let tableHtml = '<table class="md-table"><thead>';
+                    if (headerRow) {
+                        tableHtml += '<tr>' + headerRow.map(c => `<th>${c}</th>`).join('') + '</tr>';
+                    }
+                    tableHtml += '</thead><tbody>';
+                    bodyRows.forEach(row => {
+                        tableHtml += '<tr>' + row.map(c => `<td>${c}</td>`).join('') + '</tr>';
+                    });
+                    tableHtml += '</tbody></table>';
+                    html += tableHtml;
                     continue;
                 }
                 // Unordered list

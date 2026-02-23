@@ -953,6 +953,40 @@ p {
     color: var(--primary-brass);
 }
 
+/* Table */
+.md-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.2rem 0;
+    font-size: 0.93rem;
+    border: 1px solid var(--glass-border);
+}
+
+.md-table th,
+.md-table td {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--glass-border);
+    text-align: left;
+}
+
+.md-table thead th {
+    background-color: rgba(182, 141, 64, 0.1);
+    color: var(--primary-brass);
+    font-weight: 700;
+}
+
+.md-table tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+body.night-mode .md-table thead th {
+    background-color: rgba(182, 141, 64, 0.15);
+}
+
+body.night-mode .md-table tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
 /* Bold / Italic / Del */
 .md-body strong {
     font-weight: 700;
