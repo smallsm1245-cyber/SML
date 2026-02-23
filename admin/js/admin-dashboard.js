@@ -16,6 +16,39 @@ const turndownService = new TurndownService({
     codeBlockStyle: 'fenced'
 });
 
+// Refined Turndown rules to strip Summernote's inline styles that break site consistency
+turndownService.addRule('stripUnwantedStyles', {
+    filter: ['span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'table', 'div'],
+    replacement: function (content, node) {
+        // Strip common unwanted styles but keep the tag structure
+        const tag = node.nodeName.toLowerCase();
+
+        // Use standard Turndown behavior for headings, lists, etc.
+        // We just want to ensure we don't have <span style="font-family: ..."> mess
+        if (tag === 'span' && !node.attributes.length) return content;
+
+        // For other tags, we let Turndown handle the conversion to MD, 
+        // but we've already stripped the mess if we used a pre-processor 
+        // or we can handle it here if needed.
+        return node.outerHTML;
+    }
+});
+
+// Custom filter for clean Markdown
+turndownService.remove(['script', 'style', 'noscript']);
+turndownService.addRule('cleanSpan', {
+    filter: 'span',
+    replacement: function (content, node) {
+        // If it's a color span or bold span, we might want to keep it, 
+        // but for general Summernote font mess, just return content
+        const style = node.getAttribute('style') || '';
+        if (style.includes('color') || style.includes('background-color')) {
+            return `<span style="${style}">${content}</span>`;
+        }
+        return content;
+    }
+});
+
 const showdownConverter = new showdown.Converter({
     tables: true,
     strikethrough: true,
@@ -375,13 +408,30 @@ async function loadHomeSettings() {
 
         // Summernote Editor for Home
         const homeHtml = showdownConverter.makeHtml(settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.');
-        $('#homeContentEditor').summernote({
+        const summernoteConfig = {
             height: 300,
             lang: 'ko-KR',
+            placeholder: '홈 화면 내용을 입력하세요...',
+            toolbar: [
+                ['style', ['style', 'bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link', 'picture', 'hr']],
+                ['view', ['fullscreen', 'codeview']]
+            ],
+            styleTags: ['p', 'h2', 'h3', 'h4'], // Filtered list for site consistency
             callbacks: {
-                onChange: updateHomePreview
+                onChange: updateHomePreview,
+                onPaste: function (e) {
+                    // Strip absolute font sizes on paste
+                    const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+                    e.preventDefault();
+                    document.execCommand('insertText', false, bufferText);
+                }
             }
-        });
+        };
+
+        $('#homeContentEditor').summernote(summernoteConfig);
         $('#homeContentEditor').summernote('code', homeHtml);
 
         document.getElementById('showRecentPosts').checked = settings.show_recent_posts === 'true';
@@ -764,7 +814,7 @@ window.editPost = async function (id) {
 
 function initPostEditor(content) {
     const summernoteConfig = {
-        height: 600,
+        height: 500,
         placeholder: '내용을 입력하세요...',
         lang: 'ko-KR',
         toolbar: [
@@ -776,11 +826,28 @@ function initPostEditor(content) {
             ['insert', ['link', 'picture', 'hr']],
             ['view', ['fullscreen', 'codeview', 'help']]
         ],
+        styleTags: [
+            'p',
+            { title: '제목 1', tag: 'h2', className: 'post-h1', value: 'h2' },
+            { title: '제목 2', tag: 'h3', className: 'post-h2', value: 'h3' },
+            { title: '본문 리드', tag: 'p', className: 'lead', value: 'p' }
+        ],
+        fontNames: ['Noto Serif KR', 'Inter', 'Arial'],
+        fontNamesIgnoreCheck: ['Noto Serif KR'],
+        addDefaultFonts: false,
         callbacks: {
             onImageUpload: function (files) {
                 for (let i = 0; i < files.length; i++) {
                     uploadImageToSummernote(files[i], this);
                 }
+            },
+            onPaste: function (e) {
+                // Prevent font-family/size mess when pasting
+                const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+                e.preventDefault();
+                setTimeout(() => {
+                    document.execCommand('insertText', false, bufferText);
+                }, 10);
             }
         }
     };

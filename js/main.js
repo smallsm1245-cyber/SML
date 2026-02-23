@@ -221,7 +221,7 @@
 
             let query = supabaseClient
                 .from('archive_posts')
-                .select('id, title, created_at')
+                .select('id, title, created_at, category_id')
                 .order('created_at', { ascending: false })
                 .limit(count);
 
@@ -235,16 +235,36 @@
             if (posts && posts.length > 0) {
                 const content = document.getElementById('mainContent');
                 const recentSection = document.createElement('div');
-                recentSection.style.marginTop = '3rem';
+                recentSection.className = 'recent-records-section';
+                recentSection.style.marginTop = '4rem';
+
+                // Fetch category names for the posts
+                const categoryIds = [...new Set(posts.map(p => p.category_id))];
+                const { data: categories } = await supabaseClient
+                    .from('categories')
+                    .select('id, name')
+                    .in('id', categoryIds);
+
+                const catMap = {};
+                if (categories) categories.forEach(c => catMap[c.id] = c.name);
+
                 recentSection.innerHTML = `
-                    <h2 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--primary-brass); border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">최근 기록</h2>
-                    ${posts.map(post => `
-                        <div style="margin-bottom: 1rem;">
-                            <a href="post.html?id=${post.id}" style="color: var(--text-primary); text-decoration: none; font-size: 0.95rem;">
-                                • ${post.title} <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 0.5rem;">${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
-                            </a>
-                        </div>
-                    `).join('')}
+                    <h2 class="archive-section-title" style="font-size: 1.1rem; margin-bottom: 2rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.2em; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.8rem; font-family: var(--font-mono);">Recent Records</h2>
+                    <ul class="archive-list" style="list-style: none; padding: 0;">
+                        ${posts.map(post => `
+                            <li style="margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 4px;">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <a href="post.html?id=${post.id}" style="color: var(--text-primary); text-decoration: none; font-size: 1.1rem; font-family: var(--font-serif); font-weight: 500;">
+                                        ${post.title}
+                                    </a>
+                                    <span style="color: var(--text-dim); font-size: 0.8rem; font-family: var(--font-mono);">${new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--primary-brass); font-family: var(--font-mono); text-transform: uppercase; opacity: 0.8;">
+                                    [ ${catMap[post.category_id] || 'General'} ]
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
                 `;
                 content.appendChild(recentSection);
             }
