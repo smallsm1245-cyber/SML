@@ -1384,9 +1384,10 @@
 
     function initBottomNav() {
         const navHome = document.getElementById('navHome');
+        const navWiki = document.getElementById('navWiki');
         const navSearch = document.getElementById('navSearch');
         const navSettings = document.getElementById('navSettings');
-        const mainEls = document.querySelectorAll('.content-panel, .site-footer');
+        const mainEls = document.querySelectorAll('.content-panel, .site-footer, .post-title, .post-meta');
         const settingsView = document.getElementById('settingsView');
 
         if (!navHome || !navSettings) return;
@@ -1397,11 +1398,15 @@
                 if (settingsView) settingsView.style.display = 'block';
                 navSettings.classList.add('active');
                 navHome.classList.remove('active');
+                if (navWiki) navWiki.classList.remove('active');
+                if (navSearch) navSearch.classList.remove('active');
             } else {
                 mainEls.forEach(el => el.style.display = 'block');
                 if (settingsView) settingsView.style.display = 'none';
                 navHome.classList.add('active');
+                if (navWiki) navWiki.classList.remove('active');
                 navSettings.classList.remove('active');
+                if (navSearch) navSearch.classList.remove('active');
             }
             window.scrollTo(0, 0);
         };
@@ -1417,9 +1422,27 @@
             showView('settings');
         });
 
+        if (navWiki) {
+            navWiki.addEventListener('click', (e) => {
+                e.preventDefault();
+                renderTendencyView();
+                navHome.classList.remove('active');
+                navWiki.classList.add('active');
+                navSettings.classList.remove('active');
+                if (navSearch) navSearch.classList.remove('active');
+                window.scrollTo(0, 0);
+            });
+        }
+
         if (navSearch) {
             navSearch.addEventListener('click', (e) => {
                 e.preventDefault();
+                // Remove active from others
+                navHome.classList.remove('active');
+                navWiki.classList.remove('active');
+                navSettings.classList.remove('active');
+                navSearch.classList.add('active');
+
                 // Focusing search in sidebar as a fallback or if we want a separate search view
                 const searchInput = document.getElementById('searchInput');
                 if (searchInput) {
@@ -1494,6 +1517,12 @@
         initHeaderScroll();
         initEmergencySystem();
         initBottomNav();
+
+        // Initialize Lucide Icons
+        if (window.lucide) {
+            window.lucide.createIcons();
+            console.log('✨ Lucide icons created');
+        }
 
         console.log('🎉 Initialization complete');
     });

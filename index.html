@@ -61,11 +61,20 @@
 
     <!-- Mobile Header (Visible only on mobile) -->
     <header class="mobile-header">
-        <button class="menu-toggle" id="menuToggleBtn">☰</button>
-        <div class="mobile-logo">SMALLSM</div>
-        <button class="mode-toggle header-mode-toggle" id="headerModeToggle">
-            <span class="mode-icon">🌙</span>
-        </button>
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggleBtn" aria-label="Toggle Menu">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+        <div class="mobile-logo">
+            <a href="index.html">SMALLSM</a>
+        </div>
+        <div class="header-right">
+            <button class="mode-toggle header-mode-toggle" id="headerModeToggle" aria-label="Toggle Dark Mode">
+                <i data-lucide="moon" class="mode-icon-dark"></i>
+                <i data-lucide="sun" class="mode-icon-light"></i>
+            </button>
+        </div>
     </header>
 
     <!-- Sidebar Overlay (Scrim) -->
@@ -149,22 +158,26 @@
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
         <a href="index.html" class="nav-item active" id="navHome">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-label">홈</span>
+            <i data-lucide="home"></i>
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="javascript:void(0);" class="nav-item" id="navWiki">
+            <i data-lucide="book-open"></i>
+            <span class="nav-label">Wiki</span>
         </a>
         <a href="javascript:void(0);" class="nav-item" id="navSearch">
-            <span class="nav-icon">🔍</span>
-            <span class="nav-label">검색</span>
+            <i data-lucide="search"></i>
+            <span class="nav-label">Search</span>
         </a>
         <a href="javascript:void(0);" class="nav-item" id="navSettings">
-            <span class="nav-icon">⚙️</span>
-            <span class="nav-label">설정</span>
+            <i data-lucide="settings"></i>
+            <span class="nav-label">Settings</span>
         </a>
     </nav>
 
     <!-- Emergency FAB -->
-    <button id="emergencyFab" class="emergency-fab">
-        🏃
+    <button id="emergencyFab" class="emergency-fab" aria-label="Emergency Escape">
+        <i data-lucide="zap"></i>
     </button>
 
     <!-- Scripts -->
