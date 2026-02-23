@@ -26,6 +26,28 @@
                 bulletListMarker: '-',
                 codeBlockStyle: 'fenced'
             });
+
+            // Refined Turndown rules to strip Summernote's inline styles
+            turndownService.addRule('stripUnwantedStyles', {
+                filter: ['span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'table', 'div'],
+                replacement: function (content, node) {
+                    const tag = node.nodeName.toLowerCase();
+                    if (tag === 'span' && !node.attributes.length) return content;
+                    return node.outerHTML;
+                }
+            });
+
+            turndownService.remove(['script', 'style', 'noscript']);
+            turndownService.addRule('cleanSpan', {
+                filter: 'span',
+                replacement: function (content, node) {
+                    const style = node.getAttribute('style') || '';
+                    if (style.includes('color') || style.includes('background-color')) {
+                        return `<span style="${style}">${content}</span>`;
+                    }
+                    return content;
+                }
+            });
         }
 
         if (typeof showdown !== 'undefined') {
@@ -394,7 +416,24 @@
                 ['table', ['table']],
                 ['insert', ['link', 'picture', 'hr']],
                 ['view', ['fullscreen', 'codeview']]
-            ]
+            ],
+            styleTags: [
+                'p',
+                { title: '제목 1', tag: 'h2', className: 'post-h1', value: 'h2' },
+                { title: '제목 2', tag: 'h3', className: 'post-h2', value: 'h3' }
+            ],
+            fontNames: ['Noto Serif KR', 'Inter', 'Arial'],
+            fontNamesIgnoreCheck: ['Noto Serif KR'],
+            addDefaultFonts: false,
+            callbacks: {
+                onPaste: function (e) {
+                    const bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+                    e.preventDefault();
+                    setTimeout(() => {
+                        document.execCommand('insertText', false, bufferText);
+                    }, 10);
+                }
+            }
         });
 
         $('#summernoteModal').summernote('code', htmlContent);

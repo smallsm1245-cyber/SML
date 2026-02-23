@@ -868,3 +868,106 @@
     opacity: 0.3;
     cursor: not-allowed;
 }
+
+/* ═══════════════════════════════════════════════════
+   SUMMERNOTE EDITOR CUSTOMIZATION
+   ═══════════════════════════════════════════════════ */
+/* Editor Area Typography Synchronization */
+.note-editor.note-frame .note-editable {
+    font-family: 'Noto Serif KR', serif !important;
+    font-size: 16px !important;
+    line-height: 1.7 !important;
+    color: var(--admin-text) !important;
+    background-color: #1a1a18 !important;
+    /* Slightly lighter than panel for contrast */
+    padding: 2.5rem !important;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+/* Mobile responsive padding for editor */
+@media (max-width: 768px) {
+    .note-editor.note-frame .note-editable {
+        padding: 1.5rem 1rem !important;
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+    }
+}
+
+/* Summernote UI Optimization for Dark Mode & Mobile */
+.note-editor.note-frame {
+    border: 1px solid var(--admin-border) !important;
+    background: var(--admin-panel) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.note-toolbar {
+    background: #1e1e1c !important;
+    border-bottom: 1px solid var(--admin-border) !important;
+    padding: 5px 10px !important;
+}
+
+.note-btn {
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--admin-text-dim) !important;
+    transition: var(--transition) !important;
+    padding: 6px 10px !important;
+}
+
+.note-btn:hover,
+.note-btn.active {
+    background: var(--admin-hover) !important;
+    color: var(--admin-primary) !important;
+    border-color: var(--admin-primary) !important;
+}
+
+.note-dropdown-menu {
+    background: #252522 !important;
+    border: 1px solid var(--admin-border) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.note-dropdown-item:hover {
+    background: var(--admin-hover) !important;
+}
+
+.note-modal-content {
+    background: #252522 !important;
+    color: var(--admin-text) !important;
+    border: 1px solid var(--admin-border) !important;
+    border-radius: 16px !important;
+}
+
+.note-modal-header {
+    border-bottom: 1px solid var(--admin-border) !important;
+}
+
+.note-modal-footer {
+    border-top: 1px solid var(--admin-border) !important;
+}
+
+.note-form-label {
+    color: var(--admin-primary) !important;
+}
+
+.note-input {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid var(--admin-border) !important;
+    color: var(--admin-text) !important;
+    border-radius: 8px !important;
+}
+
+/* Toolbar responsiveness for mobile */
+@media (max-width: 480px) {
+    .note-toolbar .note-btn-group {
+        margin-right: 2px !important;
+    }
+
+    .note-btn {
+        padding: 5px 7px !important;
+        font-size: 11px !important;
+    }
+}

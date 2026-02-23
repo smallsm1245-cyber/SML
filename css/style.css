@@ -730,18 +730,63 @@ p {
 
 /* Post Content - Mobile first */
 .post-content {
-    font-size: 15px;
-    line-height: 1.55;
+    font-size: 16px;
+    line-height: 1.7;
     color: var(--text-primary);
     word-break: keep-all;
     overflow-wrap: break-word;
+    font-family: var(--font-body);
 }
 
+.post-content p {
+    margin-bottom: 1.5rem;
+}
+
+.post-content h2,
+.post-content h3 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+.post-content ul,
+.post-content ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.post-content li {
+    margin-bottom: 0.5rem;
+}
+
+/* Tablet & Desktop adjustments */
 @media (min-width: 769px) {
     .post-content {
-        font-size: 16px;
-        line-height: 1.65;
+        font-size: 17px;
+        line-height: 1.8;
     }
+}
+
+/* Table Responsiveness for Summernote */
+.post-content table {
+    width: 100% !important;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    display: block;
+    /* Force scroll on small screens */
+}
+
+.post-content table th,
+.post-content table td {
+    padding: 12px;
+    border: 1px solid var(--glass-border);
+    text-align: left;
+}
+
+.post-content table th {
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 700;
 }
 
 /* Toast UI Viewer Override for Dark Mode & Font */
