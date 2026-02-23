@@ -1487,25 +1487,19 @@
     document.addEventListener('DOMContentLoaded', () => {
         console.log('📱 DOM ready');
 
-        // Yes button
+        // Age Verification Buttons
         const btnYes = document.getElementById('btnYes');
+        const btnNo = document.getElementById('btnNo');
+
         if (btnYes) {
             btnYes.addEventListener('click', () => {
                 console.log('✅ Yes clicked');
                 localStorage.setItem(VERIFICATION_KEY, Date.now().toString());
                 hideDisclaimer();
-
-                waitForConfig(() => {
-                    initializeSupabase();
-                    loadHomeSettings();
-                    loadCategories();
-                    initSearch();
-                });
+                initApp();
             });
         }
 
-        // No button
-        const btnNo = document.getElementById('btnNo');
         if (btnNo) {
             btnNo.addEventListener('click', () => {
                 console.log('❌ No clicked');
@@ -1513,16 +1507,23 @@
             });
         }
 
-        // Check verification
-        if (checkAgeVerification()) {
+        // Shared initialization function
+        function initApp() {
             waitForConfig(() => {
-                initializeSupabase();
-                loadHomeSettings();
-                loadCategories();
-                initSearch();
+                if (initializeSupabase()) {
+                    loadHomeSettings();
+                    loadCategories();
+                    initSearch();
+                }
             });
         }
 
+        // Start app if already verified
+        if (checkAgeVerification()) {
+            initApp();
+        }
+
+        // Initialize UI Modules
         initNightMode();
         initAdminLongPress();
         initMobileMenu();

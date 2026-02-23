@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Noto+Serif+KR:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Noto+Serif+KR:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🎬 SMALLSM ARCHIVE - CINEMATIC SYSTEM STYLESHEET
@@ -8,22 +8,28 @@
    0. ROOT VARIABLES - 색상 중앙 제어
    ═══════════════════════════════════════════════════ */
 :root {
-    /* Color Palette - Refined High Contrast */
-    --primary-brass: #B68D40;
-    --primary-gold: #D4A574;
-    --bg-deep: #F5F6F7;
+    /* Color Palette - Rose & Slate (Unified) */
+    --primary-rose: #e11d48;
+    /* Rose 600 */
+    --primary-rose-hover: #be123c;
+    /* Rose 700 */
+    --bg-deep: #F8FAFC;
+    /* Slate 50 */
     --bg-panel: #FFFFFF;
-    --text-primary: #1A1A1A;
-    --text-secondary: #4A4A4A;
-    --text-dim: #717171;
-    --accent-amber: #D9534F;
-    --glass-border: rgba(0, 0, 0, 0.1);
-    --link-color: #0275d8;
+    --text-primary: #0F172A;
+    /* Slate 900 */
+    --text-secondary: #475569;
+    /* Slate 600 */
+    --text-dim: #94A3B8;
+    /* Slate 400 */
+    --accent-rose: #e11d48;
+    --glass-border: rgba(15, 23, 42, 0.1);
+    --link-color: #e11d48;
 
     /* Glassmorphism - Light Mode */
-    --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-blur: 12px;
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --glass-bg: rgba(255, 255, 255, 0.82);
+    --glass-blur: 16px;
+    --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
 
     /* Typography */
     --font-serif: 'Noto Serif KR', serif;
@@ -31,42 +37,56 @@
     --font-body: 'Noto Sans KR', sans-serif;
     --font-mono: 'Courier Prime', monospace;
 
-    /* Spacing */
+    /* Mobile Optimizations */
+    --base-font-size: 16px;
     --header-height: 64px;
     --sidebar-width: 280px;
-    --content-max: 1200px;
-    --container-padding: 24px;
-    --border-radius: 8px;
+
+    /* Spacing */
+    --container-padding: 1.5rem;
+    --border-radius: 1rem;
 
     /* Transitions */
-    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Shadows & Glows */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --glow-brass: 0 0 15px rgba(182, 141, 64, 0.3);
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1), 0 2px 4px -1px rgba(15, 23, 42, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+    --glow-rose: 0 0 15px rgba(225, 29, 72, 0.3);
 }
 
-/* Night Library Mode - High Contrast & Depth */
+/* Dark Mode - Slate 950 */
 body.night-mode,
 html.dark body {
-    --bg-deep: #0A0A0A;
-    --bg-panel: #141414;
-    --text-primary: #E5E5E5;
-    --text-secondary: #A0A0A0;
-    --text-dim: #666666;
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --link-color: #64B5F6;
-    --primary-brass: #D4A574;
+    --bg-deep: #020617;
+    /* Slate 950 */
+    --bg-panel: #0F172A;
+    /* Slate 900 */
+    --text-primary: #F8FAFC;
+    /* Slate 50 */
+    --text-secondary: #94A3B8;
+    /* Slate 400 */
+    --text-dim: #475569;
+    /* Slate 600 */
+    --glass-border: rgba(248, 250, 252, 0.1);
+    --link-color: #FB7185;
+    /* Rose 400 */
+    --primary-rose: #E11D48;
 
     /* Glassmorphism - Night Mode */
-    --glass-bg: rgba(20, 20, 20, 0.8);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    --glass-bg: rgba(15, 23, 42, 0.85);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 
-    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.6);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Global Styles */
+::selection {
+    background: rgba(225, 29, 72, 0.2);
+    color: inherit;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -157,7 +177,7 @@ html.dark .archive-accordion summary:hover {
     content: '+';
     font-family: var(--font-mono);
     font-size: 1.2rem;
-    color: var(--rose-600, #e11d48);
+    color: var(--primary-rose);
     transition: transform 0.3s ease;
 }
 
@@ -262,7 +282,7 @@ body.night-mode {
     font-size: 1.2rem;
     font-weight: 800;
     letter-spacing: 0.1em;
-    color: var(--primary-brass);
+    color: var(--primary-rose);
 }
 
 .mobile-logo a {
