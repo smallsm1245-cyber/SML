@@ -24,9 +24,9 @@
 
     /* Typography */
     --font-serif: 'Noto Serif KR', serif;
-    /* Keep headers serif if desired, or switch */
-    --font-body: 'Noto Sans KR', sans-serif;
+    --font-display: 'Noto Sans KR', sans-serif;
     /* Readable body font */
+    --font-body: 'Noto Sans KR', sans-serif;
     --font-mono: 'Courier Prime', monospace;
 
     /* Spacing */
@@ -36,14 +36,16 @@
 
     /* Effects */
     --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --glow-subtle: 0 0 10px rgba(206, 177, 128, 0.2);
+    --glow-medium: 0 0 20px rgba(206, 177, 128, 0.4);
 
-    /* High Density Visuals (New) */
+    /* Dim Text */
+    --text-dim: #777777;
+
+    /* High Density Visuals */
     --base-font-size: 15px;
-    /* Reduced from 16px default */
     --line-height: 1.5;
-    /* Compact line height */
     --container-padding: 16px;
-    /* Reduced padding */
     --card-padding: 1rem;
     --border-radius: 8px;
 }
@@ -772,19 +774,105 @@ p {
     font-size: 1.3rem !important;
 }
 
-/* 모달 내부 마크다운 컨테이너 전역 h 스타일 차단 */
+/* 모달 내부 마크다운 컨테이너 전역 h 스타일 차단 및 기본 마진 초기화 */
 .role-description .toastui-editor-contents h1,
 .role-description .toastui-editor-contents h2,
 .role-description .toastui-editor-contents h3,
 .role-description .toastui-editor-contents h4,
 .role-description .toastui-editor-contents h5,
 .role-description .toastui-editor-contents h6 {
+    margin: 0 !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
-    margin-top: 1.4rem !important;
-    margin-bottom: 0.5rem !important;
+    margin-top: 2rem !important;
+    /* 상단 여백 (이미지 참조) */
+    margin-bottom: 1rem !important;
+    /* 하단 여백 (이미지 참조) */
     padding-bottom: 0.3rem !important;
     line-height: 1.4 !important;
     font-weight: 700 !important;
+}
+
+/* 첫 번째 제목의 불필요한 상단 여백 제거 */
+.role-description .toastui-editor-contents>h1:first-child,
+.role-description .toastui-editor-contents>h2:first-child,
+.role-description .toastui-editor-contents>h3:first-child {
+    margin-top: 0 !important;
+}
+
+/* ─── 인라인 편집 스타일 ─── */
+.kink-admin-btn {
+    display: none;
+    /* Default hidden */
+    margin-left: auto;
+    align-self: center;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    cursor: pointer;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    position: relative;
+    z-index: 10000;
+}
+
+.kink-admin-btn i {
+    width: 14px;
+    height: 14px;
+}
+
+.kink-admin-btn.edit-btn {
+    background: #ceb180;
+    color: #121212;
+    box-shadow: 0 4px 15px rgba(206, 177, 128, 0.4);
+}
+
+.kink-admin-btn.save-btn {
+    background: #4CAF50;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.kink-admin-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Edit Mode 활성 시 버튼 노출 */
+body.admin-edit-active #kinkModalEditBtn {
+    display: flex !important;
+}
+
+.role-description.is-editable {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px dashed transparent;
+    border-radius: 8px;
+    padding: 10px;
+    margin: -10px;
+}
+
+body.admin-edit-active .role-description.is-editable:hover {
+    background: rgba(206, 177, 128, 0.05);
+    border-color: rgba(206, 177, 128, 0.3);
+}
+
+.role-description .toastui-editor-main {
+    background: transparent !important;
+}
+
+.role-description .toastui-editor-dark {
+    background-color: transparent !important;
+}
+
+.role-description .toastui-editor-defaultUI {
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 8px;
+    background: #1a1a1a !important;
 }
 
 /* heading 크기 계층 유지 */
@@ -806,30 +894,36 @@ p {
     font-size: 1rem !important;
 }
 
-/* 단락 줄간격 */
+/* 단락 줄간격 및 여백 고정 */
 .role-description .toastui-editor-contents p {
+    margin: 0 !important;
     color: var(--text-primary) !important;
-    line-height: 1.75 !important;
-    margin-bottom: 0.8rem !important;
+    line-height: 1.6 !important;
+    /* 요구사항: 1.6 고정 */
+    margin-bottom: 1rem !important;
+    /* 단락 사이 여백 */
 }
 
 /* 리스트 */
 .role-description .toastui-editor-contents ul,
 .role-description .toastui-editor-contents ol {
+    margin: 0 !important;
     padding-left: 1.4rem !important;
+    margin-bottom: 1rem !important;
 }
 
 .role-description .toastui-editor-contents ul li,
 .role-description .toastui-editor-contents ol li {
-    margin-bottom: 0.6rem !important;
-    line-height: 1.65 !important;
+    margin: 0 !important;
+    margin-bottom: 0.4rem !important;
+    line-height: 1.6 !important;
 }
 
 /* hr - 마크다운 --- 구분선 */
 .role-description .toastui-editor-contents hr {
     border: none !important;
     border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-    margin: 1.2rem 0 !important;
+    margin: 1.5rem 0 !important;
 }
 
 /* 강조 */
@@ -1087,9 +1181,6 @@ body.night-mode .post-content strong {
 /* ═══════════════════════════════════════════════════
    5. FOOTER
    ═══════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════
-   5. FOOTER
-   ═══════════════════════════════════════════════════ */
 .site-footer {
     text-align: center;
     padding: 1.5rem;
@@ -1243,24 +1334,6 @@ body.night-mode .post-content strong {
 
 .admin-title {
     font-size: 2rem;
-}
-
-/* Typography & Spacing (High Density Optimized) */
-:root {
-    --base-font-size: 15px;
-    /* Reduced from 16px */
-    --line-height: 1.5;
-    /* Reduced from 1.7 */
-    /* Typography & Spacing (High Density Optimized) */
-    --base-font-size: 15px;
-    /* Reduced from 16px */
-    --line-height: 1.5;
-    /* Reduced from 1.7 */
-    --container-padding: 16px;
-    /* Reduced padding */
-    --card-padding: 1rem;
-    --border-radius: 8px;
-    /* Slightly sharper */
 }
 
 /* (body styles defined in section 1 above) */
@@ -1448,21 +1521,6 @@ header {
 /* ═══════════════════════════════════════════════════
    8. 404 ERROR PAGE
    ═══════════════════════════════════════════════════ */
-/* Age Verification Disclaimer */
-.disclaimer-overlay {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.95);
-    z-index: 10000;
-    backdrop-filter: blur(10px);
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-}
 
 /* 모바일 텍스트 최적화 (768px 이하) */
 @media (max-width: 768px) {
@@ -1829,6 +1887,7 @@ header {
     line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     margin-top: 0.2rem;
@@ -1939,18 +1998,6 @@ header {
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 600;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 /* Modal Styling */
@@ -2097,9 +2144,43 @@ header {
     line-height: 1.8;
     color: #ffffff;
     font-size: 1.1rem;
-    white-space: pre-wrap;
     letter-spacing: -0.01em;
     word-break: keep-all;
+}
+
+/* 빈 단락 및 연속 br 태그로 인한 불필요한 공백 제거 */
+.role-description .toastui-editor-contents p:empty {
+    display: none;
+}
+
+.role-description .toastui-editor-contents>br:first-child {
+    display: none;
+}
+
+.role-description .toastui-editor-contents br+br {
+    display: none;
+}
+
+/* 세부성향 모달 편집 모드 활성화 시 스타일 */
+.role-description.is-editable {
+    cursor: pointer !important;
+    border: 1.5px dashed rgba(206, 177, 128, 0.6) !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+    background: rgba(206, 177, 128, 0.05) !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
+}
+
+.role-description.is-editable:hover {
+    background: rgba(206, 177, 128, 0.1) !important;
+    border-color: rgba(206, 177, 128, 0.9) !important;
+}
+
+/* 편집 버튼 스타일 */
+#kinkModalEditBtn {
+    z-index: 9999 !important;
+    /* 모달 overlay가 2000이므로 충분히 위로 */
 }
 
 .role-description .toastui-editor-contents,

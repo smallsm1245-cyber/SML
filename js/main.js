@@ -958,6 +958,13 @@
                                     <h3 class="modal-title" id="modalTitle">Role Name</h3>
                                     <p class="modal-subname" id="modalSubName">SUBNAME</p>
                                 </div>
+                                <!-- Permanent Edit/Save Buttons -->
+                                <button id="kinkModalEditBtn" class="kink-admin-btn edit-btn">
+                                    <i data-lucide="edit-3"></i><span>내용 수정</span>
+                                </button>
+                                <button id="kinkModalSaveBtn" class="kink-admin-btn save-btn">
+                                    <i data-lucide="save"></i><span>저장</span>
+                                </button>
                             </div>
                             <div class="modal-body">
                                 <div class="description-container">
@@ -1022,28 +1029,34 @@
 
             let content = item.description || '';
 
+            // ─── 연속 빈 줄 압축 (3개 이상 → 최대 1개)
+            // Toast UI Viewer는 빈 줄을 <p><br></p>로 렌더링하므로 미리 정리
+            content = content.replace(/\n{3,}/g, '\n\n');
+
             if (window.toastui && window.toastui.Editor) {
+                const viewerOptions = {
+                    el: description,
+                    viewer: true,
+                    initialValue: content,
+                    theme: 'dark',
+                    customHTMLRenderer: {
+                        softbreak() {
+                            return { type: 'html', content: ' ' };
+                        }
+                    }
+                };
+
                 try {
                     // Try to use Toast UI Viewer instance creation directly
-                    window._kinkViewer = window.toastui.Editor.factory({
-                        el: description,
-                        viewer: true,
-                        initialValue: content,
-                        theme: 'dark'
-                    });
+                    window._kinkViewer = window.toastui.Editor.factory(viewerOptions);
                 } catch (e) {
                     console.error('Toast UI Viewer initialization failed:', e);
                     try {
-                        window._kinkViewer = new window.toastui.Editor({
-                            el: description,
-                            viewer: true,
-                            initialValue: content,
-                            theme: 'dark'
-                        });
+                        window._kinkViewer = new window.toastui.Editor(viewerOptions);
                     } catch (e2) {
                         console.error('Toast UI Viewer fallback also failed:', e2);
                         // Complete fallback using basic regex replacement
-                        description.innerHTML = `<div class="md-body"><p class="md-p">${content.replace(/\\n/g, '<br>')}</p></div>`;
+                        description.innerHTML = `<div class="md-body"><p class="md-p">${content.replace(/\\n\\n/g, '</p><p class="md-p">').replace(/\\n/g, ' ')}</p></div>`;
                     }
                 }
             } else {
@@ -1053,12 +1066,199 @@
         }
 
         if (window.lucide) window.lucide.createIcons();
+
+        // ─── Edit Mode: 편집 버튼 및 클릭 편집 기능 ───
+        const isEditMode = (typeof window.isAdminEditMode === 'function' && window.isAdminEditMode()) ||
+            document.body.classList.contains('admin-edit-active');
+
+        const editBtn = document.getElementById('kinkModalEditBtn');
+        const saveBtn = document.getElementById('kinkModalSaveBtn');
+
+        if (isEditMode && editBtn && saveBtn) {
+            editBtn.style.display = 'flex';
+            saveBtn.style.display = 'none';
+            description.classList.add('is-editable');
+            description.title = '클릭하여 내용을 수정하시겠습니까?';
+
+            editBtn.onclick = (e) => {
+                e.preventDefault();
+                _openKinkEditor(item, description, editBtn, saveBtn);
+            };
+
+            saveBtn.onclick = (e) => {
+                e.preventDefault();
+                _saveKinkContent(item, description, editBtn, saveBtn);
+            };
+
+            description._kinkEditHandler = (e) => {
+                if (editBtn.style.display !== 'none') {
+                    _openKinkEditor(item, description, editBtn, saveBtn);
+                }
+            };
+            description.addEventListener('click', description._kinkEditHandler);
+        } else if (editBtn && saveBtn) {
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'none';
+            description.classList.remove('is-editable');
+            description.title = '';
+        }
     };
+
+
+    // 인라인 에디터 열기
+    function _openKinkEditor(item, descriptionEl, editBtn, saveBtn) {
+        if (!window.toastui || !window.toastui.Editor) return;
+
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'flex';
+
+        if (window._kinkViewer) {
+            try { window._kinkViewer.destroy(); } catch (e) { }
+            window._kinkViewer = null;
+        }
+
+        descriptionEl.innerHTML = '';
+        descriptionEl.classList.remove('is-editable');
+
+        window._kinkInlineEditor = new window.toastui.Editor({
+            el: descriptionEl,
+            height: 'auto',
+            minHeight: '200px',
+            initialEditType: 'markdown',
+            previewStyle: 'vertical',
+            initialValue: item.description || '',
+            theme: 'dark'
+        });
+
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    // 변경사항 저장
+    async function _saveKinkContent(item, descriptionEl, editBtn, saveBtn) {
+        if (!window._kinkInlineEditor) return;
+
+        const newContent = window._kinkInlineEditor.getMarkdown();
+
+        try {
+            if (typeof window.showToast === 'function') window.showToast('저장 중...', 'loading');
+
+            const { error } = await window.supabaseClient
+                .from('archive_posts')
+                .update({ content: newContent, updated_at: new Date().toISOString() })
+                .eq('id', item.id);
+
+            if (error) throw error;
+
+            if (typeof window.showToast === 'function') window.showToast('변경사항이 저장되었습니다.', 'success');
+
+            item.description = newContent;
+            const dataItem = (window.tendencyData || []).find(t => t.id === item.id);
+            if (dataItem) dataItem.description = newContent;
+
+            window._kinkInlineEditor.destroy();
+            window._kinkInlineEditor = null;
+
+            editBtn.style.display = 'flex';
+            saveBtn.style.display = 'none';
+            descriptionEl.classList.add('is-editable');
+
+            let content = newContent.replace(/\n{3,}/g, '\n\n');
+            window._kinkViewer = window.toastui.Editor.factory({
+                el: descriptionEl,
+                viewer: true,
+                initialValue: content,
+                theme: 'dark',
+                customHTMLRenderer: {
+                    softbreak() { return { type: 'html', content: ' ' }; }
+                }
+            });
+
+        } catch (e) {
+            console.error('Save failed:', e);
+            if (typeof window.showToast === 'function') window.showToast('저장 실패: ' + e.message, 'error');
+        }
+    }
 
     window.closeRoleDetail = function () {
         const overlay = document.getElementById('roleDetailOverlay');
+        if (!overlay) return;
         overlay.classList.remove('active');
         document.body.style.overflow = '';
+
+        // 편집기 정리
+        if (window._kinkInlineEditor) {
+            window._kinkInlineEditor.destroy();
+            window._kinkInlineEditor = null;
+        }
+
+        // 버튼 및 핸들러 정리
+        const editBtn = document.getElementById('kinkModalEditBtn');
+        const saveBtn = document.getElementById('kinkModalSaveBtn');
+        if (editBtn) editBtn.remove();
+        if (saveBtn) saveBtn.remove();
+
+        const desc = document.getElementById('roleDescription');
+        if (desc) {
+            if (desc._kinkEditHandler) {
+                desc.removeEventListener('click', desc._kinkEditHandler);
+                desc._kinkEditHandler = null;
+            }
+            desc.classList.remove('is-editable');
+            desc.style.cssText = '';
+            desc.title = '';
+        }
+    };
+
+    // Edit Mode가 토글될 때 admin-inline.js가 호출하는 전역 함수
+    // 모달이 현재 열려 있으면 편집 UI를 즉시 주입 / 제거
+    window.activateKinkModalEditMode = function (enabled) {
+        const overlay = document.getElementById('roleDetailOverlay');
+        const desc = document.getElementById('roleDescription');
+        const editBtn = document.getElementById('kinkModalEditBtn');
+        const saveBtn = document.getElementById('kinkModalSaveBtn');
+
+        if (!overlay || !overlay.classList.contains('active') || !desc || !editBtn || !saveBtn) return;
+
+        if (enabled) {
+            const currentId = window.currentDetailId;
+            if (!currentId) return;
+            const item = (window.tendencyData || []).find(t => t.id === currentId);
+            if (!item) return;
+
+            editBtn.style.display = 'flex';
+            saveBtn.style.display = 'none';
+            desc.classList.add('is-editable');
+            desc.title = '클릭하여 내용을 수정하시겠습니까?';
+
+            editBtn.onclick = (e) => {
+                e.preventDefault();
+                _openKinkEditor(item, desc, editBtn, saveBtn);
+            };
+
+            saveBtn.onclick = (e) => {
+                e.preventDefault();
+                _saveKinkContent(item, desc, editBtn, saveBtn);
+            };
+
+            if (!desc._kinkEditHandler) {
+                desc._kinkEditHandler = (e) => {
+                    if (editBtn.style.display !== 'none') {
+                        _openKinkEditor(item, desc, editBtn, saveBtn);
+                    }
+                };
+                desc.addEventListener('click', desc._kinkEditHandler);
+            }
+        } else {
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'none';
+            if (desc._kinkEditHandler) {
+                desc.removeEventListener('click', desc._kinkEditHandler);
+                desc._kinkEditHandler = null;
+            }
+            desc.classList.remove('is-editable');
+            desc.style.cssText = '';
+            desc.title = '';
+        }
     };
 
     function initNightMode() {

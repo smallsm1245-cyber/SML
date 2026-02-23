@@ -139,14 +139,27 @@
         isEditMode = enabled;
         document.body.classList.toggle('admin-edit-active', isEditMode);
 
+        // 외부에서 Edit Mode 상태를 확인할 수 있도록 전역 함수 노출
+        window.isAdminEditMode = () => isEditMode;
+
         if (isEditMode) {
             showToast('편집 모드가 활성화되었습니다.', 'info');
             enableInlineTriggers();
             loadCategoriesForManager();
+
+            // 현재 열린 세부성향 모달에도 즉시 편집 UI 주입
+            if (typeof window.activateKinkModalEditMode === 'function') {
+                window.activateKinkModalEditMode(true);
+            }
         } else {
             showToast('편집 모드가 비활성화되었습니다.');
             disableInlineTriggers();
             removeCategoryManager();
+
+            // 현재 열린 세부성향 모달에서 편집 UI 제거
+            if (typeof window.activateKinkModalEditMode === 'function') {
+                window.activateKinkModalEditMode(false);
+            }
         }
     }
 
@@ -359,8 +372,14 @@
         await saveChange(currentModalId, currentModalField, markdown, title);
         closeModal();
 
-        // Refresh appropriate view
-        setTimeout(() => window.location.reload(), 1000);
+        // _kinkEditorSaveCallback이 있으면 리로드 없이 모달 내용 즉시 갱신
+        if (typeof window._kinkEditorSaveCallback === 'function') {
+            window._kinkEditorSaveCallback(markdown);
+            window._kinkEditorSaveCallback = null;
+        } else {
+            // Refresh appropriate view
+            setTimeout(() => window.location.reload(), 1000);
+        }
     }
 
     async function saveChange(id, field, value, title = null) {
@@ -518,6 +537,9 @@
         window.addCategoryInline = addCategoryInline;
         window.saveCategoryChanges = saveCategoryChanges;
         window.toggleCatVisibility = toggleCatVisibility;
+        // 성향 백과 모달 편집을 위해 전역 노출
+        window.openContentEditorModal = openContentEditorModal;
+        window.isAdminEditMode = () => isEditMode;
     }
 
     // ═══════════════════════════════════════════════════
