@@ -1274,7 +1274,7 @@
             // Header Scroll Logic (hide on scroll down, show on scroll up)
             if (Math.abs(currentScrollY - lastScrollY) < 10) return;
 
-            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+            if (currentScrollY > lastScrollY && currentScrollY > 64) {
                 header.style.transform = 'translateY(-100%)';
             } else {
                 header.style.transform = 'translateY(0)';

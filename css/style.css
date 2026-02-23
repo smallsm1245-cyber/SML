@@ -32,6 +32,7 @@
     --font-mono: 'Courier Prime', monospace;
 
     /* Spacing */
+    --header-height: 64px;
     --sidebar-width: 280px;
     --content-max: 1200px;
     --container-padding: 24px;
@@ -196,12 +197,13 @@ body {
     background: var(--bg-deep);
     color: var(--text-primary);
     font-size: var(--base-font-size);
-    line-height: var(--line-height);
+    line-height: 1.6;
     overflow-x: hidden;
     transition: background 0.3s ease;
     word-break: keep-all;
     overflow-wrap: break-word;
     min-height: 100vh;
+    letter-spacing: -0.01em;
 }
 
 body.night-mode {
@@ -1970,9 +1972,9 @@ header {
 .kink-tabs-container {
     padding: 0 1.5rem;
     position: sticky;
-    top: 60px;
+    top: var(--header-height);
     z-index: 40;
-    background: linear-gradient(to bottom, #121212 80%, transparent);
+    background: linear-gradient(to bottom, var(--bg-deep) 80%, transparent);
     margin-bottom: 1rem;
 }
 
@@ -2061,22 +2063,22 @@ header {
 }
 
 .kink-list-item {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 1.5rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.25rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 @media (max-width: 640px) {
     .kink-list-item {
-        padding: 1.2rem;
-        border-radius: 16px;
+        padding: 1rem;
+        border-radius: 12px;
     }
 }
 
