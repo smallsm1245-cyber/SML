@@ -1,15 +1,15 @@
 /* admin/css/builder.css */
 :root {
-    --builder-bg: #1e1e1e;
-    --builder-panel-bg: #252526;
-    --builder-border: #333333;
+    --builder-bg: #121212;
+    --builder-panel-bg: #1A1A1A;
+    --builder-border: rgba(225, 29, 72, 0.15);
     --builder-canvas-bg: #e5e5e5;
-    --builder-text: #cccccc;
-    --builder-text-bright: #ffffff;
-    --builder-primary: #007acc;
-    --builder-primary-hover: #0098ff;
-    --builder-accent: #007acc;
-    --builder-handle: #0098ff;
+    --builder-text: #94A3B8;
+    --builder-text-bright: #F8FAFC;
+    --builder-primary: #e11d48;
+    --builder-primary-hover: #be123c;
+    --builder-accent: #e11d48;
+    --builder-handle: #fb7185;
 }
 
 body.builder-body {

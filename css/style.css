@@ -8,63 +8,77 @@
    0. ROOT VARIABLES - 색상 중앙 제어
    ═══════════════════════════════════════════════════ */
 :root {
-    /* Color Palette - Rose & Slate (Unified) */
+    /* 1. Global Color System (Rose & Slate) */
     --primary-rose: #e11d48;
-    /* Rose 600 */
+    /* Rose 600 - WCAG AAA on White */
     --primary-rose-hover: #be123c;
     /* Rose 700 */
+    --primary-rose-light: #fb7185;
+    /* Rose 400 */
+
     --bg-deep: #F8FAFC;
     /* Slate 50 */
     --bg-panel: #FFFFFF;
+
+    /* Neutral Palette - Refined Slate */
     --text-primary: #0F172A;
-    /* Slate 900 */
+    /* Slate 900 - High Contrast */
     --text-secondary: #475569;
     /* Slate 600 */
     --text-dim: #94A3B8;
     /* Slate 400 */
+
     --accent-rose: #e11d48;
     --glass-border: rgba(15, 23, 42, 0.1);
     --link-color: #e11d48;
 
-    /* Glassmorphism - Light Mode */
+    /* 2. Spacing System (8pt Grid) */
+    --space-05: 4px;
+    --space-1: 8px;
+    --space-2: 16px;
+    --space-3: 24px;
+    --space-4: 32px;
+    --space-5: 40px;
+    --space-6: 48px;
+    --space-8: 64px;
+
+    /* Layout Specs */
+    --header-height: 64px;
+    --sidebar-width: 280px;
+    --container-max: 1200px;
+    --container-padding: var(--space-3);
+    --border-radius: 12px;
+
+    /* 3. Typography Hierarchy */
+    --font-serif: 'Noto Serif KR', serif;
+    --font-sans: 'Noto Sans KR', sans-serif;
+    --font-mono: 'Courier Prime', monospace;
+
+    --base-font-size: 16px;
+    --line-height-body: 1.6;
+    --line-height-heading: 1.3;
+    --letter-spacing-kr: -0.03em;
+    /* Korean Readability Optimization */
+
+    /* 4. Glassmorphism & Effects */
     --glass-bg: rgba(255, 255, 255, 0.82);
     --glass-blur: 16px;
     --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
 
-    /* Typography */
-    --font-serif: 'Noto Serif KR', serif;
-    --font-display: 'Noto Sans KR', sans-serif;
-    --font-body: 'Noto Sans KR', sans-serif;
-    --font-mono: 'Courier Prime', monospace;
-
-    /* Mobile Optimizations */
-    --base-font-size: 16px;
-    --header-height: 64px;
-    --sidebar-width: 280px;
-
-    /* Spacing */
-    --container-padding: 1.5rem;
-    --border-radius: 1rem;
-
-    /* Transitions */
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-
-    /* Shadows & Glows */
     --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1), 0 2px 4px -1px rgba(15, 23, 42, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1);
     --glow-rose: 0 0 15px rgba(225, 29, 72, 0.3);
 }
 
-/* Dark Mode - Slate 950 */
+/* Night Library Mode - Dark Grey optimization (#1A1A1A) */
 body.night-mode,
 html.dark body {
-    --bg-deep: #020617;
-    /* Slate 950 */
-    --bg-panel: #0F172A;
-    /* Slate 900 */
+    --bg-deep: #121212;
+    /* Refined Dark Grey */
+    --bg-panel: #1A1A1A;
+    /* Low eye-strain grey */
     --text-primary: #F8FAFC;
     /* Slate 50 */
     --text-secondary: #94A3B8;
@@ -73,15 +87,14 @@ html.dark body {
     /* Slate 600 */
     --glass-border: rgba(248, 250, 252, 0.1);
     --link-color: #FB7185;
-    /* Rose 400 */
     --primary-rose: #E11D48;
 
     /* Glassmorphism - Night Mode */
-    --glass-bg: rgba(15, 23, 42, 0.85);
+    --glass-bg: rgba(26, 26, 26, 0.85);
     --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-
     --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
+
 
 /* Global Styles */
 ::selection {
@@ -115,15 +128,18 @@ html.dark body {
 /* Wiki Typography */
 .prose {
     font-family: var(--font-serif);
-    line-height: 1.85;
-    letter-spacing: -0.01em;
+    line-height: var(--line-height-body);
+    letter-spacing: var(--letter-spacing-kr);
+    font-size: var(--base-font-size);
 }
 
 .prose h1,
 .prose h2,
 .prose h3 {
-    font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    font-family: var(--font-sans);
+    line-height: var(--line-height-heading);
+    letter-spacing: var(--letter-spacing-kr);
+    font-weight: 700;
 }
 
 /* Scroll Animations */
@@ -213,17 +229,17 @@ html.dark .archive-accordion summary:hover {
 }
 
 body {
-    font-family: var(--font-body);
+    font-family: var(--font-sans);
     background: var(--bg-deep);
     color: var(--text-primary);
     font-size: var(--base-font-size);
-    line-height: 1.6;
+    line-height: var(--line-height-body);
+    letter-spacing: var(--letter-spacing-kr);
     overflow-x: hidden;
     transition: background 0.3s ease;
     word-break: keep-all;
     overflow-wrap: break-word;
     min-height: 100vh;
-    letter-spacing: -0.01em;
 }
 
 body.night-mode {
@@ -296,13 +312,14 @@ body.night-mode {
     border: none;
     color: var(--text-primary);
     cursor: pointer;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    /* Optimized Tap Target */
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    transition: background 0.2s ease;
+    transition: background var(--transition-fast);
 }
 
 .menu-toggle:active,
@@ -370,7 +387,7 @@ body.night-mode .mode-icon-dark {
 }
 
 .nav-item.active {
-    color: var(--primary-brass);
+    color: var(--primary-rose);
 }
 
 .nav-item i {
@@ -393,13 +410,13 @@ body.night-mode .mode-icon-dark {
 /* Emergency FAB */
 .emergency-fab {
     position: fixed;
-    right: 20px;
+    right: var(--space-3);
     bottom: 80px;
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    background: var(--primary-brass);
-    color: #1A1A1A;
+    background: var(--primary-rose);
+    color: #fff;
     border: none;
     cursor: pointer;
     box-shadow: var(--shadow-lg);
@@ -464,6 +481,7 @@ body.night-mode .mode-icon-dark {
 
 .category-link.active .chevron {
     transform: rotate(90deg);
+    color: var(--primary-rose);
 }
 
 .cat-count {
@@ -498,7 +516,7 @@ body.night-mode .mode-icon-dark {
 }
 
 .submenu-link:hover {
-    color: var(--primary-brass);
+    color: var(--primary-rose);
 }
 
 /* Settings View */
@@ -509,15 +527,15 @@ body.night-mode .mode-icon-dark {
 
 .settings-group {
     background: var(--bg-panel);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-top: 1.5rem;
+    border-radius: var(--border-radius);
+    padding: var(--space-3);
+    margin-top: var(--space-3);
     border: 1px solid var(--glass-border);
 }
 
 .settings-group h3 {
-    margin-bottom: 1.5rem;
-    color: var(--primary-brass);
+    margin-bottom: var(--space-3);
+    color: var(--primary-rose);
     font-size: 1.1rem;
 }
 
@@ -564,7 +582,7 @@ body.night-mode .mode-icon-dark {
 
 .setting-item input[type="range"] {
     width: 100%;
-    accent-color: var(--primary-brass);
+    accent-color: var(--primary-rose);
 }
 
 @keyframes fadeIn {
@@ -1079,9 +1097,9 @@ p {
 }
 
 .kink-admin-btn.edit-btn {
-    background: #ceb180;
-    color: #121212;
-    box-shadow: 0 4px 15px rgba(206, 177, 128, 0.4);
+    background: var(--primary-rose);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4);
 }
 
 .kink-admin-btn.save-btn {
@@ -1111,8 +1129,8 @@ body.admin-edit-active #kinkModalEditBtn {
 }
 
 body.admin-edit-active .role-description.is-editable:hover {
-    background: rgba(206, 177, 128, 0.05);
-    border-color: rgba(206, 177, 128, 0.3);
+    background: rgba(225, 29, 72, 0.05);
+    border-color: rgba(225, 29, 72, 0.3);
 }
 
 /* 단순 텍스트 본문 스타일 */
@@ -1218,7 +1236,7 @@ body.admin-edit-active .role-description.is-editable:hover {
 /* 강조 */
 .role-description .toastui-editor-contents strong {
     font-weight: 700 !important;
-    color: var(--primary-brass) !important;
+    color: var(--primary-rose) !important;
 }
 
 /* 테이블 스타일 오버라이드 (Toast UI Viewer용) */
@@ -1292,8 +1310,8 @@ body.admin-edit-active .role-description.is-editable:hover {
 .md-h1 {
     font-size: 1.25rem;
     border-bottom: 2px solid var(--glass-border) !important;
-    padding-bottom: 0.45rem !important;
-    color: var(--primary-brass);
+    padding-bottom: var(--space-05) !important;
+    color: var(--primary-rose);
 }
 
 .md-h2 {
@@ -1434,11 +1452,8 @@ body.night-mode .post-content strong {
    ═══════════════════════════════════════════════════ */
 .site-footer {
     text-align: center;
-    padding: 1.5rem;
-    margin-top: 2rem;
-    /* Reduced top margin */
-    /* border-top: 1px solid var(--glass-border); */
-    /* Optional: Remove border if too disjointed */
+    padding: var(--space-3);
+    margin-top: var(--space-4);
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--text-secondary);
@@ -1533,9 +1548,9 @@ body.night-mode .post-content strong {
 }
 
 .btn-primary {
-    background: var(--primary-brass);
-    border-color: var(--primary-brass);
-    color: var(--bg-deep);
+    background: var(--primary-rose);
+    border-color: var(--primary-rose);
+    color: #fff;
 }
 
 .btn-primary:hover {
@@ -1655,8 +1670,8 @@ header {
 }
 
 .editor-btn:hover {
-    background: rgba(206, 177, 128, 0.2);
-    border-color: var(--primary-brass);
+    background: rgba(225, 29, 72, 0.2);
+    border-color: var(--primary-rose);
 }
 
 /* Split View Editor */
@@ -2998,7 +3013,7 @@ input:checked+.slider:before {
 }
 
 .detail-description strong {
-    color: var(--primary-brass);
+    color: var(--primary-rose);
 }
 
 @media (max-width: 768px) {

@@ -3,29 +3,37 @@
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 :root {
-    --admin-bg: #0C0C0B;
-    --admin-panel: #161614;
-    --admin-card: rgba(22, 22, 20, 0.8);
-    --admin-border: rgba(206, 177, 128, 0.15);
-    --admin-primary: #CEB180;
-    --admin-primary-dark: #A68E66;
-    --admin-text: #F2F0ED;
-    --admin-text-dim: #999185;
-    --admin-success: #5eb95e;
-    --admin-warning: #f8a531;
-    --admin-danger: #e65c5c;
-    --admin-hover: rgba(206, 177, 128, 0.08);
+    /* Admin Design System - Unified with Rose & Slate */
+    --admin-bg: #121212;
+    --admin-panel: #1A1A1A;
+    --admin-card: rgba(26, 26, 26, 0.8);
+    --admin-border: rgba(225, 29, 72, 0.15);
+    --admin-primary: #e11d48;
+    --admin-primary-dark: #be123c;
+    --admin-text: #F8FAFC;
+    --admin-text-dim: #94A3B8;
+    --admin-success: #10B981;
+    --admin-warning: #F59E0B;
+    --admin-danger: #EF4444;
+    --admin-hover: rgba(225, 29, 72, 0.08);
     --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-blur: blur(12px);
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --glass-blur: blur(16px);
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Spacing Tokens */
+    --space-1: 8px;
+    --space-2: 16px;
+    --space-3: 24px;
+    --space-4: 32px;
 }
+
 
 /* Back Button Styling */
 .back-overview-btn {
-    background: rgba(206, 177, 128, 0.08);
+    background: var(--admin-hover);
     border: 1px solid var(--admin-border);
     color: var(--admin-primary);
-    padding: 0.4rem 1rem;
+    padding: 0.5rem 1.2rem;
     border-radius: 10px;
     cursor: pointer;
     font-size: 0.85rem;
@@ -35,6 +43,8 @@
     align-items: center;
     gap: 0.5rem;
     margin-right: 0.5rem;
+    min-height: 44px;
+    /* Optimized Tap Target */
 }
 
 .back-overview-btn:hover {
@@ -253,6 +263,8 @@
     transition: var(--transition);
     text-align: left;
     width: 100%;
+    min-height: 48px;
+    /* Optimized Tap Target */
 }
 
 .nav-item:hover {
@@ -262,7 +274,7 @@
 
 .nav-item.active {
     background: var(--admin-primary);
-    color: var(--admin-bg);
+    color: #fff;
 }
 
 .nav-item .badge {
