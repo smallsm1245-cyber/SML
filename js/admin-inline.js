@@ -12,6 +12,33 @@
     let isEditMode = false;
     const ADMIN_EMAIL = 'smallsm@naver.com';
 
+    // Markdown Converters
+    let turndownService = null;
+    let showdownConverter = null;
+
+    function initConverters() {
+        if (turndownService && showdownConverter) return;
+
+        if (typeof TurndownService !== 'undefined') {
+            turndownService = new TurndownService({
+                headingStyle: 'atx',
+                hr: '---',
+                bulletListMarker: '-',
+                codeBlockStyle: 'fenced'
+            });
+        }
+
+        if (typeof showdown !== 'undefined') {
+            showdownConverter = new showdown.Converter({
+                tables: true,
+                strikethrough: true,
+                tasklists: true,
+                simpleLineBreaks: true,
+                openLinksInNewWindow: true
+            });
+        }
+    }
+
     // ═══════════════════════════════════════════════════
     // 1. INITIALIZATION & AUTH
     // ═══════════════════════════════════════════════════
@@ -326,11 +353,22 @@
     }
 
     function initModalEditor(content) {
-        if (!window.toastui || !window.toastui.Editor) {
-            showToast('Loading Editor...', 'loading');
-            loadScript('https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js', () => {
-                loadStyle('https://uicdn.toast.com/editor/latest/toastui-editor.min.css', () => {
-                    createEditor(content);
+        initConverters();
+
+        if (typeof $ === 'undefined' || typeof $.fn.summernote === 'undefined') {
+            showToast('Loading Summernote...', 'loading');
+
+            // Sequential loading of dependencies
+            loadScript('https://code.jquery.com/jquery-3.6.0.min.js', () => {
+                loadStyle('https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css', () => {
+                    loadScript('https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js', () => {
+                        loadScript('https://unpkg.com/turndown/dist/turndown.js', () => {
+                            loadScript('https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js', () => {
+                                initConverters();
+                                createEditor(content);
+                            });
+                        });
+                    });
                 });
             });
         } else {
@@ -340,15 +378,26 @@
 
     function createEditor(content) {
         const container = document.getElementById('modalEditorContainer');
-        container.innerHTML = '';
-        editorInstance = new toastui.Editor({
-            el: container,
-            height: '500px',
-            initialEditType: 'markdown',
-            previewStyle: 'vertical',
-            initialValue: content,
-            theme: 'dark'
+        container.innerHTML = '<div id="summernoteModal"></div>';
+
+        const htmlContent = showdownConverter ? showdownConverter.makeHtml(content || '') : content;
+
+        $('#summernoteModal').summernote({
+            height: 400,
+            dialogsInBody: true,
+            lang: 'ko-KR',
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'hr']],
+                ['view', ['fullscreen', 'codeview']]
+            ]
         });
+
+        $('#summernoteModal').summernote('code', htmlContent);
         showToast('에디터 준비 완료', 'info');
     }
 
@@ -360,8 +409,11 @@
     }
 
     async function handleModalSave() {
-        if (!editorInstance) return;
-        const markdown = editorInstance.getMarkdown();
+        const summernoteEl = document.getElementById('summernoteModal');
+        if (!summernoteEl) return;
+
+        const htmlContent = $('#summernoteModal').summernote('code');
+        const markdown = turndownService ? turndownService.turndown(htmlContent) : htmlContent;
 
         let title = 'New Post';
         if (currentModalId === 'new') {
@@ -424,6 +476,8 @@
                 if (error) throw error;
             } else if (id.startsWith('setting:')) {
                 const key = id.replace('setting:', '');
+                // For settings, we might want to keep HTML or convert to MD depending on usage
+                // But the requirement is to keep MD in DB.
                 const { error } = await supabaseClient
                     .from('settings')
                     .update({ value: value, updated_at: new Date().toISOString() })

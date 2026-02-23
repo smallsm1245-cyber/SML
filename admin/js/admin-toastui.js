@@ -5,8 +5,23 @@
 console.log('🚀 Toast UI Admin loading...');
 
 let supabaseClient = null;
-let editor = null;
 let currentPostId = null;
+
+// Markdown Converters
+const turndownService = new TurndownService({
+    headingStyle: 'atx',
+    hr: '---',
+    bulletListMarker: '-',
+    codeBlockStyle: 'fenced'
+});
+
+const showdownConverter = new showdown.Converter({
+    tables: true,
+    strikethrough: true,
+    tasklists: true,
+    simpleLineBreaks: true,
+    openLinksInNewWindow: true
+});
 
 // ═══════════════════════════════════════════════════
 // WAIT FOR CONFIG
@@ -87,56 +102,53 @@ async function showDashboard() {
 }
 
 // ═══════════════════════════════════════════════════
-// TOAST UI EDITOR
+// SUMMERNOTE EDITOR
 // ═══════════════════════════════════════════════════
 function initializeEditor() {
-    if (editor) return; // Already initialized
-
-    const Editor = toastui.Editor;
-
-    editor = new Editor({
-        el: document.querySelector('#editor'),
-        height: '500px',
-        initialEditType: 'markdown',
-        previewStyle: 'vertical',
+    const summernoteConfig = {
+        height: 500,
         placeholder: '내용을 입력하세요...',
-        language: 'ko-KR',
-        toolbarItems: [
-            ['heading', 'bold', 'italic', 'strike'],
-            ['hr', 'quote'],
-            ['ul', 'ol', 'task', 'indent', 'outdent'],
-            ['table', 'image', 'link'],
-            ['code', 'codeblock'],
-            ['scrollSync']
+        lang: 'ko-KR',
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'underline', 'clear']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'hr']],
+            ['view', ['fullscreen', 'codeview', 'help']]
         ],
-        hooks: {
-            addImageBlobHook: async (blob, callback) => {
-                try {
-                    const url = await uploadImage(blob);
-                    callback(url, 'Image');
-                } catch (error) {
-                    console.error('Image upload failed:', error);
-                    alert('이미지 업로드 실패: ' + error.message);
+        callbacks: {
+            onImageUpload: function (files) {
+                for (let i = 0; i < files.length; i++) {
+                    uploadImageToSummernote(files[i], this);
                 }
             }
         }
-    });
+    };
 
-    console.log('✅ Toast UI Editor initialized');
+    $('#summernote').summernote(summernoteConfig);
 
     // Initialize Home Editor
-    if (!window.homeEditorInstance) {
-        window.homeEditorInstance = new Editor({
-            el: document.querySelector('#homeEditor'),
-            height: '300px',
-            initialEditType: 'markdown',
-            previewStyle: 'vertical',
-            language: 'ko-KR',
-            initialValue: '',
-            events: {
-                change: updateHomePreview
-            }
-        });
+    $('#homeContentEditor').summernote({
+        ...summernoteConfig,
+        height: 300,
+        callbacks: {
+            ...summernoteConfig.callbacks,
+            onChange: updateHomePreview
+        }
+    });
+
+    console.log('✅ Summernote Editors initialized');
+}
+
+async function uploadImageToSummernote(file, editorInstance) {
+    try {
+        const url = await uploadImage(file);
+        $(editorInstance).summernote('insertImage', url);
+    } catch (error) {
+        console.error('Image upload failed:', error);
+        alert('이미지 업로드 실패: ' + error.message);
     }
 }
 
@@ -272,7 +284,8 @@ window.editPost = async function (id) {
         document.getElementById('originFree').checked = post.origin_free;
 
         // Set editor content
-        editor.setMarkdown(post.content);
+        const htmlContent = showdownConverter.makeHtml(post.content || '');
+        $('#summernote').summernote('code', htmlContent);
 
         // Store current post ID
         currentPostId = id;
@@ -314,9 +327,8 @@ function showNewPostEditor() {
     // Clear form
     document.getElementById('postTitle').value = '';
     document.getElementById('postCategory').value = '';
-    document.getElementById('isPrivate').checked = false;
     document.getElementById('originFree').checked = false;
-    editor.setMarkdown('');
+    $('#summernote').summernote('code', '');
 
     currentPostId = null;
 
@@ -337,7 +349,8 @@ async function publishPost() {
     const categoryId = document.getElementById('postCategory').value;
     const isPrivate = document.getElementById('isPrivate').checked;
     const originFree = document.getElementById('originFree').checked;
-    const content = editor.getMarkdown();
+    const htmlContent = $('#summernote').summernote('code');
+    const content = turndownService.turndown(htmlContent);
 
     if (!title) {
         alert('제목을 입력하세요.');
@@ -708,9 +721,8 @@ async function loadHomeSettings() {
         document.getElementById('homeTitle').value = settings.home_title || '환영합니다';
         document.getElementById('homeSubtitle').value = settings.home_subtitle || 'SMALLSM Archive에 오신 것을 환영합니다';
 
-        if (window.homeEditorInstance) {
-            window.homeEditorInstance.setMarkdown(settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.');
-        }
+        const homeHtml = showdownConverter.makeHtml(settings.home_content || '좌측 사이드바에서 카테고리를 선택하여 기록을 탐색하세요.');
+        $('#homeContentEditor').summernote('code', homeHtml);
 
         document.getElementById('showRecentPosts').checked = settings.show_recent_posts === 'true';
         document.getElementById('recentPostsCount').value = settings.recent_posts_count || '3';
@@ -726,7 +738,7 @@ async function loadHomeSettings() {
 function updateHomePreview() {
     const title = document.getElementById('homeTitle').value;
     const subtitle = document.getElementById('homeSubtitle').value;
-    const content = window.homeEditorInstance ? window.homeEditorInstance.getHTML() : '';
+    const content = $('#homeContentEditor').summernote('code');
 
     document.getElementById('previewTitle').textContent = title;
     document.getElementById('previewSubtitle').textContent = subtitle;
@@ -743,7 +755,7 @@ async function saveHomeSettings() {
     const settings = [
         { key: 'home_title', value: document.getElementById('homeTitle').value },
         { key: 'home_subtitle', value: document.getElementById('homeSubtitle').value },
-        { key: 'home_content', value: window.homeEditorInstance ? window.homeEditorInstance.getMarkdown() : '' },
+        { key: 'home_content', value: turndownService.turndown($('#homeContentEditor').summernote('code')) },
         { key: 'show_recent_posts', value: document.getElementById('showRecentPosts').checked.toString() },
         { key: 'recent_posts_count', value: document.getElementById('recentPostsCount').value }
     ];
@@ -888,22 +900,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('draft_post', JSON.stringify({
             title: document.getElementById('postTitle').value,
             category: document.getElementById('postCategory').value,
-            content: editor.getMarkdown(),
+            content: turndownService.turndown($('#summernote').summernote('code')),
             timestamp: Date.now()
         }));
         alert('✅ 임시 저장되었습니다!');
     });
 
-    // Home preview real-time
-    ['homeTitle', 'homeSubtitle'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', updateHomePreview);
-    });
-
-    // Hook into editor change for preview
-    if (window.homeEditorInstance) {
-        window.homeEditorInstance.on('change', updateHomePreview);
-    }
+    // Home preview real-time logic is handled by Summernote's onChange callback
 
     document.getElementById('showRecentPosts').addEventListener('change', toggleRecentPostsCount);
     document.getElementById('saveHomeBtn').addEventListener('click', saveHomeSettings);

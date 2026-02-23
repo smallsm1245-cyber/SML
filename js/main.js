@@ -1021,48 +1021,15 @@
         if (description) {
             description.innerHTML = '';
 
-            // Destroy previous Toast viewer if any
+            // Toast UI 관여 코드 제거 (백업용 window._kinkViewer 정리만 남김)
             if (window._kinkViewer) {
-                try { window._kinkViewer.destroy(); } catch (e) { console.warn('Viewer destroy error:', e); }
+                try { window._kinkViewer.destroy(); } catch (e) { }
                 window._kinkViewer = null;
             }
 
             let content = item.description || '';
-
-            // ─── 연속 빈 줄 압축 (3개 이상 → 최대 1개)
-            // Toast UI Viewer는 빈 줄을 <p><br></p>로 렌더링하므로 미리 정리
-            content = content.replace(/\n{3,}/g, '\n\n');
-
-            if (window.toastui && window.toastui.Editor) {
-                const viewerOptions = {
-                    el: description,
-                    viewer: true,
-                    initialValue: content,
-                    theme: 'dark',
-                    customHTMLRenderer: {
-                        softbreak() {
-                            return { type: 'html', content: ' ' };
-                        }
-                    }
-                };
-
-                try {
-                    // Try to use Toast UI Viewer instance creation directly
-                    window._kinkViewer = window.toastui.Editor.factory(viewerOptions);
-                } catch (e) {
-                    console.error('Toast UI Viewer initialization failed:', e);
-                    try {
-                        window._kinkViewer = new window.toastui.Editor(viewerOptions);
-                    } catch (e2) {
-                        console.error('Toast UI Viewer fallback also failed:', e2);
-                        // Complete fallback using basic regex replacement
-                        description.innerHTML = `<div class="md-body"><p class="md-p">${content.replace(/\\n\\n/g, '</p><p class="md-p">').replace(/\\n/g, ' ')}</p></div>`;
-                    }
-                }
-            } else {
-                // Fallback for missing library
-                description.innerHTML = `<div class="md-body"><p class="md-p">${content.replace(/\\n/g, '<br>')}</p></div>`;
-            }
+            // 줄바꿈을 <br>로 변환하여 표시 (단순 텍스트 방식)
+            description.innerHTML = `<div class="plain-text-body">${content.replace(/\n/g, '<br>')}</div>`;
         }
 
         if (window.lucide) window.lucide.createIcons();
@@ -1105,39 +1072,39 @@
     };
 
 
-    // 인라인 에디터 열기
+    // 인라인 에디터 열기 (마크다운 대신 단순 textarea 사용)
     function _openKinkEditor(item, descriptionEl, editBtn, saveBtn) {
-        if (!window.toastui || !window.toastui.Editor) return;
-
         editBtn.style.display = 'none';
         saveBtn.style.display = 'flex';
 
-        if (window._kinkViewer) {
-            try { window._kinkViewer.destroy(); } catch (e) { }
-            window._kinkViewer = null;
-        }
-
+        const originalContent = item.description || '';
         descriptionEl.innerHTML = '';
         descriptionEl.classList.remove('is-editable');
 
-        window._kinkInlineEditor = new window.toastui.Editor({
-            el: descriptionEl,
-            height: 'auto',
-            minHeight: '200px',
-            initialEditType: 'markdown',
-            previewStyle: 'vertical',
-            initialValue: item.description || '',
-            theme: 'dark'
-        });
+        const textarea = document.createElement('textarea');
+        textarea.id = 'kinkModalTextarea';
+        textarea.className = 'kink-edit-textarea';
+        textarea.value = originalContent;
+        textarea.placeholder = '내용을 입력하세요...';
 
-        if (window.lucide) window.lucide.createIcons();
+        descriptionEl.appendChild(textarea);
+        textarea.focus();
+
+        // 텍스트 영역 높이 자동 조절
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight + 20) + 'px';
+        textarea.oninput = () => {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight + 20) + 'px';
+        };
     }
 
     // 변경사항 저장
     async function _saveKinkContent(item, descriptionEl, editBtn, saveBtn) {
-        if (!window._kinkInlineEditor) return;
+        const textarea = document.getElementById('kinkModalTextarea');
+        if (!textarea) return;
 
-        const newContent = window._kinkInlineEditor.getMarkdown();
+        const newContent = textarea.value;
 
         try {
             if (typeof window.showToast === 'function') window.showToast('저장 중...', 'loading');
@@ -1155,23 +1122,12 @@
             const dataItem = (window.tendencyData || []).find(t => t.id === item.id);
             if (dataItem) dataItem.description = newContent;
 
-            window._kinkInlineEditor.destroy();
-            window._kinkInlineEditor = null;
-
             editBtn.style.display = 'flex';
             saveBtn.style.display = 'none';
             descriptionEl.classList.add('is-editable');
 
-            let content = newContent.replace(/\n{3,}/g, '\n\n');
-            window._kinkViewer = window.toastui.Editor.factory({
-                el: descriptionEl,
-                viewer: true,
-                initialValue: content,
-                theme: 'dark',
-                customHTMLRenderer: {
-                    softbreak() { return { type: 'html', content: ' ' }; }
-                }
-            });
+            // 뷰어 복구 (단순 HTML 방식)
+            descriptionEl.innerHTML = `<div class="plain-text-body">${newContent.replace(/\n/g, '<br>')}</div>`;
 
         } catch (e) {
             console.error('Save failed:', e);
@@ -1185,11 +1141,8 @@
         overlay.classList.remove('active');
         document.body.style.overflow = '';
 
-        // 편집기 정리
-        if (window._kinkInlineEditor) {
-            window._kinkInlineEditor.destroy();
-            window._kinkInlineEditor = null;
-        }
+        // 편집기 정리 (textarea는 remove되면 끝)
+        window._kinkInlineEditor = null;
 
         // 버튼 상태 초기화 (수정 버튼 노출, 저장 버튼 숨김)
         const editBtn = document.getElementById('kinkModalEditBtn');

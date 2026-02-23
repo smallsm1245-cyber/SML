@@ -18,9 +18,14 @@
     <link rel="stylesheet" href="/admin/css/admin-dashboard.css?v=3">
     <link rel="stylesheet" href="/admin/css/admin-tendencies.css?v=3">
     <link rel="stylesheet" href="/admin/css/admin-toastui-hierarchy.css?v=3">
-    <!-- Toast UI Editor -->
-    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
-    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css" />
+    <!-- jQuery (Required for Summernote) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Summernote Lite -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+    <!-- Markdown Conversion Libraries -->
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -342,10 +347,12 @@
                                 </div>
                             </div>
 
-                            <!-- Toast UI Editor -->
+                            <!-- Summernote Editor -->
                             <div class="form-group">
                                 <label>본문</label>
-                                <div id="editor"></div>
+                                <div id="summernote"></div>
+                                <div id="editor" style="display: none;"></div>
+                                <!-- Keep for compatibility if needed elsewhere -->
                             </div>
 
                             <!-- Action Buttons -->
@@ -478,7 +485,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <!-- (Toast UI script removed) -->
     <script src="/api/config"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="/js/modules/pdf-module.js"></script>
