@@ -242,9 +242,11 @@ async function loadPost() {
 
         // Initialize Toast UI Viewer
         const Viewer = toastui.Editor;
-        const viewer = new Viewer({
+        const viewer = Viewer.factory({
             el: document.querySelector('#postContent'),
-            initialValue: post.content
+            viewer: true,
+            initialValue: post.content,
+            theme: 'dark'
         });
 
         // Add copy protection class if needed

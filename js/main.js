@@ -193,10 +193,10 @@
                 content.dataset.adminField = 'value';
                 // Initialize Toast UI Viewer
                 const Viewer = toastui.Editor;
-                // Check if viewer already exists to avoid duplicates if called multiple times (though loadHomeSettings is usually once)
                 content.innerHTML = '';
-                const viewer = new Viewer({
+                const viewer = Viewer.factory({
                     el: content,
+                    viewer: true,
                     initialValue: settings.home_content
                 });
             }
@@ -483,8 +483,9 @@
 
                 // Initialize Toast UI Viewer for the content
                 const Viewer = toastui.Editor;
-                const viewer = new Viewer({
+                const viewer = Viewer.factory({
                     el: content,
+                    viewer: true,
                     initialValue: post.content,
                     theme: 'dark' // Assuming dark theme is preferred or matches style
                 });
@@ -1006,152 +1007,50 @@
         title.textContent = item.name;
         subName.textContent = item.subName || item.sub_name || '';
 
+        // Show the modal FIRST so dimensions are correct
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
         if (description) {
             description.innerHTML = '';
+
             // Destroy previous Toast viewer if any
             if (window._kinkViewer) {
-                try { window._kinkViewer.destroy(); } catch (e) { }
+                try { window._kinkViewer.destroy(); } catch (e) { console.warn('Viewer destroy error:', e); }
                 window._kinkViewer = null;
             }
 
-            // ── Markdown → HTML renderer (자체 파서) ──────────────────
-            const raw = (item.description || '').replace(/<!--[\s\S]*?-->/g, '');
-            const lines = raw.split('\n');
-            let html = '';
-            let inUl = false;
-            let inOl = false;
+            let content = item.description || '';
 
-            const closeList = () => {
-                if (inUl) { html += '</ul>'; inUl = false; }
-                if (inOl) { html += '</ol>'; inOl = false; }
-            };
-
-            const inlineRender = (text) =>
-                text
-                    .replace(/`([^`]+)`/g, '<code class="md-code">$1</code>')
-                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-                    .replace(/~~(.+?)~~/g, '<del>$1</del>')
-                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-
-                // H1
-                if (/^# (.+)/.test(line)) {
-                    closeList();
-                    html += `<h1 class="md-h1">${inlineRender(line.replace(/^# /, ''))}</h1>`;
-                    continue;
-                }
-                // H2
-                if (/^## (.+)/.test(line)) {
-                    closeList();
-                    html += `<h2 class="md-h2">${inlineRender(line.replace(/^## /, ''))}</h2>`;
-                    continue;
-                }
-                // H3
-                if (/^### (.+)/.test(line)) {
-                    closeList();
-                    html += `<h3 class="md-h3">${inlineRender(line.replace(/^### /, ''))}</h3>`;
-                    continue;
-                }
-                // HR  (--- 만 있는 줄 - 테이블 구분행과 구분)
-                if (/^---$/.test(line.trim())) {
-                    closeList();
-                    html += '<hr class="md-hr">';
-                    continue;
-                }
-                // ── TABLE ──────────────────────────────────────
-                // | 로 시작하는 줄이면 테이블 모드로 진입
-                if (/^\|/.test(line)) {
-                    closeList();
-                    // 연속된 | 줄들을 모두 수집
-                    const tableLines = [];
-                    while (i < lines.length && /^\|/.test(lines[i])) {
-                        tableLines.push(lines[i]);
-                        i++;
-                    }
-                    i--; // 루프 i++ 대비
-
-                    // 줄 분리: 첫 행=헤더, 두 번째 행=구분(---)인지 확인
-                    const parseRow = (rowLine) =>
-                        rowLine
-                            .replace(/^\||\|$/g, '')  // 양쪽 끝 | 제거
-                            .split('|')
-                            .map(cell => inlineRender(cell.trim()));
-
-                    const isDivider = (rowLine) =>
-                        /^\|[\s\-:|\s]+\|$/.test(rowLine.trim());
-
-                    let headerRow = null;
-                    let bodyRows = [];
-                    let hasDivider = false;
-
-                    tableLines.forEach((tl, idx) => {
-                        if (idx === 0) {
-                            headerRow = parseRow(tl);
-                        } else if (idx === 1 && isDivider(tl)) {
-                            hasDivider = true; // skip as separator
-                        } else {
-                            bodyRows.push(parseRow(tl));
-                        }
+            if (window.toastui && window.toastui.Editor) {
+                try {
+                    // Try to use Toast UI Viewer instance creation directly
+                    window._kinkViewer = window.toastui.Editor.factory({
+                        el: description,
+                        viewer: true,
+                        initialValue: content,
+                        theme: 'dark'
                     });
-
-                    // 구분행이 없으면 전부 tbody로
-                    if (!hasDivider && headerRow) {
-                        bodyRows.unshift(headerRow);
-                        headerRow = null;
+                } catch (e) {
+                    console.error('Toast UI Viewer initialization failed:', e);
+                    try {
+                        window._kinkViewer = new window.toastui.Editor({
+                            el: description,
+                            viewer: true,
+                            initialValue: content,
+                            theme: 'dark'
+                        });
+                    } catch (e2) {
+                        console.error('Toast UI Viewer fallback also failed:', e2);
+                        // Complete fallback using basic regex replacement
+                        description.innerHTML = `<div class="md-body"><p class="md-p">${content.replace(/\\n/g, '<br>')}</p></div>`;
                     }
-
-                    let tableHtml = '<table class="md-table"><thead>';
-                    if (headerRow) {
-                        tableHtml += '<tr>' + headerRow.map(c => `<th>${c}</th>`).join('') + '</tr>';
-                    }
-                    tableHtml += '</thead><tbody>';
-                    bodyRows.forEach(row => {
-                        tableHtml += '<tr>' + row.map(c => `<td>${c}</td>`).join('') + '</tr>';
-                    });
-                    tableHtml += '</tbody></table>';
-                    html += tableHtml;
-                    continue;
                 }
-                // Unordered list
-                if (/^[-*] (.+)/.test(line)) {
-                    if (inOl) { html += '</ol>'; inOl = false; }
-                    if (!inUl) { html += '<ul class="md-ul">'; inUl = true; }
-                    html += `<li class="md-li">${inlineRender(line.replace(/^[-*] /, ''))}</li>`;
-                    continue;
-                }
-                // Ordered list
-                if (/^\d+\. (.+)/.test(line)) {
-                    if (inUl) { html += '</ul>'; inUl = false; }
-                    if (!inOl) { html += '<ol class="md-ol">'; inOl = true; }
-                    html += `<li class="md-li">${inlineRender(line.replace(/^\d+\. /, ''))}</li>`;
-                    continue;
-                }
-                // Blockquote
-                if (/^> (.+)/.test(line)) {
-                    closeList();
-                    html += `<blockquote class="md-blockquote">${inlineRender(line.replace(/^> /, ''))}</blockquote>`;
-                    continue;
-                }
-                // Empty line
-                if (line.trim() === '') {
-                    closeList();
-                    html += '<br>';
-                    continue;
-                }
-                // Normal paragraph
-                closeList();
-                html += `<p class="md-p">${inlineRender(line)}</p>`;
+            } else {
+                // Fallback for missing library
+                description.innerHTML = `<div class="md-body"><p class="md-p">${content.replace(/\\n/g, '<br>')}</p></div>`;
             }
-            closeList();
-
-            description.innerHTML = `<div class="md-body">${html}</div>`;
         }
-
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
 
         if (window.lucide) window.lucide.createIcons();
     };

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+</head>
+
+<body>
+    <div id="viewer"></div>
+    <script>
+        window.onerror = function (msg, url, line) {
+            document.body.innerHTML += "<br>Error: " + msg;
+        };
+        try {
+            window.myViewer = window.toastui.Editor.factory({
+                el: document.getElementById('viewer'),
+                viewer: true,
+                initialValue: '# Hello\n| A | B |\n|---|---|\n| 1 | 2 |'
+            });
+        } catch (e) {
+            document.body.innerHTML += "<br>Caught Error: " + e.message;
+        }
+    </script>
+</body>
+
+</html>

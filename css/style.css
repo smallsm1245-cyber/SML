@@ -838,12 +838,41 @@ p {
     color: var(--primary-brass) !important;
 }
 
-/* 코드 블록 */
+/* 테이블 스타일 오버라이드 (Toast UI Viewer용) */
+.role-description .toastui-editor-contents table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 1.2rem 0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.role-description .toastui-editor-contents th,
+.role-description .toastui-editor-contents td {
+    padding: 10px 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    font-size: 0.92rem !important;
+}
+
+.role-description .toastui-editor-contents th {
+    background-color: rgba(182, 141, 64, 0.15) !important;
+    color: var(--primary-brass) !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+}
+
+.role-description .toastui-editor-contents tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* 코드 블록 오버라이드 */
 .role-description .toastui-editor-contents code {
-    background: rgba(255, 255, 255, 0.07) !important;
-    padding: 0.1em 0.4em !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: var(--primary-brass) !important;
+    padding: 2px 5px !important;
     border-radius: 4px !important;
-    font-size: 0.9em !important;
+    font-family: var(--font-mono) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 /* ─────────────────────────────────────────────────
