@@ -611,20 +611,22 @@
         title.textContent = '검색 결과';
 
         if (results.length === 0) {
-            content.innerHTML = '<p>검색 결과가 없습니다.</p>';
+            content.innerHTML = '<div class="py-12 text-center text-slate-400 italic">검색 결과가 없습니다.</div>';
             return;
         }
 
-        content.innerHTML = results.map(post => `
-            <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
-                <h3>
-                    <a href="post.html?id=${post.id}" style="color: var(--primary-brass); text-decoration: none;">
+        content.innerHTML = results.map((post, index) => `
+            <div class="animate-slide-up bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 mb-4 hover:border-rose-600/30 transition-colors" style="animation-delay: ${index * 0.05}s">
+                <h3 class="text-xl font-bold font-serif mb-2">
+                    <a href="post.html?id=${post.id}" class="text-slate-900 dark:text-slate-100 hover:text-rose-600 transition-colors">
                         ${post.title}
                     </a>
                 </h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
-                    ${new Date(post.created_at).toLocaleDateString('ko-KR')}
-                </p>
+                <div class="flex items-center gap-3 text-xs font-semibold text-slate-400 tracking-wider uppercase">
+                    <span>${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
+                    <span class="w-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full"></span>
+                    <span class="text-rose-600/70">ARCHIVE RECORD</span>
+                </div>
             </div>
         `).join('');
     }
@@ -1235,52 +1237,47 @@
     };
 
     function initNightMode() {
-        const sidebarToggle = document.getElementById('modeToggle');
         const headerToggle = document.getElementById('headerModeToggle');
-        if (!sidebarToggle && !headerToggle) return;
+        if (!headerToggle) return;
 
-        const isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === 'true';
-
-        const updateUI = (nightMode) => {
-            document.body.classList.toggle('night-mode', nightMode);
-            const icon = nightMode ? '☀️' : '🌙';
-            const text = nightMode ? 'Day Mode' : 'Night Library';
-
-            if (sidebarToggle) sidebarToggle.innerHTML = `<span>${icon}</span><span>${text}</span>`;
-            if (headerToggle) headerToggle.innerHTML = `<span class="mode-icon">${icon}</span>`;
+        const updateUI = (isDark) => {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
         };
 
-        if (isNightMode) updateUI(true);
-
-        const toggleMode = () => {
-            const currentMode = document.body.classList.contains('night-mode');
-            const nextMode = !currentMode;
-            localStorage.setItem(NIGHT_MODE_KEY, nextMode);
-            updateUI(nextMode);
-        };
-
-        if (sidebarToggle) sidebarToggle.addEventListener('click', toggleMode);
-        if (headerToggle) headerToggle.addEventListener('click', toggleMode);
+        headerToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+        });
     }
 
     function initHeaderScroll() {
-        const header = document.querySelector('.mobile-header');
+        const header = document.getElementById('mainHeader');
+        const progressBar = document.getElementById('readingProgress');
         if (!header) return;
 
         let lastScrollY = window.scrollY;
 
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
 
-            // 50px 이상 스크롤했을 때만 동작 (감도 조절)
+            // Progress Bar Calculation
+            if (progressBar && docHeight > 0) {
+                const progress = (currentScrollY / docHeight) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+
+            // Header Scroll Logic (hide on scroll down, show on scroll up)
             if (Math.abs(currentScrollY - lastScrollY) < 10) return;
 
             if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                // 아래로 스크롤 중이며 어느 정도 내려왔을 때 숨김
-                header.classList.add('header-hidden');
+                header.style.transform = 'translateY(-100%)';
             } else {
-                // 위로 스크롤 중일 때 다시 표시
-                header.classList.remove('header-hidden');
+                header.style.transform = 'translateY(0)';
             }
 
             lastScrollY = currentScrollY;
@@ -1289,31 +1286,42 @@
 
     function initMobileMenu() {
         const menuToggle = document.getElementById('menuToggleBtn');
-        const sidebar = document.querySelector('.sidebar');
+        const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
 
         if (!menuToggle || !sidebar || !overlay) return;
 
         const closeMenu = () => {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
+            sidebar.classList.add('-translate-x-full');
+            sidebar.classList.add('hidden');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('opacity-100');
             document.body.style.overflow = '';
         };
 
-        const toggleMenu = () => {
-            const isActive = sidebar.classList.toggle('active');
-            overlay.classList.toggle('active', isActive);
-            document.body.style.overflow = isActive ? 'hidden' : '';
+        const openMenu = () => {
+            sidebar.classList.remove('hidden');
+            overlay.classList.remove('hidden');
+            // Small timeout to allow transition
+            setTimeout(() => {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.add('opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
         };
 
         menuToggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            toggleMenu();
+            if (sidebar.classList.contains('-translate-x-full')) {
+                openMenu();
+            } else {
+                closeMenu();
+            }
         });
 
         overlay.addEventListener('click', closeMenu);
 
-        // 카테고리 클릭 시 메뉴 닫기
+        // Close on category click
         const categoryNav = document.getElementById('categoryNav');
         if (categoryNav) {
             categoryNav.addEventListener('click', (e) => {
@@ -1387,32 +1395,44 @@
         const navWiki = document.getElementById('navWiki');
         const navSearch = document.getElementById('navSearch');
         const navSettings = document.getElementById('navSettings');
-        const mainEls = document.querySelectorAll('.content-panel, .site-footer, .post-title, .post-meta');
-        const settingsView = document.getElementById('settingsView');
 
-        if (!navHome || !navSettings) return;
+        const welcomeSection = document.getElementById('welcomeSection');
+        const mainContent = document.getElementById('mainContent');
+        const settingsView = document.getElementById('settingsView');
+        const navItems = [navHome, navWiki, navSearch, navSettings];
+
+        if (!navHome) return;
+
+        const resetActive = () => {
+            navItems.forEach(item => {
+                if (item) {
+                    item.classList.remove('text-rose-600');
+                    item.classList.add('text-slate-400');
+                }
+            });
+        };
 
         const showView = (view) => {
+            resetActive();
             if (view === 'settings') {
-                mainEls.forEach(el => el.style.display = 'none');
-                if (settingsView) settingsView.style.display = 'block';
-                navSettings.classList.add('active');
-                navHome.classList.remove('active');
-                if (navWiki) navWiki.classList.remove('active');
-                if (navSearch) navSearch.classList.remove('active');
-            } else {
-                mainEls.forEach(el => el.style.display = 'block');
-                if (settingsView) settingsView.style.display = 'none';
-                navHome.classList.add('active');
-                if (navWiki) navWiki.classList.remove('active');
-                navSettings.classList.remove('active');
-                if (navSearch) navSearch.classList.remove('active');
+                if (welcomeSection) welcomeSection.classList.add('hidden');
+                if (mainContent) mainContent.classList.add('hidden');
+                if (settingsView) settingsView.classList.remove('hidden');
+                if (navSettings) navSettings.classList.add('text-rose-600');
+            } else if (view === 'home') {
+                if (welcomeSection) welcomeSection.classList.remove('hidden');
+                if (mainContent) mainContent.classList.remove('hidden');
+                if (settingsView) settingsView.classList.add('hidden');
+                if (navHome) navHome.classList.add('text-rose-600');
+
+                // If we were in Wiki view (gallery), we might need to reload or reset mainContent
+                // But for now, let's just make sure it's visible.
             }
             window.scrollTo(0, 0);
         };
 
         navHome.addEventListener('click', (e) => {
-            if (window.location.pathname.includes('post.html')) return; // Allow natural navigation
+            if (window.location.pathname.includes('post.html')) return;
             e.preventDefault();
             showView('home');
         });
@@ -1425,11 +1445,12 @@
         if (navWiki) {
             navWiki.addEventListener('click', (e) => {
                 e.preventDefault();
+                resetActive();
+                navWiki.classList.add('text-rose-600');
                 renderTendencyView();
-                navHome.classList.remove('active');
-                navWiki.classList.add('active');
-                navSettings.classList.remove('active');
-                if (navSearch) navSearch.classList.remove('active');
+                if (welcomeSection) welcomeSection.classList.add('hidden');
+                if (mainContent) mainContent.classList.remove('hidden');
+                if (settingsView) settingsView.classList.add('hidden');
                 window.scrollTo(0, 0);
             });
         }
@@ -1437,21 +1458,12 @@
         if (navSearch) {
             navSearch.addEventListener('click', (e) => {
                 e.preventDefault();
-                // Remove active from others
-                navHome.classList.remove('active');
-                navWiki.classList.remove('active');
-                navSettings.classList.remove('active');
-                navSearch.classList.add('active');
+                resetActive();
+                navSearch.classList.add('text-rose-600');
 
-                // Focusing search in sidebar as a fallback or if we want a separate search view
-                const searchInput = document.getElementById('searchInput');
-                if (searchInput) {
-                    const sidebar = document.querySelector('.sidebar');
-                    const overlay = document.getElementById('sidebarOverlay');
-                    sidebar.classList.add('active');
-                    overlay.classList.add('active');
-                    setTimeout(() => searchInput.focus(), 300);
-                }
+                // Toggle Sidebar to show search
+                const menuToggle = document.getElementById('menuToggleBtn');
+                if (menuToggle) menuToggle.click();
             });
         }
     }

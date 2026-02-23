@@ -50,7 +50,8 @@
 }
 
 /* Night Library Mode - High Contrast & Depth */
-body.night-mode {
+body.night-mode,
+html.dark body {
     --bg-deep: #0A0A0A;
     --bg-panel: #141414;
     --text-primary: #E5E5E5;
@@ -65,6 +66,120 @@ body.night-mode {
     --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 
     --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════
+   MODERN UI UTILITIES (Tailwind Extensions)
+   ═══════════════════════════════════════════════════ */
+.safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Micro-interactions */
+.nav-item {
+    transition: transform var(--transition-fast), color var(--transition-fast);
+}
+
+.nav-item:active {
+    transform: scale(0.9);
+}
+
+.glass-pill {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+/* Wiki Typography */
+.prose {
+    font-family: var(--font-serif);
+    line-height: 1.85;
+    letter-spacing: -0.01em;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+}
+
+/* Scroll Animations */
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-slide-up {
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Accordion UI (Progressive Disclosure) */
+.archive-accordion {
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    background: var(--bg-panel);
+}
+
+.archive-accordion summary {
+    padding: 1.25rem 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-panel);
+    transition: background 0.2s ease;
+}
+
+.archive-accordion summary:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+body.night-mode .archive-accordion summary:hover,
+html.dark .archive-accordion summary:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.archive-accordion summary::after {
+    content: '+';
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--rose-600, #e11d48);
+    transition: transform 0.3s ease;
+}
+
+.archive-accordion[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.archive-accordion .accordion-content {
+    padding: 1.5rem;
+    border-top: 1px solid var(--glass-border);
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ═══════════════════════════════════════════════════

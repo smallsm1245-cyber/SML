@@ -300,32 +300,55 @@ function initAdminLongPress() {
 }
 
 function initNightMode() {
-    const sidebarToggle = document.getElementById('modeToggle');
     const headerToggle = document.getElementById('headerModeToggle');
-    if (!sidebarToggle && !headerToggle) return;
+    if (!headerToggle) return;
 
-    const isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === 'true';
+    headerToggle.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.theme = isDark ? 'dark' : 'light';
+    });
+}
 
-    const updateUI = (nightMode) => {
-        document.body.classList.toggle('night-mode', nightMode);
-        const icon = nightMode ? '☀️' : '🌙';
-        const text = nightMode ? 'Day Mode' : 'Night Library';
+function initHeaderScroll() {
+    const header = document.getElementById('mainHeader');
+    const progressBar = document.getElementById('readingProgress');
+    const utilityBar = document.getElementById('utilityBar');
+    if (!header) return;
 
-        if (sidebarToggle) sidebarToggle.innerHTML = `<span>${icon}</span><span>${text}</span>`;
-        if (headerToggle) headerToggle.innerHTML = `<span class="mode-icon">${icon}</span>`;
-    };
+    let lastScrollY = window.scrollY;
 
-    if (isNightMode) updateUI(true);
+    window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
 
-    const toggleMode = () => {
-        const currentMode = document.body.classList.contains('night-mode');
-        const nextMode = !currentMode;
-        localStorage.setItem(NIGHT_MODE_KEY, nextMode);
-        updateUI(nextMode);
-    };
+        // Progress Bar Calculation
+        if (progressBar && docHeight > 0) {
+            const progress = (currentScrollY / docHeight) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
 
-    if (sidebarToggle) sidebarToggle.addEventListener('click', toggleMode);
-    if (headerToggle) headerToggle.addEventListener('click', toggleMode);
+        // Utility Bar Visibility (show after scrolling 300px)
+        if (utilityBar) {
+            if (currentScrollY > 300) {
+                utilityBar.classList.remove('scale-0', 'opacity-0');
+                utilityBar.classList.add('scale-100', 'opacity-100');
+            } else {
+                utilityBar.classList.remove('scale-100', 'opacity-100');
+                utilityBar.classList.add('scale-0', 'opacity-0');
+            }
+        }
+
+        // Header Scroll Logic
+        if (Math.abs(currentScrollY - lastScrollY) < 10) return;
+
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+            header.style.transform = 'translateY(-100%)';
+        } else {
+            header.style.transform = 'translateY(0)';
+        }
+
+        lastScrollY = currentScrollY;
+    }, { passive: true });
 }
 
 // ═══════════════════════════════════════════════════
@@ -387,78 +410,124 @@ function initEmergencySystem() {
 
 function initBottomNav() {
     const navHome = document.getElementById('navHome');
+    const navWiki = document.getElementById('navWiki');
     const navSearch = document.getElementById('navSearch');
     const navSettings = document.getElementById('navSettings');
-    const mainEls = document.querySelectorAll('.content-panel, .site-footer');
-    const settingsView = document.getElementById('settingsView');
 
-    if (!navHome || !navSettings) return;
+    const article = document.querySelector('article');
+    const settingsView = document.getElementById('settingsView');
+    const navItems = [navHome, navWiki, navSearch, navSettings];
+
+    if (!navHome) return;
+
+    const resetActive = () => {
+        navItems.forEach(item => {
+            if (item) {
+                item.classList.remove('text-rose-600');
+                item.classList.add('text-slate-400');
+            }
+        });
+    };
 
     const showView = (view) => {
+        resetActive();
         if (view === 'settings') {
-            mainEls.forEach(el => el.style.display = 'none');
-            if (settingsView) settingsView.style.display = 'block';
-            navSettings.classList.add('active');
-            navHome.classList.remove('active');
+            if (article) article.classList.add('hidden');
+            if (settingsView) settingsView.classList.remove('hidden');
+            if (navSettings) navSettings.classList.add('text-rose-600');
         } else {
-            mainEls.forEach(el => el.style.display = 'block');
-            if (settingsView) settingsView.style.display = 'none';
-            navHome.classList.add('active');
-            navSettings.classList.remove('active');
+            if (article) article.classList.remove('hidden');
+            if (settingsView) settingsView.classList.add('hidden');
+            if (navHome) navHome.classList.add('text-slate-400'); // default
         }
         window.scrollTo(0, 0);
     };
-
-    navHome.addEventListener('click', (e) => {
-        // Since we are on post.html, Home should always lead back to index.html
-        // The default link is already index.html, so we just let it happen or force it
-    });
 
     navSettings.addEventListener('click', (e) => {
         e.preventDefault();
         showView('settings');
     });
 
-    if (navSearch) {
-        navSearch.addEventListener('click', (e) => {
-            e.preventDefault();
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                const sidebar = document.querySelector('.sidebar');
-                const overlay = document.getElementById('sidebarOverlay');
-                sidebar.classList.add('active');
-                overlay.classList.add('active');
-                setTimeout(() => searchInput.focus(), 300);
+    // Other nav items are links to index.html with hashes, which is fine
+}
+
+function initUtilityBar() {
+    const btnTextSize = document.getElementById('btnTextSize');
+    const btnShare = document.getElementById('btnShare');
+    const btnEmergency = document.getElementById('btnEmergency');
+    const content = document.getElementById('postContent');
+
+    if (btnTextSize && content) {
+        let sizeIndex = 1;
+        const sizes = ['text-base', 'text-lg', 'text-xl'];
+        btnTextSize.addEventListener('click', () => {
+            content.classList.remove(...sizes);
+            sizeIndex = (sizeIndex + 1) % sizes.length;
+            content.classList.add(sizes[sizeIndex]);
+        });
+    }
+
+    if (btnShare) {
+        btnShare.addEventListener('click', async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: document.getElementById('postTitle').textContent,
+                        url: window.location.href
+                    });
+                } catch (err) {
+                    console.log('Share failed:', err);
+                }
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('링크가 복사되었습니다.');
             }
+        });
+    }
+
+    if (btnEmergency) {
+        btnEmergency.addEventListener('click', () => {
+            const url = localStorage.getItem(EMERGENCY_URL_KEY) || 'https://www.google.com';
+            window.location.replace(url);
         });
     }
 }
 
 function initMobileMenu() {
     const menuToggle = document.getElementById('menuToggleBtn');
-    const sidebar = document.querySelector('.sidebar');
+    const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
 
     if (!menuToggle || !sidebar || !overlay) return;
 
-    const toggleMenu = () => {
-        const isActive = sidebar.classList.toggle('active');
-        overlay.classList.toggle('active', isActive);
-        document.body.style.overflow = isActive ? 'hidden' : '';
+    const closeMenu = () => {
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.add('hidden');
+        overlay.classList.add('hidden');
+        overlay.classList.remove('opacity-100');
+        document.body.style.overflow = '';
     };
 
-    menuToggle.addEventListener('click', toggleMenu);
-    overlay.addEventListener('click', toggleMenu);
+    const openMenu = () => {
+        sidebar.classList.remove('hidden');
+        overlay.classList.remove('hidden');
+        setTimeout(() => {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.add('opacity-100');
+        }, 10);
+        document.body.style.overflow = 'hidden';
+    };
 
-    // Close sidebar on navigation (mobile)
-    const nav = document.getElementById('categoryNav');
-    if (nav) {
-        nav.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768 && (e.target.tagName === 'A' || e.target.closest('a'))) {
-                toggleMenu();
-            }
-        });
-    }
+    menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (sidebar.classList.contains('-translate-x-full')) {
+            openMenu();
+        } else {
+            closeMenu();
+        }
+    });
+
+    overlay.addEventListener('click', closeMenu);
 }
 
 // ═══════════════════════════════════════════════════
@@ -532,8 +601,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initNightMode();
     initAdminLongPress();
     initMobileMenu();
+    initHeaderScroll();
     initEmergencySystem();
     initBottomNav();
+    initUtilityBar();
+
+    if (window.lucide) window.lucide.createIcons();
 
     // Home Link
     const titleConfig = document.querySelector('.sidebar-header');
