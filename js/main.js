@@ -987,7 +987,7 @@
         const item = window.tendencyData.find(t => t.id === id);
         if (!item) return;
 
-        window.currentDetailId = id; // Save for "Read More" button
+        window.currentDetailId = id;
 
         const overlay = document.getElementById('roleDetailOverlay');
         const accentBar = document.getElementById('modalAccentBar');
@@ -996,50 +996,110 @@
         const subName = document.getElementById('modalSubName');
         const description = document.getElementById('roleDescription');
 
-        const themeColor = item.type === 'top' ? '#ff4d4d' : '#4da6ff';
+        const isTop = item.type === 'top';
+        const themeColor = isTop ? '#ff4d4d' : '#4da6ff';
 
         accentBar.style.backgroundColor = themeColor;
         iconWrapper.style.color = themeColor;
         iconWrapper.innerHTML = `<i data-lucide="${(item.icon_class || 'crown').toLowerCase()}" style="width: 48px; height: 48px;"></i>`;
 
         title.textContent = item.name;
-        subName.textContent = item.sub_name || '';
+        subName.textContent = item.subName || item.sub_name || '';
 
         if (description) {
-            // Use ToastUI Viewer for proper markdown rendering
-            description.innerHTML = ''; // Clear previous content
-            if (window.toastui && window.toastui.Editor) {
-                // Destroy previous viewer if any
-                if (window._kinkViewer) {
-                    try { window._kinkViewer.destroy(); } catch (e) { }
-                    window._kinkViewer = null;
-                }
-                window._kinkViewer = new window.toastui.Editor({
-                    el: description,
-                    viewer: true,
-                    initialValue: item.description || '',
-                    theme: 'dark'
-                });
-            } else {
-                // Fallback: basic markdown to HTML
-                let descHtml = (item.description || '')
-                    .replace(/^# (.+)/gm, '<h1>$1</h1>')
-                    .replace(/^## (.+)/gm, '<h2>$1</h2>')
-                    .replace(/^### (.+)/gm, '<h3>$1</h3>')
+            description.innerHTML = '';
+            // Destroy previous Toast viewer if any
+            if (window._kinkViewer) {
+                try { window._kinkViewer.destroy(); } catch (e) { }
+                window._kinkViewer = null;
+            }
+
+            // ── Markdown → HTML renderer (자체 파서) ──────────────────
+            const raw = (item.description || '').replace(/<!--[\s\S]*?-->/g, '');
+            const lines = raw.split('\n');
+            let html = '';
+            let inUl = false;
+            let inOl = false;
+
+            const closeList = () => {
+                if (inUl) { html += '</ul>'; inUl = false; }
+                if (inOl) { html += '</ol>'; inOl = false; }
+            };
+
+            const inlineRender = (text) =>
+                text
+                    .replace(/`([^`]+)`/g, '<code class="md-code">$1</code>')
                     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-                    .replace(/^---$/gm, '<hr>')
-                    .replace(/\n\n/g, '<br><br>');
-                description.innerHTML = descHtml;
+                    .replace(/~~(.+?)~~/g, '<del>$1</del>')
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                // H1
+                if (/^# (.+)/.test(line)) {
+                    closeList();
+                    html += `<h1 class="md-h1">${inlineRender(line.replace(/^# /, ''))}</h1>`;
+                    continue;
+                }
+                // H2
+                if (/^## (.+)/.test(line)) {
+                    closeList();
+                    html += `<h2 class="md-h2">${inlineRender(line.replace(/^## /, ''))}</h2>`;
+                    continue;
+                }
+                // H3
+                if (/^### (.+)/.test(line)) {
+                    closeList();
+                    html += `<h3 class="md-h3">${inlineRender(line.replace(/^### /, ''))}</h3>`;
+                    continue;
+                }
+                // HR
+                if (/^---$/.test(line.trim())) {
+                    closeList();
+                    html += '<hr class="md-hr">';
+                    continue;
+                }
+                // Unordered list
+                if (/^[-*] (.+)/.test(line)) {
+                    if (inOl) { html += '</ol>'; inOl = false; }
+                    if (!inUl) { html += '<ul class="md-ul">'; inUl = true; }
+                    html += `<li class="md-li">${inlineRender(line.replace(/^[-*] /, ''))}</li>`;
+                    continue;
+                }
+                // Ordered list
+                if (/^\d+\. (.+)/.test(line)) {
+                    if (inUl) { html += '</ul>'; inUl = false; }
+                    if (!inOl) { html += '<ol class="md-ol">'; inOl = true; }
+                    html += `<li class="md-li">${inlineRender(line.replace(/^\d+\. /, ''))}</li>`;
+                    continue;
+                }
+                // Blockquote
+                if (/^> (.+)/.test(line)) {
+                    closeList();
+                    html += `<blockquote class="md-blockquote">${inlineRender(line.replace(/^> /, ''))}</blockquote>`;
+                    continue;
+                }
+                // Empty line
+                if (line.trim() === '') {
+                    closeList();
+                    html += '<br>';
+                    continue;
+                }
+                // Normal paragraph
+                closeList();
+                html += `<p class="md-p">${inlineRender(line)}</p>`;
             }
+            closeList();
+
+            description.innerHTML = `<div class="md-body">${html}</div>`;
         }
 
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
 
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
+        if (window.lucide) window.lucide.createIcons();
     };
 
     window.closeRoleDetail = function () {
