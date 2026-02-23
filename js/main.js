@@ -1191,11 +1191,11 @@
             window._kinkInlineEditor = null;
         }
 
-        // 버튼 및 핸들러 정리
+        // 버튼 상태 초기화 (수정 버튼 노출, 저장 버튼 숨김)
         const editBtn = document.getElementById('kinkModalEditBtn');
         const saveBtn = document.getElementById('kinkModalSaveBtn');
-        if (editBtn) editBtn.remove();
-        if (saveBtn) saveBtn.remove();
+        if (editBtn) editBtn.style.display = '';
+        if (saveBtn) saveBtn.style.display = 'none';
 
         const desc = document.getElementById('roleDescription');
         if (desc) {
