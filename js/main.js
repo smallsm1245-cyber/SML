@@ -1462,8 +1462,8 @@
         const resetActive = () => {
             navItems.forEach(item => {
                 if (item) {
-                    item.classList.remove('text-rose-600');
-                    item.classList.add('text-slate-400');
+                    item.classList.remove('text-bamboo-gold');
+                    item.classList.add('text-white/10');
                 }
             });
         };
@@ -1474,12 +1474,12 @@
                 if (welcomeSection) welcomeSection.classList.add('hidden');
                 if (mainContent) mainContent.classList.add('hidden');
                 if (settingsView) settingsView.classList.remove('hidden');
-                if (navSettings) navSettings.classList.add('text-rose-600');
+                if (navSettings) navSettings.classList.add('text-bamboo-gold');
             } else if (view === 'home') {
                 if (welcomeSection) welcomeSection.classList.remove('hidden');
                 if (mainContent) mainContent.classList.remove('hidden');
                 if (settingsView) settingsView.classList.add('hidden');
-                if (navHome) navHome.classList.add('text-rose-600');
+                if (navHome) navHome.classList.add('text-bamboo-gold');
 
                 // If we were in Wiki view (gallery), we might need to reload or reset mainContent
                 // But for now, let's just make sure it's visible.
@@ -1502,7 +1502,7 @@
             navWiki.addEventListener('click', (e) => {
                 e.preventDefault();
                 resetActive();
-                navWiki.classList.add('text-rose-600');
+                navWiki.classList.add('text-bamboo-gold');
                 renderTendencyView();
                 if (welcomeSection) welcomeSection.classList.add('hidden');
                 if (mainContent) mainContent.classList.remove('hidden');
@@ -1515,7 +1515,7 @@
             navSearch.addEventListener('click', (e) => {
                 e.preventDefault();
                 resetActive();
-                navSearch.classList.add('text-rose-600');
+                navSearch.classList.add('text-bamboo-gold');
 
                 // Toggle Sidebar to show search
                 const menuToggle = document.getElementById('menuToggleBtn');
@@ -1605,31 +1605,40 @@
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
             const header = document.getElementById('mainHeader');
-            const bottomNav = document.querySelector('nav.fixed.bottom-8');
+            const bottomNav = document.querySelector('nav.fixed.bottom-10');
             const emergencyFab = document.getElementById('emergencyFab');
 
             if (currentScroll > 100) {
                 if (currentScroll > lastScroll) {
                     // Scrolling down - Hide UI
                     if (header) header.style.transform = 'translateY(-100%)';
-                    if (bottomNav) bottomNav.style.transform = 'translate( -50%, 200%)';
-                    if (emergencyFab) emergencyFab.style.transform = 'scale(0.5) opacity(0)';
+                    if (bottomNav) bottomNav.style.transform = 'translate(-50%, 250%)';
+                    if (emergencyFab) {
+                        emergencyFab.style.transform = 'translateY(100px) scale(0.5)';
+                        emergencyFab.style.opacity = '0';
+                    }
                 } else {
                     // Scrolling up - Show UI
                     if (header) {
                         header.style.transform = 'translateY(0)';
-                        header.classList.add('bg-ink/90', 'backdrop-blur-3xl');
+                        header.classList.add('bg-forest-night/80', 'backdrop-blur-3xl');
                     }
                     if (bottomNav) bottomNav.style.transform = 'translate(-50%, 0)';
-                    if (emergencyFab) emergencyFab.style.transform = 'scale(1) opacity(1)';
+                    if (emergencyFab) {
+                        emergencyFab.style.transform = 'translateY(0) scale(1)';
+                        emergencyFab.style.opacity = '1';
+                    }
                 }
             } else {
                 if (header) {
                     header.style.transform = 'translateY(0)';
-                    header.classList.remove('bg-ink/90', 'backdrop-blur-3xl');
+                    header.classList.remove('bg-forest-night/80', 'backdrop-blur-3xl');
                 }
                 if (bottomNav) bottomNav.style.transform = 'translate(-50%, 0)';
-                if (emergencyFab) emergencyFab.style.transform = 'scale(1) opacity(1)';
+                if (emergencyFab) {
+                    emergencyFab.style.transform = 'translateY(0) scale(1)';
+                    emergencyFab.style.opacity = '1';
+                }
             }
             lastScroll = currentScroll;
         });

@@ -32,19 +32,19 @@
             theme: {
                 extend: {
                     colors: {
-                        ink: {
-                            DEFAULT: '#020617', // Deep Obsidian
-                            light: '#0f172a',
-                            dark: '#010409',
+                        forest: {
+                            night: '#050805', // Deep Obsidian Green
+                            deep: '#0a0f0a',
+                            mist: '#1a241a',
                         },
-                        champagne: {
-                            DEFAULT: '#C5A059', // Muted Brass/Gold
-                            dim: '#8E7342',
-                            light: '#E5D5B7',
+                        bamboo: {
+                            gold: '#D4C9A8', // Muted Bone/Yellow
+                            dim: '#8B836B',
+                            light: '#F2ECD9',
                         },
-                        slate: {
-                            900: '#0f172a',
-                            950: '#020617',
+                        leaf: {
+                            DEFAULT: '#4A554A',
+                            dim: '#2D352D',
                         }
                     },
                     fontFamily: {
@@ -60,17 +60,17 @@
                         exhibition: '1.9',
                     },
                     animation: {
-                        'reveal': 'reveal 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards',
-                        'subtle-float': 'subtleFloat 6s ease-in-out infinite',
+                        'mist-reveal': 'mistReveal 2s cubic-bezier(0.77, 0, 0.175, 1) forwards',
+                        'vertical-slide': 'verticalSlide 1.5s ease-out forwards',
                     },
                     keyframes: {
-                        reveal: {
-                            '0%': { opacity: '0', transform: 'translateY(20px) scale(0.98)' },
-                            '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                        mistReveal: {
+                            '0%': { opacity: '0', filter: 'blur(20px)', transform: 'scale(1.05)' },
+                            '100%': { opacity: '1', filter: 'blur(0)', transform: 'scale(1)' },
                         },
-                        subtleFloat: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
+                        verticalSlide: {
+                            '0%': { transform: 'scaleY(0)', transformOrigin: 'top' },
+                            '100%': { transform: 'scaleY(1)', transformOrigin: 'top' },
                         }
                     }
                 }
@@ -109,76 +109,95 @@
 </head>
 
 <body
-    class="bg-ink-dark text-white/80 font-serif selection:bg-champagne/20 transition-colors duration-1000 overflow-x-hidden">
-    <!-- Age Verification Disclaimer (Quiet Luxury) -->
-    <div id="disclaimerOverlay"
-        class="fixed inset-0 z-[9999] flex items-center justify-center bg-ink/95 backdrop-blur-3xl px-6 transition-all duration-1000">
+    class="bg-forest-night text-white/70 font-serif selection:bg-bamboo-gold/20 transition-colors duration-1000 overflow-x-hidden">
+
+    <!-- Decorative Bamboo Stems (Background) -->
+    <div class="fixed inset-0 pointer-events-none z-0 opacity-10">
         <div
-            class="bg-ink p-12 rounded-3xl max-w-sm w-full text-center border border-white/5 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)]">
-            <h2 class="text-[10px] uppercase tracking-[0.4em] mb-12 font-medium text-champagne/60">Archive Protocol</h2>
-            <p class="text-3xl font-display italic font-light text-white mb-2">Age Verification</p>
-            <p class="text-xs font-serif text-white/30 mb-12 leading-relaxed tracking-wide">
+            class="absolute left-1/4 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-bamboo-gold/40 to-transparent">
+        </div>
+        <div
+            class="absolute right-1/3 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-bamboo-gold/20 to-transparent">
+        </div>
+    </div>
+
+    <!-- Age Verification Disclaimer (Forest Edition) -->
+    <div id="disclaimerOverlay"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-forest-night/95 backdrop-blur-3xl px-6 transition-all duration-1000">
+        <div
+            class="bg-forest-night p-12 rounded-3xl max-w-sm w-full text-center border border-white/5 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)]">
+            <h2 class="text-[9px] uppercase tracking-[0.4em] mb-12 font-medium text-bamboo-gold/50">Grove Protocol</h2>
+            <p class="text-4xl font-display italic font-light text-white mb-2">Sanctuary</p>
+            <p class="text-[11px] font-serif text-white/30 mb-12 leading-relaxed tracking-widest italic">
                 본 공간은 성인 지향 아카이브를 포함합니다.<br>
-                당신은 사유할 준비가 된 만 19세 이상입니까?
+                숲의 고요에 머물 준비가 되었습니까?
             </p>
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-5">
                 <button
-                    class="w-full py-4 bg-white/5 hover:bg-champagne text-white hover:text-ink rounded-full font-medium tracking-widest uppercase transition-all duration-500 border border-white/5 hover:border-transparent"
-                    id="btnYes">준비되었습니다 (19+)</button>
+                    class="w-full py-4 bg-white/5 hover:bg-bamboo-gold text-white hover:text-forest-night rounded-full font-medium tracking-[0.3em] uppercase transition-all duration-700 border border-white/5 hover:border-transparent text-[10px]"
+                    id="btnYes">ENTER THE GROVE (19+)</button>
                 <button
-                    class="w-full py-4 text-white/20 hover:text-white/40 text-[10px] font-medium uppercase tracking-widest transition-colors"
-                    id="btnNo">아니요</button>
+                    class="w-full py-4 text-white/10 hover:text-white/30 text-[9px] font-medium uppercase tracking-widest transition-colors"
+                    id="btnNo">LEAVE</button>
             </div>
         </div>
     </div>
 
     <!-- Cinematic Header -->
     <header id="mainHeader"
-        class="fixed top-0 left-0 right-0 z-50 bg-ink/60 dark:bg-black/40 backdrop-blur-xl border-b border-white/5 transition-all duration-700">
+        class="fixed top-0 left-0 right-0 z-50 bg-forest-night/40 dark:bg-black/40 backdrop-blur-3xl border-b border-white/5 transition-all duration-700">
         <div class="max-w-screen-xl mx-auto h-20 flex items-center justify-between px-8">
             <div class="flex items-center gap-8">
-                <button id="menuToggleBtn" class="group p-2 -ml-2 text-white/40 hover:text-champagne transition-colors"
-                    aria-label="Menu">
-                    <i data-lucide="menu" class="w-5 h-5 stroke-[1.25]"></i>
+                <button id="menuToggleBtn"
+                    class="group p-2 -ml-2 text-white/30 hover:text-bamboo-gold transition-colors" aria-label="Menu">
+                    <i data-lucide="menu" class="w-5 h-5 stroke-[1]"></i>
                 </button>
-                <h1 class="text-xs font-display font-medium tracking-widest text-white/50 uppercase">
-                    <a href="index.html" class="hover:text-champagne transition-colors">Smallsm Archive</a>
+                <h1 class="text-[10px] font-display font-medium tracking-[0.4em] text-white/40 uppercase">
+                    <a href="index.html" class="hover:text-bamboo-gold transition-colors">Smallsm <span
+                            class="text-white/20">Archive</span></a>
                 </h1>
             </div>
             <div class="flex items-center gap-6">
-                <button id="headerModeToggle" class="text-white/30 hover:text-champagne transition-colors"
+                <button id="headerModeToggle" class="text-white/20 hover:text-bamboo-gold transition-colors"
                     aria-label="Toggle Mode">
-                    <i data-lucide="moon" class="dark:hidden w-4 h-4 stroke-[1.5]"></i>
-                    <i data-lucide="sun" class="hidden dark:block w-4 h-4 stroke-[1.5]"></i>
+                    <i data-lucide="moon" class="dark:hidden w-4 h-4 stroke-[1.25]"></i>
+                    <i data-lucide="sun" class="hidden dark:block w-4 h-4 stroke-[1.25]"></i>
                 </button>
             </div>
         </div>
-        <!-- Ultra-fine Progress Bar -->
+        <!-- Ultra-fine Progress Bar (Bamboo Node style) -->
         <div class="h-[1px] w-full bg-white/5">
-            <div id="readingProgress" class="h-full bg-champagne transition-all duration-300 ease-out"
+            <div id="readingProgress"
+                class="h-full bg-bamboo-gold/60 transition-all duration-300 ease-out shadow-[0_0_8px_rgba(212,201,168,0.4)]"
                 style="width: 0%"></div>
         </div>
     </header>
 
     <!-- Main Content Stage (Wider, Gallery-like) -->
     <div id="appContainer"
-        class="max-w-screen-xl mx-auto pt-32 pb-32 px-6 md:px-12 min-h-screen transition-all duration-1000">
+        class="max-w-screen-xl mx-auto pt-44 pb-32 px-6 md:px-12 min-h-screen transition-all duration-1000 z-10 relative">
 
-        <!-- Cinematic Welcome Stage -->
-        <section id="welcomeSection" class="relative mb-24 opacity-0 animate-reveal">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-12 border-b border-white/10 pb-12">
+        <!-- Forest Welcome Stage -->
+        <section id="welcomeSection" class="relative mb-32 opacity-0 animate-mist-reveal">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-12 pb-16 relative">
+                <!-- Vertical Stem Accent -->
+                <div
+                    class="absolute -left-6 top-0 bottom-0 w-[1px] bg-gradient-to-b from-bamboo-gold/40 to-transparent hidden md:block animate-vertical-slide">
+                </div>
+
                 <div class="max-w-2xl">
-                    <span class="text-[10px] uppercase tracking-widest text-champagne mb-4 block font-medium">Record of
-                        Tendency</span>
+                    <span
+                        class="text-[9px] uppercase tracking-[0.5em] text-bamboo-gold/50 mb-6 block font-medium">Bamboos
+                        Grove Records</span>
                     <h2 id="welcomeTitle"
-                        class="text-5xl md:text-7xl font-display font-light text-white leading-[1.1] mb-6 italic">
-                        Quiet <span class="not-italic text-white/90">Archive</span>
+                        class="text-6xl md:text-8xl font-display font-light text-white/90 leading-[1.05] mb-8 italic">
+                        Hidden <span class="not-italic text-white/40 block md:inline">Forest</span>
                     </h2>
                 </div>
                 <div class="md:text-right">
                     <p id="welcomeSubtitle"
-                        class="text-sm font-serif text-white/40 max-w-xs md:ml-auto leading-exhibition tracking-wide">
-                        사유의 공간, 드러나지 않음으로써 깊어지는 성향과 실천의 정교한 기록들.
+                        class="text-xs font-serif text-white/30 max-w-[280px] md:ml-auto leading-exhibition tracking-luxury italic">
+                        짙은 어둠 속, 바람에 흔들리는 대나무 숲의 고요한 속삭임과 기록들.
                     </p>
                 </div>
             </div>
@@ -188,34 +207,37 @@
         <div id="mainContent" class="prose prose-slate dark:prose-invert max-w-none leading-relaxed font-serif text-lg">
             <!-- Loaded dynamically -->
             <div class="flex justify-center py-20">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600"></div>
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-bamboo-gold/60"></div>
             </div>
         </div>
 
-        <!-- Settings View (Hidden)            <div id="settingsView" class="hidden">
-                <h2 class="text-3xl font-display italic font-light text-white mb-12 animate-on-scroll">Settings</h2>
-                <div
-                    class="bg-white/5 backdrop-blur-3xl border border-white/5 rounded-3xl p-10 space-y-10 animate-on-scroll">
+        <!-- Settings View (Hidden) -->
+        <div id="settingsView" class="hidden">
+            <h2 class="text-4xl font-display italic font-light text-white mb-12 animate-on-scroll">Grove Soul</h2>
+            <div
+                class="bg-forest-mist/30 backdrop-blur-3xl border border-white/5 rounded-3xl p-10 space-y-12 animate-on-scroll">
                 <div>
-                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">비상탈출 (Quick Exit)
+                    <h3 class="text-[9px] font-medium text-bamboo-gold/40 uppercase tracking-[0.4em] mb-8">
+                        비상탈출 (Grove Exit)
                     </h3>
-                    <div class="space-y-4">
+                    <div class="space-y-8">
                         <div>
-                            <label class="text-sm block mb-2 text-slate-500">위장 URL</label>
+                            <label class="text-[10px] block mb-3 text-white/20 uppercase tracking-widest">Warp
+                                Link</label>
                             <input type="text" id="escapeUrlInput"
-                                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-rose-600/50 transition-colors"
+                                class="w-full bg-forest-night/40 border border-white/5 rounded-2xl px-6 py-4 text-xs text-white/50 outline-none focus:border-bamboo-gold/40 transition-all font-serif italic"
                                 placeholder="https://www.google.com">
                         </div>
-                        <div class="flex flex-wrap gap-2">
+                        <div class="flex flex-wrap gap-3">
                             <button
-                                class="preset-btn px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-semibold"
+                                class="preset-btn px-5 py-2 rounded-full border border-white/5 text-[8px] uppercase tracking-widest text-white/20 hover:border-bamboo-gold/40 hover:text-bamboo-gold transition-all"
                                 data-url="https://www.google.com">Google</button>
                             <button
-                                class="preset-btn px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-semibold"
-                                data-url="https://ko.wikipedia.org">Wikipedia</button>
+                                class="preset-btn px-5 py-2 rounded-full border border-white/5 text-[8px] uppercase tracking-widest text-white/20 hover:border-bamboo-gold/40 hover:text-bamboo-gold transition-all"
+                                data-url="https://ko.wikipedia.org">Wiki</button>
                             <button
-                                class="preset-btn px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-semibold"
-                                data-url="https://news.naver.com">News</button>
+                                class="preset-btn px-5 py-2 rounded-full border border-white/5 text-[8px] uppercase tracking-widest text-white/20 hover:border-bamboo-gold/40 hover:text-bamboo-gold transition-all"
+                                data-url="https://news.naver.com">Naver</button>
                         </div>
                     </div>
                 </div>
@@ -224,80 +246,82 @@
         </main>
     </div>
 
-    <!-- Sidebar / Gallery Nav -->
-        <aside id="sidebar"
-            class="fixed inset-y-0 left-0 w-80 z-[100] bg-ink/95 backdrop-blur-3xl border-r border-white/5 transform -translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.77, 0, 0.175, 1)] lg:static lg:translate-x-0 hidden">
-            <div class="h-full flex flex-col p-10">
-                <h1 class="text-xl font-display italic font-light text-white mb-12 tracking-luxury">Archive <span
-                        class="not-italic text-champagne text-[10px] align-top">Core</span></h1>
-                <div class="relative mb-12 group">
-                    <i data-lucide="search"
-                        class="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-champagne transition-colors"></i>
-                    <input type="text" id="searchInput"
-                        class="w-full bg-transparent border-b border-white/5 focus:border-champagne/40 rounded-none pl-8 pr-4 py-3 text-sm text-white/60 placeholder:text-white/10 outline-none transition-all"
-                        placeholder="Search records...">
-                </div>
-                <nav class="flex-1 overflow-y-auto">
-                    <ul id="categoryNav" class="space-y-6">
-                        <!-- Loaded dynamically -->
-                    </ul>
-                </nav>
+    <!-- Sidebar / Gallery Nav (Bamboo Grove) -->
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 w-80 z-[100] bg-forest-night/95 backdrop-blur-3xl border-r border-white/5 transform -translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.77, 0, 0.175, 1)] lg:static lg:translate-x-0 hidden">
+        <div class="h-full flex flex-col p-10 relative">
+            <!-- Vertical Line Motif -->
+            <div class="absolute left-6 top-10 bottom-10 w-[1px] bg-bamboo-gold/10"></div>
+
+            <h1 class="text-xl font-display italic font-light text-white mb-12 tracking-luxury">Archive <span
+                    class="not-italic text-bamboo-gold text-[10px] align-top uppercase tracking-widest">Grove</span>
+            </h1>
+            <div class="relative mb-12 group">
+                <i data-lucide="search"
+                    class="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-bamboo-gold transition-colors"></i>
+                <input type="text" id="searchInput"
+                    class="w-full bg-transparent border-b border-white/5 focus:border-bamboo-gold/40 rounded-none pl-8 pr-4 py-3 text-xs text-white/60 placeholder:text-white/10 outline-none transition-all tracking-luxury"
+                    placeholder="Search grove...">
             </div>
-        </aside>
-        <!-- Scrim-like Overlay for Menu -->
-        <div id="sidebarOverlay"
-            class="fixed inset-0 bg-black/60 backdrop-blur-md z-[90] hidden opacity-0 transition-opacity duration-500">
+            <nav class="flex-1 overflow-y-auto">
+                <ul id="categoryNav" class="space-y-8">
+                    <!-- Loaded dynamically -->
+                </ul>
+            </nav>
         </div>
+    </aside>
+    <!-- Scrim-like Overlay -->
+    <div id="sidebarOverlay"
+        class="fixed inset-0 bg-black/80 backdrop-blur-md z-[90] hidden opacity-0 transition-opacity duration-700">
+    </div>
 
-        <!-- Bottom Navigation (Refined Thumb Zone) -->
-        <nav
-            class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-3rem)] max-w-sm h-16 bg-ink-light/40 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl safe-area-bottom">
-            <div class="grid grid-cols-4 h-full items-center px-4">
-                <a href="index.html"
-                    class="flex flex-col items-center justify-center gap-1 text-white/20 hover:text-champagne transition-all group"
-                    id="navHome">
-                    <i data-lucide="home" class="w-5 h-5 stroke-[1.5] group-hover:scale-110 transition-transform"></i>
-                    <span
-                        class="text-[8px] font-medium uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100">Home</span>
-                </a>
-                <button
-                    class="flex flex-col items-center justify-center gap-1 text-white/20 hover:text-champagne transition-all group"
-                    id="navWiki">
-                    <i data-lucide="book-open"
-                        class="w-5 h-5 stroke-[1.5] group-hover:scale-110 transition-transform"></i>
-                    <span
-                        class="text-[8px] font-medium uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100">Wiki</span>
-                </button>
-                <button
-                    class="flex flex-col items-center justify-center gap-1 text-white/20 hover:text-champagne transition-all group"
-                    id="navSearch">
-                    <i data-lucide="search" class="w-5 h-5 stroke-[1.5] group-hover:scale-110 transition-transform"></i>
-                    <span
-                        class="text-[8px] font-medium uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100">Search</span>
-                </button>
-                <button
-                    class="flex flex-col items-center justify-center gap-1 text-white/20 hover:text-champagne transition-all group"
-                    id="navSettings">
-                    <i data-lucide="settings"
-                        class="w-5 h-5 stroke-[1.5] group-hover:scale-110 transition-transform"></i>
-                    <span
-                        class="text-[8px] font-medium uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100">Setup</span>
-                </button>
-            </div>
-        </nav>
+    <!-- Bottom Navigation (Grove Path) -->
+    <nav
+        class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-4rem)] max-w-sm h-14 bg-forest-mist/60 backdrop-blur-3xl border border-white/5 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] safe-area-bottom overflow-hidden">
+        <div class="grid grid-cols-4 h-full items-center px-6">
+            <a href="index.html"
+                class="flex flex-col items-center justify-center gap-1 text-white/10 hover:text-bamboo-gold transition-all group"
+                id="navHome">
+                <i data-lucide="home" class="w-4 h-4 stroke-[1.25] group-hover:scale-110 transition-transform"></i>
+                <span
+                    class="text-[7px] font-medium uppercase tracking-[0.3em] opacity-30 group-hover:opacity-100">Path</span>
+            </a>
+            <button
+                class="flex flex-col items-center justify-center gap-1 text-white/10 hover:text-bamboo-gold transition-all group"
+                id="navWiki">
+                <i data-lucide="book-open" class="w-4 h-4 stroke-[1.25] group-hover:scale-110 transition-transform"></i>
+                <span
+                    class="text-[7px] font-medium uppercase tracking-[0.3em] opacity-30 group-hover:opacity-100">Wiki</span>
+            </button>
+            <button
+                class="flex flex-col items-center justify-center gap-1 text-white/10 hover:text-bamboo-gold transition-all group"
+                id="navSearch">
+                <i data-lucide="search" class="w-4 h-4 stroke-[1.25] group-hover:scale-110 transition-transform"></i>
+                <span
+                    class="text-[7px] font-medium uppercase tracking-[0.3em] opacity-30 group-hover:opacity-100">Find</span>
+            </button>
+            <button
+                class="flex flex-col items-center justify-center gap-1 text-white/10 hover:text-bamboo-gold transition-all group"
+                id="navSettings">
+                <i data-lucide="settings" class="w-4 h-4 stroke-[1.25] group-hover:scale-110 transition-transform"></i>
+                <span
+                    class="text-[7px] font-medium uppercase tracking-[0.3em] opacity-30 group-hover:opacity-100">Soul</span>
+            </button>
+        </div>
+    </nav>
 
-        <!-- Emergency Button (Refined Panic) -->
-        <button id="emergencyFab"
-            class="fixed right-8 bottom-32 z-[60] w-12 h-12 bg-white/5 backdrop-blur-xl text-white/20 rounded-full border border-white/10 shadow-xl flex items-center justify-center hover:bg-champagne hover:text-ink hover:border-transparent active:scale-90 transition-all opacity-40 hover:opacity-100 group">
-            <i data-lucide="zap" class="w-5 h-5 stroke-[1.5]"></i>
-        </button>
+    <!-- Emergency Button (Grove Exit) -->
+    <button id="emergencyFab"
+        class="fixed right-10 bottom-32 z-[60] w-10 h-10 bg-white/5 backdrop-blur-3xl text-white/10 rounded-full border border-white/5 shadow-2xl flex items-center justify-center hover:bg-bamboo-gold hover:text-forest-night hover:border-transparent active:scale-90 transition-all opacity-40 hover:opacity-100 group">
+        <i data-lucide="zap" class="w-4 h-4 stroke-[1.5]"></i>
+    </button>
 
-        <!-- Scripts -->
-        <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-        <script src="/api/config" async></script>
-        <script src="js/main.js"></script>
-        <script src="js/admin-inline.js"></script>
+    <!-- Scripts -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/api/config" async></script>
+    <script src="js/main.js"></script>
+    <script src="js/admin-inline.js"></script>
 
 
 </body>
