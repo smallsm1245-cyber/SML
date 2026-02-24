@@ -1046,6 +1046,33 @@ p {
     font-size: 1.3rem !important;
 }
 
+/* 모달 상세성향(Subname) 바지/태그 스타일 */
+.modal-subname-wrapper {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.modal-subname {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(225, 29, 72, 0.1);
+    border: 1px solid rgba(225, 29, 72, 0.25);
+    padding: 4px 10px;
+    border-radius: 16px;
+    color: var(--primary-rose);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+}
+
+.modal-subname i.subname-icon {
+    width: 14px;
+    height: 14px;
+}
+
+
 /* 모달 내부 마크다운 컨테이너 전역 h 스타일 차단 및 기본 마진 초기화 */
 .role-description .toastui-editor-contents h1,
 .role-description .toastui-editor-contents h2,
@@ -2141,11 +2168,25 @@ header {
 }
 
 .kink-item-subname {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     font-size: 0.75rem;
-    color: var(--primary-brass);
-    font-weight: 600;
+    color: var(--primary-rose);
+    background: rgba(225, 29, 72, 0.08);
+    /* Transparent Rose */
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
     letter-spacing: 0.05em;
+    border: 1px solid rgba(225, 29, 72, 0.2);
 }
+
+.kink-item-subname i {
+    width: 12px;
+    height: 12px;
+}
+
 
 .kink-item-desc {
     font-size: 0.9rem;
@@ -2590,14 +2631,14 @@ body.has-admin-toolbar {
 }
 
 /* 관리자 툴바 활성 시 모바일 헤더 위치 조정 */
-body.has-admin-toolbar .mobile-header {
+body.has-admin-toolbar #mainHeader {
     top: 50px;
 }
 
 /* 관리자 툴바 활성 시 app-container 여백 조정 */
-body.has-admin-toolbar .app-container {
-    padding-top: 110px;
-    /* 50px 툴바 + 60px 모바일 헤더 */
+body.has-admin-toolbar #appContainer {
+    padding-top: 114px;
+    /* 50px 툴바 + 64px 모바일 헤더 */
 }
 
 .toolbar-content {
@@ -3685,4 +3726,151 @@ body.builder-mode-active .editable:hover {
 .wiki-icon {
     font-size: 1rem;
     flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   15. UI/UX REVAMP (Modular, Haptic, Blur, Focus Search)
+   ═══════════════════════════════════════════════════ */
+
+/* 1) MODULAR SECTION CARDS */
+.modular-card,
+.card,
+.admin-card,
+.post-row,
+.category-item-card,
+.micro-card,
+#mainContent>div.animate-slide-up {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(225, 29, 72, 0.1) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    overflow: hidden;
+    position: relative;
+}
+
+.dark .modular-card,
+.dark .card,
+.dark .post-row,
+.dark .category-item-card,
+.dark .micro-card,
+.dark #mainContent>div.animate-slide-up {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.modular-card:hover,
+.card:hover,
+.post-row:hover,
+.category-item-card:hover,
+#mainContent>div.animate-slide-up:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 15px 35px rgba(225, 29, 72, 0.15) !important;
+    border-color: rgba(225, 29, 72, 0.3) !important;
+}
+
+/* 2) HAPTIC RESPONSIVE UI (Click scale & Ripple) */
+button,
+.nav-item,
+.quick-action-btn,
+.category-item-card,
+.post-row,
+.modular-card,
+a.category-link {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s, background 0.2s, border-color 0.2s !important;
+}
+
+button:active:not(:disabled),
+.nav-item:active,
+.quick-action-btn:active,
+.modular-card:active,
+.category-item-card:active,
+.post-row:active {
+    transform: scale(0.97) !important;
+}
+
+/* Ripple effect Base */
+.ripple-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-effect::after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.4) 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform 0.5s, opacity 1s;
+}
+
+.ripple-effect:active::after {
+    transform: scale(0, 0);
+    opacity: 0.3;
+    transition: 0s;
+}
+
+/* 3) ULTRA-FINE BLUR (Glassmorphism Refinement) */
+.glass-panel,
+#mainHeader,
+nav.fixed.bottom-0,
+.dashboard-header,
+.login-panel,
+.admin-inline-toolbar,
+.role-detail-modal {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(24px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .glass-panel,
+.dark #mainHeader,
+.dark nav.fixed.bottom-0 {
+    background: rgba(2, 6, 23, 0.65) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 4) INTELLIGENT SEARCH BAR (Focus Mode) */
+.search-focus-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 95;
+    /* Below sidebar/search but above main content */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+body.search-focused .search-focus-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#searchInput {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+body.search-focused #searchInput,
+body.search-focused .search-container {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.2) !important;
+    background: var(--admin-bg) !important;
+    border-color: var(--admin-primary) !important;
+    z-index: 100;
+    position: relative;
 }

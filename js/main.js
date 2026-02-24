@@ -566,6 +566,24 @@
         const searchInput = document.getElementById('searchInput');
         if (!searchInput) return;
 
+        // Inject focus overlay if not exists
+        if (!document.querySelector('.search-focus-overlay')) {
+            const overlay = document.createElement('div');
+            overlay.className = 'search-focus-overlay';
+            document.body.appendChild(overlay);
+        }
+
+        searchInput.addEventListener('focus', () => {
+            document.body.classList.add('search-focused');
+        });
+
+        searchInput.addEventListener('blur', () => {
+            // Slight delay to allow clicking on search results without immediately dismissing
+            setTimeout(() => {
+                document.body.classList.remove('search-focused');
+            }, 200);
+        });
+
         searchInput.addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
 
@@ -918,7 +936,7 @@
                             <div class="kink-item-content">
                                 <div class="kink-item-header">
                                     <h3 class="kink-item-name">${item.name}</h3>
-                                    ${item.subName ? `<span class="kink-item-subname">(${item.subName})</span>` : ''}
+                                    ${item.subName ? `<span class="kink-item-subname"><i data-lucide="tag"></i>${item.subName}</span>` : ''}
                                 </div>
                                 <p class="kink-item-desc">${brief}</p>
                             </div>
@@ -978,7 +996,12 @@
                                 </div>
                                 <div>
                                     <h3 class="modal-title" id="modalTitle">Role Name</h3>
-                                    <p class="modal-subname" id="modalSubName">SUBNAME</p>
+                                    <div class="modal-subname-wrapper" id="modalSubNameWrapper">
+                                        <div class="modal-subname">
+                                            <i data-lucide="tag" class="subname-icon"></i>
+                                            <span id="modalSubNameText">SUBNAME</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <!-- Permanent Edit/Save Buttons -->
                                 <button id="kinkModalEditBtn" class="kink-admin-btn edit-btn">
@@ -1033,8 +1056,18 @@
         iconWrapper.style.color = themeColor;
         iconWrapper.innerHTML = `<i data-lucide="${(item.icon_class || 'crown').toLowerCase()}" style="width: 48px; height: 48px;"></i>`;
 
+        const subNameWrapper = document.getElementById('modalSubNameWrapper');
+        const subNameText = document.getElementById('modalSubNameText');
+        const subNameValue = item.subName || item.sub_name || '';
+
         title.textContent = item.name;
-        subName.textContent = item.subName || item.sub_name || '';
+
+        if (subNameValue) {
+            subNameText.textContent = subNameValue;
+            subNameWrapper.style.display = 'flex';
+        } else {
+            subNameWrapper.style.display = 'none';
+        }
 
         // Show the modal FIRST so dimensions are correct
         overlay.classList.add('active');
@@ -1043,15 +1076,23 @@
         if (description) {
             description.innerHTML = '';
 
-            // Toast UI 관여 코드 제거 (백업용 window._kinkViewer 정리만 남김)
             if (window._kinkViewer) {
                 try { window._kinkViewer.destroy(); } catch (e) { }
                 window._kinkViewer = null;
             }
 
             let content = item.description || '';
-            // 줄바꿈을 <br>로 변환하여 표시 (단순 텍스트 방식)
-            description.innerHTML = `<div class="plain-text-body">${content.replace(/\n/g, '<br>')}</div>`;
+
+            if (typeof toastui !== 'undefined' && toastui.Editor) {
+                window._kinkViewer = toastui.Editor.factory({
+                    el: description,
+                    viewer: true,
+                    initialValue: content,
+                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                });
+            } else {
+                description.innerHTML = `<div class="plain-text-body">${content.replace(/\n/g, '<br>')}</div>`;
+            }
         }
 
         if (window.lucide) window.lucide.createIcons();
@@ -1148,8 +1189,21 @@
             saveBtn.style.display = 'none';
             descriptionEl.classList.add('is-editable');
 
-            // 뷰어 복구 (단순 HTML 방식)
-            descriptionEl.innerHTML = `<div class="plain-text-body">${newContent.replace(/\n/g, '<br>')}</div>`;
+            // 뷰어 복구 (Toast UI 방식)
+            descriptionEl.innerHTML = '';
+            if (typeof toastui !== 'undefined' && toastui.Editor) {
+                if (window._kinkViewer) {
+                    try { window._kinkViewer.destroy(); } catch (e) { }
+                }
+                window._kinkViewer = toastui.Editor.factory({
+                    el: descriptionEl,
+                    viewer: true,
+                    initialValue: newContent,
+                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                });
+            } else {
+                descriptionEl.innerHTML = `<div class="plain-text-body">${newContent.replace(/\n/g, '<br>')}</div>`;
+            }
 
         } catch (e) {
             console.error('Save failed:', e);

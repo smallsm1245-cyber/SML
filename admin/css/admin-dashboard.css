@@ -90,6 +90,9 @@
     min-height: 100vh;
     background: var(--admin-bg);
     padding: 2rem;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
 }
 
 .login-panel {
