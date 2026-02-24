@@ -249,18 +249,20 @@
                 if (categories) categories.forEach(c => catMap[c.id] = c.name);
 
                 recentSection.innerHTML = `
-                    <h2 class="archive-section-title" style="font-size: 1.1rem; margin-bottom: 2rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.2em; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.8rem; font-family: var(--font-mono);">Recent Records</h2>
-                    <ul class="archive-list" style="list-style: none; padding: 0;">
-                        ${posts.map(post => `
-                            <li style="margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 4px;">
-                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                    <a href="post.html?id=${post.id}" style="color: var(--text-primary); text-decoration: none; font-size: 1.1rem; font-family: var(--font-serif); font-weight: 500;">
+                    <h2 class="text-[10px] uppercase tracking-widest text-champagne/60 border-b border-white/5 pb-4 mb-12 font-medium">Recent Archives</h2>
+                    <ul class="space-y-12">
+                        ${posts.map((post, idx) => `
+                            <li class="group opacity-0 translate-y-4 transition-all duration-700 delay-[${idx * 100}ms] animate-on-scroll">
+                                <div class="flex flex-col md:flex-row md:items-baseline justify-between gap-2">
+                                    <a href="post.html?id=${post.id}" class="text-2xl md:text-3xl font-display italic font-light text-white/80 hover:text-champagne transition-all duration-300">
                                         ${post.title}
                                     </a>
-                                    <span style="color: var(--text-dim); font-size: 0.8rem; font-family: var(--font-mono);">${new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                    <span class="text-[10px] font-medium tracking-luxury text-white/20 uppercase whitespace-nowrap">
+                                        ${new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </span>
                                 </div>
-                                <div style="font-size: 0.75rem; color: var(--primary-brass); font-family: var(--font-mono); text-transform: uppercase; opacity: 0.8;">
-                                    [ ${catMap[post.category_id] || 'General'} ]
+                                <div class="mt-2 text-[9px] text-champagne/40 tracking-[0.3em] uppercase">
+                                    // ${catMap[post.category_id] || 'Fragment'}
                                 </div>
                             </li>
                         `).join('')}
@@ -634,16 +636,16 @@
         }
 
         content.innerHTML = results.map((post, index) => `
-            <div class="animate-slide-up bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 mb-4 hover:border-rose-600/30 transition-colors" style="animation-delay: ${index * 0.05}s">
-                <h3 class="text-xl font-bold font-serif mb-2">
-                    <a href="post.html?id=${post.id}" class="text-slate-900 dark:text-slate-100 hover:text-rose-600 transition-colors">
+            <div class="group py-8 border-b border-white/5 opacity-0 translate-y-4 animate-on-scroll" style="transition-delay: ${index * 50}ms">
+                <h3 class="text-2xl font-display italic font-light mb-2">
+                    <a href="post.html?id=${post.id}" class="text-white/70 hover:text-champagne transition-all duration-300">
                         ${post.title}
                     </a>
                 </h3>
-                <div class="flex items-center gap-3 text-xs font-semibold text-slate-400 tracking-wider uppercase">
-                    <span>${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
-                    <span class="w-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full"></span>
-                    <span class="text-rose-600/70">ARCHIVE RECORD</span>
+                <div class="flex items-center gap-4 text-[10px] font-medium tracking-widest text-white/20 uppercase">
+                    <span>${new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                    <span class="w-1 h-1 bg-white/5 rounded-full"></span>
+                    <span class="text-champagne/40">Archive Fragment</span>
                 </div>
             </div>
         `).join('');
@@ -1594,4 +1596,104 @@
         console.log('🎉 Initialization complete');
     });
 
+    // ═══════════════════════════════════════════════════
+    // 8. LUXURY INTERACTION (Focus Mode / Scroll Reveal)
+    // ═══════════════════════════════════════════════════
+    function initLuxuryInteractions() {
+        // A. Focus Mode (Hide UI on scroll)
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            const header = document.getElementById('mainHeader');
+            const bottomNav = document.querySelector('nav.fixed.bottom-8');
+            const emergencyFab = document.getElementById('emergencyFab');
+
+            if (currentScroll > 100) {
+                if (currentScroll > lastScroll) {
+                    // Scrolling down - Hide UI
+                    if (header) header.style.transform = 'translateY(-100%)';
+                    if (bottomNav) bottomNav.style.transform = 'translate( -50%, 200%)';
+                    if (emergencyFab) emergencyFab.style.transform = 'scale(0.5) opacity(0)';
+                } else {
+                    // Scrolling up - Show UI
+                    if (header) {
+                        header.style.transform = 'translateY(0)';
+                        header.classList.add('bg-ink/90', 'backdrop-blur-3xl');
+                    }
+                    if (bottomNav) bottomNav.style.transform = 'translate(-50%, 0)';
+                    if (emergencyFab) emergencyFab.style.transform = 'scale(1) opacity(1)';
+                }
+            } else {
+                if (header) {
+                    header.style.transform = 'translateY(0)';
+                    header.classList.remove('bg-ink/90', 'backdrop-blur-3xl');
+                }
+                if (bottomNav) bottomNav.style.transform = 'translate(-50%, 0)';
+                if (emergencyFab) emergencyFab.style.transform = 'scale(1) opacity(1)';
+            }
+            lastScroll = currentScroll;
+        });
+
+        // B. Intersection Observer (Reveal Content)
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.remove('opacity-0', 'translate-y-4');
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Dynamically observe elements
+        const observeTargets = () => {
+            document.querySelectorAll('.animate-on-scroll').forEach(el => revealObserver.observe(el));
+        };
+
+        // Run observation when content might have changed
+        const originalLoadRecent = loadRecentPosts;
+        loadRecentPosts = async (...args) => {
+            await originalLoadRecent(...args);
+            observeTargets();
+        };
+
+        const originalDisplaySearch = displaySearchResults;
+        displaySearchResults = (...args) => {
+            originalDisplaySearch(...args);
+            observeTargets();
+        };
+
+        observeTargets();
+    }
+
+    // ═══════════════════════════════════════════════════
+    // 9. INITIALIZATION
+    // ═══════════════════════════════════════════════════
+    async function init() {
+        const hasVerif = checkAgeVerification();
+
+        waitForConfig(() => {
+            if (initializeSupabase()) {
+                loadHomeSettings();
+                loadCategories();
+                initSearch();
+                initAdminLongPress();
+                initLuxuryInteractions();
+            }
+        });
+
+        // Lucide re-init
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+
 })();
+
