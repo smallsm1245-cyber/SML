@@ -1368,32 +1368,6 @@
         };
 
         function initSidebarNavButtons() {
-            const sidebarWikiBtn = document.getElementById('sidebarWikiBtn');
-            if (sidebarWikiBtn && !sidebarWikiBtn.dataset.listenerAdded) {
-                sidebarWikiBtn.addEventListener('click', () => {
-                    if (typeof renderTendencyView === 'function') {
-                        renderTendencyView();
-                        const welcomeSection = document.getElementById('welcomeSection');
-                        const mainContent = document.getElementById('mainContent');
-                        const settingsView = document.getElementById('settingsView');
-                        if (welcomeSection) welcomeSection.classList.add('hidden');
-                        if (mainContent) mainContent.classList.remove('hidden');
-                        if (settingsView) settingsView.classList.add('hidden');
-                    }
-                    closeMenu();
-                });
-                sidebarWikiBtn.dataset.listenerAdded = 'true';
-            }
-
-            const sidebarSearchBtn = document.getElementById('sidebarSearchBtn');
-            if (sidebarSearchBtn && !sidebarSearchBtn.dataset.listenerAdded) {
-                sidebarSearchBtn.addEventListener('click', () => {
-                    const searchInput = document.getElementById('searchInput');
-                    if (searchInput) searchInput.focus();
-                });
-                sidebarSearchBtn.dataset.listenerAdded = 'true';
-            }
-
             const sidebarSettingsBtn = document.getElementById('sidebarSettingsBtn');
             if (sidebarSettingsBtn && !sidebarSettingsBtn.dataset.listenerAdded) {
                 sidebarSettingsBtn.addEventListener('click', () => {
