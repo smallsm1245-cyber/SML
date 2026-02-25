@@ -1362,7 +1362,61 @@
                 overlay.classList.add('opacity-100');
             }, 10);
             document.body.style.overflow = 'hidden';
+
+            // [추가] 사이드바 전용 버튼 리스너 초기화 (중복 방지 체크)
+            initSidebarNavButtons();
         };
+
+        function initSidebarNavButtons() {
+            const sidebarWikiBtn = document.getElementById('sidebarWikiBtn');
+            if (sidebarWikiBtn && !sidebarWikiBtn.dataset.listenerAdded) {
+                sidebarWikiBtn.addEventListener('click', () => {
+                    if (typeof renderTendencyView === 'function') {
+                        renderTendencyView();
+                        const welcomeSection = document.getElementById('welcomeSection');
+                        const mainContent = document.getElementById('mainContent');
+                        const settingsView = document.getElementById('settingsView');
+                        if (welcomeSection) welcomeSection.classList.add('hidden');
+                        if (mainContent) mainContent.classList.remove('hidden');
+                        if (settingsView) settingsView.classList.add('hidden');
+                    }
+                    closeMenu();
+                });
+                sidebarWikiBtn.dataset.listenerAdded = 'true';
+            }
+
+            const sidebarSearchBtn = document.getElementById('sidebarSearchBtn');
+            if (sidebarSearchBtn && !sidebarSearchBtn.dataset.listenerAdded) {
+                sidebarSearchBtn.addEventListener('click', () => {
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) searchInput.focus();
+                });
+                sidebarSearchBtn.dataset.listenerAdded = 'true';
+            }
+
+            const sidebarSettingsBtn = document.getElementById('sidebarSettingsBtn');
+            if (sidebarSettingsBtn && !sidebarSettingsBtn.dataset.listenerAdded) {
+                sidebarSettingsBtn.addEventListener('click', () => {
+                    showSettings();
+                    closeMenu();
+                });
+                sidebarSettingsBtn.dataset.listenerAdded = 'true';
+            }
+        }
+
+        function showSettings() {
+            const settingsView = document.getElementById('settingsView');
+            const mainContent = document.getElementById('mainContent');
+            const welcomeSection = document.getElementById('welcomeSection');
+
+            if (settingsView) {
+                settingsView.classList.remove('hidden');
+                if (mainContent) mainContent.classList.add('hidden');
+                if (welcomeSection) welcomeSection.classList.add('hidden');
+                window.scrollTo(0, 0);
+            }
+        }
+        window.showSettings = showSettings;
 
         menuToggle.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -1455,7 +1509,7 @@
         const settingsView = document.getElementById('settingsView');
         const navItems = [navHome, navWiki, navSearch, navSettings];
 
-        if (!navHome) return;
+        if (!navHome && !document.getElementById('sidebarSettingsBtn')) return;
 
         const resetActive = () => {
             navItems.forEach(item => {
