@@ -12,8 +12,8 @@
 }
 
 .tendency-item-admin {
-    background: #1a1a1a;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #141414;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 20px;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -110,7 +110,7 @@
 .subname-input {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    color: var(--primary-rose, #e11d48);
+    color: var(--primary-yellow);
     padding: 0.7rem 1rem;
     border-radius: 12px;
     font-weight: 700;
@@ -169,5 +169,5 @@
 
 .sortable-ghost {
     opacity: 0.1;
-    background: var(--primary-rose, #e11d48);
+    background: var(--primary-yellow);
 }

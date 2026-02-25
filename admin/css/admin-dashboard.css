@@ -3,19 +3,19 @@
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 :root {
-    /* Admin Design System - Unified with Rose & Slate */
-    --admin-bg: #121212;
-    --admin-panel: #1A1A1A;
-    --admin-card: rgba(26, 26, 26, 0.8);
-    --admin-border: rgba(225, 29, 72, 0.15);
-    --admin-primary: #e11d48;
-    --admin-primary-dark: #be123c;
-    --admin-text: #F8FAFC;
-    --admin-text-dim: #94A3B8;
+    /* Admin Design System - Unified with Brass/Yellow & Black */
+    --admin-bg: #000000;
+    --admin-panel: #141414;
+    --admin-card: rgba(20, 20, 20, 0.8);
+    --admin-border: rgba(182, 141, 64, 0.15);
+    --admin-primary: #B68D40;
+    --admin-primary-dark: #9c7836;
+    --admin-text: #E0E0E0;
+    --admin-text-dim: #888888;
     --admin-success: #10B981;
     --admin-warning: #F59E0B;
     --admin-danger: #EF4444;
-    --admin-hover: rgba(225, 29, 72, 0.08);
+    --admin-hover: rgba(182, 141, 64, 0.08);
     --glass-bg: rgba(255, 255, 255, 0.03);
     --glass-blur: blur(16px);
     --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);

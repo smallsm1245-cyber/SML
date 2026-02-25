@@ -259,7 +259,7 @@
                                     </a>
                                     <span style="color: var(--text-dim); font-size: 0.8rem; font-family: var(--font-mono);">${new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                 </div>
-                                <div style="font-size: 0.75rem; color: var(--primary-brass); font-family: var(--font-mono); text-transform: uppercase; opacity: 0.8;">
+                                <div style="font-size: 0.75rem; color: var(--primary-yellow); font-family: var(--font-mono); text-transform: uppercase; opacity: 0.8;">
                                     [ ${catMap[post.category_id] || 'General'} ]
                                 </div>
                             </li>
@@ -533,7 +533,7 @@
             content.innerHTML = posts.map(post => `
                 <div class="admin-post-item" style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border); position: relative;">
                     <h3>
-                        <a href="post.html?id=${post.id}" style="color: var(--primary-brass); text-decoration: none;" data-admin-editable="text" data-admin-id="${post.id}" data-admin-field="title">
+                        <a href="post.html?id=${post.id}" style="color: var(--primary-yellow); text-decoration: none;" data-admin-editable="text" data-admin-id="${post.id}" data-admin-field="title">
                             ${post.title}
                             ${post.is_private ? '<span style="font-size: 0.8em; color: var(--accent-amber);"> 🔒</span>' : ''}
                         </a>
@@ -634,16 +634,16 @@
         }
 
         content.innerHTML = results.map((post, index) => `
-            <div class="animate-slide-up bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 mb-4 hover:border-rose-600/30 transition-colors" style="animation-delay: ${index * 0.05}s">
+            <div class="animate-slide-up bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 mb-4 hover:border-brand-primary/30 transition-colors" style="animation-delay: ${index * 0.05}s">
                 <h3 class="text-xl font-bold font-serif mb-2">
-                    <a href="post.html?id=${post.id}" class="text-slate-900 dark:text-slate-100 hover:text-rose-600 transition-colors">
+                    <a href="post.html?id=${post.id}" class="text-slate-900 dark:text-slate-100 hover:text-brand-primary transition-colors">
                         ${post.title}
                     </a>
                 </h3>
                 <div class="flex items-center gap-3 text-xs font-semibold text-slate-400 tracking-wider uppercase">
                     <span>${new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
                     <span class="w-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full"></span>
-                    <span class="text-rose-600/70">ARCHIVE RECORD</span>
+                    <span class="text-brand-primary/70">ARCHIVE RECORD</span>
                 </div>
             </div>
         `).join('');
@@ -1020,8 +1020,8 @@
                     </div>
                 </div>
 
-                <div class="kink-dict-hint">
-                    <div class="hint-badge">목록을 클릭하여 상세 정보를 확인하세요</div>
+                <div class="flex justify-center py-20">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
                 </div>
             </div>
         `;
@@ -1460,7 +1460,7 @@
         const resetActive = () => {
             navItems.forEach(item => {
                 if (item) {
-                    item.classList.remove('text-rose-600');
+                    item.classList.remove('text-brand-primary');
                     item.classList.add('text-slate-400');
                 }
             });
@@ -1472,12 +1472,12 @@
                 if (welcomeSection) welcomeSection.classList.add('hidden');
                 if (mainContent) mainContent.classList.add('hidden');
                 if (settingsView) settingsView.classList.remove('hidden');
-                if (navSettings) navSettings.classList.add('text-rose-600');
+                if (navSettings) navSettings.classList.add('text-brand-primary');
             } else if (view === 'home') {
                 if (welcomeSection) welcomeSection.classList.remove('hidden');
                 if (mainContent) mainContent.classList.remove('hidden');
                 if (settingsView) settingsView.classList.add('hidden');
-                if (navHome) navHome.classList.add('text-rose-600');
+                if (navHome) navHome.classList.add('text-brand-primary');
 
                 // If we were in Wiki view (gallery), we might need to reload or reset mainContent
                 // But for now, let's just make sure it's visible.
@@ -1500,7 +1500,7 @@
             navWiki.addEventListener('click', (e) => {
                 e.preventDefault();
                 resetActive();
-                navWiki.classList.add('text-rose-600');
+                navWiki.classList.add('text-brand-primary');
                 renderTendencyView();
                 if (welcomeSection) welcomeSection.classList.add('hidden');
                 if (mainContent) mainContent.classList.remove('hidden');
@@ -1513,7 +1513,7 @@
             navSearch.addEventListener('click', (e) => {
                 e.preventDefault();
                 resetActive();
-                navSearch.classList.add('text-rose-600');
+                navSearch.classList.add('text-brand-primary');
 
                 // Toggle Sidebar to show search
                 const menuToggle = document.getElementById('menuToggleBtn');

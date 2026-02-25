@@ -423,7 +423,7 @@ function initBottomNav() {
     const resetActive = () => {
         navItems.forEach(item => {
             if (item) {
-                item.classList.remove('text-rose-600');
+                item.classList.remove('text-brand-primary');
                 item.classList.add('text-slate-400');
             }
         });
@@ -434,7 +434,7 @@ function initBottomNav() {
         if (view === 'settings') {
             if (article) article.classList.add('hidden');
             if (settingsView) settingsView.classList.remove('hidden');
-            if (navSettings) navSettings.classList.add('text-rose-600');
+            if (navSettings) navSettings.classList.add('text-brand-primary');
         } else {
             if (article) article.classList.remove('hidden');
             if (settingsView) settingsView.classList.add('hidden');

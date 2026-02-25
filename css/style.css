@@ -8,29 +8,26 @@
    0. ROOT VARIABLES - 색상 중앙 제어
    ═══════════════════════════════════════════════════ */
 :root {
-    /* 1. Global Color System (Rose & Slate) */
-    --primary-rose: #e11d48;
-    /* Rose 600 - WCAG AAA on White */
-    --primary-rose-hover: #be123c;
-    /* Rose 700 */
-    --primary-rose-light: #fb7185;
-    /* Rose 400 */
+    /* 1. Global Color System (Restored Brass & Neutral) */
+    --primary-yellow: #B68D40;
+    --primary-brass: var(--primary-yellow);
+    /* Alias for compatibility */
+    /* Restored Brass Gold */
+    --primary-yellow-hover: #9c7836;
+    --primary-yellow-light: #ceb180;
 
-    --bg-deep: #F8FAFC;
-    /* Slate 50 */
+    --bg-deep: #F5F6F7;
+    /* Wiki Style Light Gray */
     --bg-panel: #FFFFFF;
 
-    /* Neutral Palette - Refined Slate */
-    --text-primary: #0F172A;
-    /* Slate 900 - High Contrast */
-    --text-secondary: #475569;
-    /* Slate 600 */
-    --text-dim: #94A3B8;
-    /* Slate 400 */
+    /* Neutral Palette */
+    --text-primary: #373A3C;
+    --text-secondary: #555555;
+    --text-dim: #888888;
 
-    --accent-rose: #e11d48;
-    --glass-border: rgba(15, 23, 42, 0.1);
-    --link-color: #e11d48;
+    --accent-yellow: #B68D40;
+    --glass-border: #DDDDDD;
+    --link-color: #0275d8;
 
     /* 2. Spacing System (8pt Grid) */
     --space-05: 4px;
@@ -55,9 +52,9 @@
     --font-mono: 'Courier Prime', monospace;
 
     --base-font-size: 16px;
-    --line-height-body: 1.6;
-    --line-height-heading: 1.3;
-    --letter-spacing-kr: -0.03em;
+    --line-height-body: 1.85;
+    --line-height-heading: 1.35;
+    --letter-spacing-kr: -0.01em;
     /* Korean Readability Optimization */
 
     /* 4. Glassmorphism & Effects */
@@ -67,38 +64,36 @@
 
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1);
-    --glow-rose: 0 0 15px rgba(225, 29, 72, 0.3);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --glow-yellow: 0 0 15px rgba(182, 141, 64, 0.3);
 }
 
-/* Night Library Mode - Dark Grey optimization (#1A1A1A) */
+/* Night Library Mode - High Contrast Black & Yellow */
 body.night-mode,
 html.dark body {
-    --bg-deep: #121212;
-    /* Refined Dark Grey */
-    --bg-panel: #1A1A1A;
-    /* Low eye-strain grey */
-    --text-primary: #F8FAFC;
-    /* Slate 50 */
-    --text-secondary: #94A3B8;
-    /* Slate 400 */
-    --text-dim: #475569;
-    /* Slate 600 */
-    --glass-border: rgba(248, 250, 252, 0.1);
-    --link-color: #FB7185;
-    --primary-rose: #E11D48;
+    --bg-deep: #000000;
+    /* Pure Black */
+    --bg-panel: #141414;
+    /* Near Black Panel */
+    --text-primary: #E0E0E0;
+    --text-secondary: #A0A0A0;
+    --text-dim: #666666;
+    --glass-border: #222222;
+    --link-color: #D4A574;
+    --primary-yellow: #D4A574;
+    --primary-brass: var(--primary-yellow);
 
     /* Glassmorphism - Night Mode */
-    --glass-bg: rgba(26, 26, 26, 0.85);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --glass-bg: rgba(0, 0, 0, 0.85);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.8);
 }
 
 
 /* Global Styles */
 ::selection {
-    background: rgba(225, 29, 72, 0.2);
+    background: rgba(182, 141, 64, 0.3);
     color: inherit;
 }
 
@@ -193,7 +188,7 @@ html.dark .archive-accordion summary:hover {
     content: '+';
     font-family: var(--font-mono);
     font-size: 1.2rem;
-    color: var(--primary-rose);
+    color: var(--primary-yellow);
     transition: transform 0.3s ease;
 }
 
@@ -298,7 +293,7 @@ body.night-mode {
     font-size: 1.2rem;
     font-weight: 800;
     letter-spacing: 0.1em;
-    color: var(--primary-rose);
+    color: var(--primary-yellow);
 }
 
 .mobile-logo a {
@@ -387,7 +382,7 @@ body.night-mode .mode-icon-dark {
 }
 
 .nav-item.active {
-    color: var(--primary-rose);
+    color: var(--primary-yellow);
 }
 
 .nav-item i {
@@ -415,8 +410,8 @@ body.night-mode .mode-icon-dark {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--primary-rose);
-    color: #fff;
+    background: var(--primary-yellow);
+    color: #000;
     border: none;
     cursor: pointer;
     box-shadow: var(--shadow-lg);
@@ -481,7 +476,7 @@ body.night-mode .mode-icon-dark {
 
 .category-link.active .chevron {
     transform: rotate(90deg);
-    color: var(--primary-rose);
+    color: var(--primary-yellow);
 }
 
 .cat-count {
@@ -516,7 +511,7 @@ body.night-mode .mode-icon-dark {
 }
 
 .submenu-link:hover {
-    color: var(--primary-rose);
+    color: var(--primary-yellow);
 }
 
 /* Settings View */
@@ -535,7 +530,7 @@ body.night-mode .mode-icon-dark {
 
 .settings-group h3 {
     margin-bottom: var(--space-3);
-    color: var(--primary-rose);
+    color: var(--primary-yellow);
     font-size: 1.1rem;
 }
 
@@ -582,7 +577,7 @@ body.night-mode .mode-icon-dark {
 
 .setting-item input[type="range"] {
     width: 100%;
-    accent-color: var(--primary-rose);
+    accent-color: var(--primary-yellow);
 }
 
 @keyframes fadeIn {
@@ -3098,7 +3093,7 @@ input:checked+.slider:before {
 }
 
 .detail-description strong {
-    color: var(--primary-rose);
+    color: var(--primary-yellow);
 }
 
 @media (max-width: 768px) {
@@ -3615,7 +3610,7 @@ input:checked+.slider:before {
 .micro-card,
 #mainContent>div.animate-slide-up {
     background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(225, 29, 72, 0.1) !important;
+    border: 1px solid rgba(182, 141, 64, 0.1) !important;
     border-radius: 20px !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
     backdrop-filter: blur(20px) saturate(180%) !important;
@@ -3641,8 +3636,8 @@ input:checked+.slider:before {
 .category-item-card:hover,
 #mainContent>div.animate-slide-up:hover {
     transform: translateY(-4px) !important;
-    box-shadow: 0 15px 35px rgba(225, 29, 72, 0.15) !important;
-    border-color: rgba(225, 29, 72, 0.3) !important;
+    box-shadow: 0 15px 35px rgba(182, 141, 64, 0.15) !important;
+    border-color: rgba(182, 141, 64, 0.3) !important;
 }
 
 /* 2) HAPTIC RESPONSIVE UI (Click scale & Ripple) */
@@ -3742,7 +3737,7 @@ body.search-focused .search-focus-overlay {
 body.search-focused #searchInput,
 body.search-focused .search-container {
     transform: scale(1.02);
-    box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.2) !important;
+    box-shadow: 0 0 0 4px rgba(182, 141, 64, 0.2) !important;
     background: var(--admin-bg) !important;
     border-color: var(--admin-primary) !important;
     z-index: 100;

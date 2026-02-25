@@ -76,8 +76,8 @@
 }
 
 .tab-btn.active {
-    color: var(--primary-brass);
-    border-bottom-color: var(--primary-brass);
+    color: var(--primary-yellow);
+    border-bottom-color: var(--primary-yellow);
 }
 
 .tab-btn:hover {
@@ -177,7 +177,7 @@
 
 .mailbox-textarea:focus {
     outline: none;
-    border-color: var(--primary-brass);
+    border-color: var(--primary-yellow);
 }
 
 @media (min-width: 769px) {
@@ -237,14 +237,14 @@
 
 .mailbox-input-sm:focus {
     outline: none;
-    border-color: var(--primary-brass);
+    border-color: var(--primary-yellow);
 }
 
 /* ─── Send Button ─── */
 .btn-send {
     width: 100%;
     padding: 0.9rem 1.5rem;
-    background: var(--primary-brass);
+    background: var(--primary-yellow);
     border: none;
     border-radius: 10px;
     color: #000;

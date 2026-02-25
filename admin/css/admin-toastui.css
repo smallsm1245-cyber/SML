@@ -6,17 +6,17 @@
    ROOT VARIABLES
    ═══════════════════════════════════════════════════ */
 :root {
-    --admin-bg: #0F0F0E;
-    --admin-panel: #1A1A18;
-    --admin-card: rgba(25, 25, 23, 0.9);
-    --admin-border: rgba(206, 177, 128, 0.2);
-    --admin-primary: #CEB180;
-    --admin-text: #E8E6E3;
-    --admin-text-dim: #A89F91;
-    --admin-success: #4CAF50;
-    --admin-warning: #FF9800;
-    --admin-danger: #F44336;
-    --admin-hover: rgba(206, 177, 128, 0.1);
+    --admin-bg: #000000;
+    --admin-panel: #141414;
+    --admin-card: rgba(20, 20, 20, 0.9);
+    --admin-border: rgba(182, 141, 64, 0.2);
+    --admin-primary: #B68D40;
+    --admin-text: #E0E0E0;
+    --admin-text-dim: #888888;
+    --admin-success: #10B981;
+    --admin-warning: #F59E0B;
+    --admin-danger: #EF4444;
+    --admin-hover: rgba(182, 141, 64, 0.1);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -417,8 +417,7 @@
 }
 
 .post-row-title {
-    color: #FFB74D;
-    /* Orange/Gold */
+    color: var(--admin-primary);
     font-size: 1.1rem;
     font-weight: 500;
 }
@@ -551,7 +550,7 @@
 }
 
 .preview-content h1 {
-    color: #CEB180;
+    color: var(--admin-primary);
     margin-bottom: 1rem;
 }
 
