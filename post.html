@@ -105,8 +105,8 @@
 
     <!-- Sticky Header & Progress Bar -->
     <header id="mainHeader"
-        class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-transform duration-300">
-        <div class="max-w-screen-md mx-auto h-16 flex items-center justify-between px-4">
+        class="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-transform duration-300">
+        <div class="max-w-screen-md mx-auto h-[var(--header-height)] flex items-center justify-between px-4">
             <div class="flex items-center gap-4">
                 <a href="index.html" class="p-2 -ml-2 text-slate-600 dark:text-slate-400 block lg:hidden"
                     aria-label="Home">
@@ -131,11 +131,11 @@
 
     <!-- Content Area -->
     <div id="appContainer"
-        class="max-w-screen-md mx-auto pt-[64px] pb-24 px-3 md:px-4 min-h-screen transition-all duration-300">
-        <main class="space-y-8">
-            <article class="py-6">
-                <header class="mb-8 border-b border-slate-200 dark:border-slate-800 pb-6">
-                    <h1 id="postTitle" class="text-3xl font-bold font-serif mb-3 leading-tight">로딩 중...</h1>
+        class="max-w-screen-md mx-auto pt-[var(--header-height)] pb-20 px-3 md:px-4 min-h-screen transition-all duration-300">
+        <main class="space-y-6">
+            <article class="py-4">
+                <header class="mb-6 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <h1 id="postTitle" class="text-2xl font-bold font-serif mb-2 leading-tight">로딩 중...</h1>
                     <div id="postMeta"
                         class="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-500 text-xs font-semibold tracking-wide uppercase">
                         <span id="postCategory" class="text-brand-primary">Category</span>
