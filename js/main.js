@@ -1306,10 +1306,11 @@
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.theme = isDark ? 'dark' : 'light';
         });
+        if (window.lucide) window.lucide.createIcons();
     }
 
     function initHeaderScroll() {
-        const header = document.getElementById('mainHeader');
+        return; // Temporarily disabled to prevent header from hiding
         const progressBar = document.getElementById('readingProgress');
         if (!header) return;
 
