@@ -11,13 +11,10 @@
     /* 1. Global Color System (Restored Brass & Neutral) */
     --primary-yellow: #B68D40;
     --primary-brass: var(--primary-yellow);
-    /* Alias for compatibility */
-    /* Restored Brass Gold */
     --primary-yellow-hover: #9c7836;
     --primary-yellow-light: #ceb180;
 
     --bg-deep: #F5F6F7;
-    /* Wiki Style Light Gray */
     --bg-panel: #FFFFFF;
 
     /* Neutral Palette */
@@ -26,25 +23,23 @@
     --text-dim: #888888;
 
     --accent-yellow: #B68D40;
-    --glass-border: #DDDDDD;
+    --glass-border: rgba(0, 0, 0, 0.08);
     --link-color: #0275d8;
 
     /* 2. Spacing System (8pt Grid) */
-    --space-05: 4px;
     --space-1: 8px;
     --space-2: 16px;
     --space-3: 24px;
     --space-4: 32px;
-    --space-5: 40px;
-    --space-6: 48px;
     --space-8: 64px;
 
     /* Layout Specs */
     --header-height: 64px;
     --sidebar-width: 280px;
     --container-max: 1200px;
-    --container-padding: var(--space-3);
-    --border-radius: 12px;
+    --container-padding: var(--space-2);
+    --border-radius: 8px;
+    /* Standardized to 8px */
 
     /* 3. Typography Hierarchy */
     --font-serif: 'Noto Serif KR', serif;
@@ -55,39 +50,34 @@
     --line-height-body: 1.85;
     --line-height-heading: 1.35;
     --letter-spacing-kr: -0.01em;
-    /* Korean Readability Optimization */
 
     /* 4. Glassmorphism & Effects */
-    --glass-bg: rgba(255, 255, 255, 0.82);
+    --glass-bg: rgba(255, 255, 255, 0.85);
     --glass-blur: 16px;
-    --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
+    --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --glow-yellow: 0 0 15px rgba(182, 141, 64, 0.3);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --glow-yellow: 0 0 15px rgba(182, 141, 64, 0.2);
 }
 
 /* Night Library Mode - High Contrast Black & Yellow */
 body.night-mode,
 html.dark body {
     --bg-deep: #000000;
-    /* Pure Black */
-    --bg-panel: #141414;
-    /* Near Black Panel */
+    --bg-panel: #0A0A0A;
     --text-primary: #E0E0E0;
     --text-secondary: #A0A0A0;
     --text-dim: #666666;
-    --glass-border: #222222;
+    --glass-border: rgba(255, 255, 255, 0.08);
     --link-color: #D4A574;
     --primary-yellow: #D4A574;
     --primary-brass: var(--primary-yellow);
 
-    /* Glassmorphism - Night Mode */
-    --glass-bg: rgba(0, 0, 0, 0.85);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
-    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.8);
+    --glass-bg: rgba(10, 10, 10, 0.85);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 }
 
 
@@ -157,7 +147,7 @@ html.dark body {
 /* Accordion UI (Progressive Disclosure) */
 .archive-accordion {
     border: 1px solid var(--glass-border);
-    border-radius: 1rem;
+    border-radius: var(--border-radius);
     overflow: hidden;
     margin-bottom: 1rem;
     background: var(--bg-panel);
@@ -224,7 +214,8 @@ html.dark .archive-accordion summary:hover {
 }
 
 body {
-    font-family: var(--font-sans);
+    font-family: var(--font-serif);
+    /* Archive feel: Serif as primary body font */
     background: var(--bg-deep);
     color: var(--text-primary);
     font-size: var(--base-font-size);
@@ -3609,13 +3600,11 @@ input:checked+.slider:before {
 .category-item-card,
 .micro-card,
 #mainContent>div.animate-slide-up {
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(182, 141, 64, 0.1) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    background: var(--bg-panel);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s var(--transition-base);
     overflow: hidden;
     position: relative;
 }
@@ -3635,9 +3624,9 @@ input:checked+.slider:before {
 .post-row:hover,
 .category-item-card:hover,
 #mainContent>div.animate-slide-up:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 15px 35px rgba(182, 141, 64, 0.15) !important;
-    border-color: rgba(182, 141, 64, 0.3) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-yellow);
 }
 
 /* 2) HAPTIC RESPONSIVE UI (Click scale & Ripple) */
@@ -3697,11 +3686,11 @@ nav.fixed.bottom-0,
 .login-panel,
 .admin-inline-toolbar,
 .role-detail-modal {
-    background: rgba(255, 255, 255, 0.05) !important;
-    backdrop-filter: blur(24px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
 }
 
 .dark .glass-panel,

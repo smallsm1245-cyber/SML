@@ -45,6 +45,9 @@
                         serif: ['"Noto Serif KR"', 'serif'],
                         sans: ['"Noto Sans KR"', 'sans-serif'],
                     },
+                    borderRadius: {
+                        'brand': '8px',
+                    },
                     lineHeight: {
                         relaxed: '1.85',
                     }
@@ -89,7 +92,7 @@
     <div id="disclaimerOverlay"
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md px-6">
         <div
-            class="bg-white dark:bg-slate-900 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl border border-slate-200 dark:border-slate-800">
+            class="bg-white dark:bg-slate-900 p-8 rounded-lg max-w-sm w-full text-center shadow-2xl border border-slate-200 dark:border-slate-800">
             <h2 class="text-2xl font-bold mb-4 font-serif text-brand-primary">성인 인증</h2>
             <p class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
                 본 사이트는 성인 지향 콘텐츠를 포함하고 있습니다.<br>
@@ -97,10 +100,10 @@
             </p>
             <div class="flex flex-col gap-3">
                 <button
-                    class="w-full py-4 bg-brand-primary text-[#000] rounded-xl font-bold hover:bg-brand-primary/80 transition-colors"
+                    class="w-full py-4 bg-brand-primary text-[#000] rounded-lg font-bold hover:bg-brand-primary/80 transition-colors"
                     id="btnYes">예 (19세 이상)</button>
                 <button
-                    class="w-full py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                    class="w-full py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                     id="btnNo">아니요</button>
             </div>
         </div>
@@ -157,7 +160,7 @@
             <div id="settingsView" class="hidden space-y-8 py-4">
                 <h2 class="text-2xl font-bold font-serif mb-6">Settings</h2>
                 <div
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-6">
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 space-y-6">
                     <div>
                         <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">비상탈출 (Quick Exit)
                         </h3>
@@ -165,7 +168,7 @@
                             <div>
                                 <label class="text-sm block mb-2 text-slate-500">위장 URL</label>
                                 <input type="text" id="escapeUrlInput"
-                                    class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-brand-primary/50 transition-colors"
+                                    class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 outline-none focus:border-brand-primary/50 transition-colors"
                                     placeholder="https://www.google.com">
                             </div>
                             <div class="flex flex-wrap gap-2">
@@ -194,7 +197,7 @@
             <div class="relative mb-8">
                 <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
                 <input type="text" id="searchInput"
-                    class="w-full bg-slate-50 dark:bg-slate-900 border-none rounded-xl pl-10 pr-4 py-3 text-sm"
+                    class="w-full bg-slate-50 dark:bg-slate-900 border-none rounded-lg pl-10 pr-4 py-3 text-sm"
                     placeholder="Search archive...">
             </div>
             <nav class="flex-1 overflow-y-auto">

@@ -25,6 +25,8 @@
     --space-2: 16px;
     --space-3: 24px;
     --space-4: 32px;
+    --border-radius: 8px;
+    /* Standardized */
 }
 
 
@@ -190,7 +192,7 @@
     color: var(--admin-primary);
     font-size: 1.5rem;
     padding: 0.2rem 0.6rem;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     cursor: pointer;
 }
 
@@ -258,7 +260,7 @@
     padding: 0.8rem 1.2rem;
     background: transparent;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     color: var(--admin-text-dim);
     font-size: 0.95rem;
     font-weight: 500;
@@ -283,7 +285,7 @@
 .nav-item .badge {
     background: rgba(0, 0, 0, 0.1);
     padding: 0.2rem 0.6rem;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     font-size: 0.75rem;
 }
 
@@ -491,7 +493,7 @@
     color: var(--admin-bg);
     border: none;
     padding: 0.8rem 1.8rem;
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     font-weight: 700;
     cursor: pointer;
     transition: var(--transition);
@@ -564,7 +566,7 @@
 .category-item-card {
     background: var(--admin-card);
     border: 1px solid var(--admin-border);
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     padding: 0.6rem 1rem;
     display: flex;
     align-items: center;
@@ -703,7 +705,7 @@
     gap: 1rem;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.02);
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     margin-bottom: 0.5rem;
 }
 
@@ -737,7 +739,7 @@
     grid-template-columns: 80px 1fr 140px 100px;
     padding: 0.8rem 1.2rem;
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     font-size: 0.85rem;
     font-weight: 700;
     color: var(--admin-primary);
