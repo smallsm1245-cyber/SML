@@ -18,19 +18,22 @@
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/mailbox.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
-    <!-- Mobile Header -->
-    <header id="mainHeader" class="mobile-header">
-        <button class="menu-toggle" id="menuToggleBtn">☰</button>
-        <div style="width: 40px;"></div>
-    </header>
+    <!-- Floating Menu Button -->
+    <button id="menuToggleBtn"
+        class="fixed top-4 left-4 z-[100] w-12 h-12 bg-black/20 dark:bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-brand-primary border border-white/10 shadow-lg hover:scale-110 transition-all lg:hidden"
+        aria-label="Menu">
+        <i data-lucide="menu" class="w-6 h-6" style="stroke-width: 2.5px;"></i>
+    </button>
 
     <!-- Sidebar Overlay -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <div class="app-container content-blur pb-12" id="appContainer">
+    <div class="app-container content-blur pt-0 pb-12" id="appContainer">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -58,9 +61,9 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content" style="padding-top: 1rem;">
             <div class="mailbox-container">
-                <header class="mailbox-header">
+                <header class="mailbox-header" style="margin-bottom: 1.5rem;">
                     <h1 class="mailbox-title">📬 익명 우체통</h1>
                     <p class="mailbox-subtitle">
                         하고 싶은 말이 있지만, 누구에게도 할 수 없었던 이야기.<br>
