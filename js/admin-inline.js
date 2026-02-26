@@ -27,15 +27,12 @@
                 codeBlockStyle: 'fenced'
             });
 
-            // Refined Turndown rules to strip Summernote's inline styles
-            turndownService.addRule('stripUnwantedStyles', {
-                filter: ['span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'table', 'div'],
-                replacement: function (content, node) {
-                    const tag = node.nodeName.toLowerCase();
-                    if (tag === 'span' && !node.attributes.length) return content;
-                    return node.outerHTML;
-                }
-            });
+            // Prevent Turndown from escaping Markdown syntax typed by the user
+            turndownService.escape = function (string) {
+                return string;
+            };
+
+
 
             turndownService.remove(['script', 'style', 'noscript']);
             turndownService.addRule('cleanSpan', {
@@ -451,7 +448,8 @@
         const summernoteEl = document.getElementById('summernoteModal');
         if (!summernoteEl) return;
 
-        const htmlContent = $('#summernoteModal').summernote('code');
+        let htmlContent = $('#summernoteModal').summernote('code');
+        htmlContent = htmlContent.replace(/&nbsp;|\u00A0/g, ' ');
         const markdown = turndownService ? turndownService.turndown(htmlContent) : htmlContent;
 
         let title = 'New Post';

@@ -311,6 +311,28 @@
                 }
             }
 
+            // 'BDSM 궁합표' 카테고리 자동 생성
+            const hasBdsm = (categories || []).some(c => c.name === 'BDSM 궁합표' && !c.parent_id);
+            if (!hasBdsm) {
+                try {
+                    const { data: { user } } = await supabaseClient.auth.getUser();
+                    if (user && user.email === window.ADMIN_EMAIL) {
+                        const maxOrder = (categories || [])
+                            .filter(c => !c.parent_id)
+                            .reduce((max, c) => Math.max(max, c.display_order || 0), 0);
+                        const { data: newCat } = await supabaseClient
+                            .from('categories')
+                            .insert({ name: 'BDSM 궁합표', parent_id: null, display_order: maxOrder + 1, is_visible: true })
+                            .select()
+                            .single();
+                        if (newCat) categories.push(newCat);
+                        console.log('✅ BDSM 궁합표 카테고리 자동 생성됨');
+                    }
+                } catch (e) {
+                    console.warn('BDSM 궁합표 카테고리 생성 스킵:', e.message);
+                }
+            }
+
             // Fetch Post Counts (public only)
             const { data: posts } = await supabaseClient
                 .from('archive_posts')
@@ -373,8 +395,8 @@
             return `
                 <li class="category-item">
                     <div class="category-header-wrap">
-                        <a href="javascript:void(0);" 
-                           onclick="${hasChildren ? `toggleAccordion('${root.id}')` : `filterByCategory('${root.id}', this)`}" 
+                        <a href="${root.name === 'BDSM 궁합표' ? 'bdsm-chart.html' : 'javascript:void(0);'}" 
+                           ${root.name === 'BDSM 궁합표' ? '' : `onclick="${hasChildren ? `toggleAccordion('${root.id}')` : `filterByCategory('${root.id}', this)`}"`}
                            class="category-link ${hasChildren ? 'has-children' : ''}" 
                            data-id="${root.id}">
                             <div class="cat-name-block">
@@ -390,7 +412,9 @@
                 const childCount = counts[child.id] || 0;
                 return `
                                     <li class="submenu-item">
-                                        <a href="javascript:void(0);" onclick="filterByCategory('${child.id}', this)" class="submenu-link" data-id="${child.id}">
+                                        <a href="${child.name === 'BDSM 궁합표' ? 'bdsm-chart.html' : 'javascript:void(0);'}" 
+                                           ${child.name === 'BDSM 궁합표' ? '' : `onclick="filterByCategory('${child.id}', this)"`}
+                                           class="submenu-link" data-id="${child.id}">
                                             - ${child.name} <span class="cat-count" style="float:right">${childCount}</span>
                                         </a>
                                     </li>
