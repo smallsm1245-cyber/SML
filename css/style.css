@@ -2667,14 +2667,15 @@ body.has-admin-toolbar {
 }
 
 /* 관리자 툴바 활성 시 모바일 헤더 위치 조정 */
-body.has-admin-toolbar #mainHeader {
+body.has-admin-toolbar #mainHeader,
+body.has-admin-toolbar .mobile-header {
     top: 50px;
 }
 
 /* 관리자 툴바 활성 시 app-container 여백 조정 */
-body.has-admin-toolbar #appContainer {
-    padding-top: 114px;
-    /* 50px 툴바 + 64px 모바일 헤더 */
+body.has-admin-toolbar #appContainer,
+body.has-admin-toolbar .app-container {
+    padding-top: calc(50px + var(--header-height) + 16px) !important;
 }
 
 .toolbar-content {
