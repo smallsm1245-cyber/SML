@@ -354,7 +354,8 @@ async function publishPost() {
     const categoryId = document.getElementById('postCategory').value;
     const isPrivate = document.getElementById('isPrivate').checked;
     const originFree = document.getElementById('originFree').checked;
-    const htmlContent = $('#summernote').summernote('code');
+    let htmlContent = $('#summernote').summernote('code');
+    htmlContent = htmlContent.replace(/&nbsp;|\u00A0/g, ' ');
     const content = turndownService.turndown(htmlContent);
 
     if (!title) {
@@ -757,10 +758,13 @@ function toggleRecentPostsCount() {
 }
 
 async function saveHomeSettings() {
+    let homeHtml = $('#homeContentEditor').summernote('code');
+    homeHtml = homeHtml.replace(/&nbsp;|\u00A0/g, ' ');
+
     const settings = [
         { key: 'home_title', value: document.getElementById('homeTitle').value },
         { key: 'home_subtitle', value: document.getElementById('homeSubtitle').value },
-        { key: 'home_content', value: turndownService.turndown($('#homeContentEditor').summernote('code')) },
+        { key: 'home_content', value: turndownService.turndown(homeHtml) },
         { key: 'show_recent_posts', value: document.getElementById('showRecentPosts').checked.toString() },
         { key: 'recent_posts_count', value: document.getElementById('recentPostsCount').value }
     ];

@@ -429,7 +429,9 @@ function toggleRecentPostsCount() {
 }
 
 async function saveHomeSettings() {
-    const content = turndownService.turndown($('#homeContentEditor').summernote('code'));
+    let homeHtml = $('#homeContentEditor').summernote('code');
+    homeHtml = homeHtml.replace(/&nbsp;|\u00A0/g, ' ');
+    const content = turndownService.turndown(homeHtml);
 
     const settings = [
         { key: 'home_title', value: document.getElementById('homeTitle').value },
