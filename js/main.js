@@ -691,448 +691,246 @@
     }
 
     // ═══════════════════════════════════════════════════
-    // TENDENCY VIEW INTEGRATION - KINK DICTIONARY
+    // ENCYCLOPEDIA INTEGRATION
     // ═══════════════════════════════════════════════════
-    window.tendencyActiveTab = 'Top';
-
     async function renderTendencyView() {
-        window.renderTendencyView = renderTendencyView;
         if (!supabaseClient) return;
 
         const mainContent = document.getElementById('mainContent');
-        const welcomeTitle = document.getElementById('welcomeTitle');
-        const metaDiv = document.querySelector('.post-meta');
+        const welcomeSection = document.getElementById('welcomeSection');
 
         if (!mainContent) return;
 
-        if (welcomeTitle) welcomeTitle.style.display = 'none';
-        if (metaDiv) metaDiv.style.display = 'none';
+        // Apply Encyclopedia Mode
+        document.body.classList.add('encyclopedia-mode');
+        if (welcomeSection) welcomeSection.style.display = 'none';
 
-        mainContent.innerHTML = `<div class="loading-container"><div class="loading"></div></div>`;
+        mainContent.innerHTML = `<div class="flex justify-center py-20"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B91C1C]"></div></div>`;
 
         try {
-            // Find "성향 백과" category ID dynamically
-            const { data: categoryData, error: catError } = await supabaseClient
+            const { data: categoryData } = await supabaseClient
                 .from('categories')
                 .select('id')
                 .eq('name', '성향 백과')
                 .single();
 
-            if (catError) throw new Error('성향 백과 카테고리를 찾을 수 없습니다.');
-            const kinkDictCategoryId = categoryData.id;
+            if (!categoryData) throw new Error('성향 백과 카테고리를 찾을 수 없습니다.');
 
-            // Fetch archive_posts under this category
             const { data: posts, error } = await supabaseClient
                 .from('archive_posts')
-                .select('id, title, content, created_at')
-                .eq('category_id', kinkDictCategoryId)
-                .order('created_at', { ascending: true }); // Using created_at or title for ordering
+                .select('*')
+                .eq('category_id', categoryData.id)
+                .order('created_at', { ascending: true });
 
-            // Fetch kink dictionary settings
-            const { data: kinkSettings } = await supabaseClient.from('settings').select('*').in('key', ['kink_dictionary_pairs', 'kink_role_overrides', 'kink_display_order']);
+            if (error) throw error;
 
-            const pairData = (kinkSettings || []).find(s => s.key === 'kink_dictionary_pairs');
-            const kinkPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
-            window.kinkDictionaryPairs = kinkPairs;
+            window.encyclopediaData = posts.map(post => {
+                // Parse principles from content if it follows a list format
+                // For simplicity, we'll try to extract them if they start with numbers or bullets
+                const principles = [];
+                const contentLines = post.content.split('\n');
+                let inPrinciples = false;
 
-            const overrideData = (kinkSettings || []).find(s => s.key === 'kink_role_overrides');
-            const kinkRoleOverrides = overrideData && overrideData.value ? JSON.parse(overrideData.value) : {};
-
-            const orderData = (kinkSettings || []).find(s => s.key === 'kink_display_order');
-            const kinkDisplayOrder = orderData && orderData.value ? JSON.parse(orderData.value) : [];
-
-            // Process posts and convert them to "tendencies" format
-            let tendenciesData = (posts || []).map(post => {
-                // Determine type: prioritze manual override, then tag, then keyword
-                let type = kinkRoleOverrides[post.id];
-                if (type) type = type.toLowerCase();
-                let rawTitle = post.title;
-
-                if (!type) {
-                    const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
-                    if (tagMatch) {
-                        type = tagMatch[1].toLowerCase();
-                        rawTitle = rawTitle.slice(tagMatch[0].length).trim();
-                        // If it's relation, treat it as top for list categorization
-                        if (type === 'relation') type = 'top';
-                    } else {
-                        const bottomKeywords = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|bottom|submissive|브랫|brat|펫|pet|리틀|little|디그레이디|degradee/i;
-                        if (bottomKeywords.test(rawTitle)) type = 'bottom';
-                        else type = 'top';
+                // If content has a section like "## 핵심 원칙" or "### 원칙"
+                const filteredLines = contentLines.filter(line => {
+                    const trimmed = line.trim();
+                    if (trimmed.includes('핵심 원칙')) {
+                        inPrinciples = true;
+                        return false;
                     }
-                } else {
-                    // If override exists, still clean title of tags for display
-                    const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
-                    if (tagMatch) rawTitle = rawTitle.slice(tagMatch[0].length).trim();
-                }
-
-                // 3) Try to extract English sub name from parenthesis e.g. "마스터 (Master)"
-                const titleMatch = rawTitle.match(/(.*?)\s*\((.*?)\)$/);
-                let name = rawTitle;
-                let sub_name = '';
-                if (titleMatch) {
-                    name = titleMatch[1].trim();
-                    sub_name = titleMatch[2].trim();
-                }
-
-                // 4) Extract <!--pair: name--> tag from content for Relation tab
-                let pairTarget = null;
-                const pairMatch = (post.content || '').match(/<!--\s*pair:\s*(.+?)\s*-->/i);
-                if (pairMatch) pairTarget = pairMatch[1].trim();
-
-                // 5) Strip <!--pair:...--> and metadata from content before storing
-                // const cleanContent = (post.content || '').replace(/<!--.*?-->/gs, '').trim(); // No longer needed as description uses full content
+                    if (inPrinciples && (trimmed.startsWith('-') || trimmed.match(/^\d+\./))) {
+                        principles.push(trimmed.replace(/^-|\d+\./, '').trim());
+                        return false;
+                    }
+                    return true;
+                });
 
                 return {
                     id: post.id,
-                    name: name,
-                    subName: sub_name,
-                    description: post.content,
-                    icon: null,
-                    type: type,
-                    pair: pairTarget
+                    code: post.title.match(/\[(.*?)\]/)?.[1] || `IDX-${post.id.substring(0, 3).toUpperCase()}`,
+                    title: post.title.replace(/\[.*?\]/, '').trim(),
+                    category: '성향 백과',
+                    date: new Date(post.created_at).toLocaleDateString(),
+                    definition: filteredLines[0]?.trim() || '정보가 없습니다.',
+                    principles: principles.length > 0 ? principles : ['기본 원칙 준수'],
+                    analysis: filteredLines.slice(1).join('\n')
                 };
             });
 
-            // Apply custom display order if it exists
-            if (kinkDisplayOrder && kinkDisplayOrder.length > 0) {
-                const orderMap = {};
-                kinkDisplayOrder.forEach((id, idx) => orderMap[id] = idx);
-
-                tendenciesData.sort((a, b) => {
-                    const orderA = orderMap[a.id] !== undefined ? orderMap[a.id] : 9999;
-                    const orderB = orderMap[b.id] !== undefined ? orderMap[b.id] : 9999;
-                    return orderA - orderB;
-                });
-            }
-
-            window.tendencyData = tendenciesData;
-
-            // Hide the legacy page-header to avoid duplicate titles
-            const pageHeader = document.querySelector('.page-header');
-            if (pageHeader) pageHeader.style.display = 'none';
-
-            renderKinkDictionaryUI();
+            renderEncyclopediaUI();
+            addSafetyBar();
 
         } catch (error) {
-            console.error('Gallery load failed:', error);
+            console.error('Encyclopedia load failed:', error);
             mainContent.innerHTML = `<p style="color:red; text-align:center; padding: 2rem;">데이터 로딩 실패: ${error.message}</p>`;
         }
     }
 
-    window.renderKinkDictionaryUI = function () {
+    function renderEncyclopediaUI() {
         const mainContent = document.getElementById('mainContent');
         if (!mainContent) return;
 
-        const tendenciesData = window.tendencyData || [];
-        const doms = tendenciesData.filter(t => t.type === 'top');
-        const subs = tendenciesData.filter(t => t.type === 'bottom');
+        const data = window.encyclopediaData || [];
+        const activeDocId = window.activeEncyclopediaDocId || data[0]?.id;
+        const activeDoc = data.find(d => d.id === activeDocId) || data[0];
 
-        const activeTab = window.tendencyActiveTab || 'Top';
-
-        // Show empty state if no posts yet
-        if (tendenciesData.length === 0) {
-            mainContent.innerHTML = `
-                <div class="kink-dict-wrapper">
-                    <div class="kink-dict-header">
-                        <h1 class="kink-dict-title">성향 백과</h1>
-                        <p class="kink-dict-subtitle">아직 등록된 성향이 없습니다.</p>
-                    </div>
-                    <div style="text-align:center; padding: 3rem 1rem; color: var(--text-secondary);">
-                        <p>관리자 페이지에서 게시글을 작성하고 <strong>성향 백과</strong> 카테고리를 선택하면 여기에 표시됩니다.</p>
-                        <p style="margin-top:1rem; font-size:0.85rem; opacity:0.7;">제목 앞에 <code>[top]</code> 또는 <code>[bottom]</code>을 붙이면 자동 분류됩니다.<br>예: <code>[top] 마스터 (Master)</code></p>
-                    </div>
-                </div>
-            `;
+        if (data.length === 0) {
+            mainContent.innerHTML = '<div class="p-20 text-center text-slate-400">등록된 문서가 없습니다.</div>';
             return;
         }
 
-        let contentHtml = '';
-
-        if (activeTab === 'Relation') {
-            console.log(`[KinkDict] Rendering Relation tab.`);
-            // Build pairs: for each top, find its pair from kinkPairs setting, else fallback to name match, else fallback to index
-            const buildPairs = () => {
-                const tops = tendenciesData.filter(t => t.type === 'top');
-                const bottoms = tendenciesData.filter(t => t.type === 'bottom');
-                const pairs = [];
-                const usedBottomIds = new Set();
-                const kinkPairs = window.kinkDictionaryPairs || {};
-
-                tops.forEach((top, idx) => {
-                    let matched = null;
-
-                    // 1) Use admin-defined pair if available
-                    if (kinkPairs[top.id]) {
-                        matched = bottoms.find(b => b.id === kinkPairs[top.id]);
-                    }
-
-                    // 2) Fallback: pair tag
-                    if (!matched && top.pair) {
-                        matched = bottoms.find(b =>
-                            b.name.toLowerCase().includes(top.pair.toLowerCase()) ||
-                            top.pair.toLowerCase().includes(b.name.toLowerCase())
-                        );
-                    }
-
-                    // 3) Fallback: pair by index
-                    if (!matched) {
-                        matched = bottoms.filter(b => !usedBottomIds.has(b.id))[0] || null;
-                    }
-
-                    if (matched) usedBottomIds.add(matched.id);
-                    pairs.push({ top, bottom: matched });
-                });
-                return pairs;
-            };
-
-            const pairs = buildPairs();
-            contentHtml = `
-                <div class="kink-relation-container">
-                    <div class="kink-relation-info">
-                        <p>관리자 페이지 설정 또는 Top 게시글 태그(<code>&lt;!--pair: 이름--&gt;</code>)에 따라 매칭됩니다.</p>
-                    </div>
-                    <div class="kink-relation-list">
-            `;
-            pairs.forEach(({ top, bottom }) => {
-                const bottomName = bottom ? bottom.name : '?';
-                contentHtml += `
-                    <div class="kink-relation-item">
-                        <div class="kink-relation-card top" onclick="showRoleDetail('${top.id}')" style="cursor:pointer">
-                            <div class="relation-badge top-badge">TOP</div>
-                            <div class="relation-name">${top.name}</div>
-                        </div>
-                        <div class="relation-icon"><i data-lucide="zap"></i></div>
-                        <div class="kink-relation-card bottom" ${bottom ? `onclick="showRoleDetail('${bottom.id}')" style="cursor:pointer"` : ''} >
-                            <div class="relation-badge bottom-badge">BOTTOM</div>
-                            <div class="relation-name">${bottomName}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            contentHtml += `</div></div>`;
-        } else {
-            const listData = (activeTab === 'Top' ? doms : subs) || [];
-            console.log(`[KinkDict] Rendering ${activeTab} tab. items count: ${listData.length}`);
-
-            contentHtml = `<div class="kink-list-container">`;
-            listData.forEach((item, idx) => {
-                try {
-                    // Create a brief summary of the markdown content for the list view
-                    // IMPORTANT: Strip HTML comments FIRST (<!--...-->) before stripping tags,
-                    // otherwise <!--pair:name--> loses its '>' and becomes an unclosed comment in innerHTML
-                    const plainText = (item.description || '')
-                        .replace(/<!--[\s\S]*?-->/g, '')   // 1) Remove HTML comments (e.g. <!--pair:...-->)
-                        .replace(/<[^>]*>/g, '')            // 2) Remove all remaining HTML tags
-                        .replace(/[#*_~`]/g, '')            // 3) Remove markdown syntax chars
-                        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 4) Convert markdown links to text
-                        .trim();
-                    const brief = plainText.length > 60 ? plainText.substring(0, 60) + '...' : plainText;
-
-                    console.log(`[KinkDict]  - Rendering item ${idx + 1}/${listData.length}: ${item.name} (${item.id})`);
-
-                    contentHtml += `
-                        <div class="kink-list-item" onclick="showRoleDetail('${item.id}')">
-                            <div class="kink-item-content">
-                                <div class="kink-item-header">
-                                    <h3 class="kink-item-name">${item.name}</h3>
-                                    ${item.subName ? `<span class="kink-item-subname"><i data-lucide="tag"></i>${item.subName}</span>` : ''}
-                                </div>
-                                <p class="kink-item-desc">${brief}</p>
-                            </div>
-                            <div class="kink-item-arrow">
-                                <i data-lucide="chevron-right"></i>
-                            </div>
-                        </div>
-                    `;
-                } catch (e) {
-                    console.error(`[KinkDict] ❌ Error rendering item ${idx + 1}:`, item, e);
-                }
-            });
-            contentHtml += `</div>`;
-        }
-
-
         mainContent.innerHTML = `
-            <div class="kink-dict-wrapper">
-                <div class="kink-dict-header">
-                    <h1 class="kink-dict-title">성향 백과</h1>
-                    <p class="kink-dict-subtitle">총 ${tendenciesData.length}개의 기록이 존재합니다.</p>
-                </div>
-
-                <div class="kink-tabs-container">
-                    <div class="kink-tabs">
-                        <button class="kink-tab ${activeTab === 'Top' ? 'active' : ''}" onclick="switchTendencyTab('Top')">
-                            <div class="kink-tab-icon"><i data-lucide="arrow-up"></i></div>
-                            <span class="kink-tab-name">TOP</span>
-                            <span class="kink-tab-count">${doms.length}</span>
-                        </button>
-                        <button class="kink-tab ${activeTab === 'Bottom' ? 'active' : ''}" onclick="switchTendencyTab('Bottom')">
-                            <div class="kink-tab-icon" style="transform: rotate(180deg)"><i data-lucide="arrow-up"></i></div>
-                            <span class="kink-tab-name">BOTTOM</span>
-                            <span class="kink-tab-count">${subs.length}</span>
-                        </button>
-                        <button class="kink-tab ${activeTab === 'Relation' ? 'active' : ''}" onclick="switchTendencyTab('Relation')">
-                            <div class="kink-tab-icon"><i data-lucide="users"></i></div>
-                            <span class="kink-tab-name">RELATION</span>
-                            <span class="kink-tab-count">${Object.keys(window.kinkDictionaryPairs || {}).length}</span>
-                        </button>
+            <div class="encyclopedia-container">
+                <aside class="encyclopedia-sidebar">
+                    <span class="ency-cat-label">Document Index</span>
+                    <div class="ency-index-list">
+                        ${data.map(item => `
+                            <button class="ency-index-item ${activeDoc?.id === item.id ? 'active' : ''}" onclick="selectEncyclopediaDoc('${item.id}')">
+                                <span>${item.title}</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 opacity-30"></i>
+                            </button>
+                        `).join('')}
                     </div>
-                </div>
+                </aside>
+                <main class="encyclopedia-main">
+                    ${activeDoc ? `
+                        <article class="ency-article">
+                            <header class="ency-doc-header">
+                                <span class="ency-doc-code">${activeDoc.code}</span>
+                                <h2 class="ency-doc-title">${activeDoc.title}</h2>
+                                <p class="ency-doc-meta">Last Revision: ${activeDoc.date}</p>
+                            </header>
+                            
+                            <div class="ency-abstract">
+                                ${activeDoc.definition}
+                            </div>
 
-                <div class="kink-dict-content">
-                    ${contentHtml}
-                </div>
-
-                <!-- Single Detail Modal (Backdrop Blur) -->
-                <div class="role-detail-overlay" id="roleDetailOverlay" onclick="closeRoleDetail()">
-                    <div class="role-detail-modal" id="roleDetailModal" onclick="event.stopPropagation()">
-                        <div class="modal-accent-bar" id="modalAccentBar"></div>
-                        <button class="modal-close-btn" onclick="closeRoleDetail()">✕</button>
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <div class="modal-icon-wrapper" id="modalIconWrapper">
-                                    <!-- Icon injected here -->
-                                </div>
-                                <div>
-                                    <h3 class="modal-title" id="modalTitle">Role Name</h3>
-                                    <div class="modal-subname-wrapper" id="modalSubNameWrapper">
-                                        <div class="modal-subname">
-                                            <i data-lucide="tag" class="subname-icon"></i>
-                                            <span id="modalSubNameText">SUBNAME</span>
+                            <section class="mb-12">
+                                <h3 class="ency-section-title"><i data-lucide="shield-check" class="text-[#B91C1C]"></i> 핵심 원칙</h3>
+                                <div class="ency-list">
+                                    ${activeDoc.principles.map((p, i) => `
+                                        <div class="ency-list-item">
+                                            <div class="ency-list-num">${i + 1}</div>
+                                            <p>${p}</p>
                                         </div>
-                                    </div>
+                                    `).join('')}
                                 </div>
-                                <!-- Permanent Edit/Save Buttons -->
-                                <button id="kinkModalEditBtn" class="kink-admin-btn edit-btn">
-                                    <i data-lucide="edit-3"></i><span>내용 수정</span>
-                                </button>
-                                <button id="kinkModalSaveBtn" class="kink-admin-btn save-btn">
-                                    <i data-lucide="save"></i><span>저장</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="description-container">
-                                    <div class="role-description" id="roleDescription"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                            </section>
 
-                <div class="flex justify-center py-20">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
-                </div>
+                            <section>
+                                <h3 class="ency-section-title"><i data-lucide="book-open" class="text-[#B91C1C]"></i> 상세 분석</h3>
+                                <div class="prose prose-slate max-w-none text-lg leading-relaxed">
+                                    ${activeDoc.analysis.replace(/\n/g, '<br>')}
+                                </div>
+                            </section>
+                        </article>
+                    ` : ''}
+                </main>
             </div>
         `;
 
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
-    };
-
-    window.switchTendencyTab = function (tabId) {
-        window.tendencyActiveTab = tabId;
-        window.renderKinkDictionaryUI();
-    };
-
-    window.showRoleDetail = function (id) {
-        const item = window.tendencyData.find(t => t.id === id);
-        if (!item) return;
-
-        window.currentDetailId = id;
-
-        const overlay = document.getElementById('roleDetailOverlay');
-        const accentBar = document.getElementById('modalAccentBar');
-        const iconWrapper = document.getElementById('modalIconWrapper');
-        const title = document.getElementById('modalTitle');
-        const subName = document.getElementById('modalSubName');
-        const description = document.getElementById('roleDescription');
-
-        const isTop = item.type === 'top';
-        const themeColor = isTop ? '#ff4d4d' : '#4da6ff';
-
-        accentBar.style.backgroundColor = themeColor;
-        iconWrapper.style.color = themeColor;
-        iconWrapper.innerHTML = `<i data-lucide="${(item.icon_class || 'crown').toLowerCase()}" style="width: 48px; height: 48px;"></i>`;
-
-        const subNameWrapper = document.getElementById('modalSubNameWrapper');
-        const subNameText = document.getElementById('modalSubNameText');
-        const subNameValue = item.subName || item.sub_name || '';
-
-        title.textContent = item.name;
-
-        if (subNameValue) {
-            subNameText.textContent = subNameValue;
-            subNameWrapper.style.display = 'flex';
-        } else {
-            subNameWrapper.style.display = 'none';
-        }
-
-        // Show the modal FIRST so dimensions are correct
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-
-        if (description) {
-            description.innerHTML = '';
-
-            if (window._kinkViewer) {
-                try { window._kinkViewer.destroy(); } catch (e) { }
-                window._kinkViewer = null;
-            }
-
-            let content = item.description || '';
-
-            if (typeof toastui !== 'undefined' && toastui.Editor) {
-                window._kinkViewer = toastui.Editor.factory({
-                    el: description,
-                    viewer: true,
-                    initialValue: content,
-                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-                });
-            } else {
-                description.innerHTML = `<div class="plain-text-body">${content.replace(/\n/g, '<br>')}</div>`;
-            }
-        }
-
+        // Initialize Lucide icons
         if (window.lucide) window.lucide.createIcons();
+    }
 
-        // ─── Edit Mode: 편집 버튼 및 클릭 편집 기능 ───
-        const isEditMode = (typeof window.isAdminEditMode === 'function' && window.isAdminEditMode()) ||
-            document.body.classList.contains('admin-edit-active');
+    window.selectEncyclopediaDoc = function (id) {
+        window.activeEncyclopediaDocId = id;
+        renderEncyclopediaUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
-        const editBtn = document.getElementById('kinkModalEditBtn');
-        const saveBtn = document.getElementById('kinkModalSaveBtn');
+    function addSafetyBar() {
+        if (document.getElementById('encyclopediaSafetyBar')) return;
 
-        if (isEditMode && editBtn && saveBtn) {
-            editBtn.style.display = 'flex';
-            saveBtn.style.display = 'none';
-            description.classList.add('is-editable');
-            description.title = '클릭하여 내용을 수정하시겠습니까?';
+        const bar = document.createElement('div');
+        bar.id = 'encyclopediaSafetyBar';
+        bar.className = 'ency-safety-bar';
+        bar.innerHTML = `
+            <div class="ency-status-indicator">
+                <div class="ency-dot"></div>
+                <span class="ency-status-text">Active Safety System Enabled</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-[10px] font-bold opacity-40 hidden sm:block">ARCHIVE PROTOCOL v4.2</span>
+                <button class="bg-[#B91C1C] hover:bg-red-700 px-3 py-1 rounded text-[10px] font-bold transition-colors">ALERT WIDGET</button>
+            </div>
+        `;
+        document.body.appendChild(bar);
+    }
 
-            editBtn.onclick = (e) => {
-                e.preventDefault();
-                _openKinkEditor(item, description, editBtn, saveBtn);
-            };
+    function removeEncyclopediaEffects() {
+        document.body.classList.remove('encyclopedia-mode');
+        const bar = document.getElementById('encyclopediaSafetyBar');
+        if (bar) bar.remove();
+        const welcomeSection = document.getElementById('welcomeSection');
+        if (welcomeSection) welcomeSection.style.display = 'block';
+    }
 
-            saveBtn.onclick = (e) => {
-                e.preventDefault();
-                _saveKinkContent(item, description, editBtn, saveBtn);
-            };
+    // Hook into category loading to cleanup when navigating away
+    const originalLoadPostsByCategory = window.loadPostsByCategory;
+    window.loadPostsByCategory = async function (categoryId) {
+        removeEncyclopediaEffects();
 
-            description._kinkEditHandler = (e) => {
-                if (editBtn.style.display !== 'none') {
-                    _openKinkEditor(item, description, editBtn, saveBtn);
-                }
-            };
-            description.addEventListener('click', description._kinkEditHandler);
-        } else if (editBtn && saveBtn) {
-            editBtn.style.display = 'none';
-            saveBtn.style.display = 'none';
-            description.classList.remove('is-editable');
-            description.title = '';
+        // Check if category is "성향 백과"
+        const { data: category } = await supabaseClient
+            .from('categories')
+            .select('name')
+            .eq('id', categoryId)
+            .single();
+
+        if (category && category.name === '성향 백과') {
+            renderTendencyView();
+        } else {
+            // Check if we were in encyclopedia mode and need to reset layout
+            const mainContent = document.getElementById('mainContent');
+            if (mainContent) mainContent.style.display = 'block'; // Ensure visible
+
+            // Call original function (which is inside the closure)
+            // Wait, originalLoadPostsByCategory is actually the function itself.
+            // Let's just use the logic from around line 430.
+            // For now, I'll just reload the page content normally.
+            loadPostsByCategoryInternal(categoryId);
         }
     };
+
+    async function loadPostsByCategoryInternal(categoryId) {
+        // This is a copy of the original loadPostsByCategory logic minus the tendency view part
+        if (!supabaseClient) return;
+        try {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const isAdmin = user && user.email === window.ADMIN_EMAIL;
+            let query = supabaseClient.from('archive_posts').select('*').eq('category_id', categoryId).order('created_at', { ascending: false });
+            if (!isAdmin) query = query.eq('is_private', false);
+            const { data: posts, error } = await query;
+            if (error) throw error;
+            const content = document.getElementById('mainContent');
+            const title = document.getElementById('welcomeTitle');
+            const pageHeader = document.querySelector('.page-header');
+            if (pageHeader) pageHeader.style.display = 'block';
+            if (!content || !title) return;
+            if (posts.length === 0) {
+                title.textContent = '게시물 없음';
+                content.innerHTML = '<p>이 카테고리에는 아직 게시물이 없습니다.</p>';
+                return;
+            }
+            const { data: categoryData } = await supabaseClient.from('categories').select('name').eq('id', categoryId).single();
+            if (posts.length === 1) {
+                const post = posts[0];
+                title.textContent = post.title;
+                content.innerHTML = '';
+                const metaDiv = document.querySelector('.post-meta');
+                if (metaDiv) {
+                    const dateStr = new Date(post.created_at).toLocaleDateString();
+                    metaDiv.innerHTML = `<span>${categoryData?.name}</span> • <span>${dateStr}</span>`;
+                }
+                const Viewer = toastui.Editor;
+                const viewer = Viewer.factory({ el: content, viewer: true, initialValue: post.content, theme: 'dark' });
+                return;
+            }
+            title.textContent = categoryData?.name || 'Archive';
+            content.innerHTML = posts.map(post => `<div class="admin-post-item"><h3><a href="post.html?id=${post.id}">${post.title}</a></h3></div>`).join('');
+        } catch (e) { console.error(e); }
+    }
 
 
     // 인라인 에디터 열기 (마크다운 대신 단순 textarea 사용)

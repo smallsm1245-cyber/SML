@@ -1,0 +1,281 @@
+/* SmallSM Encyclopedia - Professional Academic Archive Styles */
+
+:root {
+    --ency-bg: #FDFDFD;
+    --ency-text: #0F172A;
+    --ency-accent: #B91C1C;
+    --ency-slate-50: #F8FAFC;
+    --ency-slate-100: #F1F5F9;
+    --ency-slate-200: #E2E8F0;
+    --ency-slate-400: #94A3B8;
+    --ency-slate-700: #334155;
+}
+
+.encyclopedia-mode {
+    background-color: var(--ency-bg) !important;
+    color: var(--ency-text) !important;
+}
+
+/* Override existing site styles when in encyclopedia-mode */
+.encyclopedia-mode #appContainer {
+    max-width: 100% !important;
+    padding: 0 !important;
+}
+
+.encyclopedia-mode .mobile-header {
+    background-color: rgba(253, 253, 253, 0.9) !important;
+    border-bottom: 1px solid var(--ency-slate-200) !important;
+}
+
+/* Encyclopedia Layout */
+.encyclopedia-container {
+    display: flex;
+    min-height: calc(100vh - 64px);
+    background-color: var(--ency-bg);
+}
+
+.encyclopedia-sidebar {
+    width: 380px;
+    border-right: 1px solid var(--ency-slate-200);
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    padding: 2rem;
+    background-color: var(--ency-bg);
+}
+
+.encyclopedia-main {
+    flex: 1;
+    padding: 3rem 4rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Typography */
+.encyclopedia-mode h1,
+.encyclopedia-mode h2,
+.encyclopedia-mode h3,
+.encyclopedia-mode .font-serif {
+    font-family: 'Noto Serif KR', serif !important;
+}
+
+.encyclopedia-mode p,
+.encyclopedia-mode div,
+.encyclopedia-mode .font-sans {
+    font-family: 'Inter', 'Noto Sans KR', sans-serif !important;
+}
+
+/* Sidebar Elements */
+.ency-cat-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ency-accent);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.ency-index-item {
+    width: 100%;
+    text-align: left;
+    padding: 0.85rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--ency-slate-700);
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.ency-index-item:hover {
+    background-color: var(--ency-slate-50);
+    color: var(--ency-text);
+}
+
+.ency-index-item.active {
+    background-color: var(--ency-slate-100);
+    color: var(--ency-text);
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+/* Document View */
+.ency-article {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.ency-doc-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--ency-slate-100);
+}
+
+.ency-doc-code {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--ency-accent);
+    background-color: #FEF2F2;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid #FEE2E2;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.ency-doc-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--ency-text);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+}
+
+.ency-doc-meta {
+    font-size: 0.8rem;
+    color: var(--ency-slate-400);
+    font-style: italic;
+}
+
+.ency-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: var(--ency-text);
+}
+
+.ency-abstract {
+    padding: 2rem;
+    background-color: var(--ency-slate-50);
+    border-left: 5px solid var(--ency-accent);
+    border-radius: 1rem;
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: var(--ency-slate-700);
+    margin-bottom: 3rem;
+}
+
+.ency-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.ency-list-item {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: white;
+    border: 1px solid var(--ency-slate-100);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+
+.ency-list-item:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    border-color: var(--ency-accent);
+}
+
+.ency-list-num {
+    width: 2rem;
+    height: 2rem;
+    background-color: var(--ency-text);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Safety Bar */
+.ency-safety-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background-color: #0F172A;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    z-index: 10002;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.ency-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ency-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #10B981;
+    box-shadow: 0 0 10px #10B981;
+    animation: pulse 2s infinite;
+}
+
+.ency-status-text {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #10B981;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 1024px) {
+    .encyclopedia-sidebar {
+        display: none;
+    }
+
+    .ency-main {
+        padding: 2rem 1.5rem 5rem;
+    }
+
+    .ency-doc-title {
+        font-size: 2.25rem;
+    }
+}
