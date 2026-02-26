@@ -21,23 +21,7 @@ turndownService.escape = function (string) {
     return string;
 };
 
-// Refined Turndown rules to strip Summernote's inline styles that break site consistency
-turndownService.addRule('stripUnwantedStyles', {
-    filter: ['span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'table', 'div'],
-    replacement: function (content, node) {
-        // Strip common unwanted styles but keep the tag structure
-        const tag = node.nodeName.toLowerCase();
 
-        // Use standard Turndown behavior for headings, lists, etc.
-        // We just want to ensure we don't have <span style="font-family: ..."> mess
-        if (tag === 'span' && !node.attributes.length) return content;
-
-        // For other tags, we let Turndown handle the conversion to MD, 
-        // but we've already stripped the mess if we used a pre-processor 
-        // or we can handle it here if needed.
-        return node.outerHTML;
-    }
-});
 
 // Custom filter for clean Markdown
 turndownService.remove(['script', 'style', 'noscript']);

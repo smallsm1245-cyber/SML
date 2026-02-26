@@ -21,15 +21,7 @@ turndownService.escape = function (string) {
     return string;
 };
 
-// Refined Turndown rules to strip Summernote's inline styles that break site consistency
-turndownService.addRule('stripUnwantedStyles', {
-    filter: ['span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'table', 'div'],
-    replacement: function (content, node) {
-        const tag = node.nodeName.toLowerCase();
-        if (tag === 'span' && !node.attributes.length) return content;
-        return node.outerHTML;
-    }
-});
+
 
 turndownService.remove(['script', 'style', 'noscript']);
 turndownService.addRule('cleanSpan', {
