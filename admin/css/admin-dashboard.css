@@ -616,6 +616,19 @@
     background: rgba(0, 0, 0, 0.2);
     color: var(--admin-text-dim);
     white-space: nowrap;
+    transition: var(--transition);
+}
+
+.category-type-badge.clickable {
+    cursor: pointer;
+    border: 1px solid var(--admin-border);
+}
+
+.category-type-badge.clickable:hover {
+    background: var(--admin-primary);
+    color: #fff;
+    border-color: var(--admin-primary);
+    transform: translateY(-1px);
 }
 
 .category-name-input {
@@ -627,6 +640,12 @@
     padding: 0.3rem 0.6rem;
     border-radius: 6px;
     width: 100%;
+    transition: var(--transition);
+}
+
+.category-name-input:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(182, 141, 64, 0.2);
 }
 
 .category-name-input:focus {
