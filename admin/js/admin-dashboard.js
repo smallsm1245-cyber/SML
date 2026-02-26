@@ -1050,64 +1050,66 @@ function renderCategories() {
         return;
     }
 
-    // Organize into hierarchy
-    const roots = currentCategories.filter(c => !c.parent_id);
-    const childrenMap = {};
-    currentCategories.filter(c => c.parent_id).forEach(c => {
-        if (!childrenMap[c.parent_id]) childrenMap[c.parent_id] = [];
-        childrenMap[c.parent_id].push(c);
-    });
-
     let html = '';
 
-    roots.forEach(root => {
-        const isHidden = !root.is_visible;
-        const childCount = childrenMap[root.id] ? childrenMap[root.id].length : 0;
+    currentCategories.forEach((cat, index) => {
+        const isHidden = !cat.is_visible;
 
-        // Parent category card
-        html += `
-            <div class="category-item-card parent-category" data-id="${root.id}">
-                <div class="drag-handle">≡</div>
-                <span class="category-type-badge">📁 대분류</span>
-                <input type="text" class="category-name-input" value="${root.name}" 
-                       oninput="updateLocalCategoryName('${root.id}', this.value)">
-                <span class="child-count">${childCount}개 소분류</span>
-                <div class="category-actions">
-                    <button class="visibility-toggle ${isHidden ? 'off' : ''}" 
-                            onclick="toggleLocalVisibility('${root.id}')" title="숨기기/보이기">
-                        ${isHidden ? '🙈' : '👁️'}
-                    </button>
-                    <button class="action-btn danger" onclick="deleteLocalCategory('${root.id}')" title="삭제">🗑️</button>
-                </div>
-            </div>
-        `;
+        // Determine child count based on flat list sequence
+        let childCount = 0;
+        if (!cat.is_sub) {
+            for (let i = index + 1; i < currentCategories.length; i++) {
+                if (currentCategories[i].is_sub) childCount++;
+                else break;
+            }
+        }
 
-        // Child categories
-        if (childrenMap[root.id]) {
-            childrenMap[root.id].forEach(child => {
-                const childIsHidden = !child.is_visible;
-                html += `
-                    <div class="category-item-card child-category" data-id="${child.id}" data-parent="${root.id}">
-                        <div class="drag-handle">≡</div>
-                        <span class="category-type-badge">📄 소분류</span>
-                        <input type="text" class="category-name-input" value="${child.name}" 
-                               oninput="updateLocalCategoryName('${child.id}', this.value)">
-                        <div class="category-actions">
-                            <button class="visibility-toggle ${childIsHidden ? 'off' : ''}" 
-                                    onclick="toggleLocalVisibility('${child.id}')" title="숨기기/보이기">
-                                ${childIsHidden ? '🙈' : '👁️'}
-                            </button>
-                            <button class="action-btn danger" onclick="deleteLocalCategory('${child.id}')" title="삭제">🗑️</button>
-                        </div>
+        if (!cat.is_sub) {
+            // Parent category card
+            html += `
+                <div class="category-item-card parent-category" data-id="${cat.id}">
+                    <div class="drag-handle" title="순서 드래그">≡</div>
+                    <span class="category-type-badge clickable" onclick="toggleLocalIndent('${cat.id}')" title="대분류/소분류 전환">📁 대분류</span>
+                    <div class="category-header">
+                        <input type="text" class="category-name-input" value="${cat.name}" 
+                               oninput="updateLocalCategoryName('${cat.id}', this.value)" title="이름 수정">
                     </div>
-                `;
-            });
+                    <span class="child-count">${childCount}개 소분류</span>
+                    <div class="category-actions">
+                        <button class="visibility-toggle ${isHidden ? 'off' : ''}" 
+                                onclick="toggleLocalVisibility('${cat.id}')" title="숨기기/보이기">
+                            ${isHidden ? '🙈' : '👁️'}
+                        </button>
+                        <button class="action-btn danger" onclick="deleteLocalCategory('${cat.id}')" title="삭제">🗑️</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Child category card
+            html += `
+                <div class="category-item-card child-category" data-id="${cat.id}">
+                    <div class="drag-handle" title="순서 드래그">≡</div>
+                    <span class="category-indent">└─</span>
+                    <span class="category-type-badge clickable" onclick="toggleLocalIndent('${cat.id}')" title="대분류/소분류 전환">📄 소분류</span>
+                    <div class="category-header">
+                        <input type="text" class="category-name-input" value="${cat.name}" 
+                               oninput="updateLocalCategoryName('${cat.id}', this.value)" title="이름 수정">
+                    </div>
+                    <div class="category-actions">
+                        <button class="visibility-toggle ${isHidden ? 'off' : ''}" 
+                                onclick="toggleLocalVisibility('${cat.id}')" title="숨기기/보이기">
+                            ${isHidden ? '🙈' : '👁️'}
+                        </button>
+                        <button class="action-btn danger" onclick="deleteLocalCategory('${cat.id}')" title="삭제">🗑️</button>
+                    </div>
+                </div>
+            `;
         }
     });
 
     html += `
         <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
-            <button class="btn-primary" onclick="saveAllCategories()" style="max-width: 400px;">✅ 카테고리 설정 저장하기</button>
+            <button class="btn-primary" onclick="saveAllCategories()">✅ 카테고리 설정 적용하기</button>
         </div>
     `;
 
@@ -1327,18 +1329,25 @@ window.deleteCategory = async function (id, name) {
 window.deleteLocalCategory = function (id) {
     console.log('🗑️ deleteLocalCategory called with id:', id);
 
-    const cat = currentCategories.find(c => c.id == id);
+    const index = currentCategories.findIndex(c => c.id == id);
+    const cat = currentCategories[index];
     if (!cat) {
         console.warn('⚠️ Category not found:', id);
         return;
     }
 
-    // Check for children
-    const children = currentCategories.filter(c => c.parent_id == id);
-    let message = '정말 삭제하시겠습니까? (저장 시 영구 삭제됩니다)';
+    // Check for children based on current sequence (sequential UI feedback)
+    const childrenIds = [];
+    if (!cat.is_sub) {
+        for (let i = index + 1; i < currentCategories.length; i++) {
+            if (currentCategories[i].is_sub) childrenIds.push(currentCategories[i].id);
+            else break;
+        }
+    }
 
-    if (children.length > 0) {
-        message = `⚠️ 이 카테고리에는 ${children.length}개의 소분류가 포함되어 있습니다.\n\n삭제하면 소분류도 함께 삭제됩니다.\n계속하시겠습니까?`;
+    let message = '정말 삭제하시겠습니까? (저장 시 영구 삭제됩니다)';
+    if (childrenIds.length > 0) {
+        message = `⚠️ 이 카테고리에는 ${childrenIds.length}개의 소분류가 포함되어 있습니다.\n\n삭제하면 소분류도 함께 삭제됩니다.\n계속하시겠습니까?`;
     }
 
     if (!confirm(message)) {
@@ -1347,23 +1356,18 @@ window.deleteLocalCategory = function (id) {
     }
 
     console.log('✅ User confirmed deletion');
-    console.log('📝 Adding to deletedCategoryIds:', id);
 
-    // Track parent for deletion
+    // 1. Mark for DB deletion
     deletedCategoryIds.add(id);
+    childrenIds.forEach(childId => deletedCategoryIds.add(childId));
 
-    // Track children for deletion
-    children.forEach(child => {
-        console.log('📝 Adding child to deletedCategoryIds:', child.id);
-        deletedCategoryIds.add(child.id);
+    // 2. Remove also children that might be linked via parent_id but moved elsewhere (consistency)
+    currentCategories.forEach(c => {
+        if (c.parent_id == id) deletedCategoryIds.add(c.id);
     });
 
-    console.log('🗑️ deletedCategoryIds after add:', Array.from(deletedCategoryIds));
-
-    // Remove parent and children from local list
-    currentCategories = currentCategories.filter(c => c.id != id && c.parent_id != id);
-
-    console.log('📋 currentCategories count after filter:', currentCategories.length);
+    // 3. Remove from local list
+    currentCategories = currentCategories.filter(c => !deletedCategoryIds.has(c.id));
 
     renderCategories();
     hasUnsavedChanges = true;
