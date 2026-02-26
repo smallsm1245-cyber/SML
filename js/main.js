@@ -199,6 +199,9 @@
                     viewer: true,
                     initialValue: settings.home_content
                 });
+
+                // 나무위키 레이아웃 후처리 (메인 페이지용)
+                initMainWikiLayout(settings.home_title || 'SMALLSM');
             }
 
             // Handle recent posts if enabled
@@ -212,6 +215,117 @@
         } catch (error) {
             console.error('❌ Home settings loading failed:', error);
         }
+    }
+
+    // ═══════════════════════════════════════════════════
+    // 4.6. 메인 페이지 나무위키 스타일 레이아웃
+    // ═══════════════════════════════════════════════════
+    function initMainWikiLayout(pageTitle) {
+        const contentEl = document.getElementById('mainContent');
+        if (!contentEl) return;
+
+        const tryInit = () => {
+            const rendered = contentEl.querySelector('.toastui-editor-contents');
+            if (!rendered || !rendered.textContent.trim()) return false;
+
+            // 인포박스 (첫 번째 테이블 추출)
+            const infoboxEl = document.getElementById('wikiInfobox');
+            if (infoboxEl && infoboxEl.childElementCount === 0) {
+                const firstTable = rendered.querySelector('table');
+                if (firstTable) {
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'wiki-infobox-title';
+                    titleDiv.textContent = pageTitle;
+                    infoboxEl.appendChild(titleDiv);
+                    infoboxEl.appendChild(firstTable);
+                    infoboxEl.style.display = 'block';
+                }
+            }
+
+            // 목차 생성
+            const tocContainer = document.getElementById('tocContainer');
+            if (tocContainer && tocContainer.childElementCount === 0) {
+                const headings = Array.from(rendered.querySelectorAll('h2, h3'));
+                if (headings.length >= 1) {
+                    headings.forEach((h, i) => { if (!h.id) h.id = `main-section-${i}`; });
+
+                    const toc = document.createElement('div');
+                    toc.className = 'wiki-toc';
+                    const tocTitle = document.createElement('div');
+                    tocTitle.className = 'wiki-toc-title';
+                    tocTitle.textContent = '목차';
+                    toc.appendChild(tocTitle);
+
+                    const ol = document.createElement('ol');
+                    let currentLi = null, currentSubOl = null;
+                    headings.forEach(h => {
+                        if (h.tagName === 'H2') {
+                            currentLi = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = `#${h.id}`;
+                            a.textContent = h.textContent;
+                            a.addEventListener('click', e => { e.preventDefault(); document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+                            currentLi.appendChild(a);
+                            currentSubOl = null;
+                            ol.appendChild(currentLi);
+                        } else if (h.tagName === 'H3') {
+                            if (!currentLi) { currentLi = document.createElement('li'); currentLi.style.listStyle = 'none'; ol.appendChild(currentLi); }
+                            if (!currentSubOl) { currentSubOl = document.createElement('ol'); currentSubOl.className = 'toc-sub'; currentLi.appendChild(currentSubOl); }
+                            const subLi = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = `#${h.id}`;
+                            a.textContent = h.textContent;
+                            a.addEventListener('click', e => { e.preventDefault(); document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+                            subLi.appendChild(a);
+                            currentSubOl.appendChild(subLi);
+                        }
+                    });
+                    toc.appendChild(ol);
+                    tocContainer.appendChild(toc);
+
+                    // 접이식 섹션 래핑
+                    const h2s = Array.from(rendered.querySelectorAll('h2'));
+                    h2s.forEach((h2, idx) => {
+                        const nodes = [];
+                        let next = h2.nextSibling;
+                        while (next) {
+                            if (next.nodeType === 1 && (next.tagName === 'H2' || next.classList?.contains('wiki-section'))) break;
+                            nodes.push(next);
+                            next = next.nextSibling;
+                        }
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'wiki-section';
+                        const details = document.createElement('details');
+                        details.open = true;
+                        const summary = document.createElement('summary');
+                        summary.innerHTML = `<svg class="section-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg><span class="section-number">${idx + 1}.</span><span class="section-heading">${h2.textContent}</span>`;
+                        const contentDiv = document.createElement('div');
+                        contentDiv.className = 'wiki-section-content';
+                        const anchor = document.createElement('span');
+                        anchor.id = h2.id;
+                        anchor.style.cssText = 'display:block;height:0;overflow:hidden;';
+                        contentDiv.appendChild(anchor);
+                        nodes.forEach(n => contentDiv.appendChild(n));
+                        details.appendChild(summary);
+                        details.appendChild(contentDiv);
+                        wrapper.appendChild(details);
+                        h2.parentNode.insertBefore(wrapper, h2);
+                        h2.remove();
+                    });
+                }
+            }
+            return true;
+        };
+
+        if (tryInit()) return;
+
+        let tries = 0;
+        const observer = new MutationObserver(() => {
+            if (tryInit()) observer.disconnect();
+            else if (++tries > 50) observer.disconnect();
+        });
+        observer.observe(contentEl, { childList: true, subtree: true });
+        [500, 1000, 2000].forEach(d => setTimeout(() => { if (!document.getElementById('tocContainer')?.childElementCount) tryInit(); }, d));
     }
 
     async function loadRecentPosts(count) {

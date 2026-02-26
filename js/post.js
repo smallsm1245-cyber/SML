@@ -268,27 +268,81 @@ async function loadPost() {
 // ═══════════════════════════════════════════════════
 function initWikiLayout(postTitle) {
     const contentEl = document.getElementById('postContent');
-    if (!contentEl) return;
-
-    // Toast UI가 렌더링한 실제 콘텐츠 영역을 찾음
-    const rendered = contentEl.querySelector('.toastui-editor-contents') || contentEl;
-
-    styleInfobox(rendered, postTitle);
-    const headings = buildTOC(rendered);
-    if (headings.length >= 2) {
-        wrapSections(rendered, headings);
+    if (!contentEl) {
+        console.warn('[Wiki] #postContent not found');
+        return;
     }
+
+    // Toast UI가 렌더링을 완료할 때까지 MutationObserver로 기다림
+    const tryInit = () => {
+        const rendered = contentEl.querySelector('.toastui-editor-contents');
+        if (!rendered) {
+            console.warn('[Wiki] .toastui-editor-contents not found yet');
+            return false;
+        }
+
+        // 실제 콘텐츠가 있는지 확인 (빈 렌더러 방지)
+        if (!rendered.textContent.trim()) {
+            console.warn('[Wiki] Rendered content is empty');
+            return false;
+        }
+
+        console.log('[Wiki] Starting wiki post-processing...');
+        console.log('[Wiki] Content el:', rendered);
+
+        const h2s = rendered.querySelectorAll('h2');
+        const h3s = rendered.querySelectorAll('h3');
+        console.log(`[Wiki] Found ${h2s.length} h2s, ${h3s.length} h3s`);
+
+        styleInfobox(rendered, postTitle);
+        const headings = buildTOC(rendered);
+        if (headings.filter(h => h.tagName === 'H2').length >= 1) {
+            wrapSections(rendered, headings);
+        }
+
+        console.log('[Wiki] Done!');
+        return true;
+    };
+
+    // 먼저 즉시 시도
+    if (tryInit()) return;
+
+    // 실패 시 MutationObserver로 렌더링 완료 대기
+    let tries = 0;
+    const observer = new MutationObserver(() => {
+        tries++;
+        if (tryInit()) {
+            observer.disconnect();
+        } else if (tries > 50) { // 5초 후 포기
+            observer.disconnect();
+            console.error('[Wiki] Timed out waiting for Toast UI to render');
+        }
+    });
+
+    observer.observe(contentEl, { childList: true, subtree: true });
+
+    // 폴백: 500ms, 1000ms, 2000ms 시도
+    [500, 1000, 2000].forEach(delay => {
+        setTimeout(() => {
+            if (document.getElementById('tocContainer')?.childElementCount > 0) return; // 이미 완료
+            tryInit();
+        }, delay);
+    });
 }
 
 /** 첫 번째 <table>을 인포박스로 이동 */
 function styleInfobox(rendered, postTitle) {
     const infoboxEl = document.getElementById('wikiInfobox');
     if (!infoboxEl) return;
+    if (infoboxEl.childElementCount > 0) return; // 중복 방지
 
     const firstTable = rendered.querySelector('table');
-    if (!firstTable) return;
+    if (!firstTable) {
+        console.log('[Wiki] No table found for infobox');
+        return;
+    }
 
-    // 포스트 제목을 인포박스 타이틀로 사용
+    console.log('[Wiki] Moving table to infobox');
     const titleDiv = document.createElement('div');
     titleDiv.className = 'wiki-infobox-title';
     titleDiv.textContent = postTitle || 'INFO';
@@ -302,16 +356,21 @@ function styleInfobox(rendered, postTitle) {
 function buildTOC(rendered) {
     const tocContainer = document.getElementById('tocContainer');
     if (!tocContainer) return [];
+    if (tocContainer.childElementCount > 0) return []; // 중복 방지
 
     const headings = Array.from(rendered.querySelectorAll('h2, h3'));
-    if (headings.length < 2) return headings; // 헤딩이 적으면 목차 생략
+    console.log('[Wiki] buildTOC headings:', headings.map(h => `${h.tagName}: ${h.textContent}`));
+
+    if (headings.length < 1) {
+        console.log('[Wiki] Not enough headings for TOC');
+        return headings;
+    }
 
     // 각 헤딩에 ID 부여
     headings.forEach((h, i) => {
         if (!h.id) h.id = `wiki-section-${i}`;
     });
 
-    // TOC HTML 빌드
     const toc = document.createElement('div');
     toc.className = 'wiki-toc';
 
@@ -321,25 +380,28 @@ function buildTOC(rendered) {
     toc.appendChild(tocTitle);
 
     const ol = document.createElement('ol');
-    let h2Counter = 0;
     let currentLi = null;
     let currentSubOl = null;
 
     headings.forEach(h => {
         if (h.tagName === 'H2') {
-            h2Counter++;
             currentLi = document.createElement('li');
             const a = document.createElement('a');
             a.href = `#${h.id}`;
-            a.textContent = `${h.textContent}`;
+            a.textContent = h.textContent;
             a.addEventListener('click', e => {
                 e.preventDefault();
-                h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
             currentLi.appendChild(a);
             currentSubOl = null;
             ol.appendChild(currentLi);
-        } else if (h.tagName === 'H3' && currentLi) {
+        } else if (h.tagName === 'H3') {
+            if (!currentLi) { // h3가 h2보다 먼저 나온 경우 처리
+                currentLi = document.createElement('li');
+                currentLi.style.listStyle = 'none';
+                ol.appendChild(currentLi);
+            }
             if (!currentSubOl) {
                 currentSubOl = document.createElement('ol');
                 currentSubOl.className = 'toc-sub';
@@ -351,7 +413,7 @@ function buildTOC(rendered) {
             a.textContent = h.textContent;
             a.addEventListener('click', e => {
                 e.preventDefault();
-                h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
             subLi.appendChild(a);
             currentSubOl.appendChild(subLi);
@@ -365,29 +427,32 @@ function buildTOC(rendered) {
 
 /** h2 기준으로 각 섹션을 <details open> 아코디언으로 래핑 */
 function wrapSections(rendered, headings) {
-    const h2s = headings.filter(h => h.tagName === 'H2');
-    if (h2s.length === 0) return;
+    const h2s = Array.from(rendered.querySelectorAll('h2')); // 최신 DOM에서 다시 가져옴
+    if (h2s.length === 0) {
+        console.log('[Wiki] No h2 to wrap into sections');
+        return;
+    }
 
-    let sectionCounter = 0;
+    console.log(`[Wiki] Wrapping ${h2s.length} sections`);
 
-    h2s.forEach(h2 => {
-        sectionCounter++;
-        const sectionNum = sectionCounter;
+    h2s.forEach((h2, idx) => {
+        const sectionNum = idx + 1;
 
-        // h2부터 다음 h2까지의 노드들을 수집
+        // h2의 다음 h2 이전까지의 형제 노드들을 수집
         const nodes = [];
         let next = h2.nextSibling;
-        while (next && !(next.tagName === 'H2')) {
+        while (next) {
+            // 다음 h2를 만나거나, 이미 래핑된 섹션을 만나면 중단
+            if (next.nodeType === 1 && (next.tagName === 'H2' || next.classList?.contains('wiki-section'))) break;
             nodes.push(next);
             next = next.nextSibling;
         }
 
-        // 아코디언 구조 생성
         const sectionWrapper = document.createElement('div');
         sectionWrapper.className = 'wiki-section';
 
         const details = document.createElement('details');
-        details.open = true; // 기본 펼침
+        details.open = true;
 
         const summary = document.createElement('summary');
         summary.innerHTML = `
@@ -395,16 +460,16 @@ function wrapSections(rendered, headings) {
                 <polyline points="9 18 15 12 9 6"/>
             </svg>
             <span class="section-number">${sectionNum}.</span>
-            <span class="section-heading">${h2.textContent}</span>
+            <span class="section-heading">${h2.textContent.replace(/</g, '&lt;')}</span>
         `;
 
         const contentDiv = document.createElement('div');
         contentDiv.className = 'wiki-section-content';
 
-        // 헤딩 ID를 앵커용으로 보존
+        // 앵커 보존 (TOC 링크 타겟)
         const anchor = document.createElement('span');
         anchor.id = h2.id;
-        anchor.style.display = 'block';
+        anchor.style.cssText = 'display:block; height:0; overflow:hidden;';
         contentDiv.appendChild(anchor);
 
         nodes.forEach(node => contentDiv.appendChild(node));
@@ -413,11 +478,11 @@ function wrapSections(rendered, headings) {
         details.appendChild(contentDiv);
         sectionWrapper.appendChild(details);
 
-        // h2를 sectionWrapper로 교체
         h2.parentNode.insertBefore(sectionWrapper, h2);
         h2.remove();
     });
 }
+
 
 // ═══════════════════════════════════════════════════
 // 5. NIGHT MODE (Same as main.js)
