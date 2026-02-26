@@ -254,11 +254,169 @@ async function loadPost() {
             document.getElementById('postContent').classList.add('copy-protected');
         }
 
+        // 나무위키 스타일 후처리 (렌더링 완료 후 실행)
+        setTimeout(() => initWikiLayout(post.title), 150);
+
     } catch (error) {
         console.error('게시물 로딩 실패:', error);
-        // window.location.href = '404.html'; // Debugging
         document.getElementById('postContent').innerHTML = `<p style="color:red">오류 발생: ${error.message}</p>`;
     }
+}
+
+// ═══════════════════════════════════════════════════
+// 4.5. 나무위키 스타일 레이아웃 후처리
+// ═══════════════════════════════════════════════════
+function initWikiLayout(postTitle) {
+    const contentEl = document.getElementById('postContent');
+    if (!contentEl) return;
+
+    // Toast UI가 렌더링한 실제 콘텐츠 영역을 찾음
+    const rendered = contentEl.querySelector('.toastui-editor-contents') || contentEl;
+
+    styleInfobox(rendered, postTitle);
+    const headings = buildTOC(rendered);
+    if (headings.length >= 2) {
+        wrapSections(rendered, headings);
+    }
+}
+
+/** 첫 번째 <table>을 인포박스로 이동 */
+function styleInfobox(rendered, postTitle) {
+    const infoboxEl = document.getElementById('wikiInfobox');
+    if (!infoboxEl) return;
+
+    const firstTable = rendered.querySelector('table');
+    if (!firstTable) return;
+
+    // 포스트 제목을 인포박스 타이틀로 사용
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'wiki-infobox-title';
+    titleDiv.textContent = postTitle || 'INFO';
+
+    infoboxEl.appendChild(titleDiv);
+    infoboxEl.appendChild(firstTable);
+    infoboxEl.style.display = 'block';
+}
+
+/** h2/h3 헤딩을 기반으로 목차(TOC) 생성 */
+function buildTOC(rendered) {
+    const tocContainer = document.getElementById('tocContainer');
+    if (!tocContainer) return [];
+
+    const headings = Array.from(rendered.querySelectorAll('h2, h3'));
+    if (headings.length < 2) return headings; // 헤딩이 적으면 목차 생략
+
+    // 각 헤딩에 ID 부여
+    headings.forEach((h, i) => {
+        if (!h.id) h.id = `wiki-section-${i}`;
+    });
+
+    // TOC HTML 빌드
+    const toc = document.createElement('div');
+    toc.className = 'wiki-toc';
+
+    const tocTitle = document.createElement('div');
+    tocTitle.className = 'wiki-toc-title';
+    tocTitle.textContent = '목차';
+    toc.appendChild(tocTitle);
+
+    const ol = document.createElement('ol');
+    let h2Counter = 0;
+    let currentLi = null;
+    let currentSubOl = null;
+
+    headings.forEach(h => {
+        if (h.tagName === 'H2') {
+            h2Counter++;
+            currentLi = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `#${h.id}`;
+            a.textContent = `${h.textContent}`;
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            currentLi.appendChild(a);
+            currentSubOl = null;
+            ol.appendChild(currentLi);
+        } else if (h.tagName === 'H3' && currentLi) {
+            if (!currentSubOl) {
+                currentSubOl = document.createElement('ol');
+                currentSubOl.className = 'toc-sub';
+                currentLi.appendChild(currentSubOl);
+            }
+            const subLi = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `#${h.id}`;
+            a.textContent = h.textContent;
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            subLi.appendChild(a);
+            currentSubOl.appendChild(subLi);
+        }
+    });
+
+    toc.appendChild(ol);
+    tocContainer.appendChild(toc);
+    return headings;
+}
+
+/** h2 기준으로 각 섹션을 <details open> 아코디언으로 래핑 */
+function wrapSections(rendered, headings) {
+    const h2s = headings.filter(h => h.tagName === 'H2');
+    if (h2s.length === 0) return;
+
+    let sectionCounter = 0;
+
+    h2s.forEach(h2 => {
+        sectionCounter++;
+        const sectionNum = sectionCounter;
+
+        // h2부터 다음 h2까지의 노드들을 수집
+        const nodes = [];
+        let next = h2.nextSibling;
+        while (next && !(next.tagName === 'H2')) {
+            nodes.push(next);
+            next = next.nextSibling;
+        }
+
+        // 아코디언 구조 생성
+        const sectionWrapper = document.createElement('div');
+        sectionWrapper.className = 'wiki-section';
+
+        const details = document.createElement('details');
+        details.open = true; // 기본 펼침
+
+        const summary = document.createElement('summary');
+        summary.innerHTML = `
+            <svg class="section-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+            <span class="section-number">${sectionNum}.</span>
+            <span class="section-heading">${h2.textContent}</span>
+        `;
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'wiki-section-content';
+
+        // 헤딩 ID를 앵커용으로 보존
+        const anchor = document.createElement('span');
+        anchor.id = h2.id;
+        anchor.style.display = 'block';
+        contentDiv.appendChild(anchor);
+
+        nodes.forEach(node => contentDiv.appendChild(node));
+
+        details.appendChild(summary);
+        details.appendChild(contentDiv);
+        sectionWrapper.appendChild(details);
+
+        // h2를 sectionWrapper로 교체
+        h2.parentNode.insertBefore(sectionWrapper, h2);
+        h2.remove();
+    });
 }
 
 // ═══════════════════════════════════════════════════
