@@ -539,6 +539,99 @@
                 </li>
             `;
         }).join('');
+
+        // 메인 페이지 위키 TOC에 카테고리 사이드바 미러링
+        renderTocNav(roots, childrenMap, counts);
+    }
+
+    /** 위키 TOC 박스에 카테고리 목록을 나무위키 스타일로 렌더링 */
+    function renderTocNav(roots, childrenMap, counts) {
+        const tocContainer = document.getElementById('tocContainer');
+        if (!tocContainer) return;
+        if (tocContainer.childElementCount > 0) return; // 중복 방지
+
+        const toc = document.createElement('div');
+        toc.className = 'wiki-toc';
+        toc.style.minWidth = '200px';
+
+        const tocTitle = document.createElement('div');
+        tocTitle.className = 'wiki-toc-title';
+        tocTitle.textContent = '카테고리';
+        toc.appendChild(tocTitle);
+
+        const ol = document.createElement('ol');
+
+        roots.forEach((root, idx) => {
+            const children = childrenMap[root.id] || [];
+            const count = counts[root.id] || 0;
+            const href = root.name === 'BDSM 궁합표' ? 'bdsm-chart.html' : 'javascript:void(0);';
+
+            const li = document.createElement('li');
+
+            const a = document.createElement('a');
+            a.href = href;
+            a.textContent = `${root.name}`;
+            if (root.name !== 'BDSM 궁합표') {
+                a.addEventListener('click', e => {
+                    e.preventDefault();
+                    // 사이드바 카테고리 클릭과 동일하게 동작
+                    if (children.length > 0) {
+                        window.toggleAccordion?.(root.id);
+                    } else {
+                        window.filterByCategory?.(root.id, null);
+                    }
+                    // 모바일이면 사이드바 닫기
+                    const sidebar = document.getElementById('sidebar');
+                    if (window.innerWidth < 1024 && sidebar) {
+                        sidebar.classList.add('-translate-x-full', 'hidden');
+                    }
+                });
+            }
+
+            // 글 수 뱃지
+            if (count > 0) {
+                const badge = document.createElement('span');
+                badge.style.cssText = 'margin-left:6px;font-size:0.7rem;color:#6b7280;';
+                badge.textContent = `(${count})`;
+                a.appendChild(badge);
+            }
+
+            li.appendChild(a);
+
+            // 하위 카테고리
+            if (children.length > 0) {
+                const subOl = document.createElement('ol');
+                subOl.className = 'toc-sub';
+                children.forEach(child => {
+                    const childHref = child.name === 'BDSM 궁합표' ? 'bdsm-chart.html' : 'javascript:void(0);';
+                    const subLi = document.createElement('li');
+                    const subA = document.createElement('a');
+                    subA.href = childHref;
+                    subA.textContent = child.name;
+                    const childCount = counts[child.id] || 0;
+                    if (childCount > 0) {
+                        const badge = document.createElement('span');
+                        badge.style.cssText = 'margin-left:6px;font-size:0.7rem;color:#6b7280;';
+                        badge.textContent = `(${childCount})`;
+                        subA.appendChild(badge);
+                    }
+                    if (child.name !== 'BDSM 궁합표') {
+                        subA.addEventListener('click', e => {
+                            e.preventDefault();
+                            window.filterByCategory?.(child.id, null);
+                        });
+                    }
+                    subLi.appendChild(subA);
+                    subOl.appendChild(subLi);
+                });
+                li.appendChild(subOl);
+            }
+
+            ol.appendChild(li);
+        });
+
+        toc.appendChild(ol);
+        tocContainer.appendChild(toc);
     }
 
     window.toggleAccordion = function (id) {
