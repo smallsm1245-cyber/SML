@@ -353,6 +353,17 @@
     window.loadCategories = loadCategories;
 
     window.filterByCategory = function (categoryId, element) {
+        // Check if we are on the main page (index.html)
+        const isMainPage = window.location.pathname.endsWith('index.html') ||
+            window.location.pathname === '/' ||
+            window.location.pathname.endsWith('/');
+
+        if (!isMainPage) {
+            // Redirect to index.html with category parameter
+            window.location.href = `index.html?category=${categoryId}`;
+            return;
+        }
+
         // Remove active class
         document.querySelectorAll('.category-link, .submenu-link').forEach(el => el.classList.remove('active'));
         if (element) element.classList.add('active');
@@ -1449,20 +1460,35 @@
         };
 
         const showView = (view) => {
+            // Check if we are on the main page
+            const isMainPage = window.location.pathname.endsWith('index.html') ||
+                window.location.pathname === '/' ||
+                window.location.pathname.endsWith('/');
+
+            if (!isMainPage) {
+                window.location.href = `index.html?view=${view}`;
+                return;
+            }
+
             resetActive();
             if (view === 'settings') {
                 if (welcomeSection) welcomeSection.classList.add('hidden');
                 if (mainContent) mainContent.classList.add('hidden');
                 if (settingsView) settingsView.classList.remove('hidden');
                 if (navSettings) navSettings.classList.add('text-brand-primary');
-            } else if (view === 'home') {
+            } else if (view === 'home' || view === 'wiki') {
                 if (welcomeSection) welcomeSection.classList.remove('hidden');
                 if (mainContent) mainContent.classList.remove('hidden');
                 if (settingsView) settingsView.classList.add('hidden');
-                if (navHome) navHome.classList.add('text-brand-primary');
 
-                // If we were in Wiki view (gallery), we might need to reload or reset mainContent
-                // But for now, let's just make sure it's visible.
+                if (view === 'home') {
+                    if (navHome) navHome.classList.add('text-brand-primary');
+                    // Reset to home posts
+                    loadHomeSettings();
+                } else {
+                    if (navWiki) navWiki.classList.add('text-brand-primary');
+                    renderTendencyView();
+                }
             }
             window.scrollTo(0, 0);
         };
@@ -1481,13 +1507,7 @@
         if (navWiki) {
             navWiki.addEventListener('click', (e) => {
                 e.preventDefault();
-                resetActive();
-                navWiki.classList.add('text-brand-primary');
-                renderTendencyView();
-                if (welcomeSection) welcomeSection.classList.add('hidden');
-                if (mainContent) mainContent.classList.remove('hidden');
-                if (settingsView) settingsView.classList.add('hidden');
-                window.scrollTo(0, 0);
+                showView('wiki');
             });
         }
 
@@ -1525,7 +1545,20 @@
         window.SML_CORE.waitForConfig(() => {
             if (window.supabaseClient) {
                 loadHomeSettings();
-                loadCategories();
+                loadCategories().then(() => {
+                    // Check for category or view parameter in URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const categoryId = urlParams.get('category');
+                    const view = urlParams.get('view');
+
+                    if (categoryId) {
+                        console.log('🎯 Filtering by category from URL:', categoryId);
+                        filterByCategory(categoryId);
+                    } else if (view) {
+                        console.log('🎯 Switching to view from URL:', view);
+                        showView(view);
+                    }
+                });
                 initSearch();
             }
         });

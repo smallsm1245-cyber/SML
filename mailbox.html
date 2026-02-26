@@ -58,31 +58,27 @@
     <aside id="sidebar"
         class="fixed inset-y-0 left-0 w-72 z-[10000] bg-white dark:bg-black border-r border-slate-200 dark:border-slate-800 transform -translate-x-full transition-transform duration-300 ease-in-out hidden lg:static lg:translate-x-0 lg:flex">
         <div class="h-full flex flex-col p-6">
-            <h1 class="text-2xl font-bold font-serif text-brand-primary mb-8">SMALLSM</h1>
+            <h1 class="text-2xl font-bold font-serif text-brand-primary mb-8">
+                <a href="index.html">SMALLSM</a>
+            </h1>
+            <div class="relative mb-4">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input type="text" id="searchInput"
+                    class="w-full bg-slate-50 dark:bg-slate-900 border-none rounded-lg pl-10 pr-4 py-3 text-sm"
+                    placeholder="Search archive...">
+            </div>
             <nav class="flex-1 overflow-y-auto">
-                <ul class="space-y-1 mb-8">
-                    <li class="nav-item">
-                        <a href="index.html"
-                            class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg transition-colors">
-                            <i data-lucide="home" class="w-5 h-5"></i>
-                            <span class="font-medium">Archive Home</span>
-                        </a>
-                    </li>
-                    <li class="nav-item active">
-                        <a href="mailbox.html"
-                            class="w-full flex items-center gap-3 px-4 py-3 text-brand-primary bg-brand-primary/10 rounded-lg transition-colors">
-                            <i data-lucide="mail" class="w-5 h-5"></i>
-                            <span class="font-medium">Small Talk</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <button
-                            class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg transition-colors text-left btn-settings">
-                            <i data-lucide="settings" class="w-5 h-5"></i>
-                            <span class="font-medium">Settings</span>
-                        </button>
-                    </li>
+                <ul id="categoryNav" class="space-y-1 mb-8">
+                    <!-- Loaded dynamically -->
                 </ul>
+                <div class="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                    <button id="sidebarSettingsBtn"
+                        class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg transition-colors text-left btn-settings">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                        <span class="font-medium">설정 (Settings)</span>
+                    </button>
+                    <!-- Legacy Mailbox Items if needed back, but categories are better -->
+                </div>
             </nav>
         </div>
     </aside>
