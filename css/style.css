@@ -27,19 +27,19 @@
     --link-color: #0275d8;
 
     /* 2. Spacing System (Compact 8pt Grid) */
-    --space-1: 6px;
-    --space-2: 12px;
-    --space-3: 18px;
-    --space-4: 24px;
-    --space-8: 48px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-8: 32px;
 
     /* Layout Specs */
-    --header-height: 56px;
+    --header-height: 52px;
     /* Optimized for compactness */
-    --sidebar-width: 280px;
-    --container-max: 1200px;
+    --sidebar-width: 260px;
+    --container-max: 1400px;
     --container-padding: var(--space-2);
-    --border-radius: 6px;
+    --border-radius: 4px;
     /* Slightly tighter radius */
 
     /* 3. Typography Hierarchy */
@@ -47,12 +47,12 @@
     --font-sans: 'Noto Sans KR', sans-serif;
     --font-mono: 'Courier Prime', monospace;
 
-    --base-font-size: 15.5px;
-    /* Slightly smaller for density */
-    --line-height-body: 1.7;
+    --base-font-size: 16px;
+    /* Slightly larger for readability with tighter line height */
+    --line-height-body: 1.55;
     /* Tighter line height for compact view */
-    --line-height-heading: 1.25;
-    --letter-spacing-kr: -0.015em;
+    --line-height-heading: 1.2;
+    --letter-spacing-kr: -0.01em;
 
     /* 4. Glassmorphism & Effects */
     --glass-bg: rgba(255, 255, 255, 0.95);
@@ -240,9 +240,8 @@ body.night-mode {
 
 @media (min-width: 769px) {
     body {
-        display: flex;
-        justify-content: center;
         background: #111;
+        /* Removed flex centering to avoid fixed position issues */
     }
 
     body.night-mode {
@@ -3738,4 +3737,28 @@ body.search-focused .search-container {
     border-color: var(--admin-primary) !important;
     z-index: 100;
     position: relative;
+}
+
+/* Sidebar & Menu Fixes */
+#sidebar {
+    z-index: 10000 !important;
+}
+
+#sidebarOverlay {
+    z-index: 9998 !important;
+}
+
+/* Force menu toggle button visibility on desktop */
+#menuToggleBtn {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 10001 !important;
+    pointer-events: auto !important;
+}
+
+@media (max-width: 1023px) {
+    #menuToggleBtn {
+        display: none !important;
+    }
 }

@@ -46,40 +46,51 @@
 
     <!-- Global Floating Menu Button (for Desktop) -->
     <button id="menuToggleBtn"
-        class="fixed top-3 left-3 z-[101] p-3 text-brand-primary hover:scale-110 active:scale-95 transition-all hidden lg:flex items-center justify-center bg-white/10 backdrop-blur-md rounded-full border border-white/10 shadow-lg"
+        class="fixed top-3 left-3 z-[10001] p-3 text-brand-primary hover:scale-110 active:scale-95 transition-all hidden lg:flex items-center justify-center bg-white/10 backdrop-blur-md rounded-full border border-white/10 shadow-lg gap-2"
         aria-label="Menu">
         <i data-lucide="menu" class="block w-6 h-6" style="stroke-width: 2.5px;"></i>
+        <span class="text-[10px] font-bold tracking-tighter hidden xl:block">MENU</span>
     </button>
 
-    <!-- Sidebar Overlay -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-    <div class="app-container content-blur pt-4 pb-12" id="appContainer">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1 class="site-title">
-                    <a href="index.html" style="text-decoration: none; color: inherit;">SMALLSM</a>
-                </h1>
-                <p class="site-subtitle">CINEMATIC ARCHIVE</p>
-            </div>
-
-            <nav>
-                <ul class="category-nav">
-                    <li><a href="index.html" class="nav-link">🏠 홈으로</a></li>
-                    <li><a href="mailbox.html" class="nav-link active">📬 익명 우체통</a></li>
-                    <!-- Categories loaded dynamically via JS if needed, but keeping it simple for now -->
+    <!-- Sidebar / Drawer -->
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 w-72 z-[10000] bg-white dark:bg-black border-r border-slate-200 dark:border-slate-800 transform -translate-x-full transition-transform duration-300 ease-in-out hidden lg:static lg:translate-x-0 lg:flex">
+        <div class="h-full flex flex-col p-6">
+            <h1 class="text-2xl font-bold font-serif text-brand-primary mb-8">SMALLSM</h1>
+            <nav class="flex-1 overflow-y-auto">
+                <ul class="space-y-1 mb-8">
+                    <li class="nav-item">
+                        <a href="index.html"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg transition-colors">
+                            <i data-lucide="home" class="w-5 h-5"></i>
+                            <span class="font-medium">Archive Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="mailbox.html"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-brand-primary bg-brand-primary/10 rounded-lg transition-colors">
+                            <i data-lucide="mail" class="w-5 h-5"></i>
+                            <span class="font-medium">Small Talk</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <button
+                            class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg transition-colors text-left btn-settings">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                            <span class="font-medium">Settings</span>
+                        </button>
+                    </li>
                 </ul>
-                <div id="dynamicNav" style="margin-top: 1rem;"></div>
             </nav>
+        </div>
+    </aside>
 
-            <div class="sidebar-footer">
-                <button class="mode-toggle" id="modeToggle">
-                    <span>🌙</span>
-                    <span>Night Library</span>
-                </button>
-            </div>
-        </aside>
+    <!-- Scrim-like Overlay for Menu -->
+    <div id="sidebarOverlay"
+        class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300">
+    </div>
+
+    <div class="app-container content-blur max-w-screen-xl mx-auto pt-2 pb-8 px-4 md:px-6" id="appContainer">
 
         <!-- Main Content -->
         <main class="main-content" style="padding-top: 1rem;">
@@ -161,8 +172,9 @@
                 </section>
             </div>
 
-            <footer class="site-footer py-4">
-                <p id="copyrightText" class="text-xs opacity-50">© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
+            <footer class="site-footer py-4 mt-4">
+                <p id="copyrightText" class="text-xs opacity-50 text-center">© 2026 - PRESENT SMALLSM. All Rights
+                    Reserved.</p>
             </footer>
         </main>
     </div>

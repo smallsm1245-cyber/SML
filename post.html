@@ -126,14 +126,40 @@
 
     <!-- Global Floating Menu Button (for Desktop) -->
     <button id="menuToggleBtn"
-        class="fixed top-3 left-3 z-[101] p-3 text-brand-primary hover:scale-110 active:scale-95 transition-all hidden lg:flex items-center justify-center bg-white/10 backdrop-blur-md rounded-full border border-white/10 shadow-lg"
+        class="fixed top-3 left-3 z-[10001] p-3 text-brand-primary hover:scale-110 active:scale-95 transition-all hidden lg:flex items-center justify-center bg-white/10 backdrop-blur-md rounded-full border border-white/10 shadow-lg gap-2"
         aria-label="Menu">
         <i data-lucide="menu" class="block w-6 h-6" style="stroke-width: 2.5px;"></i>
+        <span class="text-[10px] font-bold tracking-tighter hidden xl:block">MENU</span>
     </button>
+
+    <!-- Sidebar / Drawer -->
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 w-72 z-[10000] bg-white dark:bg-black border-r border-slate-200 dark:border-slate-800 transform -translate-x-full transition-transform duration-300 ease-in-out hidden">
+        <div class="h-full flex flex-col p-6">
+            <h1 class="text-2xl font-bold font-serif text-brand-primary mb-8">SMALLSM</h1>
+            <nav class="flex-1 overflow-y-auto">
+                <ul id="categoryNav" class="space-y-1 mb-8">
+                    <!-- Loaded dynamically -->
+                </ul>
+                <div class="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                    <button id="sidebarSettingsBtn"
+                        class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg transition-colors text-left">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                        <span class="font-medium">설정 (Settings)</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Scrim-like Overlay for Menu -->
+    <div id="sidebarOverlay"
+        class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300">
+    </div>
 
     <!-- Content Area -->
     <div id="appContainer"
-        class="max-w-screen-md mx-auto pt-6 pb-12 px-3 md:px-4 min-h-screen transition-all duration-300">
+        class="max-w-screen-xl mx-auto pt-2 pb-8 px-4 md:px-6 min-h-screen transition-all duration-300">
         <main class="space-y-4">
             <article class="pt-0 pb-4">
                 <header class="mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">
@@ -187,7 +213,7 @@
                 </div>
             </div>
             <!-- Footer (Copyright & Admin Access) -->
-            <footer class="site-footer py-8 mt-12 border-t border-slate-200 dark:border-slate-800 text-center">
+            <footer class="site-footer py-4 mt-8 border-t border-slate-200 dark:border-slate-800 text-center">
                 <p id="copyrightText" class="text-xs opacity-50">© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
             </footer>
         </main>
@@ -195,28 +221,6 @@
 
 
 
-    <!-- Sidebar / Drawer (Minimal for Post) -->
-    <aside id="sidebar"
-        class="fixed inset-y-0 left-0 w-72 z-[100] bg-white dark:bg-black border-r border-slate-200 dark:border-slate-800 transform -translate-x-full transition-transform duration-300 lg:hidden">
-        <div class="h-full flex flex-col p-6">
-            <h1 class="text-2xl font-bold font-serif text-brand-primary mb-8">SMALLSM</h1>
-            <nav class="flex-1 overflow-y-auto">
-                <ul id="categoryNav" class="space-y-1 mb-8">
-                    <!-- Loaded dynamically -->
-                </ul>
-                <div class="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-2">
-                    <button id="sidebarSettingsBtn"
-                        class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg transition-colors text-left">
-                        <i data-lucide="settings" class="w-5 h-5"></i>
-                        <span class="font-medium">설정 (Settings)</span>
-                    </button>
-                </div>
-            </nav>
-        </div>
-    </aside>
-    <div id="sidebarOverlay"
-        class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-[90] hidden opacity-0 transition-opacity duration-300">
-    </div>
 
     <!-- Scripts -->
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
