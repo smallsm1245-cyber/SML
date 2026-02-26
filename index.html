@@ -64,8 +64,6 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-
-
     <script>
             // Check age verification immediately to prevent flash
             (function () {
@@ -185,21 +183,11 @@
             </section>
 
             <!-- Dynamic Content -->
-            <div class="wiki-article-layout">
-                <!-- 인포박스 -->
-                <aside id="wikiInfobox" class="wiki-infobox" style="display:none;"></aside>
-
-                <div class="wiki-body">
-                    <!-- 목차 -->
-                    <div id="tocContainer"></div>
-
-                    <!-- 본문 콘텐츠 -->
-                    <div id="mainContent"
-                        class="prose prose-slate dark:prose-invert max-w-none leading-relaxed font-serif text-lg">
-                        <div class="flex justify-center py-20">
-                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
-                        </div>
-                    </div>
+            <div id="mainContent"
+                class="prose prose-slate dark:prose-invert max-w-none leading-relaxed font-serif text-lg">
+                <!-- Loaded dynamically -->
+                <div class="flex justify-center py-20">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
                 </div>
             </div>
 

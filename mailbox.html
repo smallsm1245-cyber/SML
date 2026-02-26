@@ -114,92 +114,68 @@
                     <div class="write-card">
                         <div class="form-group">
                             <label>보내는 이 (선택)</label>
-                            <div class="wiki-article-layout">
-                                <!-- Wiki Infobox -->
-                                <aside class="wiki-infobox">
-                                    <div class="wiki-infobox-title">익명 우체통 (Mailbox)</div>
-                                    <table>
-                                        <tr>
-                                            <th>상태</th>
-                                            <td>운영 중</td>
-                                        </tr>
-                                        <tr>
-                                            <th>답장율</th>
-                                            <td>높음</td>
-                                        </tr>
-                                        <tr>
-                                            <th>익명성</th>
-                                            <td>보장됨</td>
-                                        </tr>
-                                    </table>
-                                    <div class="p-4 text-[10px] text-slate-500 leading-tight border-t border-slate-800">
-                                        질문이나 건의사항을 자유롭게 남겨주세요. 관리자가 확인 후 답장을 남깁니다.
-                                    </div>
-                                </aside>
+                            <input type="text" id="senderNickname" class="mailbox-input" placeholder="익명 (또는 별명)">
+                        </div>
 
-                                <div class="wiki-body">
-                                    <header class="mailbox-header" style="margin-bottom: 1.5rem;">
-                                        <h1 class="mailbox-title">📬 익명 우체통</h1>
-                                        <p class="mailbox-subtitle">
-                                            Archive of Small Talks and Questions
-                                        </p>
-                                    </header>
+                        <div class="form-group">
+                            <label>고민 내용</label>
+                            <textarea id="messageContent" class="mailbox-textarea"
+                                placeholder="당신의 이야기를 들려주세요. 개인정보가 포함되지 않도록 주의해주세요."></textarea>
+                        </div>
 
-                                    <!-- TOC -->
-                                    <div id="tocContainer" class="mb-6"></div>
-
-                                    <!-- Input Section -->
-                                    <section class="input-section mb-12">
-                                        <div class="input-card">
-                                            <textarea id="messageInput" class="mailbox-textarea"
-                                                placeholder="무엇이든 물어보세요... (익명 보장)"></textarea>
-                                            <div class="input-footer">
-                                                <span class="char-count">0 / 500</span>
-                                                <button id="sendMessage" class="send-btn">
-                                                    <i data-lucide="send" class="w-4 h-4"></i>
-                                                    전송하기
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </section>
-
-                                    <!-- Message Feed -->
-                                    <section class="feed-section">
-                                        <h2 class="feed-title mb-6">최신 대화 목록</h2>
-                                        <div id="messageFeed" class="message-feed">
-                                            <!-- Loaded from mailbox.js -->
-                                            <div class="loading-spinner">우편함을 여는 중...</div>
-                                        </div>
-                                    </section>
-
-                                    <!-- Detail Modal -->
-                                    <div id="messageModal" class="message-modal">
-                                        <div class="modal-content">
-                                            <span class="close-modal">&times;</span>
-                                            <div class="modal-header">
-                                                <span class="modal-nickname" id="modalNickname">익명</span>
-                                                <span class="modal-date" id="modalDate">2024.01.01</span>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p id="modalQuestion" class="question-text"></p>
-                                                <div class="admin-reply-box">
-                                                    <div class="reply-header">
-                                                        <span class="reply-icon">💌</span> 답장
-                                                    </div>
-                                                    <p id="modalAnswer" class="answer-text"></p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="allowPublic">
+                                <span>공개 답변 허용 (다른 사람들도 내 고민과 답변을 볼 수 있습니다)</span>
+                            </label>
+                            <!-- Password for future edit/delete feature -->
+                            <div class="password-group">
+                                <span class="lock-icon">🔒</span>
+                                <input type="password" id="msgPassword" class="mailbox-input-sm"
+                                    placeholder="비밀번호 (수정/삭제용)" maxlength="20">
                             </div>
                         </div>
 
-                        <footer class="site-footer py-4 mt-4">
-                            <p id="copyrightText" class="text-xs opacity-50 text-center">© 2026 - PRESENT SMALLSM. All
-                                Rights
-                                Reserved.</p>
-                        </footer>
+                        <button class="btn-send" onclick="submitMessage()">우표 붙여 보내기 📮</button>
+                    </div>
+                </section>
+
+                <!-- Tab Content: View -->
+                <section id="tab-view" class="tab-content">
+                    <div id="publicMessageList" class="message-list">
+                        <!-- Loaded Dynamically -->
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p>우체통을 확인하고 있습니다...</p>
+                        </div>
+                    </div>
+
+                    <!-- Detail Modal -->
+                    <div id="messageModal" class="message-modal">
+                        <div class="modal-content">
+                            <span class="close-modal">&times;</span>
+                            <div class="modal-header">
+                                <span class="modal-nickname" id="modalNickname">익명</span>
+                                <span class="modal-date" id="modalDate">2024.01.01</span>
+                            </div>
+                            <div class="modal-body">
+                                <p id="modalQuestion" class="question-text"></p>
+                                <div class="admin-reply-box">
+                                    <div class="reply-header">
+                                        <span class="reply-icon">💌</span> 답장
+                                    </div>
+                                    <p id="modalAnswer" class="answer-text"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <footer class="site-footer py-4 mt-4">
+                <p id="copyrightText" class="text-xs opacity-50 text-center">© 2026 - PRESENT SMALLSM. All Rights
+                    Reserved.</p>
+            </footer>
         </main>
     </div>
 

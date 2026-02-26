@@ -56,8 +56,6 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-
-
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -174,24 +172,12 @@
                     </div>
                 </header>
 
-                <!-- 나무위키 레이아웃 래퍼 -->
-                <div class="wiki-article-layout">
-                    <!-- 인포박스 (JS에서 첫 번째 테이블을 여기로 이동) -->
-                    <aside id="wikiInfobox" class="wiki-infobox" style="display:none;"></aside>
-
-                    <!-- 본문 + 목차 -->
-                    <div class="wiki-body">
-                        <!-- 목차 (JS에서 자동 생성) -->
-                        <div id="tocContainer"></div>
-
-                        <!-- Wiki Body -->
-                        <div id="postContent"
-                            class="prose prose-slate dark:prose-invert max-w-none leading-relaxed font-serif text-lg selection:bg-brand-primary/20">
-                            <div class="flex flex-col items-center py-20 gap-4">
-                                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-primary"></div>
-                                <p class="text-slate-400 text-sm italic">기록을 불러오는 중...</p>
-                            </div>
-                        </div>
+                <!-- Wiki Body -->
+                <div id="postContent"
+                    class="prose prose-slate dark:prose-invert max-w-none leading-relaxed font-serif text-lg selection:bg-brand-primary/20">
+                    <div class="flex flex-col items-center py-20 gap-4">
+                        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-primary"></div>
+                        <p class="text-slate-400 text-sm italic">기록을 불러오는 중...</p>
                     </div>
                 </div>
             </article>
