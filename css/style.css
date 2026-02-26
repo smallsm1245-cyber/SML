@@ -285,11 +285,11 @@ body.night-mode {
     .mobile-header {
         display: none !important;
     }
+}
 
-    /* On desktop, keep the floating button or hide it if sidebar is static */
-    #menuToggleBtn.fixed {
-        display: none;
-    }
+/* 관리자 툴바 활성 시 데스크톱 플로팅 버튼 위치 조정 */
+body.has-admin-toolbar #menuToggleBtn.fixed {
+    top: 62px;
 }
 
 .header-left,

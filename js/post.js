@@ -495,10 +495,11 @@ function initUtilityBar() {
 
 function initMobileMenu() {
     const menuToggle = document.getElementById('menuToggleBtn');
+    const menuToggleMobile = document.getElementById('menuToggleBtnMobile');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
 
-    if (!menuToggle || !sidebar || !overlay) return;
+    if (!sidebar || !overlay) return;
 
     const closeMenu = () => {
         sidebar.classList.add('-translate-x-full');
@@ -518,14 +519,27 @@ function initMobileMenu() {
         document.body.style.overflow = 'hidden';
     };
 
-    menuToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (sidebar.classList.contains('-translate-x-full')) {
-            openMenu();
-        } else {
-            closeMenu();
-        }
-    });
+    if (menuToggle) {
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (sidebar.classList.contains('-translate-x-full')) {
+                openMenu();
+            } else {
+                closeMenu();
+            }
+        });
+    }
+
+    if (menuToggleMobile) {
+        menuToggleMobile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (sidebar.classList.contains('-translate-x-full')) {
+                openMenu();
+            } else {
+                closeMenu();
+            }
+        });
+    }
 
     overlay.addEventListener('click', closeMenu);
 }

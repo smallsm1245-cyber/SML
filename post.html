@@ -106,8 +106,8 @@
     <!-- Mobile Sticky Header -->
     <header class="mobile-header lg:hidden">
         <div class="header-left">
-            <button id="menuToggleBtn"
-                class="p-2 text-brand-primary hover:bg-slate-100 dark:hover:bg-slate-900 rounded-lg transition-colors flex items-center justify-center"
+            <button id="menuToggleBtnMobile"
+                class="p-2 text-brand-primary hover:bg-slate-100 dark:hover:bg-slate-900 rounded-lg transition-colors flex items-center justify-center lg:hidden"
                 aria-label="Menu">
                 <i data-lucide="menu" class="w-6 h-6"></i>
             </button>
@@ -123,6 +123,13 @@
             </button>
         </div>
     </header>
+
+    <!-- Global Floating Menu Button (for Desktop) -->
+    <button id="menuToggleBtn"
+        class="fixed top-3 left-3 z-[101] p-3 text-brand-primary hover:scale-110 active:scale-95 transition-all hidden lg:flex items-center justify-center bg-white/10 backdrop-blur-md rounded-full border border-white/10 shadow-lg"
+        aria-label="Menu">
+        <i data-lucide="menu" class="block w-6 h-6" style="stroke-width: 2.5px;"></i>
+    </button>
 
     <!-- Content Area -->
     <div id="appContainer"
