@@ -174,49 +174,12 @@
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-            (function () {
-                const verified = localStorage.getItem('age_verified');
-                if (verified) {
-                    const timestamp = parseInt(verified);
-                    const VERIFICATION_DURATION = 24 * 60 * 60 * 1000;
-                    if (Date.now() - timestamp < VERIFICATION_DURATION) {
-                        document.documentElement.classList.add('verified');
-                        document.write('<style>#disclaimerOverlay { display: none !important; } .content-blur { filter: none !important; pointer-events: auto !important; }</style>');
-                    }
-                }
-                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark')
-                } else {
-                    document.documentElement.classList.remove('dark')
-                }
-            })();
-    </script>
+    <!-- Core Logic (Supabase, Age Gate, Dark Mode) -->
+    <script src="js/core.js"></script>
 </head>
 
 <body class="bg-[#F5F6F7] dark:bg-black text-[#373A3C] dark:text-slate-100 font-serif transition-colors duration-300">
-
-    <!-- Age Verification Disclaimer -->
-    <div id="disclaimerOverlay"
-        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md px-6">
-        <div
-            class="bg-white dark:bg-slate-900 p-8 rounded-lg max-w-sm w-full text-center shadow-2xl border border-slate-200 dark:border-slate-800">
-            <h2 class="text-2xl font-bold mb-4 font-serif text-brand-primary">성인 인증</h2>
-            <p class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
-                본 사이트는 성인 지향 콘텐츠를 포함하고 있습니다.<br>
-                귀하는 만 19세 이상이십니까?
-            </p>
-            <div class="flex flex-col gap-3">
-                <button
-                    class="w-full py-4 bg-brand-primary text-[#000] rounded-lg font-bold hover:bg-brand-primary/80 transition-colors"
-                    id="btnYes">예 (19세 이상)</button>
-                <button
-                    class="w-full py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                    id="btnNo">아니요</button>
-            </div>
-        </div>
-    </div>
+    <!-- Disclaimer Overlay is injected dynamically by core.js -->
 
     <!-- Mobile Sticky Header -->
     <header class="mobile-header lg:hidden">
@@ -364,13 +327,12 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/api/config" async></script>
-    <script src="js/main.js"></script>
-    <script src="js/admin-inline.js?v=20260226_6"></script>
-    <script src="js/bdsm-chart.js"></script>
+    <script src="js/pages/main.js"></script>
+    <script src="js/admin/admin-inline.js?v=20260226_6"></script>
+    <script src="js/pages/bdsm-chart.js"></script>
 </body>
 
 </html>
