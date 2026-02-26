@@ -15,6 +15,11 @@ const turndownService = new TurndownService({
     codeBlockStyle: 'fenced'
 });
 
+// Prevent Turndown from escaping Markdown syntax typed by the user
+turndownService.escape = function (string) {
+    return string;
+};
+
 const showdownConverter = new showdown.Converter({
     tables: true,
     strikethrough: true,
