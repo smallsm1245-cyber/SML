@@ -932,38 +932,61 @@
                     ${contentHtml}
                 </div>
 
-                <!-- Single Detail Modal (Backdrop Blur) -->
+                <!-- Refined Immersive Detail View -->
                 <div class="role-detail-overlay" id="roleDetailOverlay" onclick="closeRoleDetail()">
                     <div class="role-detail-modal" id="roleDetailModal" onclick="event.stopPropagation()">
-                        <div class="modal-accent-bar" id="modalAccentBar"></div>
-                        <button class="modal-close-btn" onclick="closeRoleDetail()" title="닫기">
-                            <i data-lucide="chevron-left"></i>
-                        </button>
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <div class="modal-icon-wrapper" id="modalIconWrapper">
-                                    <!-- Icon injected here -->
-                                </div>
-                                <div>
-                                    <h3 class="modal-title" id="modalTitle">Role Name</h3>
-                                    <div class="modal-subname-wrapper" id="modalSubNameWrapper">
-                                        <div class="modal-subname">
-                                            <i data-lucide="tag" class="subname-icon"></i>
-                                            <span id="modalSubNameText">SUBNAME</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Permanent Edit/Save Buttons -->
-                                <button id="kinkModalEditBtn" class="kink-admin-btn edit-btn">
+                        <!-- Centered Header based on Reference -->
+                        <div class="modal-header">
+                            <button class="modal-back-btn" onclick="closeRoleDetail()" title="뒤로가기">
+                                <i data-lucide="chevron-left"></i>
+                            </button>
+                            <div class="modal-header-info">
+                                <span class="modal-tag" id="modalTag">CATEGORY</span>
+                                <h3 class="modal-title" id="modalTitle">Role Name</h3>
+                            </div>
+                            <div class="modal-admin-actions" style="position: absolute; right: 4.5rem; display: flex; gap: 0.5rem;">
+                                <button id="kinkModalEditBtn" class="kink-admin-btn edit-btn" style="display:none;">
                                     <i data-lucide="edit-3"></i><span>내용 수정</span>
                                 </button>
-                                <button id="kinkModalSaveBtn" class="kink-admin-btn save-btn">
+                                <button id="kinkModalSaveBtn" class="kink-admin-btn save-btn" style="display:none;">
                                     <i data-lucide="save"></i><span>저장</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
-                                <div class="description-container">
-                                    <div class="role-description" id="roleDescription"></div>
+                            <button class="modal-close-btn" onclick="closeRoleDetail()" title="닫기">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+
+                        <div class="modal-content" id="modalScrollContent">
+                            <div class="flex justify-center mb-10">
+                                <div class="modal-icon-wrapper" id="modalIconWrapper" style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 32px; border: 1px solid rgba(255,255,255,0.1);">
+                                    <!-- Icon injected here -->
+                                </div>
+                            </div>
+
+                            <section class="mb-12">
+                                <h2 class="principles-title">
+                                    <i data-lucide="book-open" style="width:16px; height:16px;"></i> 개념 정의
+                                </h2>
+                                <p class="text-2xl font-bold leading-tight mb-6 text-white" id="modalDefinition" style="word-break: keep-all;">
+                                    "Definition Text Here"
+                                </p>
+                                <div class="role-description" id="roleDescription" style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8;">
+                                    <!-- Description injected here -->
+                                </div>
+                            </section>
+
+                            <!-- Bottom Nav -->
+                            <div class="kink-detail-nav">
+                                <div class="nav-buttons">
+                                    <button id="prevKinkBtn" class="nav-btn">
+                                        <i data-lucide="chevron-left"></i>
+                                        <span>이전 성향</span>
+                                    </button>
+                                    <button id="nextKinkBtn" class="nav-btn">
+                                        <span>다음 성향</span>
+                                        <i data-lucide="chevron-right"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -993,52 +1016,74 @@
         window.currentDetailId = id;
 
         const overlay = document.getElementById('roleDetailOverlay');
-        const accentBar = document.getElementById('modalAccentBar');
         const iconWrapper = document.getElementById('modalIconWrapper');
         const title = document.getElementById('modalTitle');
-        const subName = document.getElementById('modalSubName');
+        const tag = document.getElementById('modalTag');
+        const definition = document.getElementById('modalDefinition');
         const description = document.getElementById('roleDescription');
+        const scrollContent = document.getElementById('modalScrollContent');
 
         const isTop = item.type === 'top';
         const themeColor = isTop ? '#ff4d4d' : '#4da6ff';
 
-        accentBar.style.backgroundColor = themeColor;
-        iconWrapper.style.color = themeColor;
-        iconWrapper.innerHTML = `<i data-lucide="${(item.icon_class || 'crown').toLowerCase()}" style="width: 48px; height: 48px;"></i>`;
-
-        const subNameWrapper = document.getElementById('modalSubNameWrapper');
-        const subNameText = document.getElementById('modalSubNameText');
-        const subNameValue = item.subName || item.sub_name || '';
-
-        title.textContent = item.name;
-
-        if (subNameValue) {
-            subNameText.textContent = subNameValue;
-            subNameWrapper.style.display = 'flex';
-        } else {
-            subNameWrapper.style.display = 'none';
+        if (tag) {
+            tag.textContent = isTop ? 'TOP' : 'BOTTOM';
+            tag.style.color = themeColor;
         }
 
-        // Show the modal FIRST so dimensions are correct
+        if (iconWrapper) {
+            iconWrapper.style.color = themeColor;
+            iconWrapper.style.borderColor = `${themeColor}20`; // subtle tinted border
+            iconWrapper.innerHTML = `<i data-lucide="${(item.icon_class || (isTop ? 'zap' : 'heart')).toLowerCase()}" style="width: 48px; height: 48px;"></i>`;
+        }
+
+        if (title) title.textContent = item.name;
+
+        // Extract definition from content (first line or quoted text)
+        let content = item.description || '';
+        let defText = "";
+        const defMatch = content.match(/^"(.*?)"/m) || content.match(/^(.*?)\n/m);
+        if (defMatch) {
+            defText = defMatch[0];
+            content = content.replace(defMatch[0], "").trim();
+        } else {
+            defText = `"${item.name}"`;
+        }
+        if (definition) definition.textContent = defText;
+        if (definition) definition.style.color = '#fff';
+
+        // Update Prev/Next Buttons
+        const currentIndex = window.tendencyData.findIndex(t => t.id === id);
+        const prevBtn = document.getElementById('prevKinkBtn');
+        const nextBtn = document.getElementById('nextKinkBtn');
+
+        if (prevBtn) {
+            prevBtn.disabled = currentIndex === 0;
+            prevBtn.onclick = () => showRoleDetail(window.tendencyData[currentIndex - 1].id);
+        }
+        if (nextBtn) {
+            nextBtn.disabled = currentIndex === window.tendencyData.length - 1;
+            nextBtn.onclick = () => showRoleDetail(window.tendencyData[currentIndex + 1].id);
+        }
+
+        // Show the modal FIRST
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        if (scrollContent) scrollContent.scrollTop = 0;
 
         if (description) {
             description.innerHTML = '';
-
             if (window._kinkViewer) {
                 try { window._kinkViewer.destroy(); } catch (e) { }
                 window._kinkViewer = null;
             }
-
-            let content = item.description || '';
 
             if (typeof toastui !== 'undefined' && toastui.Editor) {
                 window._kinkViewer = toastui.Editor.factory({
                     el: description,
                     viewer: true,
                     initialValue: content,
-                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                    theme: 'dark'
                 });
             } else {
                 description.innerHTML = `<div class="plain-text-body">${content.replace(/\n/g, '<br>')}</div>`;

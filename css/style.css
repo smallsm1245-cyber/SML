@@ -2398,16 +2398,17 @@ header {
 
 .modal-close-btn {
     position: absolute;
-    top: 1.5rem;
-    left: 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
-    color: var(--primary-brass);
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
     width: 44px;
     height: 44px;
-    border-radius: 12px;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.2rem;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -2416,18 +2417,87 @@ header {
 }
 
 .modal-close-btn:hover {
-    background: rgba(206, 177, 128, 0.1);
-    border-color: var(--primary-brass);
-    transform: translateX(-4px);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.modal-back-btn {
+    position: absolute;
+    top: 50%;
+    left: 1.5rem;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.modal-back-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1.5rem;
+    background: rgba(10, 10, 10, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 70px;
+    width: 100%;
+}
+
+.modal-header-info {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-tag {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.2;
 }
 
 .modal-content {
-    padding: 6rem 1.5rem 2rem;
+    padding: 2rem 1.5rem 8rem;
     overflow-y: auto;
     flex: 1;
     max-width: 800px;
     margin: 0 auto;
     width: 100%;
+    scrollbar-width: none;
+}
+
+.modal-content::-webkit-scrollbar {
+    display: none;
 }
 
 /* Custom Scrollbar for Modal Content */
@@ -2482,13 +2552,112 @@ header {
     line-height: 1.1;
 }
 
-.modal-subname {
+.modal-subname-tag {
     font-size: 0.9rem;
     font-weight: 700;
     color: var(--primary-brass);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     margin-top: 0.2rem;
+}
+
+.kink-detail-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, var(--bg-deep) 60%, transparent);
+    padding: 1.5rem 1rem 2rem;
+    z-index: 110;
+}
+
+.nav-buttons {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.nav-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Timeline Style principles */
+.principles-section {
+    margin-top: 3rem;
+}
+
+.principles-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.principle-item {
+    position: relative;
+    padding-left: 1.5rem;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.principle-item::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background 0.3s;
+}
+
+.principle-item:hover::before {
+    background: var(--primary-rose);
+}
+
+.principle-title {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.5rem;
+}
+
+.principle-content {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
 }
 
 .description-container {
