@@ -2355,41 +2355,40 @@ header {
 .role-detail-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(12px);
+    background: var(--bg-deep);
     z-index: 3000;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 2rem;
+    padding: 0;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transform: translateX(100%);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .role-detail-overlay.active {
     opacity: 1;
     visibility: visible;
+    transform: translateX(0);
 }
 
 .role-detail-modal {
-    background: var(--bg-panel);
-    border: 1px solid var(--glass-border);
+    background: var(--bg-deep);
+    border: none;
     width: 100%;
-    max-width: 700px;
-    max-height: 90vh;
-    border-radius: 24px;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
     overflow: hidden;
     position: relative;
-    transform: translateY(30px) scale(0.95);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
 }
 
 .role-detail-overlay.active .role-detail-modal {
-    transform: translateY(0) scale(1);
+    transform: none;
 }
 
 .modal-accent-bar {
@@ -2400,26 +2399,35 @@ header {
 .modal-close-btn {
     position: absolute;
     top: 1.5rem;
-    right: 1.5rem;
+    left: 1.5rem;
     background: rgba(255, 255, 255, 0.05);
-    border: none;
-    color: #fff;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    color: var(--primary-brass);
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 1.2rem;
-    transition: background 0.2s;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
 }
 
 .modal-close-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(206, 177, 128, 0.1);
+    border-color: var(--primary-brass);
+    transform: translateX(-4px);
 }
 
 .modal-content {
-    padding: 1.5rem 1.5rem;
+    padding: 6rem 1.5rem 2rem;
     overflow-y: auto;
     flex: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 /* Custom Scrollbar for Modal Content */

@@ -936,7 +936,9 @@
                 <div class="role-detail-overlay" id="roleDetailOverlay" onclick="closeRoleDetail()">
                     <div class="role-detail-modal" id="roleDetailModal" onclick="event.stopPropagation()">
                         <div class="modal-accent-bar" id="modalAccentBar"></div>
-                        <button class="modal-close-btn" onclick="closeRoleDetail()">✕</button>
+                        <button class="modal-close-btn" onclick="closeRoleDetail()" title="닫기">
+                            <i data-lucide="chevron-left"></i>
+                        </button>
                         <div class="modal-content">
                             <div class="modal-header">
                                 <div class="modal-icon-wrapper" id="modalIconWrapper">
