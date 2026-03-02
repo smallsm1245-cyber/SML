@@ -246,6 +246,28 @@
                 }
             }
 
+            // '검증테스트' 카테고리 자동 생성
+            const hasVerification = (categories || []).some(c => c.name === '검증테스트' && !c.parent_id);
+            if (!hasVerification) {
+                try {
+                    const { data: { user } } = await supabaseClient.auth.getUser();
+                    if (user && user.email === window.ADMIN_EMAIL) {
+                        const maxOrder = (categories || [])
+                            .filter(c => !c.parent_id)
+                            .reduce((max, c) => Math.max(max, c.display_order || 0), 0);
+                        const { data: newCat } = await supabaseClient
+                            .from('categories')
+                            .insert({ name: '검증테스트', parent_id: null, display_order: maxOrder + 1, is_visible: true })
+                            .select()
+                            .single();
+                        if (newCat) categories.push(newCat);
+                        console.log('✅ 검증테스트 카테고리 자동 생성됨');
+                    }
+                } catch (e) {
+                    console.warn('검증테스트 카테고리 생성 스킵:', e.message);
+                }
+            }
+
             // Fetch Post Counts (public only)
             const { data: posts } = await supabaseClient
                 .from('archive_posts')
@@ -388,6 +410,12 @@
             // 성향 백과 카테고리 클릭 시 갤러리 표시
             if (category && category.name === '성향 백과') {
                 renderTendencyView();
+                return;
+            }
+
+            // 검증테스트 카테고리 클릭 시 프로토콜 표시
+            if (category && category.name === '검증테스트') {
+                renderVerificationTestView();
                 return;
             }
 
@@ -1282,6 +1310,224 @@
             desc.classList.remove('is-editable');
             desc.style.cssText = '';
             desc.title = '';
+        }
+    };
+
+    // ═══════════════════════════════════════════════════
+    // VERIFICATION TEST VIEW (BDSM Authenticity Protocol)
+    // ═══════════════════════════════════════════════════
+    window.renderVerificationTestView = async function () {
+        const mainContent = document.getElementById('mainContent');
+        const welcomeTitle = document.getElementById('welcomeTitle');
+        const metaDiv = document.querySelector('.post-meta');
+
+        if (!mainContent) return;
+
+        if (welcomeTitle) welcomeTitle.style.display = 'none';
+        if (metaDiv) metaDiv.style.display = 'none';
+
+        mainContent.innerHTML = `<div class="loading-container"><div class="loading"></div></div>`;
+
+        try {
+            // Fetch protocol data from Supabase
+            const { data: settings } = await supabaseClient
+                .from('settings')
+                .select('value')
+                .eq('key', 'verification_protocol_data')
+                .single();
+
+            let protocolItems = [];
+            if (settings && settings.value) {
+                protocolItems = JSON.parse(settings.value);
+            } else {
+                // Default fallback data
+                protocolItems = [
+                    { id: 1, section: 1, weight: 5, title: '장기 활동 계정 여부', desc: '생성 6개월 이상의 계정이며 성향 관련 일관된 기록이 존재하는가?' },
+                    { id: 2, section: 1, weight: 5, title: '블랙리스트 조회 무결성', desc: '성향 커뮤니티 내 피해 사례나 블랙리스트에 언급된 적이 없는가?' },
+                    { id: 3, section: 1, weight: 4, title: 'SNS/블로그 철학 기록', desc: '자신만의 성향관이나 일상을 기록한 외부 채널이 존재하는가?' },
+                    { id: 4, section: 1, weight: 3, title: '신원 정보의 항상성', desc: '나이, 직업 등 신상 정보가 대화 중 모순 없이 일관되는가?' },
+                    { id: 5, section: 1, weight: 4, title: '공식 본인 인증', desc: '이용 중인 플랫폼에서 성인 및 본인 인증을 완료했는가?' },
+                    { id: 6, section: 1, weight: 3, title: '도용 의심 사진 부재', desc: '제공한 사진이 타인의 것이거나 도용된 흔적이 없는가?' },
+                    { id: 7, section: 1, weight: 3, title: '사회적 신분 증명', desc: '직업이나 신원 확인 요청에 대해 납득 가능한 증빙이 가능한가?' },
+                    { id: 11, section: 2, weight: 5, title: '성적 조급함 부재', desc: '초기에 노골적인 성적 대화나 사진 요구를 하지 않는가?' },
+                    { id: 12, section: 2, weight: 5, title: '강제적 호칭 요구 부재', desc: '관계 합의 전 "주인님/노예" 등 극단적 호칭을 강요하지 않는가?' },
+                    { id: 13, section: 2, weight: 5, title: '거절에 대한 방어기제 부재', desc: '나의 거절을 성향 부족이나 죄책감으로 연결(가스라이팅)하지 않는가?' },
+                    { id: 14, section: 2, weight: 4, title: '만남 장소의 개방성', desc: '첫 만남으로 카페 등 공개된 장소를 당연하게 수용하는가?' },
+                    { id: 15, section: 2, weight: 4, title: '고립화 시도 부재', desc: '커뮤니티 활동이나 타인과의 소통을 "비밀"을 빌미로 금지하지 않는가?' },
+                    { id: 16, section: 2, weight: 5, title: '리미트 존중 태도', desc: '나의 한계를 "극복할 장애물"이 아닌 "지켜야 할 선"으로 인지하는가?' },
+                    { id: 17, section: 2, weight: 4, title: '안정적 정서 상태', desc: '대화 중 감정 기복이 심하거나 권위주의적 위협을 가하지 않는가?' },
+                    { id: 21, section: 3, weight: 5, title: 'SSC/RACK 프레임워크 인지', desc: '안전 원칙의 차이를 설명하고 자신만의 안전 매뉴얼이 있는가?' },
+                    { id: 22, section: 3, weight: 5, title: '세이프워드 우선 원칙', desc: '세이프워드 발동 시 즉각적인 플레이 중단과 조치를 약속하는가?' },
+                    { id: 23, section: 3, weight: 5, title: '리스크 사전 고지(RACK)', desc: '선호 행위의 신체적/정신적 위험성을 바텀에게 미리 경고하는가?' },
+                    { id: 24, section: 3, weight: 4, title: '애프터케어 구체성', desc: '플레이 후 정서적 회복(드랍 관리 등)에 대한 구체적 계획이 있는가?' },
+                    { id: 25, section: 3, weight: 4, title: '도구 위생 및 기술 지식', desc: '도구 관리와 해부학적 위험 부위(신경선 등)를 명확히 아는가?' },
+                    { id: 26, section: 3, weight: 4, title: '지속적 동의 확인', desc: '과거의 동의가 현재를 보장하지 않음을 알고 매번 확인하는가?' },
+                    { id: 27, section: 3, weight: 3, title: '비상 구급 지식', desc: '사고 발생 시 응급 처치(커팅 가위 등) 방법을 숙지하고 있는가?' }
+                ];
+            }
+
+            const sections = [
+                { id: 1, title: 'SECTION 01. FACT', subtitle: '객관적 사실 및 신원 검증', items: protocolItems.filter(i => i.section === 1) },
+                { id: 2, title: 'SECTION 02. BEHAVIOR', subtitle: '대화 및 행동 패턴 분석', items: protocolItems.filter(i => i.section === 2) },
+                { id: 3, title: 'SECTION 03. KNOWLEDGE', subtitle: '전문 지식 및 안전 원칙 숙지', items: protocolItems.filter(i => i.section === 3) }
+            ];
+
+            const maxScore = protocolItems.reduce((sum, i) => sum + i.weight, 0);
+
+            let html = `
+                <div class="verification-wrapper max-w-4xl mx-auto px-4 py-8 text-slate-300">
+                    <style>
+                        .verification-wrapper .data-row { background: #161922; border: 1px solid #1e293b; transition: all 0.2s ease; }
+                        .verification-wrapper .data-row:hover { border-color: #6366f1; background: #1c1f2a; }
+                        .verification-wrapper .checkbox-hex { appearance: none; width: 18px; height: 18px; border: 2px solid #334155; border-radius: 4px; cursor: pointer; position: relative; transition: all 0.2s; }
+                        .verification-wrapper .checkbox-hex:checked { background: #6366f1; border-color: #6366f1; }
+                        .verification-wrapper .checkbox-hex:checked::after { content: '✓'; position: absolute; color: white; font-size: 12px; left: 3px; top: -1px; }
+                        .verification-wrapper .progress-ring__circle { transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%; }
+                        .verification-wrapper .status-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+                        .verification-wrapper .status-verified { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+                        .verification-wrapper .status-warning { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.3); }
+                        .verification-wrapper .status-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+                    </style>
+
+                    <header class="mb-12 border-b border-slate-800 pb-8">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h1 class="text-3xl font-black text-white tracking-tighter mb-2">BDSM AUTHENTICITY PROTOCOL <span class="text-indigo-500">v4.0</span></h1>
+                                <p class="text-slate-500 font-mono text-xs uppercase tracking-widest">Smallsm Archive / Safety & Verification System</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-indigo-500/10 text-indigo-400 text-[10px] px-2 py-1 border border-indigo-500/20 rounded font-bold">STRICT_MODE: ON</span>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                        <div class="lg:col-span-2 space-y-12">
+                            ${sections.map(section => `
+                                <section>
+                                    <div class="flex items-center gap-3 mb-6">
+                                        <div class="h-px flex-1 bg-slate-800"></div>
+                                        <h2 class="text-sm font-bold text-slate-500 tracking-widest uppercase">${section.title}</h2>
+                                        <div class="h-px flex-1 bg-slate-800"></div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h3 class="text-white text-lg font-bold">${section.subtitle}</h3>
+                                    </div>
+                                    <div class="space-y-2">
+                                        ${section.items.map(item => `
+                                            <div class="data-row p-4 rounded-lg flex items-start gap-4" data-weight="${item.weight}">
+                                                <div class="pt-1">
+                                                    <input type="checkbox" class="checkbox-hex protocol-check" data-id="${item.id}" data-weight="${item.weight}">
+                                                </div>
+                                                <div class="flex-1">
+                                                    <div class="flex justify-between items-start mb-1">
+                                                        <h4 class="text-slate-200 font-bold text-sm">${item.title}</h4>
+                                                        <span class="text-[10px] text-slate-600 font-mono">W:${item.weight}</span>
+                                                    </div>
+                                                    <p class="text-xs text-slate-500 leading-relaxed">${item.desc}</p>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </section>
+                            `).join('')}
+                        </div>
+
+                        <div class="lg:col-span-1">
+                            <div class="sticky top-24 space-y-6">
+                                <div class="bg-[#161922] border border-slate-800 rounded-xl p-6 text-center">
+                                    <h3 class="text-xs font-bold text-slate-500 tracking-widest mb-6 uppercase">Verification Status</h3>
+                                    <div class="relative inline-flex items-center justify-center mb-6">
+                                        <svg class="w-48 h-48">
+                                            <circle class="text-slate-800" stroke-width="8" stroke="currentColor" fill="transparent" r="80" cx="96" cy="96"/>
+                                            <circle class="text-indigo-500 progress-ring__circle" stroke-width="8" stroke-dasharray="502.65" stroke-dashoffset="502.65" stroke-linecap="round" stroke="currentColor" fill="transparent" r="80" cx="96" cy="96" id="scoreProgress"/>
+                                        </svg>
+                                        <div class="absolute text-center">
+                                            <span class="block text-4xl font-black text-white tracking-tighter" id="scorePercentage">0%</span>
+                                            <span class="block text-[10px] text-slate-500 font-mono uppercase" id="scoreRatio">0 / ${maxScore}</span>
+                                        </div>
+                                    </div>
+                                    <div id="statusResult" class="py-4 border-t border-slate-800">
+                                        <span class="status-badge status-danger">NOT_VERIFIED</span>
+                                        <p class="text-[11px] text-slate-500 mt-3 italic leading-relaxed" id="statusMessage">
+                                            충분한 데이터가 확보되지 않았습니다. 신중한 판단이 필요합니다.
+                                        </p>
+                                    </div>
+                                    <button id="resetProtocol" class="w-full mt-6 py-3 border border-slate-800 rounded text-xs font-bold hover:bg-slate-800 transition-colors uppercase tracking-widest text-slate-500">Reset Data</button>
+                                </div>
+
+                                <div class="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-5">
+                                    <h4 class="text-indigo-400 text-xs font-bold mb-3 flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                                        SYSTEM_ADVISORY
+                                    </h4>
+                                    <p class="text-[11px] text-indigo-400/60 leading-relaxed font-medium">
+                                        본 프로토콜은 상대방의 진정성을 객관적으로 평가하기 위한 보조 도구입니다. 최종적인 신뢰 여부는 본인의 직관과 판단에 따르십시오.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            mainContent.innerHTML = html;
+            window.scrollTo(0, 0);
+
+            // Logic Implementation
+            const checkboxes = document.querySelectorAll('.protocol-check');
+            const scorePercentage = document.getElementById('scorePercentage');
+            const scoreRatio = document.getElementById('scoreRatio');
+            const scoreProgress = document.getElementById('scoreProgress');
+            const statusResult = document.getElementById('statusResult');
+            const statusMessage = document.getElementById('statusMessage');
+            const circleRadius = 80;
+            const circumference = 2 * Math.PI * circleRadius;
+
+            const updateScore = () => {
+                let currentScore = 0;
+                checkboxes.forEach(cb => {
+                    if (cb.checked) currentScore += parseInt(cb.dataset.weight);
+                });
+
+                const percent = Math.round((currentScore / maxScore) * 100);
+                const offset = circumference - (percent / 100) * circumference;
+
+                scorePercentage.textContent = `${percent}%`;
+                scoreRatio.textContent = `${currentScore} / ${maxScore}`;
+                scoreProgress.style.strokeDashoffset = offset;
+
+                // Update Status
+                if (percent >= 90) {
+                    statusResult.innerHTML = '<span class="status-badge status-verified">FULLY_VERIFIED</span>';
+                    statusMessage.textContent = "검증이 완료되었습니다. 매우 높은 신뢰도를 보여주고 있습니다.";
+                } else if (percent >= 70) {
+                    statusResult.innerHTML = '<span class="status-badge status-warning">QUALIFIED</span>';
+                    statusMessage.textContent = "안정적인 수준의 신뢰도를 유지하고 있습니다. 지속적인 대화가 권장됩니다.";
+                } else if (percent >= 50) {
+                    statusResult.innerHTML = '<span class="status-badge status-warning">PROVISIONAL</span>';
+                    statusMessage.textContent = "일부 정보가 불확실합니다. 더 많은 검증과 주의가 필요합니다.";
+                } else {
+                    statusResult.innerHTML = '<span class="status-badge status-danger">NOT_VERIFIED</span>';
+                    statusMessage.textContent = "데이터가 부족하거나 신뢰도가 낮습니다. 관계 형성에 매우 신중해야 합니다.";
+                }
+            };
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateScore);
+            });
+
+            document.getElementById('resetProtocol').addEventListener('click', () => {
+                checkboxes.forEach(cb => cb.checked = false);
+                updateScore();
+            });
+
+            // Initial Update
+            updateScore();
+
+        } catch (error) {
+            console.error('Verification view failed:', error);
+            mainContent.innerHTML = `<p style="color:red; text-align:center; padding: 2rem;">데이터 로딩 실패: ${error.message}</p>`;
         }
     };
 

@@ -197,6 +197,15 @@ window.switchSection = function (sectionName) {
     // Show selected section
     document.getElementById(`section-${sectionName}`).classList.add('active');
     document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+
+    // Trigger load based on section
+    if (sectionName === 'posts') loadPosts();
+    else if (sectionName === 'categories') loadCategories();
+    else if (sectionName === 'home') loadHomeSettings();
+    else if (sectionName === 'settings') loadSiteSettings();
+    else if (sectionName === 'tendencies') loadTendencies();
+    else if (sectionName === 'trash') loadTrash();
+    else if (sectionName === 'verification') window.loadVerificationSettings();
 };
 
 // ═══════════════════════════════════════════════════
@@ -450,6 +459,144 @@ async function saveHomeSettings() {
         alert('❌ 저장 실패: ' + error.message);
     }
 }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// VERIFICATION PROTOCOL MANAGEMENT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let protocolItems = [];
+
+window.loadVerificationSettings = async function () {
+    if (!supabaseClient) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('settings')
+            .select('value')
+            .eq('key', 'verification_protocol_data')
+            .single();
+
+        if (error && error.code !== 'PGRST116') throw error;
+
+        if (data && data.value) {
+            protocolItems = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+        } else {
+            // Default if nothing in DB
+            protocolItems = [
+                { id: 1, section: 1, weight: 5, title: "실명/나이/성별 기반 신원 확인", desc: "신분증 또는 공신력 있는 수단(더치트 등)을 통한 본인 인증 여부" },
+                { id: 2, section: 1, weight: 4, title: "과거 활동 이력 (SNS/커뮤니티)", desc: "최소 6개월 이상의 꾸준한 활동 기록 또는 평판 확인" },
+                { id: 3, section: 2, weight: 4, title: "SSC/RACK 원칙 숙지 및 동의", desc: "안전(Safe), 건전(Sane), 합의(Consensual) 원칙에 대한 이해도" },
+                { id: 4, section: 2, weight: 5, title: "비동의/강제 행위 이력 확인", desc: "불쾌한 접촉, 스토킹, 강제 플레이 등 부정적 피드백 존재 여부" },
+                { id: 5, section: 3, weight: 3, title: "성향 전문 지식 (BDSM 용어 등)", desc: "기본적인 가학/피학적 성향 및 안전 도구 사용법 숙지" }
+            ];
+        }
+
+        renderProtocolItems();
+    } catch (error) {
+        console.error('Load verification settings failed:', error);
+        showError('검증 설정을 불러오는 중 오류가 발생했습니다.');
+    }
+};
+
+function renderProtocolItems() {
+    const list = document.getElementById('protocolItemsList');
+    if (!list) return;
+
+    if (protocolItems.length === 0) {
+        list.innerHTML = `
+            <div class="empty-state" style="text-align: center; padding: 3rem; color: var(--admin-text-dim);">
+                <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">📋</span>
+                <p>등록된 프로토콜 항목이 없습니다. 상단에서 항목을 추가해주세요.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Sort by section then weight (desc)
+    const sorted = [...protocolItems].sort((a, b) => {
+        if (a.section !== b.section) return a.section - b.section;
+        return b.weight - a.weight;
+    });
+
+    list.innerHTML = sorted.map((item) => `
+        <div class="post-row" style="grid-template-columns: 100px 80px 1fr 100px; padding: 1.2rem; cursor: default;">
+            <div style="font-weight: 700; color: var(--admin-primary);">Sec ${item.section}</div>
+            <div style="text-align: center;"><span class="badge" style="background: rgba(182, 141, 64, 0.1); color: var(--admin-primary); border: 1px solid var(--admin-border);">W:${item.weight}</span></div>
+            <div style="min-width: 0;">
+                <div style="font-weight: 600; font-size: 1.05rem; margin-bottom: 0.2rem; color: var(--admin-text);">${item.title}</div>
+                <div style="font-size: 0.85rem; color: var(--admin-text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.desc}</div>
+            </div>
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button class="action-btn danger" onclick="window.removeProtocolItem(${item.id})" title="삭제" style="background: transparent; border: 1px solid var(--admin-border); padding: 0.3rem 0.6rem; cursor: pointer; border-radius: 6px;">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+window.addProtocolItem = function () {
+    const section = parseInt(document.getElementById('protocolSection').value);
+    const weight = parseInt(document.getElementById('protocolWeight').value);
+    const title = document.getElementById('protocolTitle').value.trim();
+    const desc = document.getElementById('protocolDesc').value.trim();
+
+    if (!title) {
+        alert('항목 제목을 입력해주세요.');
+        return;
+    }
+
+    const newItem = {
+        id: Date.now(),
+        section,
+        weight,
+        title,
+        desc
+    };
+
+    protocolItems.push(newItem);
+    hasUnsavedChanges = true;
+
+    // Reset form
+    document.getElementById('protocolTitle').value = '';
+    document.getElementById('protocolDesc').value = '';
+
+    renderProtocolItems();
+};
+
+window.removeProtocolItem = function (id) {
+    if (!confirm('이 항목을 삭제하시겠습니까?')) return;
+
+    protocolItems = protocolItems.filter(item => item.id !== id);
+    hasUnsavedChanges = true;
+    renderProtocolItems();
+};
+
+window.saveVerificationSettings = async function () {
+    if (!supabaseClient) return;
+
+    const saveBtn = document.getElementById('saveVerificationBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = '저장 중...';
+
+    try {
+        const { error } = await supabaseClient
+            .from('settings')
+            .upsert({
+                key: 'verification_protocol_data',
+                value: protocolItems,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'key' });
+
+        if (error) throw error;
+
+        alert('✅ 검증 프로토콜 설정이 저장되었습니다!');
+        hasUnsavedChanges = false;
+    } catch (error) {
+        console.error('Save verification settings failed:', error);
+        alert('❌ 저장 실패: ' + error.message);
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '💾 변경사항 저장';
+    }
+};
 
 // ═══════════════════════════════════════════════════
 // POSTS MANAGEMENT
