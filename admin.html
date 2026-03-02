@@ -106,6 +106,10 @@
                         <span class="icon">📂</span>
                         <span class="text">카테고리</span>
                     </button>
+                    <button class="nav-item" data-section="verification">
+                        <span class="icon">🛡️</span>
+                        <span class="text">검증 관리</span>
+                    </button>
                     <button class="nav-item" data-section="trash">
                         <span class="icon">🗑️</span>
                         <span class="text">휴지통</span>
@@ -478,6 +482,69 @@
                                 placeholder="naver-site-verification 코드">
                         </div>
                         <button class="btn-primary" id="saveSeoBtn">💾 SEO 설정 저장</button>
+                    </div>
+                </section>
+
+                <!-- Verification Management Section -->
+                <section id="section-verification" class="content-section">
+                    <h2 class="section-title">🛡️ 검증 프로토콜 관리</h2>
+                    <p class="section-desc">진정성 및 안전 검증 프로토콜 항목을 관리합니다. (JSON 데이터 기반)</p>
+
+                    <div class="card">
+                        <h3 class="card-title-sm" id="protocolFormTitle">➕ 새 항목 추가</h3>
+                        <input type="hidden" id="protocolEditId" value="">
+                        <div class="form-row" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                            <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                                <label>섹션</label>
+                                <select id="protocolSection" class="form-select">
+                                    <option value="1">Section 01 (Fact)</option>
+                                    <option value="2">Section 02 (Behavior)</option>
+                                    <option value="3">Section 03 (Knowledge)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex: 0 0 100px; margin-bottom: 0;">
+                                <label>가중치</label>
+                                <input type="number" id="protocolWeight" class="form-input" min="1" max="5" value="3">
+                            </div>
+                            <div class="form-group" style="flex: 2; min-width: 250px; margin-bottom: 0;">
+                                <label>항목 제목</label>
+                                <input type="text" id="protocolTitle" class="form-input"
+                                    placeholder="예: SSC/RACK 숙지 여부">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>항목 설명</label>
+                            <input type="text" id="protocolDesc" class="form-input"
+                                placeholder="항목에 대한 구체적인 검증 기준 및 가이드라인">
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                            <button id="cancelProtocolEditBtn" class="btn-primary" onclick="window.resetProtocolForm()"
+                                style="width: auto; padding: 0.8rem 1.5rem; background: var(--text-dim); border-color: var(--text-dim); display: none;">취소</button>
+                            <button id="protocolSubmitBtn" class="btn-primary" onclick="window.addProtocolItem()"
+                                style="width: auto; padding: 0.8rem 2.5rem;">항목 추가</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title-sm">📋 프로토콜 항목 리스트 (가중치 순 정렬)</h3>
+                        <div id="protocolItemsList" class="posts-list" style="margin-top: 1rem;">
+                            <!-- Dynamically loaded items -->
+                            <div class="empty-state"
+                                style="text-align: center; padding: 3rem; color: var(--admin-text-dim);">
+                                <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">📋</span>
+                                <p>등록된 프로토콜 항목이 없습니다. 상단에서 항목을 추가해주세요.</p>
+                            </div>
+                        </div>
+
+                        <div
+                            style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--admin-border); padding-top: 1.5rem;">
+                            <p style="font-size: 0.85rem; color: var(--admin-text-dim);">
+                                💡 저장 시 전체 항목이 JSON 형태로 `settings` 테이블에 저장됩니다.
+                            </p>
+                            <button class="btn-primary" id="saveVerificationBtn"
+                                onclick="window.saveVerificationSettings()"
+                                style="width: auto; padding: 0.8rem 3rem;">💾 변경사항 저장</button>
+                        </div>
                     </div>
                 </section>
             </main>
