@@ -483,11 +483,27 @@ window.loadVerificationSettings = async function () {
         } else {
             // Default if nothing in DB
             protocolItems = [
-                { id: 1, section: 1, weight: 5, title: "실명/나이/성별 기반 신원 확인", desc: "신분증 또는 공신력 있는 수단(더치트 등)을 통한 본인 인증 여부" },
-                { id: 2, section: 1, weight: 4, title: "과거 활동 이력 (SNS/커뮤니티)", desc: "최소 6개월 이상의 꾸준한 활동 기록 또는 평판 확인" },
-                { id: 3, section: 2, weight: 4, title: "SSC/RACK 원칙 숙지 및 동의", desc: "안전(Safe), 건전(Sane), 합의(Consensual) 원칙에 대한 이해도" },
-                { id: 4, section: 2, weight: 5, title: "비동의/강제 행위 이력 확인", desc: "불쾌한 접촉, 스토킹, 강제 플레이 등 부정적 피드백 존재 여부" },
-                { id: 5, section: 3, weight: 3, title: "성향 전문 지식 (BDSM 용어 등)", desc: "기본적인 가학/피학적 성향 및 안전 도구 사용법 숙지" }
+                { id: 1, section: 1, weight: 5, title: '장기 활동 계정 여부', desc: '생성 6개월 이상의 계정이며 성향 관련 일관된 기록이 존재하는가?' },
+                { id: 2, section: 1, weight: 5, title: '블랙리스트 조회 무결성', desc: '성향 커뮤니티 내 피해 사례나 블랙리스트에 언급된 적이 없는가?' },
+                { id: 3, section: 1, weight: 4, title: 'SNS/블로그 철학 기록', desc: '자신만의 성향관이나 일상을 기록한 외부 채널이 존재하는가?' },
+                { id: 4, section: 1, weight: 3, title: '신원 정보의 항상성', desc: '나이, 직업 등 신상 정보가 대화 중 모순 없이 일관되는가?' },
+                { id: 5, section: 1, weight: 4, title: '공식 본인 인증', desc: '이용 중인 플랫폼에서 성인 및 본인 인증을 완료했는가?' },
+                { id: 6, section: 1, weight: 3, title: '도용 의심 사진 부재', desc: '제공한 사진이 타인의 것이거나 도용된 흔적이 없는가?' },
+                { id: 7, section: 1, weight: 3, title: '사회적 신분 증명', desc: '직업이나 신원 확인 요청에 대해 납득 가능한 증빙이 가능한가?' },
+                { id: 11, section: 2, weight: 5, title: '성적 조급함 부재', desc: '초기에 노골적인 성적 대화나 사진 요구를 하지 않는가?' },
+                { id: 12, section: 2, weight: 5, title: '강제적 호칭 요구 부재', desc: '관계 합의 전 "주인님/노예" 등 극단적 호칭을 강요하지 않는가?' },
+                { id: 13, section: 2, weight: 5, title: '거절에 대한 방어기제 부재', desc: '나의 거절을 성향 부족이나 죄책감으로 연결(가스라이팅)하지 않는가?' },
+                { id: 14, section: 2, weight: 4, title: '만남 장소의 개방성', desc: '첫 만남으로 카페 등 공개된 장소를 당연하게 수용하는가?' },
+                { id: 15, section: 2, weight: 4, title: '고립화 시도 부재', desc: '커뮤니티 활동이나 타인과의 소통을 "비밀"을 빌미로 금지하지 않는가?' },
+                { id: 16, section: 2, weight: 5, title: '리미트 존중 태도', desc: '나의 한계를 "극복할 장애물"이 아닌 "지켜야 할 선"으로 인지하는가?' },
+                { id: 17, section: 2, weight: 4, title: '안정적 정서 상태', desc: '대화 중 감정 기복이 심하거나 권위주의적 위협을 가하지 않는가?' },
+                { id: 21, section: 3, weight: 5, title: 'SSC/RACK 프레임워크 인지', desc: '안전 원칙의 차이를 설명하고 자신만의 안전 매뉴얼이 있는가?' },
+                { id: 22, section: 3, weight: 5, title: '세이프워드 우선 원칙', desc: '세이프워드 발동 시 즉각적인 플레이 중단과 조치를 약속하는가?' },
+                { id: 23, section: 3, weight: 5, title: '리스크 사전 고지(RACK)', desc: '선호 행위의 신체적/정신적 위험성을 바텀에게 미리 경고하는가?' },
+                { id: 24, section: 3, weight: 4, title: '애프터케어 구체성', desc: '플레이 후 정서적 회복(드랍 관리 등)에 대한 구체적 계획이 있는가?' },
+                { id: 25, section: 3, weight: 4, title: '도구 위생 및 기술 지식', desc: '도구 관리와 해부학적 위험 부위(신경선 등)를 명확히 아는가?' },
+                { id: 26, section: 3, weight: 4, title: '지속적 동의 확인', desc: '과거의 동의가 현재를 보장하지 않음을 알고 매번 확인하는가?' },
+                { id: 27, section: 3, weight: 3, title: '비상 구급 지식', desc: '사고 발생 시 응급 처치(커팅 가위 등) 방법을 숙지하고 있는가?' }
             ];
         }
 
