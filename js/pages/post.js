@@ -178,6 +178,12 @@ async function loadPost() {
             theme: 'dark'
         });
 
+        // Add Wiki sidebar info (Infobox & TOC)
+        renderWikiInfo(post);
+
+        // Custom rendering for Callouts after viewer is ready
+        setTimeout(processWikiComponents, 100);
+
         // Add copy protection class if needed
         if (!post.origin_free) {
             document.getElementById('postContent').classList.add('copy-protected');
@@ -226,6 +232,100 @@ function initAdminLongPress() {
     copyright.style.cursor = 'default';
     copyright.style.userSelect = 'none';
     copyright.style.webkitUserSelect = 'none';
+}
+
+function renderWikiInfo(post) {
+    const infoCol = document.getElementById('wikiInfoCol');
+    if (!infoCol) return;
+
+    // Auto-generate TOC from headers
+    const headers = Array.from(document.getElementById('postContent').querySelectorAll('h2, h3'));
+    const tocHtml = headers.length > 0 ? `
+        <div class="wiki-toc">
+            <h3 class="toc-title">Contents</h3>
+            <ul class="toc-list">
+                ${headers.map((h, i) => {
+        const id = `heading-${i}`;
+        h.id = id;
+        return `
+                        <li class="toc-item" style="padding-left: ${h.tagName === 'H3' ? '1rem' : '0'}">
+                            <a href="#${id}" class="toc-link" onclick="scrollToHeading(event, '${id}')">${h.textContent}</a>
+                        </li>
+                    `;
+    }).join('')}
+            </ul>
+        </div>
+    ` : '';
+
+    const updatedDate = new Date(post.updated_at || post.created_at).toLocaleDateString('ko-KR', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    infoCol.innerHTML = `
+        <div class="wiki-infobox animate-slide-up">
+            <div class="infobox-header">
+                <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Document Meta</span>
+                <h3 class="infobox-title mt-2">${post.title}</h3>
+            </div>
+            <div class="infobox-data">
+                <div class="infobox-row">
+                    <span class="infobox-label">Classification</span>
+                    <span class="infobox-value">Archive Post</span>
+                </div>
+                <div class="infobox-row">
+                    <span class="infobox-label">Editor</span>
+                    <span class="infobox-value">Archive Master</span>
+                </div>
+                <div class="infobox-row">
+                    <span class="infobox-label">Last Modified</span>
+                    <span class="infobox-value">${updatedDate}</span>
+                </div>
+            </div>
+            ${tocHtml}
+        </div>
+    `;
+}
+
+window.scrollToHeading = function (e, id) {
+    if (e) e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+        const offset = 80;
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = el.getBoundingClientRect().top;
+        const elementPosition = elementRect - bodyRect;
+        const offsetPosition = elementPosition - offset;
+
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+        });
+    }
+};
+
+function processWikiComponents() {
+    const viewer = document.getElementById('postContent');
+    if (!viewer) return;
+
+    const blockquotes = viewer.querySelectorAll('blockquote');
+    blockquotes.forEach(bq => {
+        const p = bq.querySelector('p');
+        if (p && p.textContent.startsWith('[!')) {
+            const match = p.textContent.match(/\[!(.*?)\]/);
+            const type = match ? match[1] : 'NOTE';
+            const content = p.innerHTML.replace(`[!${type}]`, '').trim();
+
+            bq.outerHTML = `
+                <div class="wiki-callout">
+                    <div class="wiki-callout-title">
+                        <i data-lucide="info" class="w-4 h-4"></i> ${type.toUpperCase()}
+                    </div>
+                    <div class="wiki-callout-content">${content}</div>
+                </div>
+            `;
+        }
+    });
+    if (window.lucide) window.lucide.createIcons();
 }
 
 function initNightMode() {

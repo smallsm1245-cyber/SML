@@ -126,66 +126,52 @@
         class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity duration-300">
     </div>
 
-    <!-- Content Area -->
     <div id="appContainer"
         class="max-w-screen-xl mx-auto pt-2 pb-8 px-4 md:px-6 min-h-screen transition-all duration-300">
-        <main class="space-y-4">
-            <article class="pt-0 pb-4">
-                <header class="mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">
-                    <h1 id="postTitle" class="text-2xl font-bold font-serif mb-2 leading-tight">로딩 중...</h1>
-                    <div id="postMeta"
-                        class="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-500 text-xs font-semibold tracking-wide uppercase">
-                        <span id="postCategory" class="text-brand-primary">Category</span>
-                        <span class="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full"></span>
-                        <span id="postDate">Date</span>
+        <!-- Wiki Mode Container (3-Column) -->
+        <div id="wikiContainer">
+            <div class="wiki-layout">
+                <aside class="wiki-nav-col" id="wikiNavCol">
+                    <div class="wiki-nav-header mb-6">
+                        <h2 class="text-xs font-bold text-slate-500 tracking-[0.2em] uppercase mb-4 font-mono">Document
+                            Navigation</h2>
                     </div>
-                </header>
+                    <ul id="categoryNav" class="wiki-nav-list space-y-1">
+                        <!-- Loaded dynamically -->
+                    </ul>
+                </aside>
 
-                <!-- Wiki Body -->
-                <div id="postContent"
-                    class="prose prose-slate dark:prose-invert max-w-none leading-relaxed font-serif text-lg selection:bg-brand-primary/20">
-                    <div class="flex flex-col items-center py-20 gap-4">
-                        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-primary"></div>
-                        <p class="text-slate-400 text-sm italic">기록을 불러오는 중...</p>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Bottom Navigation Sync -->
-            <div id="settingsView" class="hidden space-y-8 py-4">
-                <h2 class="text-2xl font-bold font-serif mb-6">Settings</h2>
-                <div
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 space-y-6">
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">비상탈출 (Quick Exit)
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="text-sm block mb-2 text-slate-500">위장 URL</label>
-                                <input type="text" id="escapeUrlInput"
-                                    class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 outline-none focus:border-brand-primary/50 transition-colors"
-                                    placeholder="https://www.google.com">
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <button
-                                    class="preset-btn px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-semibold"
-                                    data-url="https://www.google.com">Google</button>
-                                <button
-                                    class="preset-btn px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-semibold"
-                                    data-url="https://ko.wikipedia.org">Wikipedia</button>
-                                <button
-                                    class="preset-btn px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-semibold"
-                                    data-url="https://news.naver.com">News</button>
-                            </div>
+                <article class="wiki-content-col" id="wikiContentCol">
+                    <header class="wiki-post-header mb-10">
+                        <div class="text-[var(--wiki-gold)] text-[10px] font-mono tracking-[0.3em] uppercase mb-2">
+                            Authenticated Record</div>
+                        <h1 id="postTitle"
+                            class="text-4xl md:text-5xl font-bold font-serif text-white mb-4 border-none !p-0">로딩 중...
+                        </h1>
+                        <div id="postMeta"
+                            class="text-[var(--wiki-text-dim)] text-xs font-mono uppercase tracking-widest flex items-center gap-2 mb-4">
+                            <span id="postCategory">Category</span> • <span id="postDate">Date</span>
+                        </div>
+                        <div class="h-1 w-20 bg-[var(--wiki-gold)]"></div>
+                    </header>
+                    <div id="postContent" class="wiki-prose">
+                        <div class="flex flex-col items-center py-20 gap-4">
+                            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-primary"></div>
+                            <p class="text-slate-400 text-sm italic">기록을 불러오는 중...</p>
                         </div>
                     </div>
-                </div>
+                </article>
+
+                <aside class="wiki-info-col" id="wikiInfoCol">
+                    <!-- Loaded dynamically (Infobox & TOC) -->
+                </aside>
             </div>
-            <!-- Footer (Copyright & Admin Access) -->
-            <footer class="site-footer py-4 mt-8 border-t border-slate-200 dark:border-slate-800 text-center">
-                <p id="copyrightText" class="text-xs opacity-50">© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
-            </footer>
-        </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="site-footer py-4 mt-8 border-t border-slate-200 dark:border-slate-800 text-center">
+            <p id="copyrightText" class="text-xs opacity-50">© 2026 - PRESENT SMALLSM. All Rights Reserved.</p>
+        </footer>
     </div>
 
 

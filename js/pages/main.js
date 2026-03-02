@@ -35,6 +35,10 @@
     async function loadHomeSettings() {
         if (!supabaseClient) return;
 
+        const mainContent = document.getElementById('mainContent');
+        const wikiContainer = document.getElementById('wikiContainer');
+        const welcomeSection = document.getElementById('welcomeSection');
+
         try {
             const { data, error } = await supabaseClient
                 .from('settings')
@@ -61,69 +65,121 @@
                 const descTag = document.getElementById('siteDescTag');
                 if (descTag) descTag.content = settings.site_description;
             }
-            if (settings.google_site_verification) {
-                const gTag = document.querySelector('meta[name="google-site-verification"]');
-                if (gTag) {
-                    gTag.content = settings.google_site_verification;
-                    console.log('✅ Google Verification Tag Updated:', settings.google_site_verification);
-                } else {
-                    console.warn('⚠️ Google Meta Tag not found in HTML');
+
+            // Apply Wiki Layout for Home too
+            if (mainContent && wikiContainer) {
+                mainContent.style.display = 'none';
+                if (welcomeSection) welcomeSection.style.display = 'none';
+                wikiContainer.classList.remove('hidden');
+
+                const contentCol = document.getElementById('wikiContentCol');
+                const infoCol = document.getElementById('wikiInfoCol');
+                const navCol = document.getElementById('wikiNavCol');
+
+                if (contentCol) {
+                    contentCol.innerHTML = `
+                        <header class="wiki-post-header mb-10">
+                            <div class="text-[var(--wiki-gold)] text-[10px] font-mono tracking-[0.3em] uppercase mb-2">Archive Gateway</div>
+                            <h1 class="text-4xl md:text-5xl font-bold font-serif text-white mb-4 border-none !p-0">${settings.home_title || 'Archive'}</h1>
+                            <p class="text-[var(--wiki-text-dim)] italic mb-6">${settings.home_subtitle || ''}</p>
+                            <div class="h-1 w-20 bg-[var(--wiki-gold)]"></div>
+                        </header>
+                        <div id="wikiHomeViewer" class="wiki-prose"></div>
+                        <div id="recentPostsWiki" class="mt-20"></div>
+                    `;
+
+                    if (settings.home_content && typeof toastui !== 'undefined' && toastui.Editor) {
+                        toastui.Editor.factory({
+                            el: document.getElementById('wikiHomeViewer'),
+                            viewer: true,
+                            initialValue: settings.home_content,
+                            theme: 'dark'
+                        });
+                    }
+                }
+
+                if (navCol) {
+                    // For Home, we could show categories or just "Home" link
+                    navCol.innerHTML = `
+                        <div class="wiki-nav-header mb-6">
+                            <h2 class="text-xs font-bold text-slate-500 tracking-[0.2em] uppercase mb-4 font-mono">Archive Portal</h2>
+                        </div>
+                        <ul class="wiki-nav-list">
+                            <li class="wiki-nav-item">
+                                <a href="index.html" class="wiki-nav-link active">
+                                    <i data-lucide="home" class="w-4 h-4 inline-block mr-2"></i> Dashboard Home
+                                </a>
+                            </li>
+                            <li class="wiki-nav-item">
+                                <a href="mailbox.html" class="wiki-nav-link">
+                                    <i data-lucide="mail" class="w-4 h-4 inline-block mr-2"></i> Terminal Mail
+                                </a>
+                            </li>
+                        </ul>
+                    `;
+                    if (window.lucide) window.lucide.createIcons();
+                }
+
+                if (infoCol) {
+                    infoCol.innerHTML = `
+                        <div class="wiki-infobox animate-slide-up">
+                            <div class="infobox-header">
+                                <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Portal Info</span>
+                                <h3 class="infobox-title mt-2">SMALLSM</h3>
+                            </div>
+                            <div class="infobox-data">
+                                <div class="infobox-row">
+                                    <span class="infobox-label">Status</span>
+                                    <span class="infobox-value">Online</span>
+                                </div>
+                                <div class="infobox-row">
+                                    <span class="infobox-label">Type</span>
+                                    <span class="infobox-value">Cinematic Archive</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Handle recent posts inside Wiki if enabled
+                if (settings.show_recent_posts === 'true') {
+                    const count = parseInt(settings.recent_posts_count) || 3;
+                    await loadRecentPostsWiki(count);
                 }
             }
-            if (settings.naver_verification) {
-                const nTag = document.querySelector('meta[name="naver-site-verification"]');
-                if (nTag) {
-                    nTag.content = settings.naver_verification;
-                    console.log('✅ Naver Verification Tag Updated:', settings.naver_verification);
-                } else {
-                    console.warn('⚠️ Naver Meta Tag not found in HTML');
-                }
-            }
-
-            const title = document.getElementById('welcomeTitle');
-            const subtitle = document.querySelector('.post-meta span');
-            const content = document.getElementById('mainContent');
-
-            // Restore the page-header if it was hidden by the gallery
-            const pageHeader = document.querySelector('.page-header');
-            if (pageHeader) pageHeader.style.display = 'block';
-
-            if (title && settings.home_title) {
-                title.textContent = settings.home_title;
-                title.dataset.adminEditable = 'text';
-                title.dataset.adminId = 'setting:home_title';
-                title.dataset.adminField = 'value';
-            }
-            if (subtitle && settings.home_subtitle) {
-                subtitle.textContent = settings.home_subtitle;
-                subtitle.dataset.adminEditable = 'text';
-                subtitle.dataset.adminId = 'setting:home_subtitle';
-                subtitle.dataset.adminField = 'value';
-            }
-            if (content && settings.home_content) {
-                content.dataset.adminEditable = 'content';
-                content.dataset.adminId = 'setting:home_content';
-                content.dataset.adminField = 'value';
-                // Initialize Toast UI Viewer
-                const Viewer = toastui.Editor;
-                content.innerHTML = '';
-                const viewer = Viewer.factory({
-                    el: content,
-                    viewer: true,
-                    initialValue: settings.home_content
-                });
-            }
-
-            // Handle recent posts if enabled
-            if (settings.show_recent_posts === 'true') {
-                const count = parseInt(settings.recent_posts_count) || 3;
-                await loadRecentPosts(count);
-            }
-
-            console.log('✅ Home settings loaded');
 
         } catch (error) {
             console.error('❌ Home settings loading failed:', error);
+        }
+    }
+
+    async function loadRecentPostsWiki(count) {
+        const container = document.getElementById('recentPostsWiki');
+        if (!container) return;
+
+        try {
+            const { data: posts } = await supabaseClient
+                .from('archive_posts')
+                .select('id, title, created_at, category_id')
+                .eq('is_private', false)
+                .order('created_at', { ascending: false })
+                .limit(count);
+
+            if (posts && posts.length > 0) {
+                container.innerHTML = `
+                    <h2 class="text-xl font-bold text-[var(--wiki-gold)] mb-6 font-serif">RECENT RECORDS</h2>
+                    <div class="grid gap-4">
+                        ${posts.map(post => `
+                            <a href="post.html?id=${post.id}" class="group block p-4 bg-white/5 border border-white/10 rounded-lg hover:border-[var(--wiki-gold)] transition-all">
+                                <h3 class="text-white group-hover:text-[var(--wiki-gold)] font-medium transition-colors">${post.title}</h3>
+                                <span class="text-[10px] text-slate-500 font-mono uppercase">${new Date(post.created_at).toLocaleDateString('en-US')}</span>
+                            </a>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        } catch (e) {
+            console.error('Recent posts Wiki load failed:', e);
         }
     }
 
@@ -398,41 +454,18 @@
         if (!supabaseClient) return;
 
         try {
-            // Check category name first
             const { data: category } = await supabaseClient
                 .from('categories')
                 .select('name')
                 .eq('id', categoryId)
                 .single();
 
-            // 성향 백과 카테고리 클릭 시 갤러리 표시
-            if (category && category.name === '성향 백과') {
-                renderTendencyView();
-                return;
-            }
-
-            // 검증테스트 카테고리 클릭 시 프로토콜 표시
             if (category && category.name === '검증테스트') {
-                renderVerificationTestView();
-                return;
+                return renderVerificationTestView();
             }
 
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            const isAdmin = user && user.email === window.ADMIN_EMAIL;
-
-            let query = supabaseClient
-                .from('archive_posts')
-                .select('*')
-                .eq('category_id', categoryId)
-                .order('created_at', { ascending: false });
-
-            if (!isAdmin) {
-                query = query.eq('is_private', false);
-            }
-
-            const { data: posts, error } = await query;
-
-            if (error) throw error;
+            // Universal Wiki View for ALL other categories
+            await renderWikiView(categoryId);
 
             const content = document.getElementById('mainContent');
             const title = document.getElementById('welcomeTitle');
@@ -669,8 +702,8 @@
     // ═══════════════════════════════════════════════════
     window.wikiActiveId = null;
 
-    async function renderTendencyView() {
-        window.renderTendencyView = renderTendencyView;
+    async function renderWikiView(categoryId) {
+        window.renderWikiView = renderWikiView;
         if (!supabaseClient) return;
 
         const mainContent = document.getElementById('mainContent');
@@ -685,27 +718,31 @@
         wikiContainer.classList.remove('hidden');
 
         try {
-            // Find "성향 백과" category ID dynamically
-            const { data: categoryData } = await supabaseClient
-                .from('categories')
-                .select('id')
-                .eq('name', '성향 백과')
-                .single();
+            // Fetch posts under this category
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const isAdmin = user && user.email === window.ADMIN_EMAIL;
 
-            const kinkDictCategoryId = categoryData.id;
-
-            // Fetch archive_posts under this category
-            const { data: posts } = await supabaseClient
+            let query = supabaseClient
                 .from('archive_posts')
                 .select('id, title, content, created_at, updated_at')
-                .eq('category_id', kinkDictCategoryId)
+                .eq('category_id', categoryId)
                 .order('title', { ascending: true });
 
+            if (!isAdmin) {
+                query = query.eq('is_private', false);
+            }
+
+            const { data: posts } = await query;
             window.wikiData = posts || [];
 
-            // Set initial active doc if none
-            if (window.wikiData.length > 0 && !window.wikiActiveId) {
-                window.wikiActiveId = window.wikiData[0].id;
+            // Set initial active doc if none or if it doesn't belong to current data
+            if (window.wikiData.length > 0) {
+                const stillValid = window.wikiData.some(p => p.id === window.wikiActiveId);
+                if (!stillValid) {
+                    window.wikiActiveId = window.wikiData[0].id;
+                }
+            } else {
+                window.wikiActiveId = null;
             }
 
             renderWikiUI();
@@ -714,6 +751,13 @@
             console.error('Wiki load failed:', error);
         }
     }
+
+    // Alias for backward compatibility if needed
+    window.renderTendencyView = () => {
+        // Find "성향 백과" ID and call renderWikiView
+        supabaseClient.from('categories').select('id').eq('name', '성향 백과').single()
+            .then(({ data }) => { if (data) renderWikiView(data.id); });
+    };
 
     function renderWikiUI() {
         renderWikiNav();
