@@ -665,651 +665,244 @@
     }
 
     // ═══════════════════════════════════════════════════
-    // TENDENCY VIEW INTEGRATION - KINK DICTIONARY
+    // WIKI SYSTEM INTEGRATION
     // ═══════════════════════════════════════════════════
-    window.tendencyActiveTab = 'Top';
+    window.wikiActiveId = null;
 
     async function renderTendencyView() {
         window.renderTendencyView = renderTendencyView;
         if (!supabaseClient) return;
 
         const mainContent = document.getElementById('mainContent');
-        const welcomeTitle = document.getElementById('welcomeTitle');
-        const metaDiv = document.querySelector('.post-meta');
+        const wikiContainer = document.getElementById('wikiContainer');
+        const welcomeSection = document.getElementById('welcomeSection');
 
-        if (!mainContent) return;
+        if (!mainContent || !wikiContainer) return;
 
-        if (welcomeTitle) welcomeTitle.style.display = 'none';
-        if (metaDiv) metaDiv.style.display = 'none';
-
-        mainContent.innerHTML = `<div class="loading-container"><div class="loading"></div></div>`;
+        // Hide standard view, show Wiki container
+        mainContent.style.display = 'none';
+        if (welcomeSection) welcomeSection.style.display = 'none';
+        wikiContainer.classList.remove('hidden');
 
         try {
             // Find "성향 백과" category ID dynamically
-            const { data: categoryData, error: catError } = await supabaseClient
+            const { data: categoryData } = await supabaseClient
                 .from('categories')
                 .select('id')
                 .eq('name', '성향 백과')
                 .single();
 
-            if (catError) throw new Error('성향 백과 카테고리를 찾을 수 없습니다.');
             const kinkDictCategoryId = categoryData.id;
 
             // Fetch archive_posts under this category
-            const { data: posts, error } = await supabaseClient
+            const { data: posts } = await supabaseClient
                 .from('archive_posts')
-                .select('id, title, content, created_at')
+                .select('id, title, content, created_at, updated_at')
                 .eq('category_id', kinkDictCategoryId)
-                .order('created_at', { ascending: true }); // Using created_at or title for ordering
+                .order('title', { ascending: true });
 
-            // Fetch kink dictionary settings
-            const { data: kinkSettings } = await supabaseClient.from('settings').select('*').in('key', ['kink_dictionary_pairs', 'kink_role_overrides', 'kink_display_order']);
+            window.wikiData = posts || [];
 
-            const pairData = (kinkSettings || []).find(s => s.key === 'kink_dictionary_pairs');
-            const kinkPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
-            window.kinkDictionaryPairs = kinkPairs;
-
-            const overrideData = (kinkSettings || []).find(s => s.key === 'kink_role_overrides');
-            const kinkRoleOverrides = overrideData && overrideData.value ? JSON.parse(overrideData.value) : {};
-
-            const orderData = (kinkSettings || []).find(s => s.key === 'kink_display_order');
-            const kinkDisplayOrder = orderData && orderData.value ? JSON.parse(orderData.value) : [];
-
-            // Process posts and convert them to "tendencies" format
-            let tendenciesData = (posts || []).map(post => {
-                // Determine type: prioritze manual override, then tag, then keyword
-                let type = kinkRoleOverrides[post.id];
-                if (type) type = type.toLowerCase();
-                let rawTitle = post.title;
-
-                if (!type) {
-                    const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
-                    if (tagMatch) {
-                        type = tagMatch[1].toLowerCase();
-                        rawTitle = rawTitle.slice(tagMatch[0].length).trim();
-                        // If it's relation, treat it as top for list categorization
-                        if (type === 'relation') type = 'top';
-                    } else {
-                        const bottomKeywords = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|bottom|submissive|브랫|brat|펫|pet|리틀|little|디그레이디|degradee/i;
-                        if (bottomKeywords.test(rawTitle)) type = 'bottom';
-                        else type = 'top';
-                    }
-                } else {
-                    // If override exists, still clean title of tags for display
-                    const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
-                    if (tagMatch) rawTitle = rawTitle.slice(tagMatch[0].length).trim();
-                }
-
-                // 3) Try to extract English sub name from parenthesis e.g. "마스터 (Master)"
-                const titleMatch = rawTitle.match(/(.*?)\s*\((.*?)\)$/);
-                let name = rawTitle;
-                let sub_name = '';
-                if (titleMatch) {
-                    name = titleMatch[1].trim();
-                    sub_name = titleMatch[2].trim();
-                }
-
-                // 4) Extract <!--pair: name--> tag from content for Relation tab
-                let pairTarget = null;
-                const pairMatch = (post.content || '').match(/<!--\s*pair:\s*(.+?)\s*-->/i);
-                if (pairMatch) pairTarget = pairMatch[1].trim();
-
-                // 5) Strip <!--pair:...--> and metadata from content before storing
-                // const cleanContent = (post.content || '').replace(/<!--.*?-->/gs, '').trim(); // No longer needed as description uses full content
-
-                return {
-                    id: post.id,
-                    name: name,
-                    subName: sub_name,
-                    description: post.content,
-                    icon: null,
-                    type: type,
-                    pair: pairTarget
-                };
-            });
-
-            // Apply custom display order if it exists
-            if (kinkDisplayOrder && kinkDisplayOrder.length > 0) {
-                const orderMap = {};
-                kinkDisplayOrder.forEach((id, idx) => orderMap[id] = idx);
-
-                tendenciesData.sort((a, b) => {
-                    const orderA = orderMap[a.id] !== undefined ? orderMap[a.id] : 9999;
-                    const orderB = orderMap[b.id] !== undefined ? orderMap[b.id] : 9999;
-                    return orderA - orderB;
-                });
+            // Set initial active doc if none
+            if (window.wikiData.length > 0 && !window.wikiActiveId) {
+                window.wikiActiveId = window.wikiData[0].id;
             }
 
-            window.tendencyData = tendenciesData;
-
-            // Hide the legacy page-header to avoid duplicate titles
-            const pageHeader = document.querySelector('.page-header');
-            if (pageHeader) pageHeader.style.display = 'none';
-
-            renderKinkDictionaryUI();
+            renderWikiUI();
 
         } catch (error) {
-            console.error('Gallery load failed:', error);
-            mainContent.innerHTML = `<p style="color:red; text-align:center; padding: 2rem;">데이터 로딩 실패: ${error.message}</p>`;
+            console.error('Wiki load failed:', error);
         }
     }
 
-    window.renderKinkDictionaryUI = function () {
-        const mainContent = document.getElementById('mainContent');
-        if (!mainContent) return;
+    function renderWikiUI() {
+        renderWikiNav();
+        renderWikiContent();
+    }
 
-        const tendenciesData = window.tendencyData || [];
-        const doms = tendenciesData.filter(t => t.type === 'top');
-        const subs = tendenciesData.filter(t => t.type === 'bottom');
+    function renderWikiNav() {
+        const navCol = document.getElementById('wikiNavCol');
+        if (!navCol) return;
 
-        const activeTab = window.tendencyActiveTab || 'Top';
+        const posts = window.wikiData || [];
 
-        // Show empty state if no posts yet
-        if (tendenciesData.length === 0) {
-            mainContent.innerHTML = `
-                <div class="kink-dict-wrapper">
-                    <div class="kink-dict-header">
-                        <h1 class="kink-dict-title">성향 백과</h1>
-                        <p class="kink-dict-subtitle">아직 등록된 성향이 없습니다.</p>
-                    </div>
-                    <div style="text-align:center; padding: 3rem 1rem; color: var(--text-secondary);">
-                        <p>관리자 페이지에서 게시글을 작성하고 <strong>성향 백과</strong> 카테고리를 선택하면 여기에 표시됩니다.</p>
-                        <p style="margin-top:1rem; font-size:0.85rem; opacity:0.7;">제목 앞에 <code>[top]</code> 또는 <code>[bottom]</code>을 붙이면 자동 분류됩니다.<br>예: <code>[top] 마스터 (Master)</code></p>
-                    </div>
-                </div>
-            `;
-            return;
-        }
-
-        let contentHtml = '';
-
-        if (activeTab === 'Relation') {
-            console.log(`[KinkDict] Rendering Relation tab.`);
-            // Build pairs: for each top, find its pair from kinkPairs setting, else fallback to name match, else fallback to index
-            const buildPairs = () => {
-                const tops = tendenciesData.filter(t => t.type === 'top');
-                const bottoms = tendenciesData.filter(t => t.type === 'bottom');
-                const pairs = [];
-                const usedBottomIds = new Set();
-                const kinkPairs = window.kinkDictionaryPairs || {};
-
-                tops.forEach((top, idx) => {
-                    let matched = null;
-
-                    // 1) Use admin-defined pair if available
-                    if (kinkPairs[top.id]) {
-                        matched = bottoms.find(b => b.id === kinkPairs[top.id]);
-                    }
-
-                    // 2) Fallback: pair tag
-                    if (!matched && top.pair) {
-                        matched = bottoms.find(b =>
-                            b.name.toLowerCase().includes(top.pair.toLowerCase()) ||
-                            top.pair.toLowerCase().includes(b.name.toLowerCase())
-                        );
-                    }
-
-                    // 3) Fallback: pair by index
-                    if (!matched) {
-                        matched = bottoms.filter(b => !usedBottomIds.has(b.id))[0] || null;
-                    }
-
-                    if (matched) usedBottomIds.add(matched.id);
-                    pairs.push({ top, bottom: matched });
-                });
-                return pairs;
-            };
-
-            const pairs = buildPairs();
-            contentHtml = `
-                <div class="kink-relation-container">
-                    <div class="kink-relation-info">
-                        <p>관리자 페이지 설정 또는 Top 게시글 태그(<code>&lt;!--pair: 이름--&gt;</code>)에 따라 매칭됩니다.</p>
-                    </div>
-                    <div class="kink-relation-list">
-            `;
-            pairs.forEach(({ top, bottom }) => {
-                const bottomName = bottom ? bottom.name : '?';
-                contentHtml += `
-                    <div class="kink-relation-item">
-                        <div class="kink-relation-card top" onclick="showRoleDetail('${top.id}')" style="cursor:pointer">
-                            <div class="relation-badge top-badge">TOP</div>
-                            <div class="relation-name">${top.name}</div>
-                        </div>
-                        <div class="relation-icon"><i data-lucide="zap"></i></div>
-                        <div class="kink-relation-card bottom" ${bottom ? `onclick="showRoleDetail('${bottom.id}')" style="cursor:pointer"` : ''} >
-                            <div class="relation-badge bottom-badge">BOTTOM</div>
-                            <div class="relation-name">${bottomName}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            contentHtml += `</div></div>`;
-        } else {
-            const listData = (activeTab === 'Top' ? doms : subs) || [];
-            console.log(`[KinkDict] Rendering ${activeTab} tab. items count: ${listData.length}`);
-
-            contentHtml = `<div class="kink-list-container">`;
-            listData.forEach((item, idx) => {
-                try {
-                    // Create a brief summary of the markdown content for the list view
-                    // IMPORTANT: Strip HTML comments FIRST (<!--...-->) before stripping tags,
-                    // otherwise <!--pair:name--> loses its '>' and becomes an unclosed comment in innerHTML
-                    const plainText = (item.description || '')
-                        .replace(/<!--[\s\S]*?-->/g, '')   // 1) Remove HTML comments (e.g. <!--pair:...-->)
-                        .replace(/<[^>]*>/g, '')            // 2) Remove all remaining HTML tags
-                        .replace(/[#*_~`]/g, '')            // 3) Remove markdown syntax chars
-                        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 4) Convert markdown links to text
-                        .trim();
-                    const brief = plainText.length > 60 ? plainText.substring(0, 60) + '...' : plainText;
-
-                    console.log(`[KinkDict]  - Rendering item ${idx + 1}/${listData.length}: ${item.name} (${item.id})`);
-
-                    contentHtml += `
-                        <div class="kink-list-item" onclick="showRoleDetail('${item.id}')">
-                            <div class="kink-item-content">
-                                <div class="kink-item-header">
-                                    <h3 class="kink-item-name">${item.name}</h3>
-                                    ${item.subName ? `<span class="kink-item-subname"><i data-lucide="tag"></i>${item.subName}</span>` : ''}
-                                </div>
-                                <p class="kink-item-desc">${brief}</p>
-                            </div>
-                            <div class="kink-item-arrow">
-                                <i data-lucide="chevron-right"></i>
-                            </div>
-                        </div>
-                    `;
-                } catch (e) {
-                    console.error(`[KinkDict] ❌ Error rendering item ${idx + 1}:`, item, e);
-                }
-            });
-            contentHtml += `</div>`;
-        }
-
-
-        mainContent.innerHTML = `
-            <div class="kink-dict-wrapper">
-                <div class="kink-dict-header">
-                    <h1 class="kink-dict-title">성향 백과</h1>
-                    <p class="kink-dict-subtitle">총 ${tendenciesData.length}개의 기록이 존재합니다.</p>
-                </div>
-
-                <div class="kink-tabs-container">
-                    <div class="kink-tabs">
-                        <button class="kink-tab ${activeTab === 'Top' ? 'active' : ''}" onclick="switchTendencyTab('Top')">
-                            <div class="kink-tab-icon"><i data-lucide="arrow-up"></i></div>
-                            <span class="kink-tab-name">TOP</span>
-                            <span class="kink-tab-count">${doms.length}</span>
-                        </button>
-                        <button class="kink-tab ${activeTab === 'Bottom' ? 'active' : ''}" onclick="switchTendencyTab('Bottom')">
-                            <div class="kink-tab-icon" style="transform: rotate(180deg)"><i data-lucide="arrow-up"></i></div>
-                            <span class="kink-tab-name">BOTTOM</span>
-                            <span class="kink-tab-count">${subs.length}</span>
-                        </button>
-                        <button class="kink-tab ${activeTab === 'Relation' ? 'active' : ''}" onclick="switchTendencyTab('Relation')">
-                            <div class="kink-tab-icon"><i data-lucide="users"></i></div>
-                            <span class="kink-tab-name">RELATION</span>
-                            <span class="kink-tab-count">${Object.keys(window.kinkDictionaryPairs || {}).length}</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="kink-dict-content">
-                    ${contentHtml}
-                </div>
-
-                <!-- Refined Immersive Detail View -->
-                <div class="role-detail-overlay" id="roleDetailOverlay" onclick="closeRoleDetail()">
-                    <div class="role-detail-modal" id="roleDetailModal" onclick="event.stopPropagation()">
-                        <!-- Centered Header based on Reference -->
-                        <div class="modal-header">
-                            <button class="modal-back-btn" onclick="closeRoleDetail()" title="뒤로가기">
-                                <i data-lucide="chevron-left"></i>
-                            </button>
-                            <div class="modal-header-info">
-                                <span class="modal-tag" id="modalTag">CATEGORY</span>
-                                <h3 class="modal-title" id="modalTitle">Role Name</h3>
-                            </div>
-                            <div class="modal-admin-actions" style="position: absolute; right: 4.5rem; display: flex; gap: 0.5rem;">
-                                <button id="kinkModalEditBtn" class="kink-admin-btn edit-btn" style="display:none;">
-                                    <i data-lucide="edit-3"></i><span>내용 수정</span>
-                                </button>
-                                <button id="kinkModalSaveBtn" class="kink-admin-btn save-btn" style="display:none;">
-                                    <i data-lucide="save"></i><span>저장</span>
-                                </button>
-                            </div>
-                            <button class="modal-close-btn" onclick="closeRoleDetail()" title="닫기">
-                                <i data-lucide="x"></i>
-                            </button>
-                        </div>
-
-                        <div class="modal-content" id="modalScrollContent">
-                            <div class="flex justify-center mb-10">
-                                <div class="modal-icon-wrapper" id="modalIconWrapper" style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 32px; border: 1px solid rgba(255,255,255,0.1);">
-                                    <!-- Icon injected here -->
-                                </div>
-                            </div>
-
-                            <section class="mb-12">
-                                <h2 class="principles-title">
-                                    <i data-lucide="book-open" style="width:16px; height:16px;"></i> 개념 정의
-                                </h2>
-                                <p class="text-2xl font-bold leading-tight mb-6 text-white" id="modalDefinition" style="word-break: keep-all;">
-                                    "Definition Text Here"
-                                </p>
-                                <div class="role-description" id="roleDescription" style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8;">
-                                    <!-- Description injected here -->
-                                </div>
-                            </section>
-
-                            <!-- Bottom Nav -->
-                            <div class="kink-detail-nav">
-                                <div class="nav-buttons">
-                                    <button id="prevKinkBtn" class="nav-btn">
-                                        <i data-lucide="chevron-left"></i>
-                                        <span>이전 성향</span>
-                                    </button>
-                                    <button id="nextKinkBtn" class="nav-btn">
-                                        <span>다음 성향</span>
-                                        <i data-lucide="chevron-right"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-center py-20">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+        navCol.innerHTML = `
+            <div class="wiki-nav-header mb-6">
+                <h2 class="text-xs font-bold text-slate-500 tracking-[0.2em] uppercase mb-4 font-mono">Archive Navigation</h2>
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500"></i>
+                    <input type="text" id="wikiSearch" placeholder="Filter documents..." 
+                        class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-xs text-white focus:border-[var(--wiki-gold)] outline-none">
                 </div>
             </div>
+            <ul class="wiki-nav-list">
+                ${posts.map(post => `
+                    <li class="wiki-nav-item">
+                        <a href="javascript:void(0)" onclick="switchWikiDoc('${post.id}')" 
+                           class="wiki-nav-link ${window.wikiActiveId === post.id ? 'active' : ''}">
+                            ${post.title}
+                        </a>
+                    </li>
+                `).join('')}
+            </ul>
         `;
-
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
-    };
-
-    window.switchTendencyTab = function (tabId) {
-        window.tendencyActiveTab = tabId;
-        window.renderKinkDictionaryUI();
-    };
-
-    window.showRoleDetail = function (id) {
-        const item = window.tendencyData.find(t => t.id === id);
-        if (!item) return;
-
-        window.currentDetailId = id;
-
-        const overlay = document.getElementById('roleDetailOverlay');
-        const iconWrapper = document.getElementById('modalIconWrapper');
-        const title = document.getElementById('modalTitle');
-        const tag = document.getElementById('modalTag');
-        const definition = document.getElementById('modalDefinition');
-        const description = document.getElementById('roleDescription');
-        const scrollContent = document.getElementById('modalScrollContent');
-
-        const isTop = item.type === 'top';
-        const themeColor = isTop ? '#ff4d4d' : '#4da6ff';
-
-        if (tag) {
-            tag.textContent = isTop ? 'TOP' : 'BOTTOM';
-            tag.style.color = themeColor;
-        }
-
-        if (iconWrapper) {
-            iconWrapper.style.color = themeColor;
-            iconWrapper.style.borderColor = `${themeColor}20`; // subtle tinted border
-            iconWrapper.innerHTML = `<i data-lucide="${(item.icon_class || (isTop ? 'zap' : 'heart')).toLowerCase()}" style="width: 48px; height: 48px;"></i>`;
-        }
-
-        if (title) title.textContent = item.name;
-
-        // Extract definition from content (first line or quoted text)
-        let content = item.description || '';
-        let defText = "";
-        const defMatch = content.match(/^"(.*?)"/m) || content.match(/^(.*?)\n/m);
-        if (defMatch) {
-            defText = defMatch[0];
-            content = content.replace(defMatch[0], "").trim();
-        } else {
-            defText = `"${item.name}"`;
-        }
-        if (definition) definition.textContent = defText;
-        if (definition) definition.style.color = '#fff';
-
-        // Update Prev/Next Buttons
-        const currentIndex = window.tendencyData.findIndex(t => t.id === id);
-        const prevBtn = document.getElementById('prevKinkBtn');
-        const nextBtn = document.getElementById('nextKinkBtn');
-
-        if (prevBtn) {
-            prevBtn.disabled = currentIndex === 0;
-            prevBtn.onclick = () => showRoleDetail(window.tendencyData[currentIndex - 1].id);
-        }
-        if (nextBtn) {
-            nextBtn.disabled = currentIndex === window.tendencyData.length - 1;
-            nextBtn.onclick = () => showRoleDetail(window.tendencyData[currentIndex + 1].id);
-        }
-
-        // Show the modal FIRST
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        if (scrollContent) scrollContent.scrollTop = 0;
-
-        if (description) {
-            description.innerHTML = '';
-            if (window._kinkViewer) {
-                try { window._kinkViewer.destroy(); } catch (e) { }
-                window._kinkViewer = null;
-            }
-
-            if (typeof toastui !== 'undefined' && toastui.Editor) {
-                window._kinkViewer = toastui.Editor.factory({
-                    el: description,
-                    viewer: true,
-                    initialValue: content,
-                    theme: 'dark'
-                });
-            } else {
-                description.innerHTML = `<div class="plain-text-body">${content.replace(/\n/g, '<br>')}</div>`;
-            }
-        }
 
         if (window.lucide) window.lucide.createIcons();
 
-        // ─── Edit Mode: 편집 버튼 및 클릭 편집 기능 ───
-        const isEditMode = (typeof window.isAdminEditMode === 'function' && window.isAdminEditMode()) ||
-            document.body.classList.contains('admin-edit-active');
-
-        const editBtn = document.getElementById('kinkModalEditBtn');
-        const saveBtn = document.getElementById('kinkModalSaveBtn');
-
-        if (isEditMode && editBtn && saveBtn) {
-            editBtn.style.display = 'flex';
-            saveBtn.style.display = 'none';
-            description.classList.add('is-editable');
-            description.title = '클릭하여 내용을 수정하시겠습니까?';
-
-            editBtn.onclick = (e) => {
-                e.preventDefault();
-                _openKinkEditor(item, description, editBtn, saveBtn);
-            };
-
-            saveBtn.onclick = (e) => {
-                e.preventDefault();
-                _saveKinkContent(item, description, editBtn, saveBtn);
-            };
-
-            description._kinkEditHandler = (e) => {
-                if (editBtn.style.display !== 'none') {
-                    _openKinkEditor(item, description, editBtn, saveBtn);
-                }
-            };
-            description.addEventListener('click', description._kinkEditHandler);
-        } else if (editBtn && saveBtn) {
-            editBtn.style.display = 'none';
-            saveBtn.style.display = 'none';
-            description.classList.remove('is-editable');
-            description.title = '';
-        }
-    };
-
-
-    // 인라인 에디터 열기 (마크다운 대신 단순 textarea 사용)
-    function _openKinkEditor(item, descriptionEl, editBtn, saveBtn) {
-        editBtn.style.display = 'none';
-        saveBtn.style.display = 'flex';
-
-        const originalContent = item.description || '';
-        descriptionEl.innerHTML = '';
-        descriptionEl.classList.remove('is-editable');
-
-        const textarea = document.createElement('textarea');
-        textarea.id = 'kinkModalTextarea';
-        textarea.className = 'kink-edit-textarea';
-        textarea.value = originalContent;
-        textarea.placeholder = '내용을 입력하세요...';
-
-        descriptionEl.appendChild(textarea);
-        textarea.focus();
-
-        // 텍스트 영역 높이 자동 조절
-        textarea.style.height = 'auto';
-        textarea.style.height = (textarea.scrollHeight + 20) + 'px';
-        textarea.oninput = () => {
-            textarea.style.height = 'auto';
-            textarea.style.height = (textarea.scrollHeight + 20) + 'px';
-        };
-    }
-
-    // 변경사항 저장
-    async function _saveKinkContent(item, descriptionEl, editBtn, saveBtn) {
-        const textarea = document.getElementById('kinkModalTextarea');
-        if (!textarea) return;
-
-        const newContent = textarea.value;
-
-        try {
-            if (typeof window.showToast === 'function') window.showToast('저장 중...', 'loading');
-
-            const { error } = await window.supabaseClient
-                .from('archive_posts')
-                .update({ content: newContent, updated_at: new Date().toISOString() })
-                .eq('id', item.id);
-
-            if (error) throw error;
-
-            if (typeof window.showToast === 'function') window.showToast('변경사항이 저장되었습니다.', 'success');
-
-            item.description = newContent;
-            const dataItem = (window.tendencyData || []).find(t => t.id === item.id);
-            if (dataItem) dataItem.description = newContent;
-
-            editBtn.style.display = 'flex';
-            saveBtn.style.display = 'none';
-            descriptionEl.classList.add('is-editable');
-
-            // 뷰어 복구 (Toast UI 방식)
-            descriptionEl.innerHTML = '';
-            if (typeof toastui !== 'undefined' && toastui.Editor) {
-                if (window._kinkViewer) {
-                    try { window._kinkViewer.destroy(); } catch (e) { }
-                }
-                window._kinkViewer = toastui.Editor.factory({
-                    el: descriptionEl,
-                    viewer: true,
-                    initialValue: newContent,
-                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+        // Search listener
+        const searchInput = document.getElementById('wikiSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                document.querySelectorAll('.wiki-nav-item').forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(term) ? 'block' : 'none';
                 });
-            } else {
-                descriptionEl.innerHTML = `<div class="plain-text-body">${newContent.replace(/\n/g, '<br>')}</div>`;
-            }
-
-        } catch (e) {
-            console.error('Save failed:', e);
-            if (typeof window.showToast === 'function') window.showToast('저장 실패: ' + e.message, 'error');
+            });
         }
     }
 
-    window.closeRoleDetail = function () {
-        const overlay = document.getElementById('roleDetailOverlay');
-        if (!overlay) return;
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
+    window.switchWikiDoc = function (id) {
+        window.wikiActiveId = id;
+        renderWikiUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
-        // 편집기 정리 (textarea는 remove되면 끝)
-        window._kinkInlineEditor = null;
+    function renderWikiContent() {
+        const contentCol = document.getElementById('wikiContentCol');
+        const infoCol = document.getElementById('wikiInfoCol');
+        if (!contentCol || !infoCol) return;
 
-        // 버튼 상태 초기화 (수정 버튼 노출, 저장 버튼 숨김)
-        const editBtn = document.getElementById('kinkModalEditBtn');
-        const saveBtn = document.getElementById('kinkModalSaveBtn');
-        if (editBtn) editBtn.style.display = '';
-        if (saveBtn) saveBtn.style.display = 'none';
+        const post = (window.wikiData || []).find(p => p.id === window.wikiActiveId);
+        if (!post) {
+            contentCol.innerHTML = '<p class="text-center opacity-50 py-20">Select a document from the sidebar.</p>';
+            infoCol.innerHTML = '';
+            return;
+        }
 
-        const desc = document.getElementById('roleDescription');
-        if (desc) {
-            if (desc._kinkEditHandler) {
-                desc.removeEventListener('click', desc._kinkEditHandler);
-                desc._kinkEditHandler = null;
-            }
-            desc.classList.remove('is-editable');
-            desc.style.cssText = '';
-            desc.title = '';
+        // Render Main Content
+        contentCol.innerHTML = `
+            <header class="wiki-post-header mb-10">
+                <div class="text-[var(--wiki-gold)] text-[10px] font-mono tracking-[0.3em] uppercase mb-2">Authenticated Record</div>
+                <h1 class="text-4xl md:text-5xl font-bold font-serif text-white mb-4 border-none !p-0">${post.title}</h1>
+                <div class="h-1 w-20 bg-[var(--wiki-gold)]"></div>
+            </header>
+            <div id="wikiViewer" class="wiki-prose"></div>
+        `;
+
+        // Initialize Toast UI Viewer
+        if (typeof toastui !== 'undefined' && toastui.Editor) {
+            toastui.Editor.factory({
+                el: document.getElementById('wikiViewer'),
+                viewer: true,
+                initialValue: post.content,
+                theme: 'dark'
+            });
+        }
+
+        // Render Right Sidebar (Infobox & TOC)
+        renderWikiInfo(post);
+
+        // Custom rendering for Callouts after viewer is ready
+        setTimeout(processWikiComponents, 100);
+    }
+
+    function renderWikiInfo(post) {
+        const infoCol = document.getElementById('wikiInfoCol');
+        if (!infoCol) return;
+
+        // Auto-generate TOC from headers
+        const headers = Array.from(document.getElementById('wikiViewer').querySelectorAll('h2, h3'));
+        const tocHtml = headers.length > 0 ? `
+            <div class="wiki-toc">
+                <h3 class="toc-title">Contents</h3>
+                <ul class="toc-list">
+                    ${headers.map((h, i) => {
+            const id = `heading-${i}`;
+            h.id = id;
+            return `
+                            <li class="toc-item" style="padding-left: ${h.tagName === 'H3' ? '1rem' : '0'}">
+                                <a href="#${id}" class="toc-link" onclick="scrollToHeading(event, '${id}')">${h.textContent}</a>
+                            </li>
+                        `;
+        }).join('')}
+                </ul>
+            </div>
+        ` : '';
+
+        const updatedDate = new Date(post.updated_at || post.created_at).toLocaleDateString('ko-KR', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        infoCol.innerHTML = `
+            <div class="wiki-infobox animate-slide-up">
+                <div class="infobox-header">
+                    <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Document Meta</span>
+                    <h3 class="infobox-title mt-2">${post.title}</h3>
+                </div>
+                <div class="infobox-data">
+                    <div class="infobox-row">
+                        <span class="infobox-label">Classification</span>
+                        <span class="infobox-value">Tendency Guide</span>
+                    </div>
+                    <div class="infobox-row">
+                        <span class="infobox-label">Editor</span>
+                        <span class="infobox-value">Archive Master</span>
+                    </div>
+                    <div class="infobox-row">
+                        <span class="infobox-label">Last Modified</span>
+                        <span class="infobox-value">${updatedDate}</span>
+                    </div>
+                </div>
+                ${tocHtml}
+            </div>
+        `;
+    }
+
+    window.scrollToHeading = function (e, id) {
+        e.preventDefault();
+        const el = document.getElementById(id);
+        if (el) {
+            const offset = 80;
+            const bodyRect = document.body.getBoundingClientRect().top;
+            const elementRect = el.getBoundingClientRect().top;
+            const elementPosition = elementRect - bodyRect;
+            const offsetPosition = elementPosition - offset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
         }
     };
 
-    // Edit Mode가 토글될 때 admin-inline.js가 호출하는 전역 함수
-    // 모달이 현재 열려 있으면 편집 UI를 즉시 주입 / 제거
-    window.activateKinkModalEditMode = function (enabled) {
-        const overlay = document.getElementById('roleDetailOverlay');
-        const desc = document.getElementById('roleDescription');
-        const editBtn = document.getElementById('kinkModalEditBtn');
-        const saveBtn = document.getElementById('kinkModalSaveBtn');
+    function processWikiComponents() {
+        const viewer = document.getElementById('wikiViewer');
+        if (!viewer) return;
 
-        if (!overlay || !overlay.classList.contains('active') || !desc || !editBtn || !saveBtn) return;
+        // Custom Callouts: Look for specific patterns like > [!NOTE] or specialized syntax
+        // For now, let's just style standard alert-like blocks if they exist
+        const blockquotes = viewer.querySelectorAll('blockquote');
+        blockquotes.forEach(bq => {
+            const p = bq.querySelector('p');
+            if (p && p.textContent.startsWith('[!')) {
+                const match = p.textContent.match(/\[!(.*?)\]/);
+                const type = match ? match[1] : 'NOTE';
+                const content = p.innerHTML.replace(`[!${type}]`, '').trim();
 
-        if (enabled) {
-            const currentId = window.currentDetailId;
-            if (!currentId) return;
-            const item = (window.tendencyData || []).find(t => t.id === currentId);
-            if (!item) return;
-
-            editBtn.style.display = 'flex';
-            saveBtn.style.display = 'none';
-            desc.classList.add('is-editable');
-            desc.title = '클릭하여 내용을 수정하시겠습니까?';
-
-            editBtn.onclick = (e) => {
-                e.preventDefault();
-                _openKinkEditor(item, desc, editBtn, saveBtn);
-            };
-
-            saveBtn.onclick = (e) => {
-                e.preventDefault();
-                _saveKinkContent(item, desc, editBtn, saveBtn);
-            };
-
-            if (!desc._kinkEditHandler) {
-                desc._kinkEditHandler = (e) => {
-                    if (editBtn.style.display !== 'none') {
-                        _openKinkEditor(item, desc, editBtn, saveBtn);
-                    }
-                };
-                desc.addEventListener('click', desc._kinkEditHandler);
+                bq.outerHTML = `
+                    <div class="wiki-callout">
+                        <div class="wiki-callout-title">
+                            <i data-lucide="info" class="w-4 h-4"></i> ${type.toUpperCase()}
+                        </div>
+                        <div class="wiki-callout-content">${content}</div>
+                    </div>
+                `;
             }
-        } else {
-            editBtn.style.display = 'none';
-            saveBtn.style.display = 'none';
-            if (desc._kinkEditHandler) {
-                desc.removeEventListener('click', desc._kinkEditHandler);
-                desc._kinkEditHandler = null;
-            }
-            desc.classList.remove('is-editable');
-            desc.style.cssText = '';
-            desc.title = '';
-        }
-    };
+        });
+        if (window.lucide) window.lucide.createIcons();
+    }
+
 
     // ═══════════════════════════════════════════════════
     // VERIFICATION TEST VIEW (BDSM Authenticity Protocol)

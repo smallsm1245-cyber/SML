@@ -10,6 +10,17 @@
 :root {
     /* 1. Global Color System (Restored Brass & Neutral) */
     --primary-yellow: #B68D40;
+    --accent-amber: #D4A574;
+
+    /* Wiki Theme - Private Library */
+    --wiki-bg: #0A0C10;
+    --wiki-gold: #C2A36A;
+    --wiki-gold-dim: rgba(194, 163, 106, 0.2);
+    --wiki-border: rgba(194, 163, 106, 0.15);
+    --wiki-text: #E0E2E5;
+    --wiki-text-dim: #9499A1;
+    --wiki-sidebar-width: 260px;
+    --wiki-right-width: 300px;
     --primary-brass: var(--primary-yellow);
     --primary-yellow-hover: #9c7836;
     --primary-yellow-light: #ceb180;
@@ -3944,5 +3955,212 @@ body.search-focused .search-container {
 @media (max-width: 1023px) {
     #menuToggleBtn {
         display: none !important;
+    }
+}
+
+/* ═══════════════════════════════════════════════════
+   11. WIKI SYSTEM - PRIVATE LIBRARY
+   ═══════════════════════════════════════════════════ */
+
+/* Wiki Container & Layout */
+#wikiContainer {
+    background: var(--wiki-bg);
+    color: var(--wiki-text);
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: var(--font-serif);
+}
+
+.wiki-layout {
+    display: grid;
+    grid-template-columns: var(--wiki-sidebar-width) 1fr var(--wiki-right-width);
+    gap: 3rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Typography Overrides for Wiki */
+.wiki-content-col h1,
+.wiki-content-col h2,
+.wiki-content-col h3 {
+    color: var(--wiki-gold);
+    border-bottom: 1px solid var(--wiki-border);
+    padding-bottom: 0.5rem;
+    margin-top: 2.5rem;
+    font-family: var(--font-sans);
+}
+
+.wiki-content-col p {
+    color: var(--wiki-text);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+/* Left Navigation (Hierarchy) */
+.wiki-nav-list {
+    list-style: none;
+    padding: 0;
+}
+
+.wiki-nav-item {
+    margin-bottom: 0.5rem;
+}
+
+.wiki-nav-link {
+    color: var(--wiki-text-dim);
+    text-decoration: none;
+    font-size: 0.95rem;
+    display: block;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.wiki-nav-link:hover,
+.wiki-nav-link.active {
+    color: var(--wiki-gold);
+    background: var(--wiki-gold-dim);
+}
+
+/* Right Sidebar: Infobox */
+.wiki-infobox {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--wiki-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: sticky;
+    top: 2rem;
+}
+
+.infobox-header {
+    text-align: center;
+    border-bottom: 1px solid var(--wiki-border);
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+}
+
+.infobox-title {
+    color: var(--wiki-gold);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.infobox-data {
+    width: 100%;
+    font-size: 0.85rem;
+}
+
+.infobox-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(194, 163, 106, 0.05);
+}
+
+.infobox-label {
+    color: var(--wiki-gold);
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.infobox-value {
+    color: var(--wiki-text);
+    text-align: right;
+}
+
+/* Table of Contents (TOC) */
+.wiki-toc {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--wiki-border);
+}
+
+.toc-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--wiki-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+}
+
+.toc-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.toc-item {
+    margin-bottom: 0.4rem;
+}
+
+.toc-link {
+    color: var(--wiki-text-dim);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+}
+
+.toc-link:hover {
+    color: var(--wiki-gold);
+}
+
+/* Callout Components */
+.wiki-callout {
+    background: rgba(194, 163, 106, 0.08);
+    border-left: 4px solid var(--wiki-gold);
+    padding: 1.2rem 1.5rem;
+    border-radius: 0 8px 8px 0;
+    margin: 2rem 0;
+}
+
+.wiki-callout-title {
+    color: var(--wiki-gold);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Internal Links */
+.wiki-internal-link {
+    color: #4da6ff;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+}
+
+.wiki-internal-link:hover {
+    color: #80c1ff;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1200px) {
+    .wiki-layout {
+        grid-template-columns: 240px 1fr;
+        gap: 2rem;
+    }
+
+    .wiki-info-col {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    #wikiContainer {
+        padding: 1rem;
+    }
+
+    .wiki-layout {
+        display: block;
+    }
+
+    .wiki-nav-col {
+        display: none;
+    }
+
+    .wiki-content-col {
+        padding: 0;
     }
 }
