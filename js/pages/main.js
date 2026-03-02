@@ -193,22 +193,23 @@
         }
 
         try {
-            // Fetch Categories
-            const { data: categories, error } = await supabaseClient
+            // Fetch Categories (all, to check for existing ones before auto-creation)
+            const { data: allCategories, error } = await supabaseClient
                 .from('categories')
                 .select('*')
-                .eq('is_visible', true)
                 .order('display_order', { ascending: true });
 
             if (error) throw error;
 
+            let categories = allCategories || [];
+
             // '성향 백과' 카테고리 자동 생성 (없을 경우 관리자로 로그인 시)
-            const hasWiki = (categories || []).some(c => c.name === '성향 백과' && !c.parent_id);
+            const hasWiki = categories.some(c => c.name === '성향 백과' && !c.parent_id);
             if (!hasWiki) {
                 try {
                     const { data: { user } } = await supabaseClient.auth.getUser();
                     if (user && user.email === window.ADMIN_EMAIL) {
-                        const maxOrder = (categories || [])
+                        const maxOrder = categories
                             .filter(c => !c.parent_id)
                             .reduce((max, c) => Math.max(max, c.display_order || 0), 0);
                         const { data: newCat } = await supabaseClient
@@ -225,12 +226,12 @@
             }
 
             // 'BDSM 궁합표' 카테고리 자동 생성
-            const hasBdsm = (categories || []).some(c => c.name === 'BDSM 궁합표' && !c.parent_id);
+            const hasBdsm = categories.some(c => c.name === 'BDSM 궁합표' && !c.parent_id);
             if (!hasBdsm) {
                 try {
                     const { data: { user } } = await supabaseClient.auth.getUser();
                     if (user && user.email === window.ADMIN_EMAIL) {
-                        const maxOrder = (categories || [])
+                        const maxOrder = categories
                             .filter(c => !c.parent_id)
                             .reduce((max, c) => Math.max(max, c.display_order || 0), 0);
                         const { data: newCat } = await supabaseClient
@@ -247,12 +248,12 @@
             }
 
             // '검증테스트' 카테고리 자동 생성
-            const hasVerification = (categories || []).some(c => c.name === '검증테스트' && !c.parent_id);
+            const hasVerification = categories.some(c => c.name === '검증테스트' && !c.parent_id);
             if (!hasVerification) {
                 try {
                     const { data: { user } } = await supabaseClient.auth.getUser();
                     if (user && user.email === window.ADMIN_EMAIL) {
-                        const maxOrder = (categories || [])
+                        const maxOrder = categories
                             .filter(c => !c.parent_id)
                             .reduce((max, c) => Math.max(max, c.display_order || 0), 0);
                         const { data: newCat } = await supabaseClient
@@ -283,19 +284,16 @@
             }
 
             // Recursive Count Update for Parents
-            // Note: This assumes a 2-level hierarchy (Parent -> Child) or ordered such that children are processed or we can iterate.
-            // Since we manipulate 'counts', let's iterate to add child counts to parents.
-            // A simple approach for 2-level:
-            if (categories) {
-                const parentIds = new Set(categories.filter(c => !c.parent_id).map(c => c.id));
-                categories.forEach(c => {
-                    if (c.parent_id && parentIds.has(c.parent_id)) {
-                        counts[c.parent_id] = (counts[c.parent_id] || 0) + (counts[c.id] || 0);
-                    }
-                });
-            }
+            const parentIds = new Set(categories.filter(c => !c.parent_id).map(c => c.id));
+            categories.forEach(c => {
+                if (c.parent_id && parentIds.has(c.parent_id)) {
+                    counts[c.parent_id] = (counts[c.parent_id] || 0) + (counts[c.id] || 0);
+                }
+            });
 
-            renderCategories(categories || [], counts);
+            // CRITICAL: Filter for display (only visible ones)
+            const visibleCategories = categories.filter(c => c.is_visible);
+            renderCategories(visibleCategories, counts);
 
             console.log('✅ Categories loaded');
 

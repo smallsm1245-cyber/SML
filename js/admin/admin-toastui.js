@@ -425,7 +425,6 @@ async function loadCategories() {
         const { data: categories, error } = await supabaseClient
             .from('categories')
             .select('*')
-            .eq('is_visible', true)
             .order('display_order', { ascending: true });
 
         if (error) throw error;
