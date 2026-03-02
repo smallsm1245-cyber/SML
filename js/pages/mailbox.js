@@ -20,11 +20,69 @@
         if (window.SML_CORE) {
             window.SML_CORE.waitForConfig(() => {
                 if (window.SML_CORE.initializeSupabase()) {
+                    loadCategories();
                     loadPublicMessages();
                 }
             });
         }
     });
+
+    async function loadCategories() {
+        if (!window.supabaseClient) return;
+        try {
+            const { data: categories } = await window.supabaseClient
+                .from('categories')
+                .select('*')
+                .eq('is_visible', true)
+                .order('display_order', { ascending: true });
+
+            const { data: posts } = await window.supabaseClient
+                .from('archive_posts')
+                .select('category_id, is_private')
+                .eq('is_private', false);
+
+            const counts = {};
+            if (posts) {
+                posts.forEach(p => {
+                    counts[p.category_id] = (counts[p.category_id] || 0) + 1;
+                });
+            }
+            renderSidebarNav(categories || [], counts);
+        } catch (e) {
+            console.error('Mailbox category load failed:', e);
+        }
+    }
+
+    function renderSidebarNav(categories, counts) {
+        const nav = document.getElementById('categoryNav');
+        if (!nav) return;
+
+        const isDesktop = window.innerWidth >= 1024;
+        const backButton = `
+            <li class="mb-4">
+                <a href="index.html" 
+                   class="flex items-center gap-2 text-xs font-bold text-[var(--wiki-gold)] hover:text-white transition-colors uppercase tracking-widest font-mono">
+                    <i data-lucide="arrow-left" class="w-3 h-3"></i> Back to Archive
+                </a>
+            </li>
+        `;
+
+        // Simplify for mailbox: just show back button and categories
+        nav.innerHTML = `
+            ${isDesktop ? backButton : ''}
+            <div class="wiki-nav-header mb-4">
+                <h2 class="text-[10px] font-bold text-slate-500 tracking-[0.2em] uppercase font-mono">Archive Categories</h2>
+            </div>
+            ${categories.filter(c => !c.parent_id).map(root => `
+                <li class="category-item mb-2">
+                    <a href="index.html#category-${root.id}" class="text-sm text-slate-400 hover:text-[var(--wiki-gold)] transition-colors">
+                        ${root.name} <span class="text-[10px] opacity-50 ml-1">(${counts[root.id] || 0})</span>
+                    </a>
+                </li>
+            `).join('')}
+        `;
+        if (window.lucide) window.lucide.createIcons();
+    }
 
     // ═══════════════════════════════════════════════════
     // 2. TAB LOGIC

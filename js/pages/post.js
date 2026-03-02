@@ -34,12 +34,9 @@ async function loadCategories() {
             .select('category_id, is_private')
             .eq('is_private', false);
 
-        const counts = {};
-        if (posts) {
-            posts.forEach(p => {
-                counts[p.category_id] = (counts[p.category_id] || 0) + 1;
-            });
-        }
+        // Save for Wiki "Back" functionality
+        window.allCategories = categories || [];
+        window.allCounts = counts;
 
         renderCategories(categories || [], counts);
 
@@ -181,6 +178,9 @@ async function loadPost() {
         // Add Wiki sidebar info (Infobox & TOC)
         renderWikiInfo(post);
 
+        // Fetch sibling posts for unified sidebar navigation
+        loadWikiSiblingPosts(post.category_id);
+
         // Custom rendering for Callouts after viewer is ready
         setTimeout(processWikiComponents, 100);
 
@@ -270,7 +270,7 @@ function renderWikiInfo(post) {
             <div class="infobox-data">
                 <div class="infobox-row">
                     <span class="infobox-label">Classification</span>
-                    <span class="infobox-value">Archive Post</span>
+                    <span class="infobox-value">${post.categories ? post.categories.name : 'Archive'}</span>
                 </div>
                 <div class="infobox-row">
                     <span class="infobox-label">Editor</span>
@@ -284,6 +284,84 @@ function renderWikiInfo(post) {
             ${tocHtml}
         </div>
     `;
+}
+
+async function loadWikiSiblingPosts(categoryId) {
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        const isAdmin = user && user.email === window.ADMIN_EMAIL;
+
+        let query = supabaseClient
+            .from('archive_posts')
+            .select('id, title')
+            .eq('category_id', categoryId)
+            .order('title', { ascending: true });
+
+        if (!isAdmin) {
+            query = query.eq('is_private', false);
+        }
+
+        const { data: posts } = await query;
+        window.wikiData = posts || [];
+        renderWikiNav();
+    } catch (e) {
+        console.error('Failed to load siblings:', e);
+    }
+}
+
+function renderWikiNav() {
+    const navCol = document.getElementById('wikiNavCol');
+    const globalCategoryNav = document.getElementById('categoryNav');
+    if (!navCol && !globalCategoryNav) return;
+
+    const posts = window.wikiData || [];
+    const isDesktop = window.innerWidth >= 1024;
+    const target = isDesktop ? globalCategoryNav : navCol;
+    if (!target) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeId = urlParams.get('id');
+
+    const backButton = `
+        <li class="mb-4">
+            <a href="index.html" 
+               class="flex items-center gap-2 text-xs font-bold text-[var(--wiki-gold)] hover:text-white transition-colors uppercase tracking-widest font-mono">
+                <i data-lucide="arrow-left" class="w-3 h-3"></i> Back to Archive
+            </a>
+        </li>
+    `;
+
+    target.innerHTML = `
+        ${isDesktop ? backButton : ''}
+        <div class="relative mb-6">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500"></i>
+            <input type="text" id="wikiSearch" placeholder="Filter documents..." 
+                class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-xs text-white focus:border-[var(--wiki-gold)] outline-none">
+        </div>
+        <ul class="wiki-nav-list">
+            ${posts.map(p => `
+                <li class="wiki-nav-item">
+                    <a href="post.html?id=${p.id}" 
+                       class="wiki-nav-link ${activeId === p.id ? 'active' : ''}">
+                        ${p.title}
+                    </a>
+                </li>
+            `).join('')}
+        </ul>
+    `;
+    if (window.lucide) window.lucide.createIcons();
+
+    // Search listener
+    const searchInput = document.getElementById('wikiSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('.wiki-nav-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(term) ? 'block' : 'none';
+            });
+        });
+    }
 }
 
 window.scrollToHeading = function (e, id) {

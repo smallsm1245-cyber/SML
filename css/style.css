@@ -3934,7 +3934,9 @@ body.search-focused .search-container {
     position: relative;
 }
 
-/* Sidebar & Menu Fixes */
+/* ═══════════════════════════════════════════════════
+   11. SIDEBAR & NAVIGATION (UNIFIED)
+   ═══════════════════════════════════════════════════ */
 #sidebar {
     z-index: 10000 !important;
 }
@@ -3943,23 +3945,52 @@ body.search-focused .search-container {
     z-index: 9998 !important;
 }
 
-/* Force menu toggle button visibility on desktop */
-#menuToggleBtn {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    z-index: 10001 !important;
-    pointer-events: auto !important;
-}
+/* DESKTOP PERMANENT SIDEBAR */
+@media (min-width: 1024px) {
+    #sidebar {
+        transform: translateX(0) !important;
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        width: var(--sidebar-width) !important;
+        display: block !important;
+        border-right: 1px solid var(--wiki-border) !important;
+        background: var(--wiki-bg) !important;
+    }
 
-@media (max-width: 1023px) {
+    #sidebarOverlay {
+        display: none !important;
+    }
+
+    #appContainer {
+        margin-left: var(--sidebar-width) !important;
+        max-width: calc(100vw - var(--sidebar-width)) !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+
+    /* Hide redundant elements on desktop */
     #menuToggleBtn {
         display: none !important;
+    }
+
+    /* Adjust Wiki Layout inside appContainer */
+    .wiki-layout {
+        /* On desktop, the global sidebar handles the leftmost column */
+        grid-template-columns: 1fr var(--wiki-right-width) !important;
+        max-width: 100% !important;
+        gap: 2rem !important;
+    }
+
+    .wiki-nav-col {
+        display: none !important;
+        /* Global sidebar now handles this */
     }
 }
 
 /* ═══════════════════════════════════════════════════
-   11. WIKI SYSTEM - PRIVATE LIBRARY
+   12. WIKI SYSTEM - PRIVATE LIBRARY
    ═══════════════════════════════════════════════════ */
 
 /* Wiki Container & Layout */

@@ -349,9 +349,19 @@
 
             // CRITICAL: Filter for display (only visible ones)
             const visibleCategories = categories.filter(c => c.is_visible);
+
+            // Save for Wiki "Back" functionality
+            window.allCategories = visibleCategories;
+            window.allCounts = counts;
+
             renderCategories(visibleCategories, counts);
 
-            console.log('✅ Categories loaded');
+            // Check URL params for category filter (Redirect support)
+            const urlParams = new URLSearchParams(window.location.search);
+            const catId = urlParams.get('category');
+            if (catId) {
+                filterByCategory(catId);
+            }
 
         } catch (error) {
             console.error('❌ Categories loading failed:', error);
@@ -766,30 +776,47 @@
 
     function renderWikiNav() {
         const navCol = document.getElementById('wikiNavCol');
-        if (!navCol) return;
+        const globalCategoryNav = document.getElementById('categoryNav'); // Global Sidebar Target
+        if (!navCol && !globalCategoryNav) return;
 
         const posts = window.wikiData || [];
+        const isDesktop = window.innerWidth >= 1024;
 
-        navCol.innerHTML = `
+        // Use global sidebar on desktop, specific nav col on mobile
+        const target = isDesktop ? globalCategoryNav : navCol;
+        if (!target) return;
+
+        const backButton = `
+        <li class="mb-4">
+            <a href="javascript:void(0)" onclick="exitWikiMode()" 
+               class="flex items-center gap-2 text-xs font-bold text-[var(--wiki-gold)] hover:text-white transition-colors uppercase tracking-widest font-mono">
+                <i data-lucide="arrow-left" class="w-3 h-3"></i> Back to Archive
+            </a>
+        </li>
+    `;
+
+        target.innerHTML = `
+        ${isDesktop ? backButton : `
             <div class="wiki-nav-header mb-6">
                 <h2 class="text-xs font-bold text-slate-500 tracking-[0.2em] uppercase mb-4 font-mono">Archive Navigation</h2>
-                <div class="relative">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500"></i>
-                    <input type="text" id="wikiSearch" placeholder="Filter documents..." 
-                        class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-xs text-white focus:border-[var(--wiki-gold)] outline-none">
-                </div>
             </div>
-            <ul class="wiki-nav-list">
-                ${posts.map(post => `
-                    <li class="wiki-nav-item">
-                        <a href="javascript:void(0)" onclick="switchWikiDoc('${post.id}')" 
-                           class="wiki-nav-link ${window.wikiActiveId === post.id ? 'active' : ''}">
-                            ${post.title}
-                        </a>
-                    </li>
-                `).join('')}
-            </ul>
-        `;
+        `}
+        <div class="relative mb-6">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500"></i>
+            <input type="text" id="wikiSearch" placeholder="Filter documents..." 
+                class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-xs text-white focus:border-[var(--wiki-gold)] outline-none">
+        </div>
+        <ul class="wiki-nav-list">
+            ${posts.map(post => `
+                <li class="wiki-nav-item">
+                    <a href="javascript:void(0)" onclick="switchWikiDoc('${post.id}')" 
+                       class="wiki-nav-link ${window.wikiActiveId === post.id ? 'active' : ''}">
+                        ${post.title}
+                    </a>
+                </li>
+            `).join('')}
+        </ul>
+    `;
 
         if (window.lucide) window.lucide.createIcons();
 
@@ -805,6 +832,26 @@
             });
         }
     }
+
+    window.exitWikiMode = function () {
+        const mainContent = document.getElementById('mainContent');
+        const wikiContainer = document.getElementById('wikiContainer');
+        const welcomeSection = document.getElementById('welcomeSection');
+
+        if (wikiContainer) wikiContainer.classList.add('hidden');
+        if (mainContent) mainContent.style.display = 'block';
+        if (welcomeSection) welcomeSection.style.display = 'block';
+
+        // Restore category list in sidebar
+        if (window.allCategories && window.allCounts) {
+            renderCategories(window.allCategories, window.allCounts);
+        } else {
+            loadCategories(); // Fallback
+        }
+
+        // Smooth scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     window.switchWikiDoc = function (id) {
         window.wikiActiveId = id;
