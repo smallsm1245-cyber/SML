@@ -129,12 +129,12 @@
                             </div>
                             <div class="infobox-data">
                                 <div class="infobox-row">
-                                    <span class="infobox-label">Status</span>
-                                    <span class="infobox-value">Online</span>
+                                    <span class="infobox-label">Editor</span>
+                                    <span class="infobox-value">SMALLSM</span>
                                 </div>
                                 <div class="infobox-row">
                                     <span class="infobox-label">Type</span>
-                                    <span class="infobox-value">Cinematic Archive</span>
+                                    <span class="infobox-value">위키형 아카라이브</span>
                                 </div>
                             </div>
                         </div>
