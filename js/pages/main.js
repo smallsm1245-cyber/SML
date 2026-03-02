@@ -1377,54 +1377,54 @@
             let html = `
                 <div class="verification-wrapper max-w-4xl mx-auto px-4 py-8 text-slate-300">
                     <style>
-                        .verification-wrapper .data-row { background: #161922; border: 1px solid #1e293b; transition: all 0.2s ease; }
-                        .verification-wrapper .data-row:hover { border-color: #6366f1; background: #1c1f2a; }
-                        .verification-wrapper .checkbox-hex { appearance: none; width: 18px; height: 18px; border: 2px solid #334155; border-radius: 4px; cursor: pointer; position: relative; transition: all 0.2s; }
-                        .verification-wrapper .checkbox-hex:checked { background: #6366f1; border-color: #6366f1; }
-                        .verification-wrapper .checkbox-hex:checked::after { content: '✓'; position: absolute; color: white; font-size: 12px; left: 3px; top: -1px; }
+                        .verification-wrapper .data-row { background: var(--bg-panel); border: 1px solid var(--glass-border); transition: all 0.2s ease; border-radius: 8px; }
+                        .verification-wrapper .data-row:hover { border-color: var(--primary-yellow); background: rgba(182, 141, 64, 0.03); }
+                        .verification-wrapper .checkbox-hex { appearance: none; width: 20px; height: 20px; border: 2px solid var(--glass-border); border-radius: 4px; cursor: pointer; position: relative; transition: all 0.2s; background: rgba(0,0,0,0.2); }
+                        .verification-wrapper .checkbox-hex:checked { background: var(--primary-yellow); border-color: var(--primary-yellow); }
+                        .verification-wrapper .checkbox-hex:checked::after { content: '✓'; position: absolute; color: black; font-size: 14px; font-weight: 800; left: 3px; top: -1px; }
                         .verification-wrapper .progress-ring__circle { transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%; }
-                        .verification-wrapper .status-badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-                        .verification-wrapper .status-verified { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+                        .verification-wrapper .status-badge { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-sans); }
+                        .verification-wrapper .status-verified { background: var(--primary-yellow); color: black; border: 1px solid var(--primary-yellow); }
+                        .verification-wrapper .status-qualified { background: rgba(182, 141, 64, 0.2); color: var(--primary-yellow); border: 1px solid var(--primary-yellow); }
                         .verification-wrapper .status-warning { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.3); }
                         .verification-wrapper .status-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
                     </style>
 
-                    <header class="mb-12 border-b border-slate-800 pb-8">
-                        <div class="flex justify-between items-start mb-4">
+                    <header class="mb-12 border-b border-white/5 pb-8">
+                        <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
                             <div>
-                                <h1 class="text-3xl font-black text-white tracking-tighter mb-2">BDSM AUTHENTICITY PROTOCOL <span class="text-indigo-500">v4.0</span></h1>
-                                <p class="text-slate-500 font-mono text-xs uppercase tracking-widest">Smallsm Archive / Safety & Verification System</p>
+                                <h1 class="text-3xl md:text-4xl font-black text-white tracking-tighter mb-2 font-sans">BDSM AUTHENTICITY PROTOCOL <span class="text-[var(--primary-yellow)]">v4.0</span></h1>
+                                <p class="text-slate-500 font-mono text-[10px] uppercase tracking-[0.2em]">Smallsm Archive / Safety & Verification System</p>
                             </div>
                             <div class="text-right">
-                                <span class="bg-indigo-500/10 text-indigo-400 text-[10px] px-2 py-1 border border-indigo-500/20 rounded font-bold">STRICT_MODE: ON</span>
+                                <span class="bg-[var(--primary-yellow)]/10 text-[var(--primary-yellow)] text-[10px] px-3 py-1.5 border border-[var(--primary-yellow)]/20 rounded-full font-bold font-mono tracking-tighter">SECURED_LINK: ESTABLISHED</span>
                             </div>
                         </div>
                     </header>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-                        <div class="lg:col-span-2 space-y-12">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-20">
+                        <div class="lg:col-span-2 space-y-16">
                             ${sections.map(section => `
                                 <section>
-                                    <div class="flex items-center gap-3 mb-6">
-                                        <div class="h-px flex-1 bg-slate-800"></div>
-                                        <h2 class="text-sm font-bold text-slate-500 tracking-widest uppercase">${section.title}</h2>
-                                        <div class="h-px flex-1 bg-slate-800"></div>
+                                    <div class="flex items-center gap-4 mb-8">
+                                        <h2 class="text-xs font-bold text-slate-500 tracking-[0.3em] uppercase whitespace-nowrap font-mono">${section.title}</h2>
+                                        <div class="h-px flex-1 bg-white/5"></div>
                                     </div>
-                                    <div class="mb-4">
-                                        <h3 class="text-white text-lg font-bold">${section.subtitle}</h3>
+                                    <div class="mb-6">
+                                        <h3 class="text-white text-xl font-bold font-serif italic">${section.subtitle}</h3>
                                     </div>
-                                    <div class="space-y-2">
+                                    <div class="space-y-4">
                                         ${section.items.map(item => `
-                                            <div class="data-row p-4 rounded-lg flex items-start gap-4" data-weight="${item.weight}">
+                                            <div class="data-row p-5 flex items-start gap-5" data-weight="${item.weight}">
                                                 <div class="pt-1">
                                                     <input type="checkbox" class="checkbox-hex protocol-check" data-id="${item.id}" data-weight="${item.weight}">
                                                 </div>
                                                 <div class="flex-1">
-                                                    <div class="flex justify-between items-start mb-1">
-                                                        <h4 class="text-slate-200 font-bold text-sm">${item.title}</h4>
-                                                        <span class="text-[10px] text-slate-600 font-mono">W:${item.weight}</span>
+                                                    <div class="flex justify-between items-start mb-2">
+                                                        <h4 class="text-white font-bold text-base leading-tight">${item.title}</h4>
+                                                        <span class="text-[10px] text-slate-600 font-mono mt-0.5">W:${item.weight}</span>
                                                     </div>
-                                                    <p class="text-xs text-slate-500 leading-relaxed">${item.desc}</p>
+                                                    <p class="text-sm text-slate-400 leading-relaxed font-serif opacity-80">${item.desc}</p>
                                                 </div>
                                             </div>
                                         `).join('')}
@@ -1435,34 +1435,34 @@
 
                         <div class="lg:col-span-1">
                             <div class="sticky top-24 space-y-6">
-                                <div class="bg-[#161922] border border-slate-800 rounded-xl p-6 text-center">
-                                    <h3 class="text-xs font-bold text-slate-500 tracking-widest mb-6 uppercase">Verification Status</h3>
-                                    <div class="relative inline-flex items-center justify-center mb-6">
-                                        <svg class="w-48 h-48">
-                                            <circle class="text-slate-800" stroke-width="8" stroke="currentColor" fill="transparent" r="80" cx="96" cy="96"/>
-                                            <circle class="text-indigo-500 progress-ring__circle" stroke-width="8" stroke-dasharray="502.65" stroke-dashoffset="502.65" stroke-linecap="round" stroke="currentColor" fill="transparent" r="80" cx="96" cy="96" id="scoreProgress"/>
+                                <div class="bg-[var(--bg-panel)] border border-white/5 rounded-2xl p-8 text-center shadow-2xl">
+                                    <h3 class="text-[10px] font-bold text-slate-500 tracking-[0.2em] mb-8 uppercase font-mono">Real-time Analysis</h3>
+                                    <div class="relative inline-flex items-center justify-center mb-8">
+                                        <svg class="w-52 h-52">
+                                            <circle class="text-white/5" stroke-width="6" stroke="currentColor" fill="transparent" r="90" cx="104" cy="104"/>
+                                            <circle class="text-[var(--primary-yellow)] progress-ring__circle" stroke-width="6" stroke-dasharray="565.48" stroke-dashoffset="565.48" stroke-linecap="round" stroke="currentColor" fill="transparent" r="90" cx="104" cy="104" id="scoreProgress"/>
                                         </svg>
                                         <div class="absolute text-center">
-                                            <span class="block text-4xl font-black text-white tracking-tighter" id="scorePercentage">0%</span>
-                                            <span class="block text-[10px] text-slate-500 font-mono uppercase" id="scoreRatio">0 / ${maxScore}</span>
+                                            <span class="block text-5xl font-black text-white tracking-tighter mb-1" id="scorePercentage">0%</span>
+                                            <span class="block text-[11px] text-slate-500 font-mono tracking-widest uppercase font-bold" id="scoreRatio">0 / ${maxScore}</span>
                                         </div>
                                     </div>
-                                    <div id="statusResult" class="py-4 border-t border-slate-800">
-                                        <span class="status-badge status-danger">NOT_VERIFIED</span>
-                                        <p class="text-[11px] text-slate-500 mt-3 italic leading-relaxed" id="statusMessage">
-                                            충분한 데이터가 확보되지 않았습니다. 신중한 판단이 필요합니다.
+                                    <div id="statusResult" class="py-6 border-t border-white/5">
+                                        <span class="status-badge status-danger">ANALYSIS_PENDING</span>
+                                        <p class="text-[12px] text-slate-400 mt-4 leading-relaxed font-serif italic" id="statusMessage">
+                                            충분한 데이터가 확보되지 않았습니다. 신뢰도 측정을 위해 항목을 체크해주십시오.
                                         </p>
                                     </div>
-                                    <button id="resetProtocol" class="w-full mt-6 py-3 border border-slate-800 rounded text-xs font-bold hover:bg-slate-800 transition-colors uppercase tracking-widest text-slate-500">Reset Data</button>
+                                    <button id="resetProtocol" class="w-full mt-8 py-3.5 border border-white/10 rounded-lg text-[10px] font-bold hover:bg-white/5 hover:border-[var(--primary-yellow)] transition-all uppercase tracking-[0.2em] text-slate-500 font-mono">Reset Protocol</button>
                                 </div>
 
-                                <div class="bg-indigo-500/5 border border-indigo-500/10 rounded-xl p-5">
-                                    <h4 class="text-indigo-400 text-xs font-bold mb-3 flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
-                                        SYSTEM_ADVISORY
+                                <div class="bg-[var(--primary-yellow)]/5 border border-[var(--primary-yellow)]/10 rounded-2xl p-6">
+                                    <h4 class="text-[var(--primary-yellow)] text-[11px] font-bold mb-3 flex items-center gap-2 font-mono uppercase tracking-wider">
+                                        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                                        System_Advisory
                                     </h4>
-                                    <p class="text-[11px] text-indigo-400/60 leading-relaxed font-medium">
-                                        본 프로토콜은 상대방의 진정성을 객관적으로 평가하기 위한 보조 도구입니다. 최종적인 신뢰 여부는 본인의 직관과 판단에 따르십시오.
+                                    <p class="text-[12px] text-slate-400 leading-relaxed font-serif italic opacity-70">
+                                        본 프로토콜은 상대방의 진정성을 객관적으로 평가하기 위한 보조 장치입니다. 인격의 모든 것을 수치화할 수 없음을 인지하십시오.
                                     </p>
                                 </div>
                             </div>
@@ -1472,6 +1472,7 @@
             `;
 
             mainContent.innerHTML = html;
+            if (window.lucide) window.lucide.createIcons();
             window.scrollTo(0, 0);
 
             // Logic Implementation
@@ -1481,7 +1482,7 @@
             const scoreProgress = document.getElementById('scoreProgress');
             const statusResult = document.getElementById('statusResult');
             const statusMessage = document.getElementById('statusMessage');
-            const circleRadius = 80;
+            const circleRadius = 90;
             const circumference = 2 * Math.PI * circleRadius;
 
             const updateScore = () => {
@@ -1499,17 +1500,17 @@
 
                 // Update Status
                 if (percent >= 90) {
-                    statusResult.innerHTML = '<span class="status-badge status-verified">FULLY_VERIFIED</span>';
-                    statusMessage.textContent = "검증이 완료되었습니다. 매우 높은 신뢰도를 보여주고 있습니다.";
+                    statusResult.innerHTML = '<span class="status-badge status-verified">FULLY_AUTHENTIC</span>';
+                    statusMessage.textContent = "검증이 완료되었습니다. 매우 높은 수준의 진정성과 안전성을 확보하고 있습니다.";
                 } else if (percent >= 70) {
-                    statusResult.innerHTML = '<span class="status-badge status-warning">QUALIFIED</span>';
-                    statusMessage.textContent = "안정적인 수준의 신뢰도를 유지하고 있습니다. 지속적인 대화가 권장됩니다.";
+                    statusResult.innerHTML = '<span class="status-badge status-qualified">QUALIFIED_PARTNER</span>';
+                    statusMessage.textContent = "안정적인 수준의 신뢰도를 보장합니다. 상호 합의 하에 실천을 고려할 수 있습니다.";
                 } else if (percent >= 50) {
-                    statusResult.innerHTML = '<span class="status-badge status-warning">PROVISIONAL</span>';
-                    statusMessage.textContent = "일부 정보가 불확실합니다. 더 많은 검증과 주의가 필요합니다.";
+                    statusResult.innerHTML = '<span class="status-badge status-warning">PROVISIONAL_TRUST</span>';
+                    statusMessage.textContent = "일부 정보가 불확실하거나 보안이 필요합니다. 더 깊은 대화와 관찰이 권장됩니다.";
                 } else {
-                    statusResult.innerHTML = '<span class="status-badge status-danger">NOT_VERIFIED</span>';
-                    statusMessage.textContent = "데이터가 부족하거나 신뢰도가 낮습니다. 관계 형성에 매우 신중해야 합니다.";
+                    statusResult.innerHTML = '<span class="status-badge status-danger">HIGH_RISK_DETECTED</span>';
+                    statusMessage.textContent = "진정성을 확인하기에 데이터가 부족하거나 위험한 패턴이 감지되었습니다. 극도로 주의하십시오.";
                 }
             };
 

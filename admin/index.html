@@ -441,7 +441,8 @@
                     <p class="section-desc">진정성 및 안전 검증 프로토콜 항목을 관리합니다. (JSON 데이터 기반)</p>
 
                     <div class="card">
-                        <h3 class="card-title-sm">➕ 새 항목 추가</h3>
+                        <h3 class="card-title-sm" id="protocolFormTitle">➕ 새 항목 추가</h3>
+                        <input type="hidden" id="protocolEditId" value="">
                         <div class="form-row" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
                             <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
                                 <label>섹션</label>
@@ -466,8 +467,10 @@
                             <input type="text" id="protocolDesc" class="form-input"
                                 placeholder="항목에 대한 구체적인 검증 기준 및 가이드라인">
                         </div>
-                        <div style="text-align: right;">
-                            <button class="btn-primary" onclick="window.addProtocolItem()"
+                        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                            <button id="cancelProtocolEditBtn" class="btn-primary" onclick="window.resetProtocolForm()"
+                                style="width: auto; padding: 0.8rem 1.5rem; background: var(--text-dim); border-color: var(--text-dim); display: none;">취소</button>
+                            <button id="protocolSubmitBtn" class="btn-primary" onclick="window.addProtocolItem()"
                                 style="width: auto; padding: 0.8rem 2.5rem;">항목 추가</button>
                         </div>
                     </div>

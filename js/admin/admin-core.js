@@ -464,6 +464,7 @@ async function saveHomeSettings() {
 // VERIFICATION PROTOCOL MANAGEMENT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 let protocolItems = [];
+let currentEditingProtocolId = null;
 
 window.loadVerificationSettings = async function () {
     if (!supabaseClient) return;
@@ -518,19 +519,53 @@ function renderProtocolItems() {
     });
 
     list.innerHTML = sorted.map((item) => `
-        <div class="post-row" style="grid-template-columns: 100px 80px 1fr 100px; padding: 1.2rem; cursor: default;">
+        <div class="post-row" style="grid-template-columns: 100px 80px 1fr 120px; padding: 1.2rem; cursor: default;">
             <div style="font-weight: 700; color: var(--admin-primary);">Sec ${item.section}</div>
             <div style="text-align: center;"><span class="badge" style="background: rgba(182, 141, 64, 0.1); color: var(--admin-primary); border: 1px solid var(--admin-border);">W:${item.weight}</span></div>
             <div style="min-width: 0;">
                 <div style="font-weight: 600; font-size: 1.05rem; margin-bottom: 0.2rem; color: var(--admin-text);">${item.title}</div>
                 <div style="font-size: 0.85rem; color: var(--admin-text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.desc}</div>
             </div>
-            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
+                <button class="action-btn" onclick="window.editProtocolItem(${item.id})" title="수정" style="background: transparent; border: 1px solid var(--admin-border); padding: 0.3rem 0.6rem; cursor: pointer; border-radius: 6px;">✏️</button>
                 <button class="action-btn danger" onclick="window.removeProtocolItem(${item.id})" title="삭제" style="background: transparent; border: 1px solid var(--admin-border); padding: 0.3rem 0.6rem; cursor: pointer; border-radius: 6px;">🗑️</button>
             </div>
         </div>
     `).join('');
 }
+
+window.editProtocolItem = function (id) {
+    const item = protocolItems.find(i => i.id === id);
+    if (!item) return;
+
+    currentEditingProtocolId = id;
+    document.getElementById('protocolEditId').value = id;
+    document.getElementById('protocolSection').value = item.section;
+    document.getElementById('protocolWeight').value = item.weight;
+    document.getElementById('protocolTitle').value = item.title;
+    document.getElementById('protocolDesc').value = item.desc;
+
+    // UI Feedback
+    document.getElementById('protocolFormTitle').textContent = '✏️ 항목 수정';
+    document.getElementById('protocolSubmitBtn').textContent = '수정 완료';
+    document.getElementById('cancelProtocolEditBtn').style.display = 'inline-block';
+
+    // Scroll to form
+    document.getElementById('protocolFormTitle').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.resetProtocolForm = function () {
+    currentEditingProtocolId = null;
+    document.getElementById('protocolEditId').value = '';
+    document.getElementById('protocolSection').value = '1';
+    document.getElementById('protocolWeight').value = '3';
+    document.getElementById('protocolTitle').value = '';
+    document.getElementById('protocolDesc').value = '';
+
+    document.getElementById('protocolFormTitle').textContent = '➕ 새 항목 추가';
+    document.getElementById('protocolSubmitBtn').textContent = '항목 추가';
+    document.getElementById('cancelProtocolEditBtn').style.display = 'none';
+};
 
 window.addProtocolItem = function () {
     const section = parseInt(document.getElementById('protocolSection').value);
@@ -543,26 +578,41 @@ window.addProtocolItem = function () {
         return;
     }
 
-    const newItem = {
-        id: Date.now(),
-        section,
-        weight,
-        title,
-        desc
-    };
+    if (currentEditingProtocolId) {
+        // Update existing
+        const index = protocolItems.findIndex(i => i.id === currentEditingProtocolId);
+        if (index !== -1) {
+            protocolItems[index] = {
+                ...protocolItems[index],
+                section,
+                weight,
+                title,
+                desc
+            };
+        }
+    } else {
+        // Add new
+        const newItem = {
+            id: Date.now(),
+            section,
+            weight,
+            title,
+            desc
+        };
+        protocolItems.push(newItem);
+    }
 
-    protocolItems.push(newItem);
     hasUnsavedChanges = true;
-
-    // Reset form
-    document.getElementById('protocolTitle').value = '';
-    document.getElementById('protocolDesc').value = '';
-
+    window.resetProtocolForm();
     renderProtocolItems();
 };
 
 window.removeProtocolItem = function (id) {
     if (!confirm('이 항목을 삭제하시겠습니까?')) return;
+
+    if (currentEditingProtocolId === id) {
+        window.resetProtocolForm();
+    }
 
     protocolItems = protocolItems.filter(item => item.id !== id);
     hasUnsavedChanges = true;
