@@ -104,7 +104,16 @@ async function checkAuth() {
 
 async function showDashboard() {
     document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminDashboard').style.display = 'block';
+    const dashboard = document.getElementById('adminDashboard');
+    dashboard.style.display = 'flex'; // Use flex for the new layout
+    dashboard.style.opacity = '0';
+    setTimeout(() => {
+        dashboard.style.transition = 'opacity 0.4s ease';
+        dashboard.style.opacity = '1';
+    }, 50);
+
+    // Initialize Mobile Sidebar
+    initMobileSidebar();
 
     // Load all data
     await Promise.all([
@@ -115,6 +124,23 @@ async function showDashboard() {
         loadPosts(),
         loadSiteSettings()
     ]);
+}
+
+function initMobileSidebar() {
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('dashboardSidebar');
+    const overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    overlay.id = 'sidebarOverlay';
+    document.querySelector('.admin-dashboard').appendChild(overlay);
+
+    const toggleSidebar = () => {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    };
+
+    if (mobileBtn) mobileBtn.onclick = toggleSidebar;
+    overlay.onclick = toggleSidebar;
 }
 
 async function loadSiteSettings() {
@@ -195,17 +221,30 @@ window.switchSection = function (sectionName) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
     // Show selected section
-    document.getElementById(`section-${sectionName}`).classList.add('active');
-    document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+    const targetSection = document.getElementById(`section-${sectionName}`);
+    const targetNav = document.querySelector(`[data-section="${sectionName}"]`);
+
+    if (targetSection) targetSection.classList.add('active');
+    if (targetNav) targetNav.classList.add('active');
+
+    // Auto-hide mobile sidebar after click
+    const sidebar = document.getElementById('dashboardSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (sidebar && sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+    }
 
     // Trigger load based on section
     if (sectionName === 'posts') loadPosts();
     else if (sectionName === 'categories') loadCategories();
     else if (sectionName === 'home') loadHomeSettings();
     else if (sectionName === 'settings') loadSiteSettings();
-    else if (sectionName === 'tendencies') loadTendencies();
     else if (sectionName === 'trash') loadTrash();
     else if (sectionName === 'verification') window.loadVerificationSettings();
+    else if (sectionName === 'migration') {
+        // Position Migration uses static HTML mainly, but let's ensure it's clean
+    }
 };
 
 // ═══════════════════════════════════════════════════

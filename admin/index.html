@@ -11,6 +11,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
@@ -62,14 +63,15 @@
         <!-- Top Header -->
         <header class="dashboard-header">
             <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
                 <h1 class="dashboard-title">
                     <a href="javascript:switchSection('overview')" style="text-decoration: none; color: inherit;">📚
                         SMALLSM Archive</a>
                 </h1>
-                <span class="admin-badge">관리자 모드</span>
+                <span class="admin-badge">관리자</span>
                 <div class="live-user-indicator" title="실시간 접속자">
                     <span class="live-dot"></span>
-                    <span class="live-count" id="liveUserCount">1</span>명 접속 중
+                    <span class="live-count" id="liveUserCount">1</span>명 접속
                 </div>
             </div>
             <div class="header-right">
@@ -82,7 +84,7 @@
 
         <div class="dashboard-container">
             <!-- Left Sidebar Menu -->
-            <aside class="dashboard-sidebar">
+            <aside class="dashboard-sidebar" id="dashboardSidebar">
                 <nav class="sidebar-nav">
                     <button class="nav-item active" data-section="overview">
                         <span class="icon">📊</span>
