@@ -51,13 +51,16 @@ function waitForConfig() {
         let attempts = 0;
         const interval = setInterval(() => {
             attempts++;
-            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
+            // Check both standard and alternate config names
+            const config = window.SUPABASE_CONFIG || window.CONFIG;
+            const url = config?.url || config?.SUPABASE_URL;
+
+            if (url && (window.supabase || window.supabaseClient)) {
                 clearInterval(interval);
                 resolve();
-            } else if (attempts > 50) { // 5 seconds timeout
-                console.error('Config load timeout. Env vars missing?');
+            } else if (attempts > 50) {
+                console.error('Config load timeout.');
                 clearInterval(interval);
-                // Resolve anyway to let the UI show errors instead of hanging
                 resolve();
             }
         }, 100);
@@ -2180,39 +2183,54 @@ window.handleLogin = async function () {
 // ═══════════════════════════════════════════════════
 // INITIALIZATION
 // ═══════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('📱 DOM ready');
-
-    // Home preview setup
-    ['homeTitle', 'homeSubtitle', 'homeContent'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', updateHomePreview);
-    });
+async function initDashboard() {
+    console.log('📱 Initializing Dashboard...');
 
     try {
         await waitForConfig();
 
-        supabaseClient = window.supabase.createClient(
-            window.SUPABASE_CONFIG.url,
-            window.SUPABASE_CONFIG.anonKey
-        );
+        const config = window.SUPABASE_CONFIG || window.CONFIG;
+        const url = config?.url || config?.SUPABASE_URL;
+        const key = config?.anonKey || config?.SUPABASE_KEY;
 
-        console.log('✅ Supabase initialized');
+        if (!window.supabaseClient && url && key) {
+            window.supabaseClient = window.supabase.createClient(url, key);
+        }
+        supabaseClient = window.supabaseClient;
 
-        // Check if already logged in
-        if (await checkAuth()) {
+        console.log('✅ Supabase initialized in admin-core');
+
+        // Setup UI listeners
+        setupEventListeners();
+
+        // Check if already logged in and show dashboard if necessary
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const dashboard = document.getElementById('adminDashboard');
+
+        if (session && dashboard && dashboard.style.display !== 'none') {
             await showDashboard();
         }
 
+        // Load saved theme
+        const savedTheme = localStorage.getItem('admin_theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            const themeIcon = document.querySelector('#themeToggle .icon');
+            if (themeIcon) themeIcon.textContent = '☀️';
+        }
+
+        console.log('🎉 Dashboard initialized');
     } catch (error) {
         console.error('Initialization failed:', error);
-        showError('시스템 초기화 실패: 설정 파일을 불러올 수 없습니다.');
     }
+}
 
-    // Logout button
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
+function setupEventListeners() {
+    console.log('🔗 Setting up event listeners...');
+
+    // Auth
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
         if (!confirm('로그아웃하시겠습니까?')) return;
-
         await supabaseClient.auth.signOut();
         window.location.reload();
     });
@@ -2228,31 +2246,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Search and Filters for Posts
+    // Search and Filter
     const postSearch = document.getElementById('postSearch');
-    const postCatFilter = document.getElementById('postFilterCategory');
-    const postStatusFilter = document.getElementById('postFilterStatus');
-
     if (postSearch) {
         let debounceTimer;
         postSearch.addEventListener('input', (e) => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
-                postSearchKeyword = e.target.value.trim();
+                postSearchKeyword = e.target.value.trim(); // Changed from postSearchQuery to postSearchKeyword
                 postCurrentPage = 1;
                 loadPosts();
             }, 300);
         });
     }
 
-    if (postCatFilter) {
-        postCatFilter.addEventListener('change', (e) => {
+    const postCategoryFilter = document.getElementById('postFilterCategory');
+    if (postCategoryFilter) {
+        postCategoryFilter.addEventListener('change', (e) => {
             postSelectedCategory = e.target.value;
             postCurrentPage = 1;
             loadPosts();
         });
     }
 
+    const postStatusFilter = document.getElementById('postFilterStatus');
     if (postStatusFilter) {
         postStatusFilter.addEventListener('change', (e) => {
             postSelectedStatus = e.target.value;
@@ -2280,30 +2297,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const overlay = document.getElementById('sidebarOverlay');
     const sidebar = document.querySelector('.dashboard-sidebar');
 
-    const toggleSidebar = () => {
+    const toggleSidebarHandler = () => {
         if (!sidebar || !overlay) return;
         const isActive = sidebar.classList.toggle('active');
-        if (overlay) overlay.classList.toggle('active', isActive);
+        overlay.classList.toggle('active', isActive);
         document.body.style.overflow = isActive ? 'hidden' : '';
     };
 
-    if (overlay) overlay.onclick = toggleSidebar;
+    if (overlay) overlay.onclick = toggleSidebarHandler;
 
     // Close sidebar on nav click (mobile)
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
             if (window.innerWidth <= 768 && sidebar && sidebar.classList.contains('active')) {
-                toggleSidebar();
+                toggleSidebarHandler();
             }
         });
     });
-
-    // Load saved theme
-    const savedTheme = localStorage.getItem('admin_theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-        document.querySelector('#themeToggle .icon').textContent = '☀️';
-    }
 
     // Unsaved changes warning
     window.addEventListener('beforeunload', (e) => {
@@ -2312,9 +2322,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.returnValue = '';
         }
     });
+}
 
-    console.log('🎉 Dashboard initialized');
-});
+// RUN IMMEDIATELY (Handles dynamic loading)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDashboard);
+} else {
+    initDashboard();
+}
 
 // ═══════════════════════════════════════════════════
 // PDF REPORT DOWNLOAD

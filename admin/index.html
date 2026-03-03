@@ -584,6 +584,13 @@
                     window.CONFIG.SUPABASE_URL,
                     window.CONFIG.SUPABASE_KEY
                 );
+
+                // Bridge for compatibility with other scripts
+                window.SUPABASE_CONFIG = {
+                    url: window.CONFIG.SUPABASE_URL,
+                    anonKey: window.CONFIG.SUPABASE_KEY
+                };
+
                 console.log('✅ Supabase initialized successfully (Inline).');
 
                 // 3. 세션 확인
