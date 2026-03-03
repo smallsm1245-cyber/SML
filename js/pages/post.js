@@ -175,6 +175,9 @@ async function loadPost() {
             theme: 'dark'
         });
 
+        // Save internal reference for highlighting
+        window.currentPostData = post;
+
         // Add Wiki sidebar info (Infobox & TOC)
         renderWikiInfo(post);
 
@@ -278,7 +281,7 @@ function renderWikiInfo(post) {
                 </div>
                 <div class="infobox-row">
                     <span class="infobox-label">Type</span>
-                    <span class="infobox-value">위키형 아카라이브</span>
+                    <span class="infobox-value">Wiki Archilive</span>
                 </div>
                 <div class="infobox-row">
                     <span class="infobox-label">Last Modified</span>
@@ -366,6 +369,28 @@ function renderWikiNav() {
             });
         });
     }
+
+    // Attempt to highlight the active category in the global nav if it was rendered by main.js
+    setTimeout(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const catId = urlParams.get('category'); // Though post.html usually uses ?id=
+        const postId = urlParams.get('id');
+
+        // If we know the post's category internally (we fetch it on load)
+        if (window.currentPostData && window.currentPostData.category_id) {
+            const activeLink = document.querySelector(`.category-link[data-id="${window.currentPostData.category_id}"], .submenu-link[data-id="${window.currentPostData.category_id}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+                const submenu = activeLink.closest('.submenu');
+                if (submenu) {
+                    submenu.classList.add('active');
+                    const parentId = submenu.id.replace('sub-', '');
+                    const parentLink = document.querySelector(`.category-link[data-id="${parentId}"]`);
+                    if (parentLink) parentLink.classList.add('active');
+                }
+            }
+        }
+    }, 500);
 }
 
 window.scrollToHeading = function (e, id) {

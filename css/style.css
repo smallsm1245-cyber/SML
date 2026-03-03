@@ -458,11 +458,16 @@ body.night-mode .mode-icon-dark {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.8rem 0;
+    padding: 0.8rem 0.5rem;
+    /* Add horizontal padding explicitly */
     color: var(--text-primary);
     text-decoration: none;
     font-size: 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    /* Added for active state consistency */
+    transition: all 0.2s;
+    /* Added smooth transition */
 }
 
 .cat-name-block {
@@ -485,6 +490,12 @@ body.night-mode .mode-icon-dark {
 .category-link.active .chevron {
     transform: rotate(90deg);
     color: var(--primary-yellow);
+}
+
+.category-link.active {
+    color: var(--wiki-gold);
+    background: var(--wiki-gold-dim);
+    border-color: transparent;
 }
 
 .cat-count {
@@ -518,8 +529,10 @@ body.night-mode .mode-icon-dark {
     transition: color 0.2s;
 }
 
-.submenu-link:hover {
+.submenu-link:hover,
+.submenu-link.active {
     color: var(--primary-yellow);
+    font-weight: 600;
 }
 
 /* Settings View */

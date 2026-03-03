@@ -95,6 +95,29 @@
                             initialValue: settings.home_content,
                             theme: 'dark'
                         });
+
+                        setTimeout(() => {
+                            const headers = Array.from(document.getElementById('wikiHomeViewer').querySelectorAll('h1, h2, h3'));
+                            const tocContainer = document.getElementById('homeTocContainer');
+                            const tocList = document.getElementById('homeTocList');
+
+                            const tocHeaders = headers.filter(h => h.tagName !== 'H1');
+
+                            if (tocHeaders.length > 0 && tocContainer && tocList) {
+                                tocContainer.style.display = 'block';
+                                tocList.innerHTML = tocHeaders.map((h, i) => {
+                                    if (!h.id) h.id = 'home-heading-' + i;
+                                    const indent = (parseInt(h.tagName.substring(1)) - 2) * 12; // h2=0, h3=12px
+                                    return `
+                                        <li class="toc-item mb-2" style="padding-left: ${Math.max(0, indent)}px">
+                                            <a href="#${h.id}" class="text-[var(--wiki-text-dim)] hover:text-[var(--wiki-gold)] text-xs transition-colors" onclick="window.scrollToHeading(event, '${h.id}')">
+                                                ${h.textContent}
+                                            </a>
+                                        </li>
+                                    `;
+                                }).join('');
+                            }
+                        }, 500);
                     }
                 }
 
@@ -122,7 +145,7 @@
 
                 if (infoCol) {
                     infoCol.innerHTML = `
-                        <div class="wiki-infobox animate-slide-up">
+                        <div class="wiki-infobox animate-slide-up mb-6">
                             <div class="infobox-header">
                                 <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Portal Info</span>
                                 <h3 class="infobox-title mt-2">SMALLSM</h3>
@@ -134,9 +157,13 @@
                                 </div>
                                 <div class="infobox-row">
                                     <span class="infobox-label">Type</span>
-                                    <span class="infobox-value">위키형 아카라이브</span>
+                                    <span class="infobox-value">Wiki Archilive</span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="wiki-toc animate-slide-up bg-white/5 border border-white/10 rounded-lg p-5" id="homeTocContainer" style="display:none;">
+                            <h3 class="font-bold text-[var(--wiki-gold)] text-[11px] font-mono tracking-[0.2em] uppercase mb-4 border-b border-white/10 pb-2">Contents</h3>
+                            <ul class="toc-list" id="homeTocList"></ul>
                         </div>
                     `;
                 }
@@ -451,8 +478,31 @@
         }
 
         // Remove active class
-        document.querySelectorAll('.category-link, .submenu-link').forEach(el => el.classList.remove('active'));
-        if (element) element.classList.add('active');
+        document.querySelectorAll('.category-link, .submenu-link').forEach(el => {
+            el.classList.remove('active');
+            // Remove background/padding dynamic adjustments if needed, handled by CSS mostly
+        });
+
+        // Find and highlight active element
+        let activeEl = element;
+        if (!activeEl) {
+            activeEl = document.querySelector(`.category-link[data-id="${categoryId}"], .submenu-link[data-id="${categoryId}"]`);
+        }
+
+        if (activeEl) {
+            activeEl.classList.add('active');
+
+            // If it's a submenu, expand the parent
+            if (activeEl.classList.contains('submenu-link')) {
+                const submenu = activeEl.closest('.submenu');
+                if (submenu) {
+                    submenu.classList.add('active');
+                    const parentId = submenu.id.replace('sub-', '');
+                    const parentLink = document.querySelector(`.category-link[data-id="${parentId}"]`);
+                    if (parentLink) parentLink.classList.add('active'); // Keep chevron rotated
+                }
+            }
+        }
 
         loadPostsByCategory(categoryId);
     };
@@ -1530,9 +1580,35 @@
                     if (categoryId) {
                         console.log('🎯 Filtering by category from URL:', categoryId);
                         filterByCategory(categoryId);
+
+                        // Ensure visual highlight right after loading
+                        setTimeout(() => {
+                            const activeLink = document.querySelector(`.category-link[data-id="${categoryId}"], .submenu-link[data-id="${categoryId}"]`);
+                            if (activeLink) {
+                                activeLink.classList.add('active');
+                                const submenu = activeLink.closest('.submenu');
+                                if (submenu) {
+                                    submenu.classList.add('active');
+                                    const parentId = submenu.id.replace('sub-', '');
+                                    const parentLink = document.querySelector(`.category-link[data-id="${parentId}"]`);
+                                    if (parentLink) parentLink.classList.add('active');
+                                }
+                            }
+                        }, 100);
+
                     } else if (view) {
                         console.log('🎯 Switching to view from URL:', view);
                         showView(view);
+                    } else if (window.location.pathname.includes('bdsm-chart.html')) {
+                        setTimeout(() => {
+                            const activeLink = document.querySelector('.category-link[href*="bdsm-chart.html"]');
+                            if (activeLink) activeLink.classList.add('active');
+                        }, 100);
+                    } else if (window.location.pathname.includes('mailbox.html')) {
+                        setTimeout(() => {
+                            const activeLink = Array.from(document.querySelectorAll('.category-link, .submenu-link')).find(el => el.textContent.includes('우체통') || el.textContent.includes('익명'));
+                            if (activeLink) activeLink.classList.add('active');
+                        }, 100);
                     }
                 });
                 initSearch();
