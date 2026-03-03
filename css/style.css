@@ -4228,6 +4228,89 @@ body.search-focused .search-container {
     color: var(--wiki-gold);
 }
 
+/* Category Index (TOC Page) */
+.wiki-index-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.wiki-index-item {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--wiki-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+}
+
+.wiki-index-item:hover {
+    background: rgba(194, 163, 106, 0.07);
+    border-bottom-color: var(--wiki-gold);
+    transform: translateX(4px);
+}
+
+.wiki-index-num {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--wiki-gold);
+    opacity: 0.6;
+    min-width: 2rem;
+    font-weight: 700;
+}
+
+.wiki-index-title {
+    flex: 1;
+    font-size: 1rem;
+    color: var(--wiki-text);
+    font-family: var(--font-serif);
+}
+
+.wiki-index-item:hover .wiki-index-title {
+    color: var(--wiki-gold);
+}
+
+.wiki-index-icon {
+    color: var(--wiki-gold);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.wiki-index-item:hover .wiki-index-icon {
+    opacity: 0.7;
+}
+
+/* Alias classes for infobox in category view */
+.wiki-infobox-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--wiki-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--wiki-border);
+}
+
+.wiki-infobox-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(194, 163, 106, 0.05);
+    color: var(--wiki-text);
+}
+
+.wiki-infobox-label {
+    color: var(--wiki-gold);
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+
 /* Callout Components */
 .wiki-callout {
     background: rgba(194, 163, 106, 0.08);

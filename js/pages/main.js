@@ -716,15 +716,8 @@
             const { data: posts } = await query;
             window.wikiData = posts || [];
 
-            // Set initial active doc if none or if it doesn't belong to current data
-            if (window.wikiData.length > 0) {
-                const stillValid = window.wikiData.some(p => p.id === window.wikiActiveId);
-                if (!stillValid) {
-                    window.wikiActiveId = window.wikiData[0].id;
-                }
-            } else {
-                window.wikiActiveId = null;
-            }
+            // Always start with the category index view (no document auto-selected)
+            window.wikiActiveId = null;
 
             renderWikiUI();
 
@@ -822,8 +815,50 @@
 
         const post = (window.wikiData || []).find(p => p.id === window.wikiActiveId);
         if (!post) {
-            contentCol.innerHTML = '<p class="text-center opacity-50 py-20">Select a document from the sidebar.</p>';
-            infoCol.innerHTML = '';
+            // Show a Category Index / TOC page when no doc is selected
+            const categoryId = window.wikiCategoryId;
+            const category = window.allCategories?.find(c => c.id === categoryId);
+            const parentCategory = category?.parent_id ? window.allCategories?.find(c => c.id === category.parent_id) : null;
+            const allPosts = window.wikiData || [];
+
+            const breadcrumbsHtml = `
+                <nav class="breadcrumbs">
+                    <a href="index.html" class="breadcrumb-item breadcrumb-link"><i data-lucide="home" class="w-3 h-3"></i> Home</a>
+                    ${parentCategory ? `<span class="breadcrumb-item"><span class="breadcrumb-link">${parentCategory.name}</span></span>` : ''}
+                    <span class="breadcrumb-item active">${category?.name || 'Archive'}</span>
+                </nav>
+            `;
+
+            const tocItemsHtml = allPosts.map((post, idx) => `
+                <li class="wiki-index-item" onclick="switchWikiDoc('${post.id}')">
+                    <span class="wiki-index-num">${String(idx + 1).padStart(2, '0')}</span>
+                    <span class="wiki-index-title">${post.title}</span>
+                    <i data-lucide="chevron-right" class="wiki-index-icon w-4 h-4"></i>
+                </li>
+            `).join('');
+
+            contentCol.innerHTML = `
+                ${breadcrumbsHtml}
+                <header class="wiki-post-header mb-8">
+                    <div class="text-[var(--wiki-gold)] text-[10px] font-mono tracking-[0.3em] uppercase mb-2">Category Index</div>
+                    <h1 class="text-4xl md:text-5xl font-bold font-serif text-white mb-4 border-none !p-0">${category?.name || 'Archive'}</h1>
+                    <div class="h-1 w-20 bg-[var(--wiki-gold)] mb-4"></div>
+                    <p class="text-[var(--wiki-text-dim)] text-sm">${allPosts.length}개의 문서가 있습니다. 항목을 클릭해 내용을 확인하세요.</p>
+                </header>
+                <ol class="wiki-index-list">
+                    ${tocItemsHtml}
+                </ol>
+            `;
+
+            infoCol.innerHTML = `
+                <div class="wiki-infobox">
+                    <div class="wiki-infobox-title">카테고리 정보</div>
+                    <div class="wiki-infobox-row"><span class="wiki-infobox-label">이름</span><span>${category?.name || '-'}</span></div>
+                    <div class="wiki-infobox-row"><span class="wiki-infobox-label">문서 수</span><span>${allPosts.length}</span></div>
+                </div>
+            `;
+
+            if (window.lucide) window.lucide.createIcons();
             return;
         }
 
