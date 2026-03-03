@@ -34,9 +34,12 @@ async function loadCategories() {
             .select('category_id, is_private')
             .eq('is_private', false);
 
-        // Save for Wiki "Back" functionality
-        window.allCategories = categories || [];
-        window.allCounts = counts;
+        const counts = {};
+        if (posts) {
+            posts.forEach(p => {
+                counts[p.category_id] = (counts[p.category_id] || 0) + 1;
+            });
+        }
 
         renderCategories(categories || [], counts);
 
@@ -175,18 +178,6 @@ async function loadPost() {
             theme: 'dark'
         });
 
-        // Save internal reference for highlighting
-        window.currentPostData = post;
-
-        // Add Wiki sidebar info (Infobox & TOC)
-        renderWikiInfo(post);
-
-        // Fetch sibling posts for unified sidebar navigation
-        loadWikiSiblingPosts(post.category_id);
-
-        // Custom rendering for Callouts after viewer is ready
-        setTimeout(processWikiComponents, 100);
-
         // Add copy protection class if needed
         if (!post.origin_free) {
             document.getElementById('postContent').classList.add('copy-protected');
@@ -235,204 +226,6 @@ function initAdminLongPress() {
     copyright.style.cursor = 'default';
     copyright.style.userSelect = 'none';
     copyright.style.webkitUserSelect = 'none';
-}
-
-function renderWikiInfo(post) {
-    const infoCol = document.getElementById('wikiInfoCol');
-    if (!infoCol) return;
-
-    // Auto-generate TOC from headers
-    const headers = Array.from(document.getElementById('postContent').querySelectorAll('h2, h3'));
-    const tocHtml = headers.length > 0 ? `
-        <div class="wiki-toc">
-            <h3 class="toc-title">Contents</h3>
-            <ul class="toc-list">
-                ${headers.map((h, i) => {
-        const id = `heading-${i}`;
-        h.id = id;
-        return `
-                        <li class="toc-item" style="padding-left: ${h.tagName === 'H3' ? '1rem' : '0'}">
-                            <a href="#${id}" class="toc-link" onclick="scrollToHeading(event, '${id}')">${h.textContent}</a>
-                        </li>
-                    `;
-    }).join('')}
-            </ul>
-        </div>
-    ` : '';
-
-    const updatedDate = new Date(post.updated_at || post.created_at).toLocaleDateString('ko-KR', {
-        year: 'numeric', month: 'long', day: 'numeric'
-    });
-
-    infoCol.innerHTML = `
-        <div class="wiki-infobox animate-slide-up">
-            <div class="infobox-header">
-                <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Document Meta</span>
-                <h3 class="infobox-title mt-2">${post.title}</h3>
-            </div>
-            <div class="infobox-data">
-                <div class="infobox-row">
-                    <span class="infobox-label">Classification</span>
-                    <span class="infobox-value">${post.categories ? post.categories.name : 'Archive'}</span>
-                </div>
-                <div class="infobox-row">
-                    <span class="infobox-label">Editor</span>
-                    <span class="infobox-value">SMALLSM</span>
-                </div>
-                <div class="infobox-row">
-                    <span class="infobox-label">Type</span>
-                    <span class="infobox-value">Wiki Archilive</span>
-                </div>
-                <div class="infobox-row">
-                    <span class="infobox-label">Last Modified</span>
-                    <span class="infobox-value">${updatedDate}</span>
-                </div>
-            </div>
-            ${tocHtml}
-        </div>
-    `;
-}
-
-async function loadWikiSiblingPosts(categoryId) {
-    try {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        const isAdmin = user && user.email === window.ADMIN_EMAIL;
-
-        let query = supabaseClient
-            .from('archive_posts')
-            .select('id, title')
-            .eq('category_id', categoryId)
-            .order('title', { ascending: true });
-
-        if (!isAdmin) {
-            query = query.eq('is_private', false);
-        }
-
-        const { data: posts } = await query;
-        window.wikiData = posts || [];
-        renderWikiNav();
-    } catch (e) {
-        console.error('Failed to load siblings:', e);
-    }
-}
-
-function renderWikiNav() {
-    const navCol = document.getElementById('wikiNavCol');
-    const globalCategoryNav = document.getElementById('categoryNav');
-    if (!navCol && !globalCategoryNav) return;
-
-    const posts = window.wikiData || [];
-    const isDesktop = window.innerWidth >= 1024;
-    const target = isDesktop ? globalCategoryNav : navCol;
-    if (!target) return;
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const activeId = urlParams.get('id');
-
-    const backButton = `
-        <li class="mb-4">
-            <a href="index.html" 
-               class="flex items-center gap-2 text-xs font-bold text-[var(--wiki-gold)] hover:text-white transition-colors uppercase tracking-widest font-mono">
-                <i data-lucide="arrow-left" class="w-3 h-3"></i> Back to Archive
-            </a>
-        </li>
-    `;
-
-    target.innerHTML = `
-        ${isDesktop ? backButton : ''}
-        <div class="relative mb-6">
-            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500"></i>
-            <input type="text" id="wikiSearch" placeholder="Filter documents..." 
-                class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-xs text-white focus:border-[var(--wiki-gold)] outline-none">
-        </div>
-        <ul class="wiki-nav-list">
-            ${posts.map(p => `
-                <li class="wiki-nav-item">
-                    <a href="post.html?id=${p.id}" 
-                       class="wiki-nav-link ${activeId === p.id ? 'active' : ''}">
-                        ${p.title}
-                    </a>
-                </li>
-            `).join('')}
-        </ul>
-    `;
-    if (window.lucide) window.lucide.createIcons();
-
-    // Search listener
-    const searchInput = document.getElementById('wikiSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            document.querySelectorAll('.wiki-nav-item').forEach(item => {
-                const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(term) ? 'block' : 'none';
-            });
-        });
-    }
-
-    // Attempt to highlight the active category in the global nav if it was rendered by main.js
-    setTimeout(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const catId = urlParams.get('category'); // Though post.html usually uses ?id=
-        const postId = urlParams.get('id');
-
-        // If we know the post's category internally (we fetch it on load)
-        if (window.currentPostData && window.currentPostData.category_id) {
-            const activeLink = document.querySelector(`.category-link[data-id="${window.currentPostData.category_id}"], .submenu-link[data-id="${window.currentPostData.category_id}"]`);
-            if (activeLink) {
-                activeLink.classList.add('active');
-                const submenu = activeLink.closest('.submenu');
-                if (submenu) {
-                    submenu.classList.add('active');
-                    const parentId = submenu.id.replace('sub-', '');
-                    const parentLink = document.querySelector(`.category-link[data-id="${parentId}"]`);
-                    if (parentLink) parentLink.classList.add('active');
-                }
-            }
-        }
-    }, 500);
-}
-
-window.scrollToHeading = function (e, id) {
-    if (e) e.preventDefault();
-    const el = document.getElementById(id);
-    if (el) {
-        const offset = 80;
-        const bodyRect = document.body.getBoundingClientRect().top;
-        const elementRect = el.getBoundingClientRect().top;
-        const elementPosition = elementRect - bodyRect;
-        const offsetPosition = elementPosition - offset;
-
-        window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-        });
-    }
-};
-
-function processWikiComponents() {
-    const viewer = document.getElementById('postContent');
-    if (!viewer) return;
-
-    const blockquotes = viewer.querySelectorAll('blockquote');
-    blockquotes.forEach(bq => {
-        const p = bq.querySelector('p');
-        if (p && p.textContent.startsWith('[!')) {
-            const match = p.textContent.match(/\[!(.*?)\]/);
-            const type = match ? match[1] : 'NOTE';
-            const content = p.innerHTML.replace(`[!${type}]`, '').trim();
-
-            bq.outerHTML = `
-                <div class="wiki-callout">
-                    <div class="wiki-callout-title">
-                        <i data-lucide="info" class="w-4 h-4"></i> ${type.toUpperCase()}
-                    </div>
-                    <div class="wiki-callout-content">${content}</div>
-                </div>
-            `;
-        }
-    });
-    if (window.lucide) window.lucide.createIcons();
 }
 
 function initNightMode() {

@@ -42,10 +42,7 @@
             if (window.supabaseClient) {
                 const { data: { user } } = await window.supabaseClient.auth.getUser();
                 if (user && window.SML_CORE.isAdmin(user.email)) {
-                    // Note: adminToolsContainer might not exist in wiki-layout version, 
-                    // usually handles via inline toolbar but let's keep logic safe
-                    const herramientas = document.getElementById('adminToolsContainer');
-                    if (herramientas) herramientas.style.display = 'flex';
+                    document.getElementById('adminToolsContainer').style.display = 'flex';
                     setupEditToggle();
                 }
             }

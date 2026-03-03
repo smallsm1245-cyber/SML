@@ -35,10 +35,6 @@
     async function loadHomeSettings() {
         if (!supabaseClient) return;
 
-        const mainContent = document.getElementById('mainContent');
-        const wikiContainer = document.getElementById('wikiContainer');
-        const welcomeSection = document.getElementById('welcomeSection');
-
         try {
             const { data, error } = await supabaseClient
                 .from('settings')
@@ -65,150 +61,69 @@
                 const descTag = document.getElementById('siteDescTag');
                 if (descTag) descTag.content = settings.site_description;
             }
-
-            // Apply Wiki Layout for Home too
-            if (mainContent && wikiContainer) {
-                mainContent.style.display = 'none';
-                if (welcomeSection) welcomeSection.style.display = 'none';
-                wikiContainer.classList.remove('hidden');
-
-                const contentCol = document.getElementById('wikiContentCol');
-                const infoCol = document.getElementById('wikiInfoCol');
-                const navCol = document.getElementById('wikiNavCol');
-
-                if (contentCol) {
-                    contentCol.innerHTML = `
-                        <header class="wiki-post-header mb-10">
-                            <div class="text-[var(--wiki-gold)] text-[10px] font-mono tracking-[0.3em] uppercase mb-2">Archive Gateway</div>
-                            <h1 class="text-4xl md:text-5xl font-bold font-serif text-white mb-4 border-none !p-0">${settings.home_title || 'Archive'}</h1>
-                            <p class="text-[var(--wiki-text-dim)] italic mb-6">${settings.home_subtitle || ''}</p>
-                            <div class="h-1 w-20 bg-[var(--wiki-gold)]"></div>
-                        </header>
-                        <div id="wikiHomeViewer" class="wiki-prose"></div>
-                        <div id="recentPostsWiki" class="mt-20"></div>
-                    `;
-
-                    if (settings.home_content && typeof toastui !== 'undefined' && toastui.Editor) {
-                        toastui.Editor.factory({
-                            el: document.getElementById('wikiHomeViewer'),
-                            viewer: true,
-                            initialValue: settings.home_content,
-                            theme: 'dark'
-                        });
-
-                        setTimeout(() => {
-                            const viewerEl = document.getElementById('wikiHomeViewer');
-                            if (!viewerEl) return;
-                            const headers = Array.from(viewerEl.querySelectorAll('h1, h2, h3'));
-                            const tocContainer = document.getElementById('homeTocContainer');
-                            const tocList = document.getElementById('homeTocList');
-
-                            const tocHeaders = headers.filter(h => h.tagName !== 'H1');
-
-                            if (tocHeaders.length > 0 && tocContainer && tocList) {
-                                tocContainer.style.display = 'block';
-                                tocList.innerHTML = tocHeaders.map((h, i) => {
-                                    if (!h.id) h.id = 'home-heading-' + i;
-                                    const indent = (parseInt(h.tagName.substring(1)) - 2) * 12; // h2=0, h3=12px
-                                    return `
-                                        <li class="toc-item mb-2" style="padding-left: ${Math.max(0, indent)}px">
-                                            <a href="#${h.id}" class="text-[var(--wiki-text-dim)] hover:text-[var(--wiki-gold)] text-xs transition-colors" onclick="window.scrollToHeading(event, '${h.id}')">
-                                                ${h.textContent}
-                                            </a>
-                                        </li>
-                                    `;
-                                }).join('');
-                            }
-                        }, 500);
-                    }
-                }
-
-                if (navCol) {
-                    // For Home, we could show categories or just "Home" link
-                    navCol.innerHTML = `
-                        <div class="wiki-nav-header mb-6">
-                            <h2 class="text-xs font-bold text-slate-500 tracking-[0.2em] uppercase mb-4 font-mono">Archive Portal</h2>
-                        </div>
-                        <ul class="wiki-nav-list">
-                            <li class="wiki-nav-item">
-                                <a href="index.html" class="wiki-nav-link active">
-                                    <i data-lucide="home" class="w-4 h-4 inline-block mr-2"></i> Dashboard Home
-                                </a>
-                            </li>
-                            <li class="wiki-nav-item">
-                                <a href="mailbox.html" class="wiki-nav-link">
-                                    <i data-lucide="mail" class="w-4 h-4 inline-block mr-2"></i> Terminal Mail
-                                </a>
-                            </li>
-                        </ul>
-                    `;
-                    if (window.lucide) window.lucide.createIcons();
-                }
-
-                if (infoCol) {
-                    infoCol.innerHTML = `
-                        <div class="wiki-infobox animate-slide-up mb-6">
-                            <div class="infobox-header">
-                                <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Portal Info</span>
-                                <h3 class="infobox-title mt-2">SMALLSM</h3>
-                            </div>
-                            <div class="infobox-data">
-                                <div class="infobox-row">
-                                    <span class="infobox-label">Editor</span>
-                                    <span class="infobox-value">SMALLSM</span>
-                                </div>
-                                <div class="infobox-row">
-                                    <span class="infobox-label">Type</span>
-                                    <span class="infobox-value">Wiki Archilive</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="wiki-toc animate-slide-up bg-white/5 border border-white/10 rounded-lg p-5" id="homeTocContainer" style="display:none;">
-                            <h3 class="font-bold text-[var(--wiki-gold)] text-[11px] font-mono tracking-[0.2em] uppercase mb-4 border-b border-white/10 pb-2">Contents</h3>
-                            <ul class="toc-list" id="homeTocList"></ul>
-                        </div>
-                    `;
-                }
-
-                // Handle recent posts inside Wiki if enabled
-                if (settings.show_recent_posts === 'true') {
-                    const count = parseInt(settings.recent_posts_count) || 3;
-                    await loadRecentPostsWiki(count);
+            if (settings.google_site_verification) {
+                const gTag = document.querySelector('meta[name="google-site-verification"]');
+                if (gTag) {
+                    gTag.content = settings.google_site_verification;
+                    console.log('✅ Google Verification Tag Updated:', settings.google_site_verification);
+                } else {
+                    console.warn('⚠️ Google Meta Tag not found in HTML');
                 }
             }
+            if (settings.naver_verification) {
+                const nTag = document.querySelector('meta[name="naver-site-verification"]');
+                if (nTag) {
+                    nTag.content = settings.naver_verification;
+                    console.log('✅ Naver Verification Tag Updated:', settings.naver_verification);
+                } else {
+                    console.warn('⚠️ Naver Meta Tag not found in HTML');
+                }
+            }
+
+            const title = document.getElementById('welcomeTitle');
+            const subtitle = document.querySelector('.post-meta span');
+            const content = document.getElementById('mainContent');
+
+            // Restore the page-header if it was hidden by the gallery
+            const pageHeader = document.querySelector('.page-header');
+            if (pageHeader) pageHeader.style.display = 'block';
+
+            if (title && settings.home_title) {
+                title.textContent = settings.home_title;
+                title.dataset.adminEditable = 'text';
+                title.dataset.adminId = 'setting:home_title';
+                title.dataset.adminField = 'value';
+            }
+            if (subtitle && settings.home_subtitle) {
+                subtitle.textContent = settings.home_subtitle;
+                subtitle.dataset.adminEditable = 'text';
+                subtitle.dataset.adminId = 'setting:home_subtitle';
+                subtitle.dataset.adminField = 'value';
+            }
+            if (content && settings.home_content) {
+                content.dataset.adminEditable = 'content';
+                content.dataset.adminId = 'setting:home_content';
+                content.dataset.adminField = 'value';
+                // Initialize Toast UI Viewer
+                const Viewer = toastui.Editor;
+                content.innerHTML = '';
+                const viewer = Viewer.factory({
+                    el: content,
+                    viewer: true,
+                    initialValue: settings.home_content
+                });
+            }
+
+            // Handle recent posts if enabled
+            if (settings.show_recent_posts === 'true') {
+                const count = parseInt(settings.recent_posts_count) || 3;
+                await loadRecentPosts(count);
+            }
+
+            console.log('✅ Home settings loaded');
 
         } catch (error) {
             console.error('❌ Home settings loading failed:', error);
-        }
-    }
-
-    async function loadRecentPostsWiki(count) {
-        const container = document.getElementById('recentPostsWiki');
-        if (!container) return;
-
-        try {
-            const { data: posts } = await supabaseClient
-                .from('archive_posts')
-                .select('id, title, created_at, category_id')
-                .eq('is_private', false)
-                .order('created_at', { ascending: false })
-                .limit(count);
-
-            if (posts && posts.length > 0) {
-                container.innerHTML = `
-                    <h2 class="text-xl font-bold text-[var(--wiki-gold)] mb-6 font-serif">RECENT RECORDS</h2>
-                    <div class="grid gap-4">
-                        ${posts.map(post => `
-                            <a href="post.html?id=${post.id}" class="group block p-4 bg-white/5 border border-white/10 rounded-lg hover:border-[var(--wiki-gold)] transition-all">
-                                <h3 class="text-white group-hover:text-[var(--wiki-gold)] font-medium transition-colors">${post.title}</h3>
-                                <span class="text-[10px] text-slate-500 font-mono uppercase">${new Date(post.created_at).toLocaleDateString('en-US')}</span>
-                            </a>
-                        `).join('')}
-                    </div>
-                `;
-            }
-        } catch (e) {
-            console.error('Recent posts Wiki load failed:', e);
         }
     }
 
@@ -378,19 +293,9 @@
 
             // CRITICAL: Filter for display (only visible ones)
             const visibleCategories = categories.filter(c => c.is_visible);
-
-            // Save for Wiki "Back" functionality
-            window.allCategories = visibleCategories;
-            window.allCounts = counts;
-
             renderCategories(visibleCategories, counts);
 
-            // Check URL params for category filter (Redirect support)
-            const urlParams = new URLSearchParams(window.location.search);
-            const catId = urlParams.get('category');
-            if (catId) {
-                filterByCategory(catId);
-            }
+            console.log('✅ Categories loaded');
 
         } catch (error) {
             console.error('❌ Categories loading failed:', error);
@@ -423,9 +328,9 @@
             return `
                 <li class="category-item">
                     <div class="category-header-wrap">
-                        <a href="${root.name.includes('궁합표') ? 'bdsm-chart.html' : 'javascript:void(0);'}" 
-                           ${root.name.includes('궁합표') ? `onclick="window.location.href='bdsm-chart.html'; return false;"` : `onclick="${hasChildren ? `toggleAccordion('${root.id}')` : `filterByCategory('${root.id}', this)`}"`}
-                           class="category-link ${hasChildren ? 'has-children' : ''} ${root.name.includes('궁합표') ? 'direct-link' : ''}" 
+                        <a href="${root.name === 'BDSM 궁합표' ? 'bdsm-chart.html' : 'javascript:void(0);'}" 
+                           ${root.name === 'BDSM 궁합표' ? '' : `onclick="${hasChildren ? `toggleAccordion('${root.id}')` : `filterByCategory('${root.id}', this)`}"`}
+                           class="category-link ${hasChildren ? 'has-children' : ''}" 
                            data-id="${root.id}">
                             <div class="cat-name-block">
                                 ${hasChildren ? chevronSvg : ''}
@@ -440,9 +345,9 @@
                 const childCount = counts[child.id] || 0;
                 return `
                                     <li class="submenu-item">
-                                        <a href="${child.name.includes('궁합표') ? 'bdsm-chart.html' : 'javascript:void(0);'}" 
-                                           ${child.name.includes('궁합표') ? `onclick="window.location.href='bdsm-chart.html'; return false;"` : `onclick="filterByCategory('${child.id}', this)"`}
-                                           class="submenu-link ${child.name.includes('궁합표') ? 'direct-link' : ''}" data-id="${child.id}">
+                                        <a href="${child.name === 'BDSM 궁합표' ? 'bdsm-chart.html' : 'javascript:void(0);'}" 
+                                           ${child.name === 'BDSM 궁합표' ? '' : `onclick="filterByCategory('${child.id}', this)"`}
+                                           class="submenu-link" data-id="${child.id}">
                                             - ${child.name} <span class="cat-count" style="float:right">${childCount}</span>
                                         </a>
                                     </li>
@@ -479,40 +384,9 @@
             return;
         }
 
-        // Clear any existing doc list injections so we start fresh
-        document.querySelectorAll('.document-list').forEach(el => el.remove());
-
-        // Remove active class from all nav items
-        document.querySelectorAll('.category-link, .submenu-link').forEach(el => {
-            el.classList.remove('active');
-        });
-
-        // Find and highlight active element
-        let activeEl = element;
-        if (!activeEl) {
-            activeEl = document.querySelector(`.category-link[data-id="${categoryId}"], .submenu-link[data-id="${categoryId}"]`);
-        }
-
-        if (activeEl) {
-            activeEl.classList.add('active');
-
-            // If it's a submenu link, expand the parent
-            if (activeEl.classList.contains('submenu-link')) {
-                const submenu = activeEl.closest('.submenu');
-                if (submenu && !submenu.classList.contains('active')) {
-                    submenu.classList.add('active');
-                    const parentId = submenu.id.replace('sub-', '');
-                    const parentLink = document.querySelector(`.category-link[data-id="${parentId}"]`);
-                    if (parentLink) parentLink.classList.add('active');
-                }
-            } else if (activeEl.classList.contains('category-link')) {
-                // Auto-expand the submenu if there's one (accordion open)
-                const submenu = document.getElementById(`sub-${categoryId}`);
-                if (submenu && !submenu.classList.contains('active')) {
-                    submenu.classList.add('active');
-                }
-            }
-        }
+        // Remove active class
+        document.querySelectorAll('.category-link, .submenu-link').forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
 
         loadPostsByCategory(categoryId);
     };
@@ -524,25 +398,138 @@
         if (!supabaseClient) return;
 
         try {
+            // Check category name first
             const { data: category } = await supabaseClient
                 .from('categories')
                 .select('name')
                 .eq('id', categoryId)
                 .single();
 
-            if (category && category.name === '검증테스트') {
-                return renderVerificationTestView();
+            // 성향 백과 카테고리 클릭 시 갤러리 표시
+            if (category && category.name === '성향 백과') {
+                renderTendencyView();
+                return;
             }
 
-            // Universal Wiki View for ALL other categories
-            await renderWikiView(categoryId);
+            // 검증테스트 카테고리 클릭 시 프로토콜 표시
+            if (category && category.name === '검증테스트') {
+                renderVerificationTestView();
+                return;
+            }
+
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const isAdmin = user && user.email === window.ADMIN_EMAIL;
+
+            let query = supabaseClient
+                .from('archive_posts')
+                .select('*')
+                .eq('category_id', categoryId)
+                .order('created_at', { ascending: false });
+
+            if (!isAdmin) {
+                query = query.eq('is_private', false);
+            }
+
+            const { data: posts, error } = await query;
+
+            if (error) throw error;
+
+            const content = document.getElementById('mainContent');
+            const title = document.getElementById('welcomeTitle');
+
+            // Restore the page-header if it was hidden by the gallery
+            const pageHeader = document.querySelector('.page-header');
+            if (pageHeader) pageHeader.style.display = 'block';
+
+            if (!content || !title) return;
+
+            if (posts.length === 0) {
+                title.textContent = '게시물 없음';
+                content.innerHTML = '<p>이 카테고리에는 아직 게시물이 없습니다.</p>';
+                return;
+            }
+
+            const { data: postCategoryData } = await supabaseClient
+                .from('categories')
+                .select('name')
+                .eq('id', categoryId)
+                .single();
+
+            // Check if there is exactly ONE post
+            if (posts.length === 1) {
+                const post = posts[0];
+                title.textContent = post.title;
+
+                // Clear previous content
+                content.innerHTML = '';
+
+                // Add Meta Info
+                const metaDiv = document.querySelector('.post-meta');
+                if (metaDiv) {
+                    const dateStr = new Date(post.created_at).toLocaleDateString('ko-KR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    const categoryName = postCategoryData ? postCategoryData.name : '';
+                    metaDiv.innerHTML = `<span>${categoryName}</span> • <span>${dateStr}</span>`;
+                }
+
+                // Initialize Toast UI Viewer for the content
+                const Viewer = toastui.Editor;
+                const viewer = Viewer.factory({
+                    el: content,
+                    viewer: true,
+                    initialValue: post.content,
+                    theme: 'dark' // Assuming dark theme is preferred or matches style
+                });
+
+                // Copy protection if needed
+                if (!post.origin_free) {
+                    content.classList.add('copy-protected');
+                    // Re-bind copy protection if not global
+                    // Note: Global copy listener in main.js handles generic copy, 
+                    // but specific attribution might depend on postId. 
+                    // The global listener checks `window.location.search`.
+                    // Since we are in SPA mode, the URL might not have ?id=...
+                    // We might need to update the global copy handler or pushState.
+                    // For now, let's keep it simple.
+                }
+
+                return;
+            }
+
+            // Multiple posts - Show List
+            title.textContent = category.name;
+            const metaDiv = document.querySelector('.post-meta');
+            if (metaDiv) metaDiv.innerHTML = `<span>총 ${posts.length}개의 게시물</span>`;
+
+            content.innerHTML = posts.map(post => `
+                <div class="admin-post-item" style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border); position: relative;">
+                    <h3>
+                        <a href="post.html?id=${post.id}" style="color: var(--primary-yellow); text-decoration: none;" data-admin-editable="text" data-admin-id="${post.id}" data-admin-field="title">
+                            ${post.title}
+                            ${post.is_private ? '<span style="font-size: 0.8em; color: var(--accent-amber);"> 🔒</span>' : ''}
+                        </a>
+                    </h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                            ${new Date(post.created_at).toLocaleDateString('ko-KR')}
+                        </p>
+                        ${isAdmin ? `
+                            <div class="admin-post-actions">
+                                <button class="admin-action-btn delete" onclick="event.preventDefault(); deletePostInline('${post.id}', '${post.title.replace(/'/g, "\\'")}')" title="Delete">🗑️</button>
+                                <button class="admin-action-btn edit" onclick="event.preventDefault(); window.location.href='admin.html?edit=${post.id}'" title="Full Edit">⚙️</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
 
         } catch (error) {
             console.error('❌ Post loading failed:', error);
         }
     }
-
-
 
     // ═══════════════════════════════════════════════════
     // 6. SEARCH FUNCTIONALITY
@@ -678,353 +665,651 @@
     }
 
     // ═══════════════════════════════════════════════════
-    // WIKI SYSTEM INTEGRATION
+    // TENDENCY VIEW INTEGRATION - KINK DICTIONARY
     // ═══════════════════════════════════════════════════
-    window.wikiActiveId = null;
+    window.tendencyActiveTab = 'Top';
 
-    async function renderWikiView(categoryId) {
-        window.renderWikiView = renderWikiView;
-        window.wikiCategoryId = categoryId;
+    async function renderTendencyView() {
+        window.renderTendencyView = renderTendencyView;
         if (!supabaseClient) return;
 
         const mainContent = document.getElementById('mainContent');
-        const wikiContainer = document.getElementById('wikiContainer');
-        const welcomeSection = document.getElementById('welcomeSection');
+        const welcomeTitle = document.getElementById('welcomeTitle');
+        const metaDiv = document.querySelector('.post-meta');
 
-        if (!mainContent || !wikiContainer) return;
+        if (!mainContent) return;
 
-        // Hide standard view, show Wiki container
-        mainContent.style.display = 'none';
-        if (welcomeSection) welcomeSection.style.display = 'none';
-        wikiContainer.classList.remove('hidden');
+        if (welcomeTitle) welcomeTitle.style.display = 'none';
+        if (metaDiv) metaDiv.style.display = 'none';
+
+        mainContent.innerHTML = `<div class="loading-container"><div class="loading"></div></div>`;
 
         try {
-            // Fetch posts under this category
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            const isAdmin = user && user.email === window.ADMIN_EMAIL;
+            // Find "성향 백과" category ID dynamically
+            const { data: categoryData, error: catError } = await supabaseClient
+                .from('categories')
+                .select('id')
+                .eq('name', '성향 백과')
+                .single();
 
-            let query = supabaseClient
+            if (catError) throw new Error('성향 백과 카테고리를 찾을 수 없습니다.');
+            const kinkDictCategoryId = categoryData.id;
+
+            // Fetch archive_posts under this category
+            const { data: posts, error } = await supabaseClient
                 .from('archive_posts')
-                .select('id, title, content, created_at, updated_at')
-                .eq('category_id', categoryId)
-                .order('title', { ascending: true });
+                .select('id, title, content, created_at')
+                .eq('category_id', kinkDictCategoryId)
+                .order('created_at', { ascending: true }); // Using created_at or title for ordering
 
-            if (!isAdmin) {
-                query = query.eq('is_private', false);
+            // Fetch kink dictionary settings
+            const { data: kinkSettings } = await supabaseClient.from('settings').select('*').in('key', ['kink_dictionary_pairs', 'kink_role_overrides', 'kink_display_order']);
+
+            const pairData = (kinkSettings || []).find(s => s.key === 'kink_dictionary_pairs');
+            const kinkPairs = pairData && pairData.value ? JSON.parse(pairData.value) : {};
+            window.kinkDictionaryPairs = kinkPairs;
+
+            const overrideData = (kinkSettings || []).find(s => s.key === 'kink_role_overrides');
+            const kinkRoleOverrides = overrideData && overrideData.value ? JSON.parse(overrideData.value) : {};
+
+            const orderData = (kinkSettings || []).find(s => s.key === 'kink_display_order');
+            const kinkDisplayOrder = orderData && orderData.value ? JSON.parse(orderData.value) : [];
+
+            // Process posts and convert them to "tendencies" format
+            let tendenciesData = (posts || []).map(post => {
+                // Determine type: prioritze manual override, then tag, then keyword
+                let type = kinkRoleOverrides[post.id];
+                if (type) type = type.toLowerCase();
+                let rawTitle = post.title;
+
+                if (!type) {
+                    const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
+                    if (tagMatch) {
+                        type = tagMatch[1].toLowerCase();
+                        rawTitle = rawTitle.slice(tagMatch[0].length).trim();
+                        // If it's relation, treat it as top for list categorization
+                        if (type === 'relation') type = 'top';
+                    } else {
+                        const bottomKeywords = /매조|섭|슬레이브|프레이|마조히스트|서브미시브|바텀|bottom|submissive|브랫|brat|펫|pet|리틀|little|디그레이디|degradee/i;
+                        if (bottomKeywords.test(rawTitle)) type = 'bottom';
+                        else type = 'top';
+                    }
+                } else {
+                    // If override exists, still clean title of tags for display
+                    const tagMatch = rawTitle.match(/^\[(top|bottom|relation)\]\s*/i);
+                    if (tagMatch) rawTitle = rawTitle.slice(tagMatch[0].length).trim();
+                }
+
+                // 3) Try to extract English sub name from parenthesis e.g. "마스터 (Master)"
+                const titleMatch = rawTitle.match(/(.*?)\s*\((.*?)\)$/);
+                let name = rawTitle;
+                let sub_name = '';
+                if (titleMatch) {
+                    name = titleMatch[1].trim();
+                    sub_name = titleMatch[2].trim();
+                }
+
+                // 4) Extract <!--pair: name--> tag from content for Relation tab
+                let pairTarget = null;
+                const pairMatch = (post.content || '').match(/<!--\s*pair:\s*(.+?)\s*-->/i);
+                if (pairMatch) pairTarget = pairMatch[1].trim();
+
+                // 5) Strip <!--pair:...--> and metadata from content before storing
+                // const cleanContent = (post.content || '').replace(/<!--.*?-->/gs, '').trim(); // No longer needed as description uses full content
+
+                return {
+                    id: post.id,
+                    name: name,
+                    subName: sub_name,
+                    description: post.content,
+                    icon: null,
+                    type: type,
+                    pair: pairTarget
+                };
+            });
+
+            // Apply custom display order if it exists
+            if (kinkDisplayOrder && kinkDisplayOrder.length > 0) {
+                const orderMap = {};
+                kinkDisplayOrder.forEach((id, idx) => orderMap[id] = idx);
+
+                tendenciesData.sort((a, b) => {
+                    const orderA = orderMap[a.id] !== undefined ? orderMap[a.id] : 9999;
+                    const orderB = orderMap[b.id] !== undefined ? orderMap[b.id] : 9999;
+                    return orderA - orderB;
+                });
             }
 
-            const { data: posts } = await query;
-            window.wikiData = posts || [];
+            window.tendencyData = tendenciesData;
 
-            // Always start with the category index view (no document auto-selected)
-            window.wikiActiveId = null;
+            // Hide the legacy page-header to avoid duplicate titles
+            const pageHeader = document.querySelector('.page-header');
+            if (pageHeader) pageHeader.style.display = 'none';
 
-            renderWikiUI();
+            renderKinkDictionaryUI();
 
         } catch (error) {
-            console.error('Wiki load failed:', error);
+            console.error('Gallery load failed:', error);
+            mainContent.innerHTML = `<p style="color:red; text-align:center; padding: 2rem;">데이터 로딩 실패: ${error.message}</p>`;
         }
     }
 
-    // Alias for backward compatibility if needed
-    window.renderTendencyView = () => {
-        // Find "성향 백과" ID and call renderWikiView
-        supabaseClient.from('categories').select('id').eq('name', '성향 백과').single()
-            .then(({ data }) => { if (data) renderWikiView(data.id); });
-    };
-
-    function renderWikiUI() {
-        renderWikiNav();
-        renderWikiContent();
-    }
-
-    function renderWikiNav() {
-        // We only use the global Category list now to unify the hierarchy.
-        const globalCategoryNav = document.getElementById('categoryNav');
-        if (!globalCategoryNav) return;
-
-        const posts = window.wikiData || [];
-
-        // 1. Remove any previously injected document lists to prevent duplicates
-        document.querySelectorAll('.document-list').forEach(el => el.remove());
-
-        // 2. Find the active category item in the sidebar
-        const activeLink = document.querySelector(`.category-link[data-id="${window.wikiCategoryId}"], .submenu-link[data-id="${window.wikiCategoryId}"]`);
-
-        if (activeLink && posts.length > 0) {
-            const li = activeLink.closest('li');
-            if (li) {
-                // Add the document list as a nested submenu
-                const docListHtml = `
-                    <ul class="submenu document-list" id="doclist-${window.wikiCategoryId}">
-                        ${posts.map(post => `
-                            <li class="document-item">
-                                <a href="javascript:void(0)" onclick="switchWikiDoc('${post.id}')" 
-                                   class="document-link ${window.wikiActiveId === post.id ? 'active' : ''}">
-                                    ${post.title}
-                                </a>
-                            </li>
-                        `).join('')}
-                    </ul>
-                `;
-                li.insertAdjacentHTML('beforeend', docListHtml);
-            }
-        }
-    }
-
-
-    window.exitWikiMode = function () {
+    window.renderKinkDictionaryUI = function () {
         const mainContent = document.getElementById('mainContent');
-        const wikiContainer = document.getElementById('wikiContainer');
-        const welcomeSection = document.getElementById('welcomeSection');
+        if (!mainContent) return;
 
-        if (wikiContainer) wikiContainer.classList.add('hidden');
-        if (mainContent) mainContent.style.display = 'block';
-        if (welcomeSection) welcomeSection.style.display = 'block';
+        const tendenciesData = window.tendencyData || [];
+        const doms = tendenciesData.filter(t => t.type === 'top');
+        const subs = tendenciesData.filter(t => t.type === 'bottom');
 
-        // Remove injected document list from sidebar
-        document.querySelectorAll('.document-list').forEach(el => el.remove());
+        const activeTab = window.tendencyActiveTab || 'Top';
 
-        // Clear active wiki state
-        window.wikiActiveId = null;
-        window.wikiCategoryId = null;
-        window.wikiData = [];
-
-        // Clear active highlight from the category nav
-        document.querySelectorAll('.category-link.active, .submenu-link.active').forEach(el => el.classList.remove('active'));
-
-        // Smooth scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    window.switchWikiDoc = function (id) {
-        window.wikiActiveId = id;
-        // Re-render: update active doc highlight in sidebar + content
-        document.querySelectorAll('.document-link').forEach(el => {
-            const postId = el.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
-            el.classList.toggle('active', postId === id);
-        });
-        renderWikiContent();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    function renderWikiContent() {
-        const contentCol = document.getElementById('wikiContentCol');
-        const infoCol = document.getElementById('wikiInfoCol');
-        if (!contentCol || !infoCol) return;
-
-        const post = (window.wikiData || []).find(p => p.id === window.wikiActiveId);
-        if (!post) {
-            // Show a Category Index / TOC page when no doc is selected
-            const categoryId = window.wikiCategoryId;
-            const category = window.allCategories?.find(c => c.id === categoryId);
-            const parentCategory = category?.parent_id ? window.allCategories?.find(c => c.id === category.parent_id) : null;
-            const allPosts = window.wikiData || [];
-
-            const breadcrumbsHtml = `
-                <nav class="breadcrumbs">
-                    <a href="index.html" class="breadcrumb-item breadcrumb-link"><i data-lucide="home" class="w-3 h-3"></i> Home</a>
-                    ${parentCategory ? `<span class="breadcrumb-item"><span class="breadcrumb-link">${parentCategory.name}</span></span>` : ''}
-                    <span class="breadcrumb-item active">${category?.name || 'Archive'}</span>
-                </nav>
-            `;
-
-            // ─── Position grouping keywords ───────────────────────────────────
-            const topKeywords = ['탑', '상위', '지배', '마스터', '대디', '마미', '새디스트', 'sadist', 'dominant', 'dom', 'daddy', 'mommy'];
-            const bottomKeywords = ['바텀', '하위', '복종', '슬레이브', '섭', 'submissive', 'sub', 'slave', 'masochist', 'masochist'];
-
-            const getGroup = (title) => {
-                const t = title.toLowerCase();
-                if (topKeywords.some(kw => t.includes(kw))) return 'top';
-                if (bottomKeywords.some(kw => t.includes(kw))) return 'bottom';
-                return 'other';
-            };
-
-            const topPosts = allPosts.filter(p => getGroup(p.title) === 'top');
-            const bottomPosts = allPosts.filter(p => getGroup(p.title) === 'bottom');
-            const otherPosts = allPosts.filter(p => getGroup(p.title) === 'other');
-
-            const renderGroup = (posts, startIdx = 0) => posts.map((post, idx) => `
-                <li class="wiki-index-item" onclick="switchWikiDoc('${post.id}')">
-                    <span class="wiki-index-num">${String(startIdx + idx + 1).padStart(2, '0')}</span>
-                    <span class="wiki-index-title">${post.title}</span>
-                    <i data-lucide="chevron-right" class="wiki-index-icon w-4 h-4"></i>
-                </li>
-            `).join('');
-
-            const renderSection = (label, badge, posts, startIdx = 0) => posts.length === 0 ? '' : `
-                <div class="wiki-index-section">
-                    <div class="wiki-index-section-header">
-                        <span class="wiki-index-badge ${badge}">${label}</span>
-                        <span class="wiki-index-section-count">${posts.length}개</span>
+        // Show empty state if no posts yet
+        if (tendenciesData.length === 0) {
+            mainContent.innerHTML = `
+                <div class="kink-dict-wrapper">
+                    <div class="kink-dict-header">
+                        <h1 class="kink-dict-title">성향 백과</h1>
+                        <p class="kink-dict-subtitle">아직 등록된 성향이 없습니다.</p>
                     </div>
-                    <ol class="wiki-index-list">${renderGroup(posts, startIdx)}</ol>
+                    <div style="text-align:center; padding: 3rem 1rem; color: var(--text-secondary);">
+                        <p>관리자 페이지에서 게시글을 작성하고 <strong>성향 백과</strong> 카테고리를 선택하면 여기에 표시됩니다.</p>
+                        <p style="margin-top:1rem; font-size:0.85rem; opacity:0.7;">제목 앞에 <code>[top]</code> 또는 <code>[bottom]</code>을 붙이면 자동 분류됩니다.<br>예: <code>[top] 마스터 (Master)</code></p>
+                    </div>
                 </div>
             `;
-
-            contentCol.innerHTML = `
-                ${breadcrumbsHtml}
-                <header class="wiki-post-header mb-8">
-                    <div class="text-[var(--wiki-gold)] text-[10px] font-mono tracking-[0.3em] uppercase mb-2">Category Index</div>
-                    <h1 class="text-4xl md:text-5xl font-bold font-serif text-white mb-4 border-none !p-0">${category?.name || 'Archive'}</h1>
-                    <div class="h-1 w-20 bg-[var(--wiki-gold)] mb-4"></div>
-                    <p class="text-[var(--wiki-text-dim)] text-sm">총 ${allPosts.length}개의 문서 · 항목을 클릭해 내용을 확인하세요.</p>
-                </header>
-                ${renderSection('⬆ 탑 포지션', 'top', topPosts, 0)}
-                ${renderSection('⬇ 바텀 포지션', 'bottom', bottomPosts, topPosts.length)}
-                ${renderSection('공통 / 기타', 'other', otherPosts, topPosts.length + bottomPosts.length)}
-            `;
-
-            infoCol.innerHTML = `
-                <div class="wiki-infobox">
-                    <div class="wiki-infobox-title">카테고리 정보</div>
-                    <div class="wiki-infobox-row"><span class="wiki-infobox-label">전체</span><span>${allPosts.length}</span></div>
-                    <div class="wiki-infobox-row"><span class="wiki-infobox-label">⬆ 탑</span><span>${topPosts.length}</span></div>
-                    <div class="wiki-infobox-row"><span class="wiki-infobox-label">⬇ 바텀</span><span>${bottomPosts.length}</span></div>
-                    ${otherPosts.length > 0 ? `<div class="wiki-infobox-row"><span class="wiki-infobox-label">공통</span><span>${otherPosts.length}</span></div>` : ''}
-                </div>
-            `;
-
-            if (window.lucide) window.lucide.createIcons();
             return;
         }
 
-        const categoryId = window.wikiCategoryId;
-        const category = window.allCategories?.find(c => c.id === categoryId);
-        const parentCategory = category?.parent_id ? window.allCategories?.find(c => c.id === category.parent_id) : null;
+        let contentHtml = '';
 
-        const breadcrumbsHtml = `
-            <nav class="breadcrumbs">
-                <a href="index.html" class="breadcrumb-item breadcrumb-link"><i data-lucide="home" class="w-3 h-3"></i> Home</a>
-                ${parentCategory ? `<span class="breadcrumb-item"><span class="breadcrumb-link">${parentCategory.name}</span></span>` : ''}
-                ${category ? `<span class="breadcrumb-item"><span class="breadcrumb-link text-[var(--wiki-gold)]">${category.name}</span></span>` : '<span class="breadcrumb-item">Archive</span>'}
-            </nav>
-        `;
+        if (activeTab === 'Relation') {
+            console.log(`[KinkDict] Rendering Relation tab.`);
+            // Build pairs: for each top, find its pair from kinkPairs setting, else fallback to name match, else fallback to index
+            const buildPairs = () => {
+                const tops = tendenciesData.filter(t => t.type === 'top');
+                const bottoms = tendenciesData.filter(t => t.type === 'bottom');
+                const pairs = [];
+                const usedBottomIds = new Set();
+                const kinkPairs = window.kinkDictionaryPairs || {};
 
-        // Render Main Content
-        contentCol.innerHTML = `
-            ${breadcrumbsHtml}
-            <header class="wiki-post-header mb-10">
-                <div class="text-[var(--wiki-gold)] text-[10px] font-mono tracking-[0.3em] uppercase mb-2">Authenticated Record</div>
-                <h1 class="text-4xl md:text-5xl font-bold font-serif text-white mb-4 border-none !p-0">${post.title}</h1>
-                <div class="h-1 w-20 bg-[var(--wiki-gold)]"></div>
-            </header>
-            <div id="wikiViewer" class="wiki-prose"></div>
-        `;
+                tops.forEach((top, idx) => {
+                    let matched = null;
 
-        // Initialize Toast UI Viewer
-        if (typeof toastui !== 'undefined' && toastui.Editor) {
-            toastui.Editor.factory({
-                el: document.getElementById('wikiViewer'),
-                viewer: true,
-                initialValue: post.content,
-                theme: 'dark'
+                    // 1) Use admin-defined pair if available
+                    if (kinkPairs[top.id]) {
+                        matched = bottoms.find(b => b.id === kinkPairs[top.id]);
+                    }
+
+                    // 2) Fallback: pair tag
+                    if (!matched && top.pair) {
+                        matched = bottoms.find(b =>
+                            b.name.toLowerCase().includes(top.pair.toLowerCase()) ||
+                            top.pair.toLowerCase().includes(b.name.toLowerCase())
+                        );
+                    }
+
+                    // 3) Fallback: pair by index
+                    if (!matched) {
+                        matched = bottoms.filter(b => !usedBottomIds.has(b.id))[0] || null;
+                    }
+
+                    if (matched) usedBottomIds.add(matched.id);
+                    pairs.push({ top, bottom: matched });
+                });
+                return pairs;
+            };
+
+            const pairs = buildPairs();
+            contentHtml = `
+                <div class="kink-relation-container">
+                    <div class="kink-relation-info">
+                        <p>관리자 페이지 설정 또는 Top 게시글 태그(<code>&lt;!--pair: 이름--&gt;</code>)에 따라 매칭됩니다.</p>
+                    </div>
+                    <div class="kink-relation-list">
+            `;
+            pairs.forEach(({ top, bottom }) => {
+                const bottomName = bottom ? bottom.name : '?';
+                contentHtml += `
+                    <div class="kink-relation-item">
+                        <div class="kink-relation-card top" onclick="showRoleDetail('${top.id}')" style="cursor:pointer">
+                            <div class="relation-badge top-badge">TOP</div>
+                            <div class="relation-name">${top.name}</div>
+                        </div>
+                        <div class="relation-icon"><i data-lucide="zap"></i></div>
+                        <div class="kink-relation-card bottom" ${bottom ? `onclick="showRoleDetail('${bottom.id}')" style="cursor:pointer"` : ''} >
+                            <div class="relation-badge bottom-badge">BOTTOM</div>
+                            <div class="relation-name">${bottomName}</div>
+                        </div>
+                    </div>
+                `;
             });
+            contentHtml += `</div></div>`;
+        } else {
+            const listData = (activeTab === 'Top' ? doms : subs) || [];
+            console.log(`[KinkDict] Rendering ${activeTab} tab. items count: ${listData.length}`);
+
+            contentHtml = `<div class="kink-list-container">`;
+            listData.forEach((item, idx) => {
+                try {
+                    // Create a brief summary of the markdown content for the list view
+                    // IMPORTANT: Strip HTML comments FIRST (<!--...-->) before stripping tags,
+                    // otherwise <!--pair:name--> loses its '>' and becomes an unclosed comment in innerHTML
+                    const plainText = (item.description || '')
+                        .replace(/<!--[\s\S]*?-->/g, '')   // 1) Remove HTML comments (e.g. <!--pair:...-->)
+                        .replace(/<[^>]*>/g, '')            // 2) Remove all remaining HTML tags
+                        .replace(/[#*_~`]/g, '')            // 3) Remove markdown syntax chars
+                        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // 4) Convert markdown links to text
+                        .trim();
+                    const brief = plainText.length > 60 ? plainText.substring(0, 60) + '...' : plainText;
+
+                    console.log(`[KinkDict]  - Rendering item ${idx + 1}/${listData.length}: ${item.name} (${item.id})`);
+
+                    contentHtml += `
+                        <div class="kink-list-item" onclick="showRoleDetail('${item.id}')">
+                            <div class="kink-item-content">
+                                <div class="kink-item-header">
+                                    <h3 class="kink-item-name">${item.name}</h3>
+                                    ${item.subName ? `<span class="kink-item-subname"><i data-lucide="tag"></i>${item.subName}</span>` : ''}
+                                </div>
+                                <p class="kink-item-desc">${brief}</p>
+                            </div>
+                            <div class="kink-item-arrow">
+                                <i data-lucide="chevron-right"></i>
+                            </div>
+                        </div>
+                    `;
+                } catch (e) {
+                    console.error(`[KinkDict] ❌ Error rendering item ${idx + 1}:`, item, e);
+                }
+            });
+            contentHtml += `</div>`;
         }
 
-        // Render Right Sidebar (Infobox & TOC)
-        renderWikiInfo(post);
 
-        // Custom rendering for Callouts after viewer is ready
-        setTimeout(processWikiComponents, 100);
-    }
-
-    function renderWikiInfo(post) {
-        const infoCol = document.getElementById('wikiInfoCol');
-        if (!infoCol) return;
-
-        // Auto-generate TOC from headers
-        const headers = Array.from(document.getElementById('wikiViewer').querySelectorAll('h2, h3'));
-        const tocHtml = headers.length > 0 ? `
-            <div class="wiki-toc">
-                <h3 class="toc-title">Contents</h3>
-                <ul class="toc-list">
-                    ${headers.map((h, i) => {
-            const id = `heading-${i}`;
-            h.id = id;
-            return `
-                            <li class="toc-item" style="padding-left: ${h.tagName === 'H3' ? '1rem' : '0'}">
-                                <a href="#${id}" class="toc-link" onclick="scrollToHeading(event, '${id}')">${h.textContent}</a>
-                            </li>
-                        `;
-        }).join('')}
-                </ul>
-            </div>
-        ` : '';
-
-        const updatedDate = new Date(post.updated_at || post.created_at).toLocaleDateString('ko-KR', {
-            year: 'numeric', month: 'long', day: 'numeric'
-        });
-
-        infoCol.innerHTML = `
-            <div class="wiki-infobox animate-slide-up">
-                <div class="infobox-header">
-                    <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Document Meta</span>
-                    <h3 class="infobox-title mt-2">${post.title}</h3>
+        mainContent.innerHTML = `
+            <div class="kink-dict-wrapper">
+                <div class="kink-dict-header">
+                    <h1 class="kink-dict-title">성향 백과</h1>
+                    <p class="kink-dict-subtitle">총 ${tendenciesData.length}개의 기록이 존재합니다.</p>
                 </div>
-                <div class="infobox-data">
-                    <div class="infobox-row">
-                        <span class="infobox-label">Classification</span>
-                        <span class="infobox-value">Tendency Guide</span>
-                    </div>
-                    <div class="infobox-row">
-                        <span class="infobox-label">Editor</span>
-                        <span class="infobox-value">Archive Master</span>
-                    </div>
-                    <div class="infobox-row">
-                        <span class="infobox-label">Last Modified</span>
-                        <span class="infobox-value">${updatedDate}</span>
+
+                <div class="kink-tabs-container">
+                    <div class="kink-tabs">
+                        <button class="kink-tab ${activeTab === 'Top' ? 'active' : ''}" onclick="switchTendencyTab('Top')">
+                            <div class="kink-tab-icon"><i data-lucide="arrow-up"></i></div>
+                            <span class="kink-tab-name">TOP</span>
+                            <span class="kink-tab-count">${doms.length}</span>
+                        </button>
+                        <button class="kink-tab ${activeTab === 'Bottom' ? 'active' : ''}" onclick="switchTendencyTab('Bottom')">
+                            <div class="kink-tab-icon" style="transform: rotate(180deg)"><i data-lucide="arrow-up"></i></div>
+                            <span class="kink-tab-name">BOTTOM</span>
+                            <span class="kink-tab-count">${subs.length}</span>
+                        </button>
+                        <button class="kink-tab ${activeTab === 'Relation' ? 'active' : ''}" onclick="switchTendencyTab('Relation')">
+                            <div class="kink-tab-icon"><i data-lucide="users"></i></div>
+                            <span class="kink-tab-name">RELATION</span>
+                            <span class="kink-tab-count">${Object.keys(window.kinkDictionaryPairs || {}).length}</span>
+                        </button>
                     </div>
                 </div>
-                ${tocHtml}
+
+                <div class="kink-dict-content">
+                    ${contentHtml}
+                </div>
+
+                <!-- Refined Immersive Detail View -->
+                <div class="role-detail-overlay" id="roleDetailOverlay" onclick="closeRoleDetail()">
+                    <div class="role-detail-modal" id="roleDetailModal" onclick="event.stopPropagation()">
+                        <!-- Centered Header based on Reference -->
+                        <div class="modal-header">
+                            <button class="modal-back-btn" onclick="closeRoleDetail()" title="뒤로가기">
+                                <i data-lucide="chevron-left"></i>
+                            </button>
+                            <div class="modal-header-info">
+                                <span class="modal-tag" id="modalTag">CATEGORY</span>
+                                <h3 class="modal-title" id="modalTitle">Role Name</h3>
+                            </div>
+                            <div class="modal-admin-actions" style="position: absolute; right: 4.5rem; display: flex; gap: 0.5rem;">
+                                <button id="kinkModalEditBtn" class="kink-admin-btn edit-btn" style="display:none;">
+                                    <i data-lucide="edit-3"></i><span>내용 수정</span>
+                                </button>
+                                <button id="kinkModalSaveBtn" class="kink-admin-btn save-btn" style="display:none;">
+                                    <i data-lucide="save"></i><span>저장</span>
+                                </button>
+                            </div>
+                            <button class="modal-close-btn" onclick="closeRoleDetail()" title="닫기">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+
+                        <div class="modal-content" id="modalScrollContent">
+                            <div class="flex justify-center mb-10">
+                                <div class="modal-icon-wrapper" id="modalIconWrapper" style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 32px; border: 1px solid rgba(255,255,255,0.1);">
+                                    <!-- Icon injected here -->
+                                </div>
+                            </div>
+
+                            <section class="mb-12">
+                                <h2 class="principles-title">
+                                    <i data-lucide="book-open" style="width:16px; height:16px;"></i> 개념 정의
+                                </h2>
+                                <p class="text-2xl font-bold leading-tight mb-6 text-white" id="modalDefinition" style="word-break: keep-all;">
+                                    "Definition Text Here"
+                                </p>
+                                <div class="role-description" id="roleDescription" style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8;">
+                                    <!-- Description injected here -->
+                                </div>
+                            </section>
+
+                            <!-- Bottom Nav -->
+                            <div class="kink-detail-nav">
+                                <div class="nav-buttons">
+                                    <button id="prevKinkBtn" class="nav-btn">
+                                        <i data-lucide="chevron-left"></i>
+                                        <span>이전 성향</span>
+                                    </button>
+                                    <button id="nextKinkBtn" class="nav-btn">
+                                        <span>다음 성향</span>
+                                        <i data-lucide="chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center py-20">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+                </div>
             </div>
         `;
-    }
 
-    window.scrollToHeading = function (e, id) {
-        e.preventDefault();
-        const el = document.getElementById(id);
-        if (el) {
-            const offset = 80;
-            const bodyRect = document.body.getBoundingClientRect().top;
-            const elementRect = el.getBoundingClientRect().top;
-            const elementPosition = elementRect - bodyRect;
-            const offsetPosition = elementPosition - offset;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
+        if (window.lucide) {
+            window.lucide.createIcons();
         }
     };
 
-    function processWikiComponents() {
-        const viewer = document.getElementById('wikiViewer');
-        if (!viewer) return;
+    window.switchTendencyTab = function (tabId) {
+        window.tendencyActiveTab = tabId;
+        window.renderKinkDictionaryUI();
+    };
 
-        // Custom Callouts: Look for specific patterns like > [!NOTE] or specialized syntax
-        // For now, let's just style standard alert-like blocks if they exist
-        const blockquotes = viewer.querySelectorAll('blockquote');
-        blockquotes.forEach(bq => {
-            const p = bq.querySelector('p');
-            if (p && p.textContent.startsWith('[!')) {
-                const match = p.textContent.match(/\[!(.*?)\]/);
-                const type = match ? match[1] : 'NOTE';
-                const content = p.innerHTML.replace(`[!${type}]`, '').trim();
+    window.showRoleDetail = function (id) {
+        const item = window.tendencyData.find(t => t.id === id);
+        if (!item) return;
 
-                bq.outerHTML = `
-                    <div class="wiki-callout">
-                        <div class="wiki-callout-title">
-                            <i data-lucide="info" class="w-4 h-4"></i> ${type.toUpperCase()}
-                        </div>
-                        <div class="wiki-callout-content">${content}</div>
-                    </div>
-                `;
+        window.currentDetailId = id;
+
+        const overlay = document.getElementById('roleDetailOverlay');
+        const iconWrapper = document.getElementById('modalIconWrapper');
+        const title = document.getElementById('modalTitle');
+        const tag = document.getElementById('modalTag');
+        const definition = document.getElementById('modalDefinition');
+        const description = document.getElementById('roleDescription');
+        const scrollContent = document.getElementById('modalScrollContent');
+
+        const isTop = item.type === 'top';
+        const themeColor = isTop ? '#ff4d4d' : '#4da6ff';
+
+        if (tag) {
+            tag.textContent = isTop ? 'TOP' : 'BOTTOM';
+            tag.style.color = themeColor;
+        }
+
+        if (iconWrapper) {
+            iconWrapper.style.color = themeColor;
+            iconWrapper.style.borderColor = `${themeColor}20`; // subtle tinted border
+            iconWrapper.innerHTML = `<i data-lucide="${(item.icon_class || (isTop ? 'zap' : 'heart')).toLowerCase()}" style="width: 48px; height: 48px;"></i>`;
+        }
+
+        if (title) title.textContent = item.name;
+
+        // Extract definition from content (first line or quoted text)
+        let content = item.description || '';
+        let defText = "";
+        const defMatch = content.match(/^"(.*?)"/m) || content.match(/^(.*?)\n/m);
+        if (defMatch) {
+            defText = defMatch[0];
+            content = content.replace(defMatch[0], "").trim();
+        } else {
+            defText = `"${item.name}"`;
+        }
+        if (definition) definition.textContent = defText;
+        if (definition) definition.style.color = '#fff';
+
+        // Update Prev/Next Buttons
+        const currentIndex = window.tendencyData.findIndex(t => t.id === id);
+        const prevBtn = document.getElementById('prevKinkBtn');
+        const nextBtn = document.getElementById('nextKinkBtn');
+
+        if (prevBtn) {
+            prevBtn.disabled = currentIndex === 0;
+            prevBtn.onclick = () => showRoleDetail(window.tendencyData[currentIndex - 1].id);
+        }
+        if (nextBtn) {
+            nextBtn.disabled = currentIndex === window.tendencyData.length - 1;
+            nextBtn.onclick = () => showRoleDetail(window.tendencyData[currentIndex + 1].id);
+        }
+
+        // Show the modal FIRST
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        if (scrollContent) scrollContent.scrollTop = 0;
+
+        if (description) {
+            description.innerHTML = '';
+            if (window._kinkViewer) {
+                try { window._kinkViewer.destroy(); } catch (e) { }
+                window._kinkViewer = null;
             }
-        });
+
+            if (typeof toastui !== 'undefined' && toastui.Editor) {
+                window._kinkViewer = toastui.Editor.factory({
+                    el: description,
+                    viewer: true,
+                    initialValue: content,
+                    theme: 'dark'
+                });
+            } else {
+                description.innerHTML = `<div class="plain-text-body">${content.replace(/\n/g, '<br>')}</div>`;
+            }
+        }
+
         if (window.lucide) window.lucide.createIcons();
+
+        // ─── Edit Mode: 편집 버튼 및 클릭 편집 기능 ───
+        const isEditMode = (typeof window.isAdminEditMode === 'function' && window.isAdminEditMode()) ||
+            document.body.classList.contains('admin-edit-active');
+
+        const editBtn = document.getElementById('kinkModalEditBtn');
+        const saveBtn = document.getElementById('kinkModalSaveBtn');
+
+        if (isEditMode && editBtn && saveBtn) {
+            editBtn.style.display = 'flex';
+            saveBtn.style.display = 'none';
+            description.classList.add('is-editable');
+            description.title = '클릭하여 내용을 수정하시겠습니까?';
+
+            editBtn.onclick = (e) => {
+                e.preventDefault();
+                _openKinkEditor(item, description, editBtn, saveBtn);
+            };
+
+            saveBtn.onclick = (e) => {
+                e.preventDefault();
+                _saveKinkContent(item, description, editBtn, saveBtn);
+            };
+
+            description._kinkEditHandler = (e) => {
+                if (editBtn.style.display !== 'none') {
+                    _openKinkEditor(item, description, editBtn, saveBtn);
+                }
+            };
+            description.addEventListener('click', description._kinkEditHandler);
+        } else if (editBtn && saveBtn) {
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'none';
+            description.classList.remove('is-editable');
+            description.title = '';
+        }
+    };
+
+
+    // 인라인 에디터 열기 (마크다운 대신 단순 textarea 사용)
+    function _openKinkEditor(item, descriptionEl, editBtn, saveBtn) {
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'flex';
+
+        const originalContent = item.description || '';
+        descriptionEl.innerHTML = '';
+        descriptionEl.classList.remove('is-editable');
+
+        const textarea = document.createElement('textarea');
+        textarea.id = 'kinkModalTextarea';
+        textarea.className = 'kink-edit-textarea';
+        textarea.value = originalContent;
+        textarea.placeholder = '내용을 입력하세요...';
+
+        descriptionEl.appendChild(textarea);
+        textarea.focus();
+
+        // 텍스트 영역 높이 자동 조절
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight + 20) + 'px';
+        textarea.oninput = () => {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight + 20) + 'px';
+        };
     }
 
+    // 변경사항 저장
+    async function _saveKinkContent(item, descriptionEl, editBtn, saveBtn) {
+        const textarea = document.getElementById('kinkModalTextarea');
+        if (!textarea) return;
+
+        const newContent = textarea.value;
+
+        try {
+            if (typeof window.showToast === 'function') window.showToast('저장 중...', 'loading');
+
+            const { error } = await window.supabaseClient
+                .from('archive_posts')
+                .update({ content: newContent, updated_at: new Date().toISOString() })
+                .eq('id', item.id);
+
+            if (error) throw error;
+
+            if (typeof window.showToast === 'function') window.showToast('변경사항이 저장되었습니다.', 'success');
+
+            item.description = newContent;
+            const dataItem = (window.tendencyData || []).find(t => t.id === item.id);
+            if (dataItem) dataItem.description = newContent;
+
+            editBtn.style.display = 'flex';
+            saveBtn.style.display = 'none';
+            descriptionEl.classList.add('is-editable');
+
+            // 뷰어 복구 (Toast UI 방식)
+            descriptionEl.innerHTML = '';
+            if (typeof toastui !== 'undefined' && toastui.Editor) {
+                if (window._kinkViewer) {
+                    try { window._kinkViewer.destroy(); } catch (e) { }
+                }
+                window._kinkViewer = toastui.Editor.factory({
+                    el: descriptionEl,
+                    viewer: true,
+                    initialValue: newContent,
+                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                });
+            } else {
+                descriptionEl.innerHTML = `<div class="plain-text-body">${newContent.replace(/\n/g, '<br>')}</div>`;
+            }
+
+        } catch (e) {
+            console.error('Save failed:', e);
+            if (typeof window.showToast === 'function') window.showToast('저장 실패: ' + e.message, 'error');
+        }
+    }
+
+    window.closeRoleDetail = function () {
+        const overlay = document.getElementById('roleDetailOverlay');
+        if (!overlay) return;
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+
+        // 편집기 정리 (textarea는 remove되면 끝)
+        window._kinkInlineEditor = null;
+
+        // 버튼 상태 초기화 (수정 버튼 노출, 저장 버튼 숨김)
+        const editBtn = document.getElementById('kinkModalEditBtn');
+        const saveBtn = document.getElementById('kinkModalSaveBtn');
+        if (editBtn) editBtn.style.display = '';
+        if (saveBtn) saveBtn.style.display = 'none';
+
+        const desc = document.getElementById('roleDescription');
+        if (desc) {
+            if (desc._kinkEditHandler) {
+                desc.removeEventListener('click', desc._kinkEditHandler);
+                desc._kinkEditHandler = null;
+            }
+            desc.classList.remove('is-editable');
+            desc.style.cssText = '';
+            desc.title = '';
+        }
+    };
+
+    // Edit Mode가 토글될 때 admin-inline.js가 호출하는 전역 함수
+    // 모달이 현재 열려 있으면 편집 UI를 즉시 주입 / 제거
+    window.activateKinkModalEditMode = function (enabled) {
+        const overlay = document.getElementById('roleDetailOverlay');
+        const desc = document.getElementById('roleDescription');
+        const editBtn = document.getElementById('kinkModalEditBtn');
+        const saveBtn = document.getElementById('kinkModalSaveBtn');
+
+        if (!overlay || !overlay.classList.contains('active') || !desc || !editBtn || !saveBtn) return;
+
+        if (enabled) {
+            const currentId = window.currentDetailId;
+            if (!currentId) return;
+            const item = (window.tendencyData || []).find(t => t.id === currentId);
+            if (!item) return;
+
+            editBtn.style.display = 'flex';
+            saveBtn.style.display = 'none';
+            desc.classList.add('is-editable');
+            desc.title = '클릭하여 내용을 수정하시겠습니까?';
+
+            editBtn.onclick = (e) => {
+                e.preventDefault();
+                _openKinkEditor(item, desc, editBtn, saveBtn);
+            };
+
+            saveBtn.onclick = (e) => {
+                e.preventDefault();
+                _saveKinkContent(item, desc, editBtn, saveBtn);
+            };
+
+            if (!desc._kinkEditHandler) {
+                desc._kinkEditHandler = (e) => {
+                    if (editBtn.style.display !== 'none') {
+                        _openKinkEditor(item, desc, editBtn, saveBtn);
+                    }
+                };
+                desc.addEventListener('click', desc._kinkEditHandler);
+            }
+        } else {
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'none';
+            if (desc._kinkEditHandler) {
+                desc.removeEventListener('click', desc._kinkEditHandler);
+                desc._kinkEditHandler = null;
+            }
+            desc.classList.remove('is-editable');
+            desc.style.cssText = '';
+            desc.title = '';
+        }
+    };
 
     // ═══════════════════════════════════════════════════
     // VERIFICATION TEST VIEW (BDSM Authenticity Protocol)
@@ -1500,20 +1785,16 @@
             window.scrollTo(0, 0);
         };
 
-        if (navHome) {
-            navHome.addEventListener('click', (e) => {
-                if (window.location.pathname.includes('post.html')) return;
-                e.preventDefault();
-                showView('home');
-            });
-        }
+        navHome.addEventListener('click', (e) => {
+            if (window.location.pathname.includes('post.html')) return;
+            e.preventDefault();
+            showView('home');
+        });
 
-        if (navSettings) {
-            navSettings.addEventListener('click', (e) => {
-                e.preventDefault();
-                showView('settings');
-            });
-        }
+        navSettings.addEventListener('click', (e) => {
+            e.preventDefault();
+            showView('settings');
+        });
 
         if (navWiki) {
             navWiki.addEventListener('click', (e) => {
@@ -1565,35 +1846,9 @@
                     if (categoryId) {
                         console.log('🎯 Filtering by category from URL:', categoryId);
                         filterByCategory(categoryId);
-
-                        // Ensure visual highlight right after loading
-                        setTimeout(() => {
-                            const activeLink = document.querySelector(`.category-link[data-id="${categoryId}"], .submenu-link[data-id="${categoryId}"]`);
-                            if (activeLink) {
-                                activeLink.classList.add('active');
-                                const submenu = activeLink.closest('.submenu');
-                                if (submenu) {
-                                    submenu.classList.add('active');
-                                    const parentId = submenu.id.replace('sub-', '');
-                                    const parentLink = document.querySelector(`.category-link[data-id="${parentId}"]`);
-                                    if (parentLink) parentLink.classList.add('active');
-                                }
-                            }
-                        }, 100);
-
                     } else if (view) {
                         console.log('🎯 Switching to view from URL:', view);
                         showView(view);
-                    } else if (window.location.pathname.includes('bdsm-chart.html')) {
-                        setTimeout(() => {
-                            const activeLink = document.querySelector('.category-link[href*="bdsm-chart.html"]');
-                            if (activeLink) activeLink.classList.add('active');
-                        }, 100);
-                    } else if (window.location.pathname.includes('mailbox.html')) {
-                        setTimeout(() => {
-                            const activeLink = Array.from(document.querySelectorAll('.category-link, .submenu-link')).find(el => el.textContent.includes('우체통') || el.textContent.includes('익명'));
-                            if (activeLink) activeLink.classList.add('active');
-                        }, 100);
                     }
                 });
                 initSearch();

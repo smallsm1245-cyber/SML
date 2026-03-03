@@ -51,16 +51,13 @@ function waitForConfig() {
         let attempts = 0;
         const interval = setInterval(() => {
             attempts++;
-            // Check both standard and alternate config names
-            const config = window.SUPABASE_CONFIG || window.CONFIG;
-            const url = config?.url || config?.SUPABASE_URL;
-
-            if (url && (window.supabase || window.supabaseClient)) {
+            if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.supabase) {
                 clearInterval(interval);
                 resolve();
-            } else if (attempts > 50) {
-                console.error('Config load timeout.');
+            } else if (attempts > 50) { // 5 seconds timeout
+                console.error('Config load timeout. Env vars missing?');
                 clearInterval(interval);
+                // Resolve anyway to let the UI show errors instead of hanging
                 resolve();
             }
         }, 100);
@@ -107,16 +104,7 @@ async function checkAuth() {
 
 async function showDashboard() {
     document.getElementById('loginScreen').style.display = 'none';
-    const dashboard = document.getElementById('adminDashboard');
-    dashboard.style.display = 'flex'; // Use flex for the new layout
-    dashboard.style.opacity = '0';
-    setTimeout(() => {
-        dashboard.style.transition = 'opacity 0.4s ease';
-        dashboard.style.opacity = '1';
-    }, 50);
-
-    // Initialize Mobile Sidebar
-    initMobileSidebar();
+    document.getElementById('adminDashboard').style.display = 'block';
 
     // Load all data
     await Promise.all([
@@ -127,23 +115,6 @@ async function showDashboard() {
         loadPosts(),
         loadSiteSettings()
     ]);
-}
-
-function initMobileSidebar() {
-    const mobileBtn = document.getElementById('mobileMenuBtn');
-    const sidebar = document.getElementById('dashboardSidebar');
-    const overlay = document.createElement('div');
-    overlay.className = 'sidebar-overlay';
-    overlay.id = 'sidebarOverlay';
-    document.querySelector('.admin-dashboard').appendChild(overlay);
-
-    const toggleSidebar = () => {
-        sidebar.classList.toggle('active');
-        overlay.classList.toggle('active');
-    };
-
-    if (mobileBtn) mobileBtn.onclick = toggleSidebar;
-    overlay.onclick = toggleSidebar;
 }
 
 async function loadSiteSettings() {
@@ -224,30 +195,17 @@ window.switchSection = function (sectionName) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
     // Show selected section
-    const targetSection = document.getElementById(`section-${sectionName}`);
-    const targetNav = document.querySelector(`[data-section="${sectionName}"]`);
-
-    if (targetSection) targetSection.classList.add('active');
-    if (targetNav) targetNav.classList.add('active');
-
-    // Auto-hide mobile sidebar after click
-    const sidebar = document.getElementById('dashboardSidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    if (sidebar && sidebar.classList.contains('active')) {
-        sidebar.classList.remove('active');
-        if (overlay) overlay.classList.remove('active');
-    }
+    document.getElementById(`section-${sectionName}`).classList.add('active');
+    document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
 
     // Trigger load based on section
     if (sectionName === 'posts') loadPosts();
     else if (sectionName === 'categories') loadCategories();
     else if (sectionName === 'home') loadHomeSettings();
     else if (sectionName === 'settings') loadSiteSettings();
+    else if (sectionName === 'tendencies') loadTendencies();
     else if (sectionName === 'trash') loadTrash();
     else if (sectionName === 'verification') window.loadVerificationSettings();
-    else if (sectionName === 'migration') {
-        // Position Migration uses static HTML mainly, but let's ensure it's clean
-    }
 };
 
 // ═══════════════════════════════════════════════════
@@ -2183,54 +2141,39 @@ window.handleLogin = async function () {
 // ═══════════════════════════════════════════════════
 // INITIALIZATION
 // ═══════════════════════════════════════════════════
-async function initDashboard() {
-    console.log('📱 Initializing Dashboard...');
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('📱 DOM ready');
+
+    // Home preview setup
+    ['homeTitle', 'homeSubtitle', 'homeContent'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateHomePreview);
+    });
 
     try {
         await waitForConfig();
 
-        const config = window.SUPABASE_CONFIG || window.CONFIG;
-        const url = config?.url || config?.SUPABASE_URL;
-        const key = config?.anonKey || config?.SUPABASE_KEY;
+        supabaseClient = window.supabase.createClient(
+            window.SUPABASE_CONFIG.url,
+            window.SUPABASE_CONFIG.anonKey
+        );
 
-        if (!window.supabaseClient && url && key) {
-            window.supabaseClient = window.supabase.createClient(url, key);
-        }
-        supabaseClient = window.supabaseClient;
+        console.log('✅ Supabase initialized');
 
-        console.log('✅ Supabase initialized in admin-core');
-
-        // Setup UI listeners
-        setupEventListeners();
-
-        // Check if already logged in and show dashboard if necessary
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        const dashboard = document.getElementById('adminDashboard');
-
-        if (session && dashboard && dashboard.style.display !== 'none') {
+        // Check if already logged in
+        if (await checkAuth()) {
             await showDashboard();
         }
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('admin_theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-theme');
-            const themeIcon = document.querySelector('#themeToggle .icon');
-            if (themeIcon) themeIcon.textContent = '☀️';
-        }
-
-        console.log('🎉 Dashboard initialized');
     } catch (error) {
         console.error('Initialization failed:', error);
+        showError('시스템 초기화 실패: 설정 파일을 불러올 수 없습니다.');
     }
-}
 
-function setupEventListeners() {
-    console.log('🔗 Setting up event listeners...');
-
-    // Auth
-    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
         if (!confirm('로그아웃하시겠습니까?')) return;
+
         await supabaseClient.auth.signOut();
         window.location.reload();
     });
@@ -2246,30 +2189,31 @@ function setupEventListeners() {
         });
     });
 
-    // Search and Filter
+    // Search and Filters for Posts
     const postSearch = document.getElementById('postSearch');
+    const postCatFilter = document.getElementById('postFilterCategory');
+    const postStatusFilter = document.getElementById('postFilterStatus');
+
     if (postSearch) {
         let debounceTimer;
         postSearch.addEventListener('input', (e) => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
-                postSearchKeyword = e.target.value.trim(); // Changed from postSearchQuery to postSearchKeyword
+                postSearchKeyword = e.target.value.trim();
                 postCurrentPage = 1;
                 loadPosts();
             }, 300);
         });
     }
 
-    const postCategoryFilter = document.getElementById('postFilterCategory');
-    if (postCategoryFilter) {
-        postCategoryFilter.addEventListener('change', (e) => {
+    if (postCatFilter) {
+        postCatFilter.addEventListener('change', (e) => {
             postSelectedCategory = e.target.value;
             postCurrentPage = 1;
             loadPosts();
         });
     }
 
-    const postStatusFilter = document.getElementById('postFilterStatus');
     if (postStatusFilter) {
         postStatusFilter.addEventListener('change', (e) => {
             postSelectedStatus = e.target.value;
@@ -2297,23 +2241,30 @@ function setupEventListeners() {
     const overlay = document.getElementById('sidebarOverlay');
     const sidebar = document.querySelector('.dashboard-sidebar');
 
-    const toggleSidebarHandler = () => {
+    const toggleSidebar = () => {
         if (!sidebar || !overlay) return;
         const isActive = sidebar.classList.toggle('active');
-        overlay.classList.toggle('active', isActive);
+        if (overlay) overlay.classList.toggle('active', isActive);
         document.body.style.overflow = isActive ? 'hidden' : '';
     };
 
-    if (overlay) overlay.onclick = toggleSidebarHandler;
+    if (overlay) overlay.onclick = toggleSidebar;
 
     // Close sidebar on nav click (mobile)
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
             if (window.innerWidth <= 768 && sidebar && sidebar.classList.contains('active')) {
-                toggleSidebarHandler();
+                toggleSidebar();
             }
         });
     });
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('admin_theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        document.querySelector('#themeToggle .icon').textContent = '☀️';
+    }
 
     // Unsaved changes warning
     window.addEventListener('beforeunload', (e) => {
@@ -2322,14 +2273,9 @@ function setupEventListeners() {
             e.returnValue = '';
         }
     });
-}
 
-// RUN IMMEDIATELY (Handles dynamic loading)
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDashboard);
-} else {
-    initDashboard();
-}
+    console.log('🎉 Dashboard initialized');
+});
 
 // ═══════════════════════════════════════════════════
 // PDF REPORT DOWNLOAD

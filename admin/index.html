@@ -11,12 +11,12 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
     <link rel="stylesheet" href="/css/style.css?v=final">
     <link rel="stylesheet" href="/admin/css/admin-dashboard.css?v=final">
+    <link rel="stylesheet" href="/admin/css/admin-tendencies.css?v=final">
     <link rel="stylesheet" href="/admin/css/admin-toastui-hierarchy.css?v=final">
     <!-- jQuery (Required for Summernote) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -62,15 +62,14 @@
         <!-- Top Header -->
         <header class="dashboard-header">
             <div class="header-left">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
                 <h1 class="dashboard-title">
                     <a href="javascript:switchSection('overview')" style="text-decoration: none; color: inherit;">📚
                         SMALLSM Archive</a>
                 </h1>
-                <span class="admin-badge">관리자</span>
+                <span class="admin-badge">관리자 모드</span>
                 <div class="live-user-indicator" title="실시간 접속자">
                     <span class="live-dot"></span>
-                    <span class="live-count" id="liveUserCount">1</span>명 접속
+                    <span class="live-count" id="liveUserCount">1</span>명 접속 중
                 </div>
             </div>
             <div class="header-right">
@@ -83,7 +82,7 @@
 
         <div class="dashboard-container">
             <!-- Left Sidebar Menu -->
-            <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <aside class="dashboard-sidebar">
                 <nav class="sidebar-nav">
                     <button class="nav-item active" data-section="overview">
                         <span class="icon">📊</span>
@@ -102,9 +101,9 @@
                         <span class="icon">📂</span>
                         <span class="text">카테고리</span>
                     </button>
-                    <button class="nav-item" data-section="migration">
-                        <span class="icon">🔀</span>
-                        <span class="text">포지션 자동분류</span>
+                    <button class="nav-item" data-section="tendencies">
+                        <span class="icon">⚖️</span>
+                        <span class="text">성향 관리</span>
                     </button>
                     <button class="nav-item" data-section="verification">
                         <span class="icon">🛡️</span>
@@ -142,9 +141,6 @@
                         </button>
                         <button class="quick-action-btn" onclick="downloadPostsReport()">
                             <span class="icon">📄</span> <span class="label">리포트</span>
-                        </button>
-                        <button class="quick-action-btn" onclick="switchSection('migration')">
-                            <span class="icon">🔀</span> <span class="label">포지션 분류</span>
                         </button>
                         <button class="quick-action-btn" onclick="switchSection('settings')">
                             <span class="icon">⚙️</span> <span class="label">설정</span>
@@ -394,42 +390,48 @@
                     </div>
                 </section>
 
-                <!-- Position Migration Section -->
-                <section id="section-migration" class="content-section">
-                    <h2 class="section-title">🔀 포지션 자동분류 도구</h2>
-                    <p class="section-desc">성향백과 카테고리의 포스트를 키워드 기반으로 <strong>탑 포지션</strong> / <strong>바텀 포지션</strong>
-                        서브카테고리에 자동 이동합니다.</p>
+                <!-- Tendencies Management Section -->
+                <section id="section-tendencies" class="content-section">
+                    <h2 class="section-title">⚖️ 성향 관리 (Top / Bottom)</h2>
+                    <p class="section-desc">Top과 Bottom 성향을 1:1로 매칭하거나 순서를 관리할 수 있습니다.</p>
 
-                    <div class="card" style="margin-bottom: 1.5rem;">
-                        <h3 class="card-title">⬆ 탑 포지션 키워드</h3>
-                        <p style="font-size: 0.9rem; color: var(--admin-text-dim); line-height: 1.8;">
-                            탑, 상위, 지배, 마스터, 대디, 마미, 새디스트, sadist, dominant, dom, daddy, mommy
-                        </p>
+                    <div class="card">
+                        <h3 class="card-title">➕ 새 성향 추가</h3>
+                        <div class="add-category-form">
+                            <select id="newTendencyType" class="form-select" style="flex: 0 0 120px;">
+                                <option value="top">⬆️ Top</option>
+                                <option value="bottom">⬇️ Bottom</option>
+                            </select>
+                            <select id="newTendencyCategory" class="form-select" style="flex: 1;">
+                                <option value="">카테고리 없음</option>
+                            </select>
+                            <input type="text" id="newTendencyName" class="form-input"
+                                placeholder="성향 이름 (예: SP, DS...)">
+                            <button class="btn-primary" id="addTendencyBtn" onclick="addTendency()">추가하기</button>
+                        </div>
                     </div>
 
-                    <div class="card" style="margin-bottom: 1.5rem;">
-                        <h3 class="card-title">⬇ 바텀 포지션 키워드</h3>
-                        <p style="font-size: 0.9rem; color: var(--admin-text-dim); line-height: 1.8;">
-                            바텀, 하위, 복종, 슬레이브, 섭, submissive, sub, slave, masochist
-                        </p>
+                    <div class="tendency-manage-container">
+                        <div class="tendency-column-group">
+                            <div class="column-header">⬆️ Top 리스트</div>
+                            <div id="topTendencyList" class="tendency-list sortable-list" data-type="top">
+                                <!-- Dynamically loaded -->
+                            </div>
+                        </div>
+                        <div class="tendency-column-group">
+                            <div class="column-header">⬇️ Bottom 리스트</div>
+                            <div id="bottomTendencyList" class="tendency-list sortable-list" data-type="bottom">
+                                <!-- Dynamically loaded -->
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="card" style="border: 2px solid var(--admin-primary, #c8852a);">
-                        <h3 class="card-title">🚀 분류 실행</h3>
-                        <ol
-                            style="font-size:0.9rem; color: var(--admin-text-dim); margin-bottom: 1.5rem; padding-left: 1.2rem; line-height: 2;">
-                            <li>성향백과 카테고리를 DB에서 찾습니다</li>
-                            <li>탑 포지션 / 바텀 포지션 서브카테고리가 없으면 자동 생성합니다</li>
-                            <li>성향백과 직속 포스트를 키워드에 따라 분류 후 이동합니다</li>
-                            <li>키워드 미해당 포스트는 성향백과에 그대로 유지됩니다</li>
-                        </ol>
-                        <button class="btn-primary" id="runMigrationBtn" onclick="migratePositions()"
-                            style="width: 100%; padding: 1rem; font-size: 1.1rem; background: var(--admin-primary, #c8852a); border-color: var(--admin-primary, #c8852a);">
-                            🚀 포지션 자동 분류 실행하기
-                        </button>
-                        <p
-                            style="margin-top: 0.8rem; font-size: 0.8rem; color: var(--admin-text-dim); text-align:center;">
-                            ⚠️ 한 번만 실행하면 됩니다. 콘솔(F12)에서 상세 결과를 확인하세요.</p>
+                    <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                        <a href="../index.html" class="btn-primary"
+                            style="text-decoration: none; background: var(--text-dim); border-color: var(--text-dim);">👀
+                            사용자 페이지에서 확인</a>
+                        <button class="btn-primary" id="saveTendencyAllBtn" onclick="saveTendencyAll()">💾 모든 변경사항
+                            저장</button>
                     </div>
                 </section>
 
@@ -545,8 +547,6 @@
                         </div>
                         <button class="btn-primary" id="saveSeoBtn">💾 SEO 설정 저장</button>
                     </div>
-
-
                 </section>
             </main>
         </div>
@@ -584,13 +584,6 @@
                     window.CONFIG.SUPABASE_URL,
                     window.CONFIG.SUPABASE_KEY
                 );
-
-                // Bridge for compatibility with other scripts
-                window.SUPABASE_CONFIG = {
-                    url: window.CONFIG.SUPABASE_URL,
-                    anonKey: window.CONFIG.SUPABASE_KEY
-                };
-
                 console.log('✅ Supabase initialized successfully (Inline).');
 
                 // 3. 세션 확인
@@ -672,8 +665,7 @@
 
             const scripts = [
                 '/js/utils/pdf-core.js?v=final',
-                '/js/admin/admin-core.js?v=final',
-                '/js/admin/migrate-positions.js?v=1'
+                '/js/admin/admin-core.js?v=final'
             ];
 
             scripts.forEach(src => {
