@@ -97,7 +97,9 @@
                         });
 
                         setTimeout(() => {
-                            const headers = Array.from(document.getElementById('wikiHomeViewer').querySelectorAll('h1, h2, h3'));
+                            const viewerEl = document.getElementById('wikiHomeViewer');
+                            if (!viewerEl) return;
+                            const headers = Array.from(viewerEl.querySelectorAll('h1, h2, h3'));
                             const tocContainer = document.getElementById('homeTocContainer');
                             const tocList = document.getElementById('homeTocList');
 
@@ -527,102 +529,12 @@
             // Universal Wiki View for ALL other categories
             await renderWikiView(categoryId);
 
-            const content = document.getElementById('mainContent');
-            const title = document.getElementById('welcomeTitle');
-
-            // Restore the page-header if it was hidden by the gallery
-            const pageHeader = document.querySelector('.page-header');
-            if (pageHeader) pageHeader.style.display = 'block';
-
-            if (!content || !title) return;
-
-            if (posts.length === 0) {
-                title.textContent = '게시물 없음';
-                content.innerHTML = '<p>이 카테고리에는 아직 게시물이 없습니다.</p>';
-                return;
-            }
-
-            const { data: postCategoryData } = await supabaseClient
-                .from('categories')
-                .select('name')
-                .eq('id', categoryId)
-                .single();
-
-            // Check if there is exactly ONE post
-            if (posts.length === 1) {
-                const post = posts[0];
-                title.textContent = post.title;
-
-                // Clear previous content
-                content.innerHTML = '';
-
-                // Add Meta Info
-                const metaDiv = document.querySelector('.post-meta');
-                if (metaDiv) {
-                    const dateStr = new Date(post.created_at).toLocaleDateString('ko-KR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    const categoryName = postCategoryData ? postCategoryData.name : '';
-                    metaDiv.innerHTML = `<span>${categoryName}</span> • <span>${dateStr}</span>`;
-                }
-
-                // Initialize Toast UI Viewer for the content
-                const Viewer = toastui.Editor;
-                const viewer = Viewer.factory({
-                    el: content,
-                    viewer: true,
-                    initialValue: post.content,
-                    theme: 'dark' // Assuming dark theme is preferred or matches style
-                });
-
-                // Copy protection if needed
-                if (!post.origin_free) {
-                    content.classList.add('copy-protected');
-                    // Re-bind copy protection if not global
-                    // Note: Global copy listener in main.js handles generic copy, 
-                    // but specific attribution might depend on postId. 
-                    // The global listener checks `window.location.search`.
-                    // Since we are in SPA mode, the URL might not have ?id=...
-                    // We might need to update the global copy handler or pushState.
-                    // For now, let's keep it simple.
-                }
-
-                return;
-            }
-
-            // Multiple posts - Show List
-            title.textContent = category.name;
-            const metaDiv = document.querySelector('.post-meta');
-            if (metaDiv) metaDiv.innerHTML = `<span>총 ${posts.length}개의 게시물</span>`;
-
-            content.innerHTML = posts.map(post => `
-                <div class="admin-post-item" style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border); position: relative;">
-                    <h3>
-                        <a href="post.html?id=${post.id}" style="color: var(--primary-yellow); text-decoration: none;" data-admin-editable="text" data-admin-id="${post.id}" data-admin-field="title">
-                            ${post.title}
-                            ${post.is_private ? '<span style="font-size: 0.8em; color: var(--accent-amber);"> 🔒</span>' : ''}
-                        </a>
-                    </h3>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">
-                            ${new Date(post.created_at).toLocaleDateString('ko-KR')}
-                        </p>
-                        ${isAdmin ? `
-                            <div class="admin-post-actions">
-                                <button class="admin-action-btn delete" onclick="event.preventDefault(); deletePostInline('${post.id}', '${post.title.replace(/'/g, "\\'")}')" title="Delete">🗑️</button>
-                                <button class="admin-action-btn edit" onclick="event.preventDefault(); window.location.href='admin.html?edit=${post.id}'" title="Full Edit">⚙️</button>
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `).join('');
-
         } catch (error) {
             console.error('❌ Post loading failed:', error);
         }
     }
+
+
 
     // ═══════════════════════════════════════════════════
     // 6. SEARCH FUNCTIONALITY
@@ -1519,16 +1431,20 @@
             window.scrollTo(0, 0);
         };
 
-        navHome.addEventListener('click', (e) => {
-            if (window.location.pathname.includes('post.html')) return;
-            e.preventDefault();
-            showView('home');
-        });
+        if (navHome) {
+            navHome.addEventListener('click', (e) => {
+                if (window.location.pathname.includes('post.html')) return;
+                e.preventDefault();
+                showView('home');
+            });
+        }
 
-        navSettings.addEventListener('click', (e) => {
-            e.preventDefault();
-            showView('settings');
-        });
+        if (navSettings) {
+            navSettings.addEventListener('click', (e) => {
+                e.preventDefault();
+                showView('settings');
+            });
+        }
 
         if (navWiki) {
             navWiki.addEventListener('click', (e) => {
