@@ -829,13 +829,38 @@
                 </nav>
             `;
 
-            const tocItemsHtml = allPosts.map((post, idx) => `
+            // ─── Position grouping keywords ───────────────────────────────────
+            const topKeywords = ['탑', '상위', '지배', '마스터', '대디', '마미', '새디스트', 'sadist', 'dominant', 'dom', 'daddy', 'mommy'];
+            const bottomKeywords = ['바텀', '하위', '복종', '슬레이브', '섭', 'submissive', 'sub', 'slave', 'masochist', 'masochist'];
+
+            const getGroup = (title) => {
+                const t = title.toLowerCase();
+                if (topKeywords.some(kw => t.includes(kw))) return 'top';
+                if (bottomKeywords.some(kw => t.includes(kw))) return 'bottom';
+                return 'other';
+            };
+
+            const topPosts = allPosts.filter(p => getGroup(p.title) === 'top');
+            const bottomPosts = allPosts.filter(p => getGroup(p.title) === 'bottom');
+            const otherPosts = allPosts.filter(p => getGroup(p.title) === 'other');
+
+            const renderGroup = (posts, startIdx = 0) => posts.map((post, idx) => `
                 <li class="wiki-index-item" onclick="switchWikiDoc('${post.id}')">
-                    <span class="wiki-index-num">${String(idx + 1).padStart(2, '0')}</span>
+                    <span class="wiki-index-num">${String(startIdx + idx + 1).padStart(2, '0')}</span>
                     <span class="wiki-index-title">${post.title}</span>
                     <i data-lucide="chevron-right" class="wiki-index-icon w-4 h-4"></i>
                 </li>
             `).join('');
+
+            const renderSection = (label, badge, posts, startIdx = 0) => posts.length === 0 ? '' : `
+                <div class="wiki-index-section">
+                    <div class="wiki-index-section-header">
+                        <span class="wiki-index-badge ${badge}">${label}</span>
+                        <span class="wiki-index-section-count">${posts.length}개</span>
+                    </div>
+                    <ol class="wiki-index-list">${renderGroup(posts, startIdx)}</ol>
+                </div>
+            `;
 
             contentCol.innerHTML = `
                 ${breadcrumbsHtml}
@@ -843,18 +868,20 @@
                     <div class="text-[var(--wiki-gold)] text-[10px] font-mono tracking-[0.3em] uppercase mb-2">Category Index</div>
                     <h1 class="text-4xl md:text-5xl font-bold font-serif text-white mb-4 border-none !p-0">${category?.name || 'Archive'}</h1>
                     <div class="h-1 w-20 bg-[var(--wiki-gold)] mb-4"></div>
-                    <p class="text-[var(--wiki-text-dim)] text-sm">${allPosts.length}개의 문서가 있습니다. 항목을 클릭해 내용을 확인하세요.</p>
+                    <p class="text-[var(--wiki-text-dim)] text-sm">총 ${allPosts.length}개의 문서 · 항목을 클릭해 내용을 확인하세요.</p>
                 </header>
-                <ol class="wiki-index-list">
-                    ${tocItemsHtml}
-                </ol>
+                ${renderSection('⬆ 탑 포지션', 'top', topPosts, 0)}
+                ${renderSection('⬇ 바텀 포지션', 'bottom', bottomPosts, topPosts.length)}
+                ${renderSection('공통 / 기타', 'other', otherPosts, topPosts.length + bottomPosts.length)}
             `;
 
             infoCol.innerHTML = `
                 <div class="wiki-infobox">
                     <div class="wiki-infobox-title">카테고리 정보</div>
-                    <div class="wiki-infobox-row"><span class="wiki-infobox-label">이름</span><span>${category?.name || '-'}</span></div>
-                    <div class="wiki-infobox-row"><span class="wiki-infobox-label">문서 수</span><span>${allPosts.length}</span></div>
+                    <div class="wiki-infobox-row"><span class="wiki-infobox-label">전체</span><span>${allPosts.length}</span></div>
+                    <div class="wiki-infobox-row"><span class="wiki-infobox-label">⬆ 탑</span><span>${topPosts.length}</span></div>
+                    <div class="wiki-infobox-row"><span class="wiki-infobox-label">⬇ 바텀</span><span>${bottomPosts.length}</span></div>
+                    ${otherPosts.length > 0 ? `<div class="wiki-infobox-row"><span class="wiki-infobox-label">공통</span><span>${otherPosts.length}</span></div>` : ''}
                 </div>
             `;
 
