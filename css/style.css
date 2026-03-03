@@ -220,9 +220,9 @@ html.dark .archive-accordion summary:hover {
     box-sizing: border-box;
 }
 
+/* Base styles (Mobile First) */
 body {
     font-family: var(--font-serif);
-    /* Archive feel: Serif as primary body font */
     background: var(--bg-deep);
     color: var(--text-primary);
     font-size: var(--base-font-size);
@@ -242,7 +242,6 @@ body.night-mode {
 @media (min-width: 769px) {
     body {
         background: #111;
-        /* Removed flex centering to avoid fixed position issues */
     }
 
     body.night-mode {
@@ -255,6 +254,7 @@ body.night-mode {
    ═══════════════════════════════════════════════════ */
 
 /* Mobile Header */
+/* Mobile Header (Default) */
 .mobile-header {
     position: fixed;
     top: 0;
@@ -272,18 +272,21 @@ body.night-mode {
     transition: transform 0.3s ease, background 0.3s ease;
 }
 
-/* Ensure content doesn't hide under sticky header on mobile */
-@media (max-width: 768px) {
-
-    #appContainer,
-    .app-container {
-        padding-top: calc(var(--header-height) + 16px) !important;
-    }
+/* Base padding for content to clear header */
+#appContainer,
+.app-container {
+    padding-top: calc(var(--header-height) + 16px) !important;
 }
 
 @media (min-width: 769px) {
     .mobile-header {
         display: none !important;
+    }
+
+    #appContainer,
+    .app-container {
+        padding-top: 2rem !important;
+        /* Reset/Adjust for desktop if needed */
     }
 }
 
@@ -655,14 +658,13 @@ p {
    2. LAYOUT STRUCTURE - MOBILE FIRST
    ═══════════════════════════════════════════════════ */
 /* Mobile-first layout */
+/* Mobile-first layout (Default) */
 .app-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     position: relative;
-    padding-top: var(--header-height);
     padding-bottom: calc(var(--header-height) + var(--space-2));
-    /* clearance for fixed bottom-nav */
     width: 100%;
     margin: 0 auto;
     background: var(--bg-deep);
@@ -672,16 +674,9 @@ p {
 @media (min-width: 769px) {
     .app-container {
         max-width: var(--container-max);
-        /* Use the defined readability max-width */
         margin: 0 auto;
         box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-    }
-}
-
-@media (min-width: 1200px) {
-    .app-container {
-        max-width: var(--container-max);
-        /* Keep consistent readability width on larger screens */
+        padding-bottom: var(--space-8);
     }
 }
 
@@ -1814,52 +1809,60 @@ header {
    ═══════════════════════════════════════════════════ */
 
 /* 모바일 텍스트 최적화 (768px 이하) */
-@media (max-width: 768px) {
+/* Post Content - Mobile First (Base) */
+.post-title {
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+    line-height: 1.3;
+    letter-spacing: -0.03em;
+    text-align: left;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--text-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+}
+
+.post-content {
+    font-size: 15.5px;
+    line-height: 1.45;
+    letter-spacing: -0.025em;
+    word-break: break-all;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    animation: slideInUp 0.6s var(--transition-base);
+}
+
+.post-content p {
+    margin-bottom: 1rem;
+}
+
+.post-content ul,
+.post-content ol {
+    padding-left: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.post-content li {
+    margin-bottom: 0.4rem;
+}
+
+@media (min-width: 769px) {
     .post-title {
-        font-size: 1.6rem;
-        margin-bottom: 0.8rem;
-        line-height: 1.3;
-        letter-spacing: -0.03em;
-        /* 자간 축소 */
+        font-size: 2rem;
+        letter-spacing: -0.02em;
     }
 
     .post-content {
-        font-size: 15.5px !important;
-        /* 16px -> 15.5px 미세 축소 */
-        line-height: 1.45 !important;
-        /* 줄 간격 최적화 */
-        letter-spacing: -0.025em !important;
-        /* 자간 축소 */
-        word-break: break-all;
-        /* 우측 여백 불규칙성 개선 */
-        color: var(--text-primary);
-    }
-
-    .post-content p {
-        margin-bottom: 1rem;
-    }
-
-    /* 컴포넌트 간소화 */
-    hr {
-        margin: 1.2rem 0 !important;
-        opacity: 0.2;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        letter-spacing: normal;
+        word-break: keep-all;
+        overflow-wrap: break-word;
     }
 
     .post-content ul,
     .post-content ol {
-        padding-left: 1.2rem !important;
-        /* 들여쓰기 최적화 */
-        margin-bottom: 1rem;
-    }
-
-    .post-content li {
-        margin-bottom: 0.4rem;
-    }
-
-    /* 제목 영역 상하 여백 축소 */
-    .content-panel h1:first-child,
-    .content-panel h2:first-child {
-        margin-top: 0;
+        padding-left: 2rem;
     }
 }
 
@@ -1904,22 +1907,15 @@ header {
    9. RESPONSIVE DESIGN
    ═══════════════════════════════════════════════════ */
 
-/* Mobile Header & Overlay */
-.mobile-header {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 100%;
-    height: 60px;
-    background: var(--bg-panel);
-    border-bottom: 1px solid var(--glass-border);
-    z-index: 1001;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1rem;
+/* Mobile Header & Overlay - Consolidation */
+/* (Base styles for mobile-header are already defined in section 10) */
+@media (min-width: 769px) {
+    .mobile-header {
+        max-width: 900px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 0 0 12px 12px;
+    }
 }
 
 @media (min-width: 769px) {
