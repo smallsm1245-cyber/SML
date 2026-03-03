@@ -423,9 +423,9 @@
             return `
                 <li class="category-item">
                     <div class="category-header-wrap">
-                        <a href="${root.name === 'BDSM 궁합표' ? 'bdsm-chart.html' : 'javascript:void(0);'}" 
-                           ${root.name === 'BDSM 궁합표' ? '' : `onclick="${hasChildren ? `toggleAccordion('${root.id}')` : `filterByCategory('${root.id}', this)`}"`}
-                           class="category-link ${hasChildren ? 'has-children' : ''}" 
+                        <a href="${root.name.includes('궁합표') ? 'bdsm-chart.html' : 'javascript:void(0);'}" 
+                           ${root.name.includes('궁합표') ? `onclick="window.location.href='bdsm-chart.html'; return false;"` : `onclick="${hasChildren ? `toggleAccordion('${root.id}')` : `filterByCategory('${root.id}', this)`}"`}
+                           class="category-link ${hasChildren ? 'has-children' : ''} ${root.name.includes('궁합표') ? 'direct-link' : ''}" 
                            data-id="${root.id}">
                             <div class="cat-name-block">
                                 ${hasChildren ? chevronSvg : ''}
@@ -440,9 +440,9 @@
                 const childCount = counts[child.id] || 0;
                 return `
                                     <li class="submenu-item">
-                                        <a href="${child.name === 'BDSM 궁합표' ? 'bdsm-chart.html' : 'javascript:void(0);'}" 
-                                           ${child.name === 'BDSM 궁합표' ? '' : `onclick="filterByCategory('${child.id}', this)"`}
-                                           class="submenu-link" data-id="${child.id}">
+                                        <a href="${child.name.includes('궁합표') ? 'bdsm-chart.html' : 'javascript:void(0);'}" 
+                                           ${child.name.includes('궁합표') ? `onclick="window.location.href='bdsm-chart.html'; return false;"` : `onclick="filterByCategory('${child.id}', this)"`}
+                                           class="submenu-link ${child.name.includes('궁합표') ? 'direct-link' : ''}" data-id="${child.id}">
                                             - ${child.name} <span class="cat-count" style="float:right">${childCount}</span>
                                         </a>
                                     </li>
@@ -479,10 +479,12 @@
             return;
         }
 
-        // Remove active class
+        // Clear any existing doc list injections so we start fresh
+        document.querySelectorAll('.document-list').forEach(el => el.remove());
+
+        // Remove active class from all nav items
         document.querySelectorAll('.category-link, .submenu-link').forEach(el => {
             el.classList.remove('active');
-            // Remove background/padding dynamic adjustments if needed, handled by CSS mostly
         });
 
         // Find and highlight active element
@@ -494,14 +496,20 @@
         if (activeEl) {
             activeEl.classList.add('active');
 
-            // If it's a submenu, expand the parent
+            // If it's a submenu link, expand the parent
             if (activeEl.classList.contains('submenu-link')) {
                 const submenu = activeEl.closest('.submenu');
-                if (submenu) {
+                if (submenu && !submenu.classList.contains('active')) {
                     submenu.classList.add('active');
                     const parentId = submenu.id.replace('sub-', '');
                     const parentLink = document.querySelector(`.category-link[data-id="${parentId}"]`);
-                    if (parentLink) parentLink.classList.add('active'); // Keep chevron rotated
+                    if (parentLink) parentLink.classList.add('active');
+                }
+            } else if (activeEl.classList.contains('category-link')) {
+                // Auto-expand the submenu if there's one (accordion open)
+                const submenu = document.getElementById(`sub-${categoryId}`);
+                if (submenu && !submenu.classList.contains('active')) {
+                    submenu.classList.add('active');
                 }
             }
         }
@@ -676,6 +684,7 @@
 
     async function renderWikiView(categoryId) {
         window.renderWikiView = renderWikiView;
+        window.wikiCategoryId = categoryId;
         if (!supabaseClient) return;
 
         const mainContent = document.getElementById('mainContent');
@@ -737,63 +746,39 @@
     }
 
     function renderWikiNav() {
-        const navCol = document.getElementById('wikiNavCol');
-        const globalCategoryNav = document.getElementById('categoryNav'); // Global Sidebar Target
-        if (!navCol && !globalCategoryNav) return;
+        // We only use the global Category list now to unify the hierarchy.
+        const globalCategoryNav = document.getElementById('categoryNav');
+        if (!globalCategoryNav) return;
 
         const posts = window.wikiData || [];
-        const isDesktop = window.innerWidth >= 1024;
 
-        // Use global sidebar on desktop, specific nav col on mobile
-        const target = isDesktop ? globalCategoryNav : navCol;
-        if (!target) return;
+        // 1. Remove any previously injected document lists to prevent duplicates
+        document.querySelectorAll('.document-list').forEach(el => el.remove());
 
-        const backButton = `
-        <li class="mb-4">
-            <a href="javascript:void(0)" onclick="exitWikiMode()" 
-               class="flex items-center gap-2 text-xs font-bold text-[var(--wiki-gold)] hover:text-white transition-colors uppercase tracking-widest font-mono">
-                <i data-lucide="arrow-left" class="w-3 h-3"></i> Back to Archive
-            </a>
-        </li>
-    `;
+        // 2. Find the active category item in the sidebar
+        const activeLink = document.querySelector(`.category-link[data-id="${window.wikiCategoryId}"], .submenu-link[data-id="${window.wikiCategoryId}"]`);
 
-        target.innerHTML = `
-        ${isDesktop ? backButton : `
-            <div class="wiki-nav-header mb-6">
-                <h2 class="text-xs font-bold text-slate-500 tracking-[0.2em] uppercase mb-4 font-mono">Archive Navigation</h2>
-            </div>
-        `}
-        <div class="relative mb-6">
-            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500"></i>
-            <input type="text" id="wikiSearch" placeholder="Filter documents..." 
-                class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 pr-3 py-2 text-xs text-white focus:border-[var(--wiki-gold)] outline-none">
-        </div>
-        <ul class="wiki-nav-list">
-            ${posts.map(post => `
-                <li class="wiki-nav-item">
-                    <a href="javascript:void(0)" onclick="switchWikiDoc('${post.id}')" 
-                       class="wiki-nav-link ${window.wikiActiveId === post.id ? 'active' : ''}">
-                        ${post.title}
-                    </a>
-                </li>
-            `).join('')}
-        </ul>
-    `;
-
-        if (window.lucide) window.lucide.createIcons();
-
-        // Search listener
-        const searchInput = document.getElementById('wikiSearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
-                document.querySelectorAll('.wiki-nav-item').forEach(item => {
-                    const text = item.textContent.toLowerCase();
-                    item.style.display = text.includes(term) ? 'block' : 'none';
-                });
-            });
+        if (activeLink && posts.length > 0) {
+            const li = activeLink.closest('li');
+            if (li) {
+                // Add the document list as a nested submenu
+                const docListHtml = `
+                    <ul class="submenu document-list" id="doclist-${window.wikiCategoryId}">
+                        ${posts.map(post => `
+                            <li class="document-item">
+                                <a href="javascript:void(0)" onclick="switchWikiDoc('${post.id}')" 
+                                   class="document-link ${window.wikiActiveId === post.id ? 'active' : ''}">
+                                    ${post.title}
+                                </a>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                li.insertAdjacentHTML('beforeend', docListHtml);
+            }
         }
     }
+
 
     window.exitWikiMode = function () {
         const mainContent = document.getElementById('mainContent');
@@ -804,12 +789,16 @@
         if (mainContent) mainContent.style.display = 'block';
         if (welcomeSection) welcomeSection.style.display = 'block';
 
-        // Restore category list in sidebar
-        if (window.allCategories && window.allCounts) {
-            renderCategories(window.allCategories, window.allCounts);
-        } else {
-            loadCategories(); // Fallback
-        }
+        // Remove injected document list from sidebar
+        document.querySelectorAll('.document-list').forEach(el => el.remove());
+
+        // Clear active wiki state
+        window.wikiActiveId = null;
+        window.wikiCategoryId = null;
+        window.wikiData = [];
+
+        // Clear active highlight from the category nav
+        document.querySelectorAll('.category-link.active, .submenu-link.active').forEach(el => el.classList.remove('active'));
 
         // Smooth scroll to top
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -817,7 +806,12 @@
 
     window.switchWikiDoc = function (id) {
         window.wikiActiveId = id;
-        renderWikiUI();
+        // Re-render: update active doc highlight in sidebar + content
+        document.querySelectorAll('.document-link').forEach(el => {
+            const postId = el.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+            el.classList.toggle('active', postId === id);
+        });
+        renderWikiContent();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -833,8 +827,21 @@
             return;
         }
 
+        const categoryId = window.wikiCategoryId;
+        const category = window.allCategories?.find(c => c.id === categoryId);
+        const parentCategory = category?.parent_id ? window.allCategories?.find(c => c.id === category.parent_id) : null;
+
+        const breadcrumbsHtml = `
+            <nav class="breadcrumbs">
+                <a href="index.html" class="breadcrumb-item breadcrumb-link"><i data-lucide="home" class="w-3 h-3"></i> Home</a>
+                ${parentCategory ? `<span class="breadcrumb-item"><span class="breadcrumb-link">${parentCategory.name}</span></span>` : ''}
+                ${category ? `<span class="breadcrumb-item"><span class="breadcrumb-link text-[var(--wiki-gold)]">${category.name}</span></span>` : '<span class="breadcrumb-item">Archive</span>'}
+            </nav>
+        `;
+
         // Render Main Content
         contentCol.innerHTML = `
+            ${breadcrumbsHtml}
             <header class="wiki-post-header mb-10">
                 <div class="text-[var(--wiki-gold)] text-[10px] font-mono tracking-[0.3em] uppercase mb-2">Authenticated Record</div>
                 <h1 class="text-4xl md:text-5xl font-bold font-serif text-white mb-4 border-none !p-0">${post.title}</h1>
