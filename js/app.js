@@ -1,3 +1,6 @@
+/**
+ * SmallSM Dictionary - Core Application Logic
+ * Vanilla JS + Supabase integration
  */
 
 function extractSummary(content) {
@@ -11,6 +14,7 @@ let supabaseLocal = null;
 let dictionaryData = [];
 let categories = [];
 let isAdmin = sessionStorage.getItem('admin_session') === 'true';
+window.isAdmin = isAdmin;
 let bookmarkedIds = JSON.parse(localStorage.getItem('bookmarks') || '[]');
 let showOnlyBookmarks = false;
 
@@ -61,18 +65,34 @@ async function init() {
     renderList(dictionaryData);
     renderToolkit();
 
-    // Admin UI Sync (if session exists)
-    if (isAdmin) {
-        const addBtn = document.getElementById('addNewBtn');
+    // 6. Admin UI Sync (Session Persistence)
+    syncAdminUI();
+
+    // Create Lucide Icons
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function syncAdminUI() {
+    const isAdminMode = sessionStorage.getItem('admin_session') === 'true';
+    const addBtn = document.getElementById('addNewBtn');
+    const loginBtn = document.getElementById('adminLoginBtn');
+    const header = document.querySelector('header h1');
+
+    if (isAdminMode) {
         if (addBtn) {
             addBtn.classList.remove('hidden');
             addBtn.onclick = window.showNewItemForm;
         }
-        const loginBtn = document.getElementById('adminLoginBtn');
-        if (loginBtn) loginBtn.innerHTML = '<i data-lucide="unlock" class="w-5 h-5 text-orange-500"></i>';
+        if (loginBtn) {
+            loginBtn.innerHTML = '<i data-lucide="unlock" class="w-5 h-5 text-orange-500"></i>';
+        }
+        if (header && !header.innerHTML.includes('ADMIN')) {
+            header.innerHTML += ' <span class="bg-orange-500 text-[10px] text-dark px-2 py-0.5 rounded-full align-middle ml-2 uppercase font-black">Admin</span>';
+        }
+    } else {
+        if (addBtn) addBtn.classList.add('hidden');
+        if (loginBtn) loginBtn.innerHTML = '<i data-lucide="lock" class="w-5 h-5"></i>';
     }
-
-    // Create Lucide Icons
     if (window.lucide) window.lucide.createIcons();
 }
 
@@ -193,9 +213,12 @@ function renderList(data) {
         // Items
         items.forEach(item => {
             const el = document.createElement('div');
-            el.className = 'dict-item cursor-pointer animate-fade-in';
+            el.className = 'dict-item cursor-pointer animate-fade-in relative';
             el.innerHTML = `
-                <div class="dict-term">${item.term}</div>
+                <div class="dict-term flex justify-between items-center">
+                    ${item.term}
+                    ${isAdmin ? '<i data-lucide="edit-3" class="w-3 h-3 text-orange-500 opacity-50"></i>' : ''}
+                </div>
                 <div class="dict-summary text-xs">${item.summary}</div>
             `;
             el.onclick = () => openBottomSheet(item);
@@ -405,7 +428,8 @@ function setupEventListeners() {
             if (confirm('관리자 모드를 종료하시겠습니까?')) {
                 isAdmin = false;
                 sessionStorage.removeItem('admin_session');
-                location.reload();
+                syncAdminUI();
+                renderList(dictionaryData);
             }
             return;
         }
@@ -413,10 +437,7 @@ function setupEventListeners() {
         if (pass === 'admin') { // Replace with real auth logic
             isAdmin = true;
             sessionStorage.setItem('admin_session', 'true');
-            document.getElementById('addNewBtn').classList.remove('hidden');
-            document.getElementById('addNewBtn').onclick = window.showNewItemForm;
-            document.getElementById('adminLoginBtn').innerHTML = '<i data-lucide="unlock" class="w-5 h-5 text-orange-500"></i>';
-            if (window.lucide) window.lucide.createIcons();
+            syncAdminUI();
             showToast('관리자 모드 활성화', 'success');
             renderList(dictionaryData); // Refresh to show edit buttons
         }
