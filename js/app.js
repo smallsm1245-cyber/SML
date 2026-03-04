@@ -73,12 +73,29 @@ async function loadConfig() {
         const response = await fetch('/api/config');
         if (response.ok) {
             const script = await response.text();
-            // This script usually sets window.SUPABASE_CONFIG
-            const func = new Function(script);
-            func();
+
+            // Temporary container to check values
+            const tempConfig = {};
+            const mockWindow = {
+                SUPABASE_CONFIG: {},
+                ADMIN_EMAIL: ''
+            };
+
+            // Execute script in a controlled context
+            const func = new Function('window', script);
+            func(mockWindow);
+
+            // Only overwrite if the fetched config has a valid URL
+            if (mockWindow.SUPABASE_CONFIG?.url && mockWindow.SUPABASE_CONFIG.url.trim() !== "") {
+                window.SUPABASE_CONFIG = mockWindow.SUPABASE_CONFIG;
+                console.log('📡 Config loaded from Vercel API');
+            }
+            if (mockWindow.ADMIN_EMAIL) {
+                window.ADMIN_EMAIL = mockWindow.ADMIN_EMAIL;
+            }
         }
     } catch (e) {
-        console.warn('⚠️ /api/config fetch failed, using local or window config');
+        console.warn('⚠️ /api/config fetch failed or empty, using local config from js/config.js');
     }
 }
 
