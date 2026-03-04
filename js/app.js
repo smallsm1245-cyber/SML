@@ -222,7 +222,7 @@ function renderList(data) {
             el.innerHTML = `
                 <div class="dict-term flex justify-between items-center">
                     ${item.term}
-                    ${isAdmin ? '<i data-lucide="edit-3" class="w-3 h-3 text-orange-500 opacity-50"></i>' : ''}
+                    ${window.isAdmin ? '<i data-lucide="edit-3" class="w-3 h-3 text-orange-500 opacity-50"></i>' : ''}
                 </div>
                 <div class="dict-summary text-xs">${item.summary}</div>
             `;
@@ -429,6 +429,7 @@ function setupEventListeners() {
 
     // Admin Login (Fake/Simple for now)
     document.getElementById('adminLoginBtn').onclick = () => {
+        console.log('🔘 Admin Login Button Clicked');
         if (window.isAdmin) {
             if (confirm('관리자 모드를 종료하시겠습니까?')) {
                 window.isAdmin = false;
