@@ -127,7 +127,9 @@ async function fetchData() {
 
         // Map categories for quick access
         const categoryMap = {};
-        catData?.forEach(c => categoryMap[c.id] = c.name);
+        if (catData) {
+            catData.forEach(c => categoryMap[c.id] = c.name);
+        }
 
         // Map to our dictionary structure
         dictionaryData = posts.map(p => ({
@@ -141,8 +143,8 @@ async function fetchData() {
 
         // Get unique sorted categories based on display_order
         const seen = new Set();
-        categories = catData
-            ?.map(c => c.name)
+        categories = (catData || [])
+            .map(c => c.name)
             .filter(name => {
                 const hasPosts = dictionaryData.some(d => d.category === name);
                 if (hasPosts && !seen.has(name)) {
@@ -150,12 +152,19 @@ async function fetchData() {
                     return true;
                 }
                 return false;
-            }) || [];
+            });
 
     } catch (err) {
         console.error('❌ Data Fetch Error 상세:', err);
         showToast(`데이터 불러오기 실패: ${err.message || '알 수 없는 오류'}`, 'error');
     }
+}
+
+function extractSummary(content) {
+    if (!content) return '';
+    // Strip HTML if any, then take first 60 chars
+    const plainText = content.replace(/<[^>]*>/g, '').replace(/\n/g, ' ');
+    return plainText.length > 60 ? plainText.substring(0, 57) + '...' : plainText;
 }
 
 // ═══════════════════════════════════════════════════
