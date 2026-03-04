@@ -288,13 +288,18 @@ function openBottomSheet(item) {
 
     content.innerHTML = `
         <div class="flex justify-between items-start mb-2">
-            <h2 class="text-2xl font-bold text-primary">${item.term}</h2>
+            <div>
+                <h2 class="sheet-title">${item.term}</h2>
+                <div class="title-accent"></div>
+            </div>
             <button onclick="toggleBookmark('${item.id}')" class="p-2 ${isBookmarked ? 'text-primary' : 'text-gray-600'}">
                 <i data-lucide="${isBookmarked ? 'star' : 'bookmark'}" class="w-6 h-6"></i>
             </button>
         </div>
-        <div class="text-xs text-gray-500 mb-6 uppercase tracking-widest">${item.category}</div>
-        <div class="prose prose-invert text-light leading-relaxed mb-10 whitespace-pre-wrap">
+        <div class="mt-4 mb-8">
+            <span class="category-chip">${item.category}</span>
+        </div>
+        <div class="body-text prose prose-invert leading-relaxed mb-10 whitespace-pre-wrap">
             ${body}
         </div>
         ${window.isAdmin ? `<button class="w-full py-4 bg-orange-500 text-dark font-bold rounded-xl mb-4" onclick="enableEditMode('${item.id}')">수정하기</button>` : ''}

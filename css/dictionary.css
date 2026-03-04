@@ -149,24 +149,42 @@ body {
     cursor: pointer;
 }
 
-/* Utility Classes */
-.hidden {
-    display: none !important;
+/* Improved Reading Experience */
+.sheet-title {
+    color: #ffffff;
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.2;
 }
 
-.fixed {
-    position: fixed;
+.title-accent {
+    width: 40px;
+    height: 4px;
+    background-color: var(--primary);
+    margin-top: 0.75rem;
+    border-radius: 2px;
 }
 
-.inset-0 {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+.category-chip {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--primary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
-.z-50 {
-    z-index: 50;
+.body-text {
+    color: #e0e0e0;
+    /* Off-white for better contrast */
+    font-size: 1.05rem;
+    line-height: 1.7;
+    letter-spacing: -0.01em;
 }
 
 .flex {
