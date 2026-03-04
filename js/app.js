@@ -97,24 +97,21 @@ function syncAdminUI() {
 }
 
 async function loadConfig() {
-    // Try to reach /api/config (Vercel) first
+    // 1. Skip Vercel API if running as a local file (to avoid CORS errors)
+    if (window.location.protocol === 'file:') {
+        console.log('🏠 Local file detected, skipping Vercel API config');
+        return;
+    }
+
+    // 2. Try to reach /api/config (Vercel)
     try {
         const response = await fetch('/api/config');
         if (response.ok) {
             const script = await response.text();
-
-            // Temporary container to check values
-            const tempConfig = {};
-            const mockWindow = {
-                SUPABASE_CONFIG: {},
-                ADMIN_EMAIL: ''
-            };
-
-            // Execute script in a controlled context
+            const mockWindow = { SUPABASE_CONFIG: {}, ADMIN_EMAIL: '' };
             const func = new Function('window', script);
             func(mockWindow);
 
-            // Only overwrite if the fetched config has a valid URL
             if (mockWindow.SUPABASE_CONFIG?.url && mockWindow.SUPABASE_CONFIG.url.trim() !== "") {
                 window.SUPABASE_CONFIG = mockWindow.SUPABASE_CONFIG;
                 console.log('📡 Config loaded from Vercel API');
@@ -124,7 +121,7 @@ async function loadConfig() {
             }
         }
     } catch (e) {
-        console.warn('⚠️ /api/config fetch failed or empty, using local config from js/config.js');
+        console.warn('⚠️ /api/config fetch failed, using local config');
     }
 }
 
