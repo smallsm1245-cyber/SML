@@ -13,8 +13,7 @@ function extractSummary(content) {
 let supabaseLocal = null;
 let dictionaryData = [];
 let categories = [];
-let isAdmin = sessionStorage.getItem('admin_session') === 'true';
-window.isAdmin = isAdmin;
+window.isAdmin = sessionStorage.getItem('admin_session') === 'true';
 let bookmarkedIds = JSON.parse(localStorage.getItem('bookmarks') || '[]');
 let showOnlyBookmarks = false;
 
@@ -73,12 +72,12 @@ async function init() {
 }
 
 function syncAdminUI() {
-    const isAdminMode = sessionStorage.getItem('admin_session') === 'true';
     const addBtn = document.getElementById('addNewBtn');
     const loginBtn = document.getElementById('adminLoginBtn');
     const header = document.querySelector('header h1');
 
-    if (isAdminMode) {
+    if (window.isAdmin) {
+        console.log('🔓 Admin UI Sync: ON');
         if (addBtn) {
             addBtn.classList.remove('hidden');
             addBtn.onclick = window.showNewItemForm;
@@ -86,12 +85,21 @@ function syncAdminUI() {
         if (loginBtn) {
             loginBtn.innerHTML = '<i data-lucide="unlock" class="w-5 h-5 text-orange-500"></i>';
         }
-        if (header && !header.innerHTML.includes('ADMIN')) {
-            header.innerHTML += ' <span class="bg-orange-500 text-[10px] text-dark px-2 py-0.5 rounded-full align-middle ml-2 uppercase font-black">Admin</span>';
+        // Badge logic: remove first if exists, then add
+        const oldBadge = document.querySelector('.admin-badge');
+        if (oldBadge) oldBadge.remove();
+        if (header) {
+            const badge = document.createElement('span');
+            badge.className = 'admin-badge bg-orange-500 text-[10px] text-dark px-2 py-0.5 rounded-full align-middle ml-2 uppercase font-black';
+            badge.innerText = 'Admin';
+            header.appendChild(badge);
         }
     } else {
+        console.log('🔒 Admin UI Sync: OFF');
         if (addBtn) addBtn.classList.add('hidden');
         if (loginBtn) loginBtn.innerHTML = '<i data-lucide="lock" class="w-5 h-5"></i>';
+        const badge = document.querySelector('.admin-badge');
+        if (badge) badge.remove();
     }
     if (window.lucide) window.lucide.createIcons();
 }
@@ -284,7 +292,7 @@ function openBottomSheet(item) {
         <div class="prose prose-invert text-light leading-relaxed mb-10 whitespace-pre-wrap">
             ${body}
         </div>
-        ${isAdmin ? `<button class="w-full py-4 bg-orange-500 text-dark font-bold rounded-xl mb-4" onclick="enableEditMode('${item.id}')">수정하기</button>` : ''}
+        ${window.isAdmin ? `<button class="w-full py-4 bg-orange-500 text-dark font-bold rounded-xl mb-4" onclick="enableEditMode('${item.id}')">수정하기</button>` : ''}
     `;
 
     overlay.classList.remove('hidden');
@@ -421,9 +429,9 @@ function setupEventListeners() {
 
     // Admin Login (Fake/Simple for now)
     document.getElementById('adminLoginBtn').onclick = () => {
-        if (isAdmin) {
+        if (window.isAdmin) {
             if (confirm('관리자 모드를 종료하시겠습니까?')) {
-                isAdmin = false;
+                window.isAdmin = false;
                 sessionStorage.removeItem('admin_session');
                 syncAdminUI();
                 renderList(dictionaryData);
@@ -432,11 +440,13 @@ function setupEventListeners() {
         }
         const pass = prompt('관리자 비밀번호를 입력하세요:');
         if (pass === 'admin') { // Replace with real auth logic
-            isAdmin = true;
+            window.isAdmin = true;
             sessionStorage.setItem('admin_session', 'true');
             syncAdminUI();
             showToast('관리자 모드 활성화', 'success');
             renderList(dictionaryData); // Refresh to show edit buttons
+        } else if (pass !== null) {
+            showToast('비밀번호가 틀렸습니다.', 'error');
         }
     };
 }
