@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SmallSM Dictionary</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS Framework (Tailwind) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0b0c10',
+                        'dark-alt': '#1f2833',
+                        light: '#c5c6c7',
+                        primary: '#45a29e',
+                        'primary-dim': '#66fcf1',
+                        admin: '#ff9800',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/dictionary.css">
+</head>
+
+<body class="bg-dark text-light overflow-hidden">
+    <!-- Emergency Exit -->
+    <div id="emergencyExit"
+        class="fixed top-4 left-4 z-50 cursor-pointer opacity-30 hover:opacity-100 transition-opacity">
+        <i data-lucide="ghost" class="w-6 h-6"></i>
+    </div>
+
+    <!-- Main Wrapper -->
+    <div class="flex flex-col h-screen">
+        <!-- Header / Search -->
+        <header class="p-4 pt-8 bg-dark-alt border-b border-gray-800">
+            <h1 class="text-xl font-bold text-primary mb-4 tracking-tight">SmallSM Dictionary</h1>
+            <div class="relative">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                <input type="text" id="searchInput"
+                    class="w-full bg-dark border-none rounded-lg pl-10 pr-4 py-3 text-sm focus:ring-1 focus:ring-primary outline-none transition-all"
+                    placeholder="용어, 요약, 내용을 검색하세요...">
+            </div>
+        </header>
+
+        <!-- High-Density List Container -->
+        <main class="flex-1 overflow-y-auto custom-scroll pb-20" id="dictionaryList">
+            <!-- Items injected by JS -->
+            <div class="p-4 text-center text-gray-600 py-20">
+                <div class="animate-pulse">데이터를 불러오는 중...</div>
+            </div>
+        </main>
+
+        <!-- Right Toolkit Bar -->
+        <nav class="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col gap-4 p-2 bg-dark-alt/80 backdrop-blur-md rounded-full border border-gray-800 z-40"
+            id="toolkitBar">
+            <!-- Category icons injected by JS -->
+        </nav>
+
+        <!-- Bottom Controls -->
+        <footer class="fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-dark to-transparent pointer-events-none">
+            <div class="flex justify-center gap-4 pointer-events-auto">
+                <button id="bookmarkToggle"
+                    class="p-3 bg-dark-alt border border-gray-800 rounded-full shadow-lg hover:bg-gray-800 transition-colors">
+                    <i data-lucide="bookmark" class="w-5 h-5"></i>
+                </button>
+                <button id="adminLoginBtn"
+                    class="p-3 bg-dark-alt border border-gray-800 rounded-full shadow-lg hover:bg-gray-800 transition-colors">
+                    <i data-lucide="lock" class="w-5 h-5"></i>
+                </button>
+                <button id="addNewBtn"
+                    class="p-3 bg-orange-500 text-dark rounded-full shadow-lg hover:bg-orange-600 transition-colors hidden">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bottom Sheet Overlay -->
+    <div id="bottomSheetOverlay"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden opacity-0 transition-opacity duration-300">
+    </div>
+
+    <!-- Bottom Sheet -->
+    <div id="bottomSheet"
+        class="fixed bottom-0 left-0 w-full max-h-[90vh] bg-dark-alt rounded-t-[2rem] border-t border-gray-800 z-[101] transform translate-y-full transition-transform duration-300 ease-out flex flex-col">
+        <div class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto my-4 flex-shrink-0"></div>
+        <div class="overflow-y-auto px-6 pb-12 flex-1 custom-scroll" id="sheetContent">
+            <!-- Detailed content injected by JS -->
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/app.js" type="module"></script>
+</body>
+
+</html>
