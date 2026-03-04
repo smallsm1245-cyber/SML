@@ -20,6 +20,11 @@ async function init() {
     // 1. Load Config
     await loadConfig();
 
+    // Catch manual config from config.js if dynamic fails
+    if (!window.SUPABASE_CONFIG?.url || window.SUPABASE_CONFIG.url === '') {
+        await new Promise(r => setTimeout(r, 300));
+    }
+
     // 2. Init Supabase
     if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.SUPABASE_CONFIG.url !== '') {
         supabaseLocal = supabase.createClient(
