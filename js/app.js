@@ -439,14 +439,18 @@ function setupEventListeners() {
             }
             return;
         }
-        const pass = prompt('관리자 비밀번호를 입력하세요:');
-        if (pass === 'admin') { // Replace with real auth logic
+        const rawPass = prompt('관리자 비밀번호를 입력하세요:');
+        const pass = (rawPass || '').trim().toLowerCase();
+
+        console.log('🔑 Password entered (length):', pass.length);
+
+        if (pass === 'admin') {
             window.isAdmin = true;
             sessionStorage.setItem('admin_session', 'true');
             syncAdminUI();
             showToast('관리자 모드 활성화', 'success');
-            renderList(dictionaryData); // Refresh to show edit buttons
-        } else if (pass !== null) {
+            renderList(dictionaryData);
+        } else if (rawPass !== null) {
             showToast('비밀번호가 틀렸습니다.', 'error');
         }
     };
