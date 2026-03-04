@@ -1,7 +1,11 @@
-/**
- * SmallSM Dictionary - Core Application Logic
- * Vanilla JS + Supabase integration
  */
+
+function extractSummary(content) {
+    if (!content) return '';
+    // Strip HTML if any, then take first 60 chars
+    const plainText = content.replace(/<[^>]*>/g, '').replace(/\n/g, ' ');
+    return plainText.length > 60 ? plainText.substring(0, 57) + '...' : plainText;
+}
 
 let supabaseLocal = null;
 let dictionaryData = [];
@@ -160,12 +164,6 @@ async function fetchData() {
     }
 }
 
-function extractSummary(content) {
-    if (!content) return '';
-    // Strip HTML if any, then take first 60 chars
-    const plainText = content.replace(/<[^>]*>/g, '').replace(/\n/g, ' ');
-    return plainText.length > 60 ? plainText.substring(0, 57) + '...' : plainText;
-}
 
 // ═══════════════════════════════════════════════════
 // 2. RENDERING & UI
