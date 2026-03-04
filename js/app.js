@@ -72,36 +72,41 @@ async function init() {
 }
 
 function syncAdminUI() {
-    const addBtn = document.getElementById('addNewBtn');
-    const loginBtn = document.getElementById('adminLoginBtn');
-    const header = document.querySelector('header h1');
+    if (!supabaseLocal) return;
 
-    if (window.isAdmin) {
-        console.log('🔓 Admin UI Sync: ON');
-        if (addBtn) {
-            addBtn.classList.remove('hidden');
-            addBtn.onclick = window.showNewItemForm;
+    supabaseLocal.auth.getSession().then(({ data: { session } }) => {
+        window.isAdmin = !!session;
+        const addBtn = document.getElementById('addNewBtn');
+        const loginBtn = document.getElementById('adminLoginBtn');
+        const header = document.querySelector('header h1');
+
+        if (window.isAdmin) {
+            console.log('🔓 Admin UI Sync: ON (User:', session.user.email, ')');
+            if (addBtn) {
+                addBtn.classList.remove('hidden');
+                addBtn.onclick = window.showNewItemForm;
+            }
+            if (loginBtn) {
+                loginBtn.innerHTML = '<i data-lucide="unlock" class="w-5 h-5 text-orange-500"></i>';
+            }
+            // Badge logic
+            const oldBadge = document.querySelector('.admin-badge');
+            if (oldBadge) oldBadge.remove();
+            if (header) {
+                const badge = document.createElement('span');
+                badge.className = 'admin-badge bg-orange-500 text-[10px] text-dark px-2 py-0.5 rounded-full align-middle ml-2 uppercase font-black';
+                badge.innerText = 'Admin';
+                header.appendChild(badge);
+            }
+        } else {
+            console.log('🔒 Admin UI Sync: OFF');
+            if (addBtn) addBtn.classList.add('hidden');
+            if (loginBtn) loginBtn.innerHTML = '<i data-lucide="lock" class="w-5 h-5"></i>';
+            const badge = document.querySelector('.admin-badge');
+            if (badge) badge.remove();
         }
-        if (loginBtn) {
-            loginBtn.innerHTML = '<i data-lucide="unlock" class="w-5 h-5 text-orange-500"></i>';
-        }
-        // Badge logic: remove first if exists, then add
-        const oldBadge = document.querySelector('.admin-badge');
-        if (oldBadge) oldBadge.remove();
-        if (header) {
-            const badge = document.createElement('span');
-            badge.className = 'admin-badge bg-orange-500 text-[10px] text-dark px-2 py-0.5 rounded-full align-middle ml-2 uppercase font-black';
-            badge.innerText = 'Admin';
-            header.appendChild(badge);
-        }
-    } else {
-        console.log('🔒 Admin UI Sync: OFF');
-        if (addBtn) addBtn.classList.add('hidden');
-        if (loginBtn) loginBtn.innerHTML = '<i data-lucide="lock" class="w-5 h-5"></i>';
-        const badge = document.querySelector('.admin-badge');
-        if (badge) badge.remove();
-    }
-    if (window.lucide) window.lucide.createIcons();
+        if (window.lucide) window.lucide.createIcons();
+    });
 }
 
 async function loadConfig() {
@@ -427,34 +432,81 @@ function setupEventListeners() {
         renderList(filtered);
     };
 
-    // Admin Login (Fake/Simple for now)
-    document.getElementById('adminLoginBtn').onclick = () => {
-        console.log('🔘 Admin Login Button Clicked');
-        if (window.isAdmin) {
-            if (confirm('관리자 모드를 종료하시겠습니까?')) {
-                window.isAdmin = false;
-                sessionStorage.removeItem('admin_session');
-                syncAdminUI();
-                renderList(dictionaryData);
+    // Admin Login Trigger
+    const loginBtn = document.getElementById('adminLoginBtn');
+    if (loginBtn) {
+        loginBtn.onclick = () => {
+            console.log('🔘 Admin Login Button Clicked');
+            if (window.isAdmin) {
+                if (confirm('관리자 모드를 종료하시겠습니까?')) {
+                    supabaseLocal.auth.signOut().then(() => {
+                        syncAdminUI();
+                        renderList(dictionaryData);
+                        showToast('로그아웃 되었습니다.', 'success');
+                    });
+                }
+                return;
             }
-            return;
-        }
-        const rawPass = prompt('관리자 비밀번호를 입력하세요:');
-        const pass = (rawPass || '').trim().toLowerCase();
+            window.openLoginModal();
+        };
+    }
 
-        console.log('🔑 Password entered (length):', pass.length);
-
-        if (pass === 'admin') {
-            window.isAdmin = true;
-            sessionStorage.setItem('admin_session', 'true');
-            syncAdminUI();
-            showToast('관리자 모드 활성화', 'success');
-            renderList(dictionaryData);
-        } else if (rawPass !== null) {
-            showToast('비밀번호가 틀렸습니다.', 'error');
-        }
-    };
+    // Submit Login
+    const submitBtn = document.getElementById('submitLoginBtn');
+    if (submitBtn) submitBtn.onclick = window.handleLogin;
 }
+
+window.openLoginModal = function () {
+    const modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    if (window.lucide) window.lucide.createIcons();
+};
+
+window.closeLoginModal = function () {
+    const modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+};
+
+window.handleLogin = async function () {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('submitLoginBtn');
+
+    if (!email || !password) {
+        showToast('이메일과 비밀번호를 입력해주세요.', 'error');
+        return;
+    }
+
+    btn.disabled = true;
+    const originalText = btn.innerText;
+    btn.innerText = '로그인 중...';
+
+    try {
+        const { error } = await supabaseLocal.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) throw error;
+
+        showToast('로그인 성공!', 'success');
+        window.closeLoginModal();
+        syncAdminUI();
+        renderList(dictionaryData);
+    } catch (e) {
+        console.error('❌ Login Error:', e);
+        showToast('로그인 실패: ' + (e.message || '다시 시도해주세요.'), 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerText = originalText;
+    }
+};
 
 // ═══════════════════════════════════════════════════
 // 5. TOAST & UTILS

@@ -94,6 +94,39 @@
         </footer>
     </div>
 
+    <!-- Login Modal -->
+    <div id="loginModal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-md z-[150] hidden flex items-center justify-center p-4">
+        <div class="bg-dark-alt w-full max-w-sm rounded-[2rem] border border-gray-800 p-8 animate-fade-in shadow-2xl">
+            <h2 class="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+                <i data-lucide="shield-check"></i>
+                Admin Login
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1 ml-1 font-bold">EMAIL</label>
+                    <input type="email" id="loginEmail"
+                        class="w-full bg-dark border border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary outline-none transition-all"
+                        placeholder="admin@example.com">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1 ml-1 font-bold">PASSWORD</label>
+                    <input type="password" id="loginPassword"
+                        class="w-full bg-dark border border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary outline-none transition-all"
+                        placeholder="••••••••">
+                </div>
+                <button id="submitLoginBtn"
+                    class="w-full py-4 bg-primary text-dark font-black rounded-xl mt-4 hover:bg-primary-dim transition-all shadow-lg active:scale-95">
+                    로그인 하기
+                </button>
+                <button onclick="closeLoginModal()"
+                    class="w-full py-3 text-gray-500 text-sm hover:text-light transition-colors">
+                    취소
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Bottom Sheet Overlay -->
     <div id="bottomSheetOverlay"
         class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden opacity-0 transition-opacity duration-300">
