@@ -153,8 +153,8 @@ async function fetchData() {
             }) || [];
 
     } catch (err) {
-        console.error('❌ Data Fetch Error:', err);
-        showToast('데이터를 불러오는데 실패했습니다.', 'error');
+        console.error('❌ Data Fetch Error 상세:', err);
+        showToast(`데이터 불러오기 실패: ${err.message || '알 수 없는 오류'}`, 'error');
     }
 }
 
