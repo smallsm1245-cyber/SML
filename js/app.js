@@ -88,14 +88,14 @@ function syncAdminUI() {
                 addBtn.onclick = window.showNewItemForm;
             }
             if (loginBtn) {
-                loginBtn.innerHTML = '<i data-lucide="unlock" class="w-5 h-5 text-orange-500"></i>';
+                loginBtn.innerHTML = '<i data-lucide="unlock" class="w-5 h-5 text-gold"></i>';
             }
             // Badge logic
             const oldBadge = document.querySelector('.admin-badge');
             if (oldBadge) oldBadge.remove();
             if (header) {
                 const badge = document.createElement('span');
-                badge.className = 'admin-badge bg-orange-500 text-[10px] text-dark px-2 py-0.5 rounded-full align-middle ml-2 uppercase font-black';
+                badge.className = 'admin-badge bg-gold text-[10px] text-black px-2 py-0.5 rounded-sm align-middle ml-2 uppercase font-black';
                 badge.innerText = 'Admin';
                 header.appendChild(badge);
             }
@@ -334,7 +334,10 @@ window.enableEditMode = function (id) {
 
     const content = document.getElementById('sheetContent');
     content.innerHTML = `
-        <h2 class="text-xl font-bold text-orange-500 mb-4">관리자 편집</h2>
+        <h2 class="text-xl font-bold text-primary mb-6 flex items-center gap-2">
+            <i data-lucide="shield-check"></i>
+            관리자 편집
+        </h2>
         <div class="mb-4">
             <label class="block text-xs text-gray-500 mb-1">용어명</label>
             <input type="text" id="editTerm" class="edit-input" value="${item.term}">
@@ -632,7 +635,10 @@ window.showNewItemForm = function () {
     const categoriesOptions = categories.map(c => `<option value="${c}">${c}</option>`).join('');
     const content = document.getElementById('sheetContent');
     content.innerHTML = `
-        <h2 class="text-xl font-bold text-orange-500 mb-4">새 항목 추가</h2>
+        <h2 class="text-xl font-bold text-primary mb-6 flex items-center gap-2">
+            <i data-lucide="plus-circle"></i>
+            새 항목 추가
+        </h2>
         <div class="mb-4">
             <label class="block text-xs text-gray-500 mb-1">카테고리</label>
             <select id="newCategory" class="edit-input">

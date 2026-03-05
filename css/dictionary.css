@@ -1,10 +1,15 @@
 :root {
-    --bg-dark: #0b0c10;
-    --bg-dark-alt: #1f2833;
-    --text-light: #c5c6c7;
-    --primary: #45a29e;
-    --primary-dim: #66fcf1;
-    --admin-orange: #ff9800;
+    --bg-dark: #050505;
+    /* Matte Black */
+    --bg-dark-alt: #0f0f0f;
+    /* Deep Grey/Black */
+    --text-light: #e0e0e0;
+    --primary: #9b0000;
+    /* Crimson Red */
+    --primary-dim: #ff1a1a;
+    --gold: #d4af37;
+    /* Luxury Gold */
+    --leather-black: #121212;
 }
 
 body {
@@ -12,6 +17,7 @@ body {
     -webkit-font-smoothing: antialiased;
     background-color: var(--bg-dark);
     color: var(--text-light);
+    background-image: radial-gradient(circle at 50% 50%, rgba(155, 0, 0, 0.05) 0%, transparent 100%);
 }
 
 .text-primary {
@@ -24,43 +30,77 @@ body {
 
 .bg-dark-alt {
     background-color: var(--bg-dark-alt);
+    border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* High-Density List Styles */
+/* High-Density List Styles - Leather & Metal */
 .dict-item {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 1rem 1.25rem;
-    /* Increased for touch target */
-    min-height: 48px;
-    /* Ensure 44px+ touch target */
-    transition: background-color 0.2s;
+    border-bottom: 1px solid rgba(155, 0, 0, 0.1);
+    padding: 1.2rem 1.25rem;
+    min-height: 52px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    background: linear-gradient(135deg, rgba(18, 18, 18, 0.8) 0%, rgba(5, 5, 5, 1) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.dict-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: var(--primary);
+    transition: height 0.3s ease;
 }
 
 .dict-item:active {
-    background-color: rgba(69, 162, 158, 0.2);
-    /* Enhanced feedback */
+    background-color: rgba(155, 0, 0, 0.15);
+    transform: scale(0.99);
+}
+
+.dict-item:active::before {
+    height: 70%;
 }
 
 .dict-term {
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 700;
-    color: var(--primary-dim);
+    color: var(--text-light);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dict-term::after {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border: 1.5px solid var(--primary);
+    border-radius: 50%;
+    /* O-ring symbol */
+    opacity: 0.5;
 }
 
 .dict-summary {
     font-size: 0.8rem;
-    color: #8892b0;
-    margin-top: 0.1rem;
+    color: #808080;
+    margin-top: 0.2rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: 400;
 }
 
 /* Custom Scrollbar */
 .custom-scroll::-webkit-scrollbar {
-    width: 4px;
+    width: 3px;
 }
 
 .custom-scroll::-webkit-scrollbar-track {
@@ -68,187 +108,148 @@ body {
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-    background: #333;
+    background: #2a2a2a;
     border-radius: 10px;
 }
 
-/* Category Section Header */
+/* Category Section Header - Dark Luxury */
 .category-header {
-    background: rgba(31, 40, 51, 0.5);
-    backdrop-filter: blur(5px);
-    padding: 0.25rem 1rem;
-    font-size: 0.7rem;
-    font-weight: 600;
+    background: rgba(10, 10, 10, 0.9);
+    backdrop-filter: blur(12px);
+    padding: 0.5rem 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 800;
     color: var(--primary);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.2em;
     position: sticky;
     top: 0;
     z-index: 10;
+    border-top: 1px solid rgba(155, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Bottom Sheet Transitions */
-#bottomSheet.translate-y-full {
-    transform: translateY(100%);
-}
-
+/* Bottom Sheet Appearance */
 #bottomSheet {
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(31, 40, 51, 0.98);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    background: linear-gradient(to bottom, #0f0f0f, #050505);
+    border-top: 2px solid var(--primary);
+    box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.8);
     will-change: transform;
+    border-radius: 2.5rem 2.5rem 0 0;
 }
 
 #sheetContent {
     -webkit-overflow-scrolling: touch;
-    /* Smooth scrolling for iOS */
+    padding-top: 1rem;
 }
 
 /* Glassmorphism for Toolkit */
 #toolkitBar {
-    background: rgba(31, 40, 51, 0.4);
-    backdrop-filter: blur(10px);
+    background: rgba(10, 10, 10, 0.6);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
-/* High-Density Item Polish */
-.dict-item {
-    position: relative;
-    overflow: hidden;
-}
-
-.dict-item::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 1rem;
-    right: 1rem;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(69, 162, 158, 0.2), transparent);
-}
-
-.dict-term {
-    letter-spacing: -0.02em;
-}
-
-/* Bookmarks */
-.is-bookmarked .dict-term::before {
-    content: '★ ';
-    color: var(--primary);
-}
-
-/* Edit Mode Form */
+/* Inputs & Form - Latex/Leather feel */
 .edit-input {
     width: 100%;
-    background: var(--bg-dark);
-    border: 1px solid #333;
-    border-radius: 0.5rem;
-    padding: 0.85rem;
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    border-radius: 0.75rem;
+    padding: 1rem;
     color: white;
     margin-bottom: 1rem;
     font-size: 16px;
-    /* Prevent iOS auto-zoom */
-    line-height: 1.5;
-}
-
-textarea.edit-input {
-    min-height: 120px;
-    resize: none;
-    overflow-y: hidden;
-    /* For JS auto-resize */
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .edit-input:focus {
     border-color: var(--primary);
     outline: none;
+    background: #0f0f0f;
+    box-shadow: 0 0 0 2px rgba(155, 0, 0, 0.2);
 }
 
-/* Ensure global inputs also don't trigger zoom */
-input,
-textarea,
-select {
-    font-size: 16px !important;
+textarea.edit-input {
+    min-height: 150px;
 }
 
-/* Button Touch Targets */
+/* Buttons - Aggressive & Bold */
 button {
-    min-width: 44px;
-    min-height: 44px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
+    min-height: 48px;
+    border-radius: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button.bg-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(155, 0, 0, 0.3);
 }
 
 button:active {
-    opacity: 0.7;
-    transform: scale(0.97);
+    transform: scale(0.96);
+    filter: brightness(1.2);
 }
 
 /* Internal Links */
 .internal-link {
     color: var(--primary-dim);
-    border-bottom: 1px dashed var(--primary);
-    cursor: pointer;
+    border-bottom: 1.5px solid var(--primary);
+    font-weight: 600;
+    text-decoration: none;
 }
 
-/* Improved Reading Experience */
+/* Sheet Content Typography */
 .sheet-title {
     color: #ffffff;
-    font-size: 1.75rem;
-    font-weight: 800;
-    line-height: 1.2;
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
 .title-accent {
-    width: 40px;
-    height: 4px;
-    background-color: var(--primary);
-    margin-top: 0.75rem;
-    border-radius: 2px;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), transparent);
+    margin-top: 1rem;
 }
 
 .category-chip {
     display: inline-flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--primary);
-    padding: 0.25rem 0.75rem;
-    border-radius: 100px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    background: rgba(155, 0, 0, 0.1);
+    border: 1px solid var(--primary);
+    color: var(--primary-dim);
+    padding: 0.3rem 1rem;
+    border-radius: 4px;
+    /* Industrial look */
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
 }
 
 .body-text {
-    color: #e0e0e0;
-    /* Off-white for better contrast */
-    font-size: 1.05rem;
-    line-height: 1.7;
-    letter-spacing: -0.01em;
+    color: #cccccc;
+    font-size: 1.1rem;
+    line-height: 1.8;
 }
 
-.flex {
-    display: flex;
+/* Admin / Status Icons */
+[data-lucide="lock"],
+[data-lucide="unlock"] {
+    color: var(--gold) !important;
 }
 
-.flex-col {
-    flex-direction: column;
+.admin-badge {
+    background-color: var(--gold) !important;
+    color: black !important;
+    text-shadow: none;
 }
-
-.h-screen {
-    height: 100vh;
-}
-
-.overflow-hidden {
-    overflow: hidden;
-}
-
-.overflow-y-auto {
-    overflow-y: auto;
-}
-
-/* Tailwind-like spacing/layout shims if Tailwind CDN is not used, 
-   but user requested Tailwind, so I should include it in index.html if possible.
-   Since I cannot easily use Tailwind CLI without Node, I'll use the CDN or provide a robust CSS.
-*/
