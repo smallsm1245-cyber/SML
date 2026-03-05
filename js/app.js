@@ -16,6 +16,7 @@ let categories = [];
 window.isAdmin = sessionStorage.getItem('admin_session') === 'true';
 let bookmarkedIds = JSON.parse(localStorage.getItem('bookmarks') || '[]');
 let showOnlyBookmarks = false;
+let currentFontSize = parseInt(localStorage.getItem('preferred_font_size') || '16');
 
 // ═══════════════════════════════════════════════════
 // 1. INITIALIZATION
@@ -300,10 +301,22 @@ function openBottomSheet(item) {
             <span class="category-chip">${item.category}</span>
         </div>
         <div class="body-text prose prose-invert leading-relaxed mb-10 whitespace-pre-wrap">
-            ${body}
+            ${window.marked ? marked.parse(body) : body}
+        </div>
+        <div class="flex gap-4 mb-8">
+            <button onclick="changeFontSize(-2)" class="flex-1 bg-dark-alt border border-gray-800 rounded-xl py-3 flex items-center justify-center gap-2 text-xs font-bold">
+                <i data-lucide="minus" class="w-4 h-4"></i> 글자 작게
+            </button>
+            <button onclick="changeFontSize(2)" class="flex-1 bg-dark-alt border border-gray-800 rounded-xl py-3 flex items-center justify-center gap-2 text-xs font-bold">
+                <i data-lucide="plus" class="w-4 h-4"></i> 글자 크게
+            </button>
         </div>
         ${window.isAdmin ? `<button class="w-full py-4 bg-orange-500 text-dark font-bold rounded-xl mb-4" onclick="enableEditMode('${item.id}')">수정하기</button>` : ''}
     `;
+
+    // Apply current font size
+    const bodyEl = content.querySelector('.body-text');
+    if (bodyEl) bodyEl.style.fontSize = currentFontSize + 'px';
 
     overlay.classList.remove('hidden');
     sheet.classList.remove('hidden');
@@ -327,6 +340,13 @@ window.enableEditMode = function (id) {
             <input type="text" id="editTerm" class="edit-input" value="${item.term}">
         </div>
         <div class="mb-4">
+            <label class="block text-xs text-gray-500 mb-1">이미지 업로드</label>
+            <input type="file" id="imageUpload" class="hidden" accept="image/*" onchange="handleImageUpload(this)">
+            <button onclick="document.getElementById('imageUpload').click()" class="w-full py-3 bg-dark border border-gray-800 rounded-lg flex items-center justify-center gap-2 text-sm text-gray-400">
+                <i data-lucide="image" class="w-4 h-4"></i> 이미지 선택 (Supabase Storage)
+            </button>
+        </div>
+        <div class="mb-4">
             <label class="block text-xs text-gray-500 mb-1">상세 내용 (Markdown 지원)</label>
             <textarea id="editContent" class="edit-input min-h-[200px] text-sm">${item.content}</textarea>
         </div>
@@ -337,6 +357,21 @@ window.enableEditMode = function (id) {
             </button>
         </div>
     `;
+
+    // Auto-resize logic for textarea
+    const textarea = document.getElementById('editContent');
+    if (textarea) {
+        textarea.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+        // Initial trigger
+        setTimeout(() => {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }, 0);
+    }
+
     if (window.lucide) window.lucide.createIcons();
 };
 
@@ -401,8 +436,62 @@ window.handleInternalLink = function (term) {
     closeBottomSheet();
 };
 
+window.changeFontSize = function (delta) {
+    currentFontSize = Math.min(Math.max(currentFontSize + delta, 12), 32);
+    localStorage.setItem('preferred_font_size', currentFontSize);
+    const bodyEl = document.querySelector('#sheetContent .body-text');
+    if (bodyEl) {
+        bodyEl.style.fontSize = currentFontSize + 'px';
+        showToast(`글자 크기: ${currentFontSize}px`, 'info');
+    }
+};
+
 // ═══════════════════════════════════════════════════
-// 4. UTILS & EVENTS
+// 5. DRAG TO CLOSE (BOTTOM SHEET)
+// ═══════════════════════════════════════════════════
+
+function setupDragToClose() {
+    const sheet = document.getElementById('bottomSheet');
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+
+    sheet.addEventListener('touchstart', (e) => {
+        // Only allow dragging from the top handle area or if at the top of scroll
+        const scrollContainer = document.getElementById('sheetContent');
+        if (scrollContainer.scrollTop > 0 && e.target.closest('#sheetContent')) return;
+
+        startY = e.touches[0].clientY;
+        isDragging = true;
+        sheet.style.transition = 'none';
+    }, { passive: true });
+
+    sheet.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+
+        if (diff > 0) {
+            sheet.style.transform = `translateY(${diff}px)`;
+        }
+    }, { passive: true });
+
+    sheet.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        sheet.style.transition = 'transform 0.3s ease-out';
+
+        const diff = currentY - startY;
+        if (diff > 150) {
+            closeBottomSheet();
+        } else {
+            sheet.style.transform = 'translateY(0)';
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════
+// 6. UTILS & EVENTS
 // ═══════════════════════════════════════════════════
 
 function setupEventListeners() {
@@ -459,6 +548,9 @@ function setupEventListeners() {
     // Submit Login
     const submitBtn = document.getElementById('submitLoginBtn');
     if (submitBtn) submitBtn.onclick = window.handleLogin;
+
+    // Init Drag to Close
+    setupDragToClose();
 }
 
 window.openLoginModal = function () {
@@ -552,11 +644,27 @@ window.showNewItemForm = function () {
             <input type="text" id="newTerm" class="edit-input" placeholder="용어를 입력하세요">
         </div>
         <div class="mb-4">
+            <label class="block text-xs text-gray-500 mb-1">이미지 업로드</label>
+            <input type="file" id="imageUpload" class="hidden" accept="image/*" onchange="handleImageUpload(this)">
+            <button onclick="document.getElementById('imageUpload').click()" class="w-full py-3 bg-dark border border-gray-800 rounded-lg flex items-center justify-center gap-2 text-sm text-gray-400">
+                <i data-lucide="image" class="w-4 h-4"></i> 이미지 선택 (Supabase Storage)
+            </button>
+        </div>
+        <div class="mb-4">
             <label class="block text-xs text-gray-500 mb-1">상세 내용</label>
             <textarea id="newContent" class="edit-input min-h-[200px] text-sm" placeholder="내용을 입력하세요"></textarea>
         </div>
         <button class="w-full py-4 bg-primary text-dark font-bold rounded-xl" onclick="createNewItem()">추가하기</button>
     `;
+
+    // Auto-resize for new content
+    const textarea = document.getElementById('newContent');
+    if (textarea) {
+        textarea.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
 
     document.getElementById('bottomSheetOverlay').classList.remove('hidden');
     document.getElementById('bottomSheet').classList.remove('hidden');

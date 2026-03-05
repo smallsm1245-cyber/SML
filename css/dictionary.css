@@ -29,12 +29,18 @@ body {
 /* High-Density List Styles */
 .dict-item {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
+    /* Increased for touch target */
+    min-height: 48px;
+    /* Ensure 44px+ touch target */
     transition: background-color 0.2s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .dict-item:active {
-    background-color: rgba(69, 162, 158, 0.1);
+    background-color: rgba(69, 162, 158, 0.2);
+    /* Enhanced feedback */
 }
 
 .dict-term {
@@ -88,9 +94,15 @@ body {
 
 #bottomSheet {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(31, 40, 51, 0.95);
+    background: rgba(31, 40, 51, 0.98);
     backdrop-filter: blur(20px);
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+    will-change: transform;
+}
+
+#sheetContent {
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling for iOS */
 }
 
 /* Glassmorphism for Toolkit */
@@ -131,15 +143,44 @@ body {
     background: var(--bg-dark);
     border: 1px solid #333;
     border-radius: 0.5rem;
-    padding: 0.75rem;
+    padding: 0.85rem;
     color: white;
     margin-bottom: 1rem;
-    font-size: 0.9rem;
+    font-size: 16px;
+    /* Prevent iOS auto-zoom */
+    line-height: 1.5;
+}
+
+textarea.edit-input {
+    min-height: 120px;
+    resize: none;
+    overflow-y: hidden;
+    /* For JS auto-resize */
 }
 
 .edit-input:focus {
     border-color: var(--primary);
     outline: none;
+}
+
+/* Ensure global inputs also don't trigger zoom */
+input,
+textarea,
+select {
+    font-size: 16px !important;
+}
+
+/* Button Touch Targets */
+button {
+    min-width: 44px;
+    min-height: 44px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:active {
+    opacity: 0.7;
+    transform: scale(0.97);
 }
 
 /* Internal Links */
