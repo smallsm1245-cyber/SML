@@ -5,8 +5,14 @@
 
 function extractSummary(content) {
     if (!content) return '';
-    // Strip HTML if any, then take first 60 chars
-    const plainText = content.replace(/<[^>]*>/g, '').replace(/\n/g, ' ');
+    // Strip HTML if any
+    let plainText = content.replace(/<[^>]*>/g, '');
+    // Strip Markdown symbols: #, ##, **, __, *, _, [, ], (, )
+    plainText = plainText.replace(/[#*_\(\)\[\]]/g, '');
+    // Replace newlines with spaces
+    plainText = plainText.replace(/\n/g, ' ');
+    // Trim and take first 60 chars
+    plainText = plainText.trim();
     return plainText.length > 60 ? plainText.substring(0, 57) + '...' : plainText;
 }
 
@@ -227,10 +233,13 @@ function renderList(data) {
             el.className = 'dict-item cursor-pointer animate-fade-in relative';
             el.innerHTML = `
                 <div class="dict-term flex justify-between items-center">
-                    ${item.term}
+                    <div class="flex items-center gap-3">
+                        <span class="text-white font-bold text-[1.1rem]">${item.term}</span>
+                        <span class="list-category-chip">${item.category}</span>
+                    </div>
                     ${window.isAdmin ? '<i data-lucide="edit-3" class="w-3 h-3 text-orange-500 opacity-50"></i>' : ''}
                 </div>
-                <div class="dict-summary text-xs">${item.summary}</div>
+                <div class="dict-summary text-[#aaaaaa] leading-relaxed mt-1">${item.summary}</div>
             `;
             el.onclick = () => openBottomSheet(item);
             listContainer.appendChild(el);
