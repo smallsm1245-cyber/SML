@@ -237,7 +237,7 @@ function renderList(data) {
                         <span class="text-white font-bold text-[1.1rem]">${item.term}</span>
                         <span class="list-category-chip">${item.category}</span>
                     </div>
-                    ${window.isAdmin ? '<i data-lucide="edit-3" class="w-3 h-3 text-orange-500 opacity-50"></i>' : ''}
+                    ${window.isAdmin ? '<i data-lucide="edit-3" class="w-3 h-3 text-primary opacity-50"></i>' : ''}
                 </div>
                 <div class="dict-summary text-[#aaaaaa] leading-relaxed mt-1">${item.summary}</div>
             `;
@@ -320,7 +320,7 @@ function openBottomSheet(item) {
                 <i data-lucide="plus" class="w-4 h-4"></i> 글자 크게
             </button>
         </div>
-        ${window.isAdmin ? `<button class="w-full py-4 bg-orange-500 text-dark font-bold rounded-xl mb-4" onclick="enableEditMode('${item.id}')">수정하기</button>` : ''}
+        ${window.isAdmin ? `<button class="w-full py-4 bg-primary text-dark font-bold rounded-xl mb-4" onclick="enableEditMode('${item.id}')">수정하기</button>` : ''}
     `;
 
     // Apply current font size
