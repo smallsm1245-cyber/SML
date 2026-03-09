@@ -192,7 +192,7 @@ body {
 .section-title {
     font-size: 1.35rem;
     font-weight: 800;
-    color: var(--jokbo-gold);
+    color: var(--jokbo-gold) !important;
     margin: 2.8rem 0 1.2rem 0;
     display: flex;
     align-items: center;
@@ -202,10 +202,11 @@ body {
 
 /* Highlights & Markers */
 .highlight-gold {
-    background: var(--jokbo-gold);
-    color: #000;
+    background-color: var(--jokbo-gold) !important;
+    color: #000 !important;
     padding: 0.1rem 0.4rem;
     font-weight: 800;
+    display: inline-block;
 }
 
 .keyword-red {
@@ -322,7 +323,10 @@ body {
 .body-text h2,
 .body-text h3 {
     font-family: 'Nanum Myeongjo', serif;
-    color: #ffb800;
+    color: var(--jokbo-gold) !important;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 800;
 }
 
 /* Professor's Marks */
