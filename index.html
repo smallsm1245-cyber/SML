@@ -9,7 +9,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&display=swap"
         rel="stylesheet">
 
     <!-- CSS Framework (Tailwind) -->
@@ -19,13 +20,18 @@
             theme: {
                 extend: {
                     colors: {
-                        dark: '#050505', // Matte Black
-                        'dark-alt': '#0a0a0a', // Deep Grey
-                        light: '#e0e0e0', // Soft White
-                        primary: '#FFB800', // Vibrant Gold/Yellow
-                        'primary-dim': '#FFD600', // Brighter Gold
-                        gold: '#FFB800', // Luxury Gold
-                        admin: '#FFB800', // Admin Gold
+                        paper: '#fdfcf8', // Aged Cream Paper
+                        'paper-dark': '#f4f1ea', // Slightly darker paper
+                        ink: '#1a1a1a', // Deep Ink Black
+                        'ink-dim': '#4a4a4a', // Faded Ink
+                        primary: '#d32f2f', // Professor's Red Pen
+                        'primary-dim': '#b71c1c',
+                        gold: '#d32f2f', // Map gold to red for exam style
+                        admin: '#1976d2', // Admin Blue Pen
+                    },
+                    fontFamily: {
+                        serif: ['"Nanum Myeongjo"', 'serif'],
+                        sans: ['"Nanum Gothic"', 'sans-serif'],
                     }
                 }
             }
@@ -43,79 +49,104 @@
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#1f2833">
+    <meta name="theme-color" content="#fdfcf8">
 
     <!-- Styles -->
     <link rel="stylesheet" href="css/dictionary.css">
 </head>
 
-<body class="bg-dark text-light overflow-hidden">
+<body class="bg-paper text-ink overflow-hidden font-serif">
     <!-- Emergency Exit -->
     <div id="emergencyExit"
-        class="fixed top-4 left-4 z-50 cursor-pointer opacity-30 hover:opacity-100 transition-opacity">
-        <i data-lucide="ghost" class="w-6 h-6"></i>
+        class="fixed top-4 left-4 z-50 cursor-pointer opacity-20 hover:opacity-100 transition-opacity">
+        <i data-lucide="x-circle" class="w-6 h-6 text-ink"></i>
     </div>
 
     <!-- Main Wrapper -->
-    <div class="flex flex-col h-screen">
-        <!-- Header / Search -->
-        <header class="p-4 pt-8 bg-dark-alt border-b border-gray-800">
-            <h1 class="text-xl font-bold text-primary mb-4 tracking-tight">SmallSM Dictionary</h1>
-            <div class="relative">
-                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+    <div
+        class="flex flex-col h-screen max-w-2xl mx-auto border-x border-gray-200 shadow-2xl relative bg-paper overflow-hidden">
+        <!-- Official Exam Header -->
+        <header class="p-6 pt-10 border-b-4 border-double border-ink bg-paper relative overflow-hidden">
+            <!-- Decorative "Confidential" or "Official" markers -->
+            <div
+                class="absolute top-2 right-4 text-[10px] font-bold border border-ink px-2 py-0.5 opacity-40 uppercase tracking-widest">
+                [ 전공심화 ]
+            </div>
+
+            <div class="text-center mb-6">
+                <h2 class="text-sm font-bold tracking-[0.3em] mb-1">2026학년도 제1학기 기말고사</h2>
+                <h1 class="text-2xl font-extrabold border-y-2 border-ink py-2 my-2 tracking-tight">성향학 개론 (Advanced
+                    Characterology)</h1>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-xs font-bold border-t border-ink/20 pt-4">
+                <div class="flex items-center gap-2 border-r border-ink/20 pr-4">
+                    <span class="opacity-60 whitespace-nowrap">과목코드:</span>
+                    <span class="tracking-widest">SML-A101</span>
+                </div>
+                <div class="flex items-center gap-2 pl-2">
+                    <span class="opacity-60 whitespace-nowrap">담당교수:</span>
+                    <span>Antigravity</span>
+                </div>
+            </div>
+
+            <div class="mt-6 relative">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-dim"></i>
                 <input type="text" id="searchInput"
-                    class="w-full bg-dark border-none rounded-lg pl-10 pr-4 py-3 text-sm focus:ring-1 focus:ring-primary outline-none transition-all"
-                    placeholder="용어, 요약, 내용을 검색하세요...">
+                    class="w-full bg-paper-dark border-b-2 border-ink-dim/30 rounded-none pl-10 pr-4 py-3 text-sm focus:border-ink outline-none transition-all placeholder:text-ink-dim/50 font-sans"
+                    placeholder="검토할 용어 또는 시험 범위를 입력하세요...">
             </div>
         </header>
 
         <!-- High-Density List Container -->
-        <main class="flex-1 overflow-y-auto custom-scroll pb-20" id="dictionaryList">
+        <main class="flex-1 overflow-y-auto custom-scroll pb-20 bg-paper" id="dictionaryList">
             <!-- Items injected by JS -->
-            <div class="p-4 text-center text-gray-600 py-20">
-                <div class="animate-pulse">데이터를 불러오는 중...</div>
+            <div class="p-10 text-center text-ink-dim py-32 italic">
+                <div class="animate-pulse">시험지를 배부하는 중입니다...</div>
             </div>
         </main>
 
-        <!-- Right Toolkit Bar -->
-        <nav class="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col gap-4 p-2 bg-dark-alt/80 backdrop-blur-md rounded-full border border-gray-800 z-40"
+        <!-- Right Toolkit Bar (Styled as margin notes or index tags) -->
+        <nav class="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 p-1 bg-paper border-2 border-ink/10 rounded-lg shadow-md z-40"
             id="toolkitBar">
             <!-- Category icons injected by JS -->
         </nav>
 
         <!-- Bottom Controls -->
-        <footer class="fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-dark to-transparent pointer-events-none">
-            <div class="flex justify-center gap-4 pointer-events-auto">
+        <footer
+            class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl p-4 bg-gradient-to-t from-paper to-transparent pointer-events-none">
+            <div class="flex justify-center gap-6 pointer-events-auto">
                 <button id="bookmarkToggle"
-                    class="p-3 bg-dark-alt border border-gray-800 rounded-full shadow-lg hover:bg-gray-800 transition-colors">
-                    <i data-lucide="bookmark" class="w-5 h-5"></i>
+                    class="p-4 bg-paper border-2 border-ink rounded-full shadow-lg hover:bg-paper-dark transition-colors active:scale-90">
+                    <i data-lucide="star" class="w-6 h-6 text-ink"></i>
                 </button>
                 <button id="adminLoginBtn"
-                    class="p-3 bg-dark-alt border border-gray-800 rounded-full shadow-lg hover:bg-gray-800 transition-colors">
-                    <i data-lucide="lock" class="w-5 h-5"></i>
+                    class="p-4 bg-paper border-2 border-ink rounded-full shadow-lg hover:bg-paper-dark transition-colors active:scale-90">
+                    <i data-lucide="key" class="w-6 h-6 text-ink"></i>
                 </button>
                 <button id="addNewBtn"
-                    class="p-3 bg-primary text-dark rounded-full shadow-lg hover:bg-primary-dim transition-colors hidden">
-                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    class="p-4 bg-primary text-paper rounded-full shadow-lg hover:bg-primary-dim transition-colors hidden active:scale-90">
+                    <i data-lucide="edit" class="w-6 h-6"></i>
                 </button>
             </div>
         </footer>
     </div>
 
-    <!-- Login Modal -->
+    <!-- Login Modal (Styled as Academic Integrity Pledge) -->
     <div id="loginModal"
-        class="fixed inset-0 bg-black/80 backdrop-blur-md z-[150] hidden flex items-center justify-center p-4">
-        <div class="bg-dark-alt w-full max-w-sm rounded-[2rem] border border-gray-800 p-8 animate-fade-in shadow-2xl">
-            <h2 class="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
-                <i data-lucide="shield-check"></i>
-                Admin Login
+        class="fixed inset-0 bg-ink/70 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
+        <div class="bg-paper w-full max-w-sm border-4 border-ink p-8 shadow-2xl animate-fade-in">
+            <h2 class="text-xl font-extrabold text-ink mb-2 flex items-center gap-2 border-b-2 border-ink pb-2">
+                <i data-lucide="clipboard-check"></i>
+                교수인증 (Admin Login)
             </h2>
-            <div class="space-y-4">
+            <p class="text-[10px] text-ink-dim mb-6 italic">* 본 시스템은 승인된 교수진만 접근 가능합니다.</p>
+            <div class="space-y-6 font-sans">
                 <div>
-                    <label class="block text-xs text-gray-500 mb-1 ml-1 font-bold">EMAIL</label>
+                    <label class="block text-xs font-bold text-ink mb-1">ID (E-MAIL)</label>
                     <input type="email" id="loginEmail"
-                        class="w-full bg-dark border border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary outline-none transition-all"
-                        placeholder="admin@example.com">
+                        class="w-full bg-paper-dark border-b-2 border-ink px-4 py-3 text-sm outline-none transition-all placeholder:text-gray-400"
+                        placeholder="admin@univ.ac.kr">
                 </div>
                 <div>
                     <label class="block text-xs text-gray-500 mb-1 ml-1 font-bold">PASSWORD</label>

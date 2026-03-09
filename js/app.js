@@ -88,27 +88,27 @@ function syncAdminUI() {
         const header = document.querySelector('header h1');
 
         if (window.isAdmin) {
-            console.log('🔓 Admin UI Sync: ON (User:', session.user.email, ')');
+            console.log('🔓 Professor UI Sync: ON (User:', session.user.email, ')');
             if (addBtn) {
                 addBtn.classList.remove('hidden');
                 addBtn.onclick = window.showNewItemForm;
             }
             if (loginBtn) {
-                loginBtn.innerHTML = '<i data-lucide="unlock" class="w-5 h-5 text-gold"></i>';
+                loginBtn.innerHTML = '<i data-lucide="unlock" class="w-6 h-6 text-admin"></i>';
             }
             // Badge logic
             const oldBadge = document.querySelector('.admin-badge');
             if (oldBadge) oldBadge.remove();
             if (header) {
                 const badge = document.createElement('span');
-                badge.className = 'admin-badge bg-gold text-[10px] text-black px-2 py-0.5 rounded-sm align-middle ml-2 uppercase font-black';
-                badge.innerText = 'Admin';
+                badge.className = 'admin-badge rounded-none align-middle ml-2 uppercase font-black';
+                badge.innerText = 'Professor';
                 header.appendChild(badge);
             }
         } else {
-            console.log('🔒 Admin UI Sync: OFF');
+            console.log('🔒 Student View Sync: ON');
             if (addBtn) addBtn.classList.add('hidden');
-            if (loginBtn) loginBtn.innerHTML = '<i data-lucide="lock" class="w-5 h-5"></i>';
+            if (loginBtn) loginBtn.innerHTML = '<i data-lucide="key" class="w-6 h-6"></i>';
             const badge = document.querySelector('.admin-badge');
             if (badge) badge.remove();
         }
@@ -232,14 +232,16 @@ function renderList(data) {
             const el = document.createElement('div');
             el.className = 'dict-item cursor-pointer animate-fade-in relative';
             el.innerHTML = `
-                <div class="dict-term flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <span class="text-white font-bold text-[1.1rem]">${item.term}</span>
-                        <span class="list-category-chip">${item.category}</span>
+                <div>
+                    <div class="dict-term flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span>${item.term}</span>
+                            <span class="list-category-chip">${item.category}</span>
+                        </div>
+                        ${window.isAdmin ? '<i data-lucide="edit-2" class="w-4 h-4 text-ink-dim opacity-30"></i>' : ''}
                     </div>
-                    ${window.isAdmin ? '<i data-lucide="edit-3" class="w-3 h-3 text-primary opacity-50"></i>' : ''}
+                    <div class="dict-summary italic p-2 border-l-2 border-ink/10 bg-black/5 mt-2">${item.summary}</div>
                 </div>
-                <div class="dict-summary text-[#aaaaaa] leading-relaxed mt-1">${item.summary}</div>
             `;
             el.onclick = () => openBottomSheet(item);
             listContainer.appendChild(el);
@@ -297,30 +299,30 @@ function openBottomSheet(item) {
     });
 
     content.innerHTML = `
-        <div class="flex justify-between items-start mb-2">
-            <div>
+        <div class="flex justify-between items-start mb-6 border-b border-ink/20 pb-4">
+            <div class="flex-1">
+                <span class="text-[10px] font-bold text-ink-dim mb-1 block uppercase tracking-widest">[ 해설지 / Supplementary Analysis ]</span>
                 <h2 class="sheet-title">${item.term}</h2>
-                <div class="title-accent"></div>
             </div>
-            <button onclick="toggleBookmark('${item.id}')" class="p-2 ${isBookmarked ? 'text-primary' : 'text-gray-600'}">
-                <i data-lucide="${isBookmarked ? 'star' : 'bookmark'}" class="w-6 h-6"></i>
+            <button onclick="toggleBookmark('${item.id}')" class="p-2 ${isBookmarked ? 'text-primary' : 'text-ink-dim'}">
+                <i data-lucide="${isBookmarked ? 'star' : 'bookmark'}" class="w-8 h-8"></i>
             </button>
         </div>
-        <div class="mt-4 mb-8">
-            <span class="category-chip">${item.category}</span>
+        <div class="mb-8">
+            <span class="category-chip">분류: ${item.category}</span>
         </div>
-        <div class="body-text prose prose-invert leading-relaxed mb-10 whitespace-pre-wrap">
+        <div class="body-text prose border-ink px-4 py-8 bg-paper-dark/30 mb-10 whitespace-pre-wrap leading-relaxed">
             ${window.marked ? marked.parse(body) : body}
         </div>
-        <div class="flex gap-4 mb-8">
-            <button onclick="changeFontSize(-2)" class="flex-1 bg-dark-alt border border-gray-800 rounded-xl py-3 flex items-center justify-center gap-2 text-xs font-bold">
-                <i data-lucide="minus" class="w-4 h-4"></i> 글자 작게
+        <div class="flex gap-4 mb-8 font-sans">
+            <button onclick="changeFontSize(-2)" class="flex-1 bg-paper-dark border-2 border-ink py-3 flex items-center justify-center gap-2 text-xs font-bold active:bg-ink active:text-paper transition-all">
+                글자 축소
             </button>
-            <button onclick="changeFontSize(2)" class="flex-1 bg-dark-alt border border-gray-800 rounded-xl py-3 flex items-center justify-center gap-2 text-xs font-bold">
-                <i data-lucide="plus" class="w-4 h-4"></i> 글자 크게
+            <button onclick="changeFontSize(2)" class="flex-1 bg-paper-dark border-2 border-ink py-3 flex items-center justify-center gap-2 text-xs font-bold active:bg-ink active:text-paper transition-all">
+                글자 확대
             </button>
         </div>
-        ${window.isAdmin ? `<button class="w-full py-4 bg-primary text-dark font-bold rounded-xl mb-4" onclick="enableEditMode('${item.id}')">수정하기</button>` : ''}
+        ${window.isAdmin ? `<button class="w-full py-5 bg-ink text-paper font-black text-lg mt-4 active:scale-95 transition-all" onclick="enableEditMode('${item.id}')">항목 수정 (교수전용)</button>` : ''}
     `;
 
     // Apply current font size
@@ -631,8 +633,8 @@ function showToast(msg, type = 'info') {
     }
 
     toast.innerText = msg;
-    toast.style.backgroundColor = type === 'success' ? 'var(--primary)' : (type === 'error' ? '#ef4444' : 'var(--bg-dark-alt)');
-    toast.style.color = type === 'success' ? 'var(--bg-dark)' : 'white';
+    toast.style.backgroundColor = type === 'success' ? 'var(--bg-paper)' : (type === 'error' ? 'var(--primary)' : 'var(--bg-paper-dark)');
+    toast.style.color = type === 'success' ? 'var(--ink)' : (type === 'error' ? 'white' : 'var(--ink)');
 
     toast.classList.remove('translate-y-20', 'opacity-0');
     setTimeout(() => {
