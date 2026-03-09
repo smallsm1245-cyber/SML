@@ -20,14 +20,15 @@
             theme: {
                 extend: {
                     colors: {
-                        paper: '#fdfcf8', // Aged Cream Paper
-                        'paper-dark': '#f4f1ea', // Slightly darker paper
-                        ink: '#1a1a1a', // Deep Ink Black
-                        'ink-dim': '#4a4a4a', // Faded Ink
-                        primary: '#d32f2f', // Professor's Red Pen
+                        paper: 'var(--bg-paper)',
+                        'paper-dark': 'var(--bg-paper-dark)',
+                        ink: 'var(--ink)',
+                        'ink-dim': 'var(--ink-dim)',
+                        primary: 'var(--jokbo-red)',
                         'primary-dim': '#b71c1c',
-                        gold: '#d32f2f', // Map gold to red for exam style
-                        admin: '#1976d2', // Admin Blue Pen
+                        gold: 'var(--jokbo-gold)',
+                        'accent-blue': 'var(--jokbo-blue)',
+                        admin: 'var(--jokbo-blue)',
                     },
                     fontFamily: {
                         serif: ['"Nanum Myeongjo"', 'serif'],

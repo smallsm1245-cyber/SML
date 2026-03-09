@@ -3,9 +3,19 @@
     --bg-paper-dark: #f4f1ea;
     --ink: #1a1a1a;
     --ink-dim: #4a4a4a;
-    --primary: #d32f2f;
-    /* Professor's Red Pen */
-    --accent-blue: #1976d2;
+
+    /* Unified Jokbo Palette */
+    --jokbo-gold: #ffcc00;
+    --jokbo-red: #cc3333;
+    --jokbo-red-bright: #ff4d4d;
+    --jokbo-blue: #4da6ff;
+    --jokbo-dark-bg: #1e1e1e;
+    --jokbo-paper: #fdfcf8;
+    --jokbo-ink: #1a1a1a;
+
+    /* Legacy Mappings (Redirect to new tokens) */
+    --primary: var(--jokbo-red);
+    --accent-blue: var(--jokbo-blue);
 }
 
 body {
@@ -104,10 +114,8 @@ body {
 
 /* Bottom Sheet (Secret Jokbo Document) */
 #bottomSheet {
-    background: #1e1e1e;
-    /* Deep Charcoal Matte */
-    border-top: 4px solid #cc3333;
-    /* Darker Red Pen */
+    background: var(--jokbo-dark-bg);
+    border-top: 4px solid var(--jokbo-red);
     box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.9);
     border-radius: 1.5rem 1.5rem 0 0;
     color: #e0e0e0;
@@ -125,8 +133,8 @@ body {
     position: absolute;
     top: 1.5rem;
     right: 1.5rem;
-    border: 3px solid var(--primary);
-    color: var(--primary);
+    border: 3px solid var(--jokbo-red-bright);
+    color: var(--jokbo-red-bright);
     padding: 0.2rem 0.6rem;
     font-size: 0.8rem;
     font-weight: 900;
@@ -184,8 +192,7 @@ body {
 .section-title {
     font-size: 1.35rem;
     font-weight: 800;
-    color: #ffcc00;
-    /* Vibrant Academic Gold */
+    color: var(--jokbo-gold);
     margin: 2.8rem 0 1.2rem 0;
     display: flex;
     align-items: center;
@@ -195,26 +202,24 @@ body {
 
 /* Highlights & Markers */
 .highlight-gold {
-    background: #ffcc00;
-    /* Solid Gold Highlight */
+    background: var(--jokbo-gold);
     color: #000;
-    /* Black text on highlight */
     padding: 0.1rem 0.4rem;
     font-weight: 800;
 }
 
 .keyword-red {
-    color: #ff4d4d;
+    color: var(--jokbo-red-bright);
     text-decoration: underline;
-    text-decoration-color: #ff4d4d;
+    text-decoration-color: var(--jokbo-red-bright);
     text-underline-offset: 4px;
     font-weight: 800;
 }
 
 .keyword-blue {
-    color: #4da6ff;
+    color: var(--jokbo-blue);
     text-decoration: underline;
-    text-decoration-color: #4da6ff;
+    text-decoration-color: var(--jokbo-blue);
     text-underline-offset: 4px;
     font-weight: 800;
 }
@@ -244,14 +249,14 @@ body {
 }
 
 .th-red {
-    color: #ff4d4d;
-    border-bottom: 2px solid #ff4d4d !important;
+    color: var(--jokbo-red-bright);
+    border-bottom: 2px solid var(--jokbo-red-bright) !important;
     font-style: italic;
 }
 
 .th-blue {
-    color: #4da6ff;
-    border-bottom: 2px solid #4da6ff !important;
+    color: var(--jokbo-blue);
+    border-bottom: 2px solid var(--jokbo-blue) !important;
     font-style: italic;
 }
 

@@ -360,32 +360,37 @@ function openBottomSheet(item) {
 function formatJokboContent(html) {
     if (!html) return '';
 
-    // 1. Wrap (n) or n. at the start of lines in .section-title
-    // Matches "(1) Title" or "1. Title"
-    html = html.replace(/^(<p>)?(\(?(\d+)\)?[\.\)]\s+)(.*?)(<\/p>)?/gm, (match, p1, p2, num, title, p3) => {
+    // 1. Clean up potential redundant titles if they repeat the term
+    // (Optional: can be removed if data is verified)
+
+    // 2. Wrap (n) or n. or A. at the start of lines in .section-title
+    // Matches "(1) Title" or "1. Title" or "A. Title"
+    html = html.replace(/^(<p>)?(\(?([0-9]|[A-Z])\)?[\.\)]\s+)(.*?)(<\/p>)?/gm, (match, p1, p2, num, title, p3) => {
         const circles = ['⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
-        const circle = circles[num] || num;
-        return `<div class="section-title"><span>${circle}</span> ${title}</div>`;
+        // Use circle if 0-10, otherwise use original num
+        const label = circles[parseInt(num)] || num;
+        return `<div class="section-title"><span>${label}</span> ${title}</div>`;
     });
 
-    // 2. Highlight patterns like "text" or **text** 
-    // We already have bold from marked, let's wrap <strong> with our highlight
+    // 3. Highlight patterns like **text** (marked makes them <strong>)
+    // We want black text on gold background
     html = html.replace(/<strong>(.*?)<\/strong>/g, '<span class="highlight-gold">$1</span>');
 
-    // 3. Underline keywords (if patterns exist, e.g. using 'text')
-    html = html.replace(/'(.*?)'/g, '<span class="keyword-red">$1</span>');
-    html = html.replace(/`(.*?)`/g, '<span class="keyword-blue">$1</span>');
+    // 4. Annotated Keywords
+    // 'text' -> Red Underline
+    html = html.replace(/'([^']+)'/g, '<span class="keyword-red">$1</span>');
+    // `text` -> Blue Underline
+    html = html.replace(/`([^`]+)`/g, '<span class="keyword-blue">$1</span>');
 
-    // 4. Professor's tip detection (lines starting with ★ or Tip:)
+    // 5. Professor's tip detection (lines starting with ★ or Tip:)
     html = html.replace(/<p>(★|Tip:)(.*?)<\/p>/g, '<div class="professor-tip"><span class="tip-label">$1 PROFESSOR\'S TIP</span>$2</div>');
 
-    // 5. Table styling
+    // 6. Table styling
     html = html.replace(/<table>/g, '<table class="jokbo-table">');
     html = html.replace(/<thead>/g, '<thead class="bg-black/20">');
-    // Alternating header colors (crude but effective for simple 2-col tables)
-    html = html.replace(/<th>(.*?)<\/th>/g, (match, content, offset, full) => {
-        const isSecond = full.indexOf(match) !== full.lastIndexOf(match);
-        return `<th class="${isSecond ? 'th-blue' : 'th-red'}">${content}</th>`;
+    // Alternating header colors for the two columns
+    html = html.replace(/<tr>\s*<th>(.*?)<\/th>\s*<th>(.*?)<\/th>\s*<\/tr>/g, (match, c1, c2) => {
+        return `<tr><th class="th-red italic">${c1}</th><th class="th-blue italic">${c2}</th></tr>`;
     });
 
     return html;
