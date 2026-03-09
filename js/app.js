@@ -360,38 +360,32 @@ function openBottomSheet(item) {
 function formatJokboContent(html) {
     if (!html) return '';
 
-    // 1. Wrap headers (h1, h2, h3) in .section-title style if not already
-    html = html.replace(/<(h[1-3])>(.*?)<\/\1>/g, '<div class="section-title">$2</div>');
-
-    // 2. Wrap (1), 1., A., or simple short lines (likely headers) in .section-title
-    html = html.replace(/^(<p>)?(\(?([0-9]|[A-Z])\)?[\.\)]\s+)?(.*?)(<\/p>)?/gm, (match, p1, p2, num, title, p3) => {
-        if (title && title.length < 50 && (p2 || /정의|원칙|메커니즘|방법|유의사항|교안|비교|내용/.test(title))) {
-            const circles = ['⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
-            const label = num ? (circles[parseInt(num)] || (num + '.')) : '';
-            return `<div class="section-title"><span>${label}</span> ${title}</div>`;
-        }
-        return match;
+    // 1. Convert leading numbers/letters to Circles (①, ②...)
+    // Applied to paragraphs starting with (1), 1. etc.
+    html = html.replace(/<p>(\(?([0-9]|[A-Z])\)?[\.\)]\s+)(.*?)(<\/p>)/gm, (match, p1, num, title, p2) => {
+        const circles = ['⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
+        const label = circles[parseInt(num)] || (num + '.');
+        return `<div class="section-title"><span>${label}</span> ${title}</div>`;
     });
 
-    // 3. Bullet points (●, ○, -)
-    html = html.replace(/<p>([●○\-\*])\s*(.*?)<\/p>/g, '<p style="color: var(--jokbo-gold) !important; font-weight: bold !important; padding-left: 1rem;"><span style="margin-right: 0.5rem;">$1</span>$2</p>');
-
-    // 4. Highlight patterns (**text** makes <strong>)
+    // 2. Highlights (Strong tags from **bold** -> Gold Highlighter)
     html = html.replace(/<strong>(.*?)<\/strong>/g, '<span class="highlight-gold">$1</span>');
-    html = html.replace(/"(.*?)"/g, '<span class="highlight-gold">$1</span>'); // Also catch text in quotes for highlight
 
-    // 5. Annotated Keywords
+    // 3. Underline keywords
+    // 'text' -> Red Underline (Professor's Pen)
     html = html.replace(/'([^']+)'/g, '<span class="keyword-red">$1</span>');
+    // `text` -> Blue Underline (Admin Pen)
     html = html.replace(/`([^`]+)`/g, '<span class="keyword-blue">$1</span>');
 
-    // 6. Professor's tip detection
+    // 4. Professor's tip detection (★ or Tip:)
     html = html.replace(/<p>(★|Tip:)(.*?)<\/p>/g, '<div class="professor-tip"><span class="tip-label">$1 PROFESSOR\'S TIP</span>$2</div>');
 
-    // 7. Table styling
+    // 5. Academic Table styling
     html = html.replace(/<table>/g, '<table class="jokbo-table">');
     html = html.replace(/<thead>/g, '<thead class="bg-black/20">');
+    // Apply alternating red/blue headers for 2-column tables
     html = html.replace(/<tr>\s*<th>(.*?)<\/th>\s*<th>(.*?)<\/th>\s*<\/tr>/g, (match, c1, c2) => {
-        return `<tr><th class="th-red italic">${c1}</th><th class="th-blue italic">${c2}</th></tr>`;
+        return `<tr><th class="th-red">${c1}</th><th class="th-blue">${c2}</th></tr>`;
     });
 
     return html;
