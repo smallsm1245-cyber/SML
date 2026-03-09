@@ -104,8 +104,10 @@ body {
 
 /* Bottom Sheet (Secret Jokbo Document) */
 #bottomSheet {
-    background: #1a1a1a;
-    border-top: 4px solid var(--primary);
+    background: #1e1e1e;
+    /* Deep Charcoal Matte */
+    border-top: 4px solid #cc3333;
+    /* Darker Red Pen */
     box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.9);
     border-radius: 1.5rem 1.5rem 0 0;
     color: #e0e0e0;
@@ -113,7 +115,6 @@ body {
     transform: translate(-50%, 100%);
     width: 100%;
     max-width: 42rem;
-    /* max-w-2xl */
 }
 
 #bottomSheet.translate-y-0 {
@@ -181,40 +182,41 @@ body {
 
 /* Section Numbering (①, ②, ③) */
 .section-title {
-    font-size: 1.3rem;
+    font-size: 1.35rem;
     font-weight: 800;
-    color: #ffb800;
-    /* Gold for section headers */
-    margin: 2.5rem 0 1.2rem 0;
+    color: #ffcc00;
+    /* Vibrant Academic Gold */
+    margin: 2.8rem 0 1.2rem 0;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
     font-family: 'Nanum Myeongjo', serif;
 }
 
 /* Highlights & Markers */
 .highlight-gold {
-    background: rgba(255, 184, 0, 0.2);
-    padding: 0.1rem 0.3rem;
-    border-bottom: 2px solid #ffb800;
-    color: #ffb800;
-    font-weight: 700;
+    background: #ffcc00;
+    /* Solid Gold Highlight */
+    color: #000;
+    /* Black text on highlight */
+    padding: 0.1rem 0.4rem;
+    font-weight: 800;
 }
 
 .keyword-red {
-    color: var(--primary);
+    color: #ff4d4d;
     text-decoration: underline;
-    text-decoration-color: var(--primary);
+    text-decoration-color: #ff4d4d;
     text-underline-offset: 4px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .keyword-blue {
-    color: var(--accent-blue);
+    color: #4da6ff;
     text-decoration: underline;
-    text-decoration-color: var(--accent-blue);
+    text-decoration-color: #4da6ff;
     text-underline-offset: 4px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 /* Academic Tables */
@@ -242,13 +244,15 @@ body {
 }
 
 .th-red {
-    color: #ff6b6b;
-    border-bottom: 2px solid #ff6b6b !important;
+    color: #ff4d4d;
+    border-bottom: 2px solid #ff4d4d !important;
+    font-style: italic;
 }
 
 .th-blue {
-    color: #4dabf7;
-    border-bottom: 2px solid #4dabf7 !important;
+    color: #4da6ff;
+    border-bottom: 2px solid #4da6ff !important;
+    font-style: italic;
 }
 
 /* Tip Box & Ethics Box */
