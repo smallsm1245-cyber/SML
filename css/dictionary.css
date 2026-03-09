@@ -102,44 +102,218 @@ body {
     content: " 관련 문항 ]";
 }
 
-/* Bottom Sheet (Explanation Sheet) */
+/* Bottom Sheet (Secret Jokbo Document) */
 #bottomSheet {
-    background: var(--bg-paper);
-    border-top: 8px solid var(--ink);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
-    border-radius: 0;
+    background: #1a1a1a;
+    border-top: 4px solid var(--primary);
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.9);
+    border-radius: 1.5rem 1.5rem 0 0;
+    color: #e0e0e0;
+    left: 50% !important;
+    transform: translate(-50%, 100%);
+    width: 100%;
+    max-width: 42rem;
+    /* max-w-2xl */
 }
 
-.sheet-title {
-    font-size: 2.2rem;
-    font-weight: 900;
-    color: var(--ink);
-    border-bottom: 4px double var(--ink);
-    padding-bottom: 0.5rem;
-    margin-bottom: 1.5rem;
+#bottomSheet.translate-y-0 {
+    transform: translate(-50%, 0);
 }
 
-.title-accent {
-    display: none;
-    /* Removed luxury accent */
-}
-
-.category-chip {
-    display: inline-block;
-    border: 2px solid var(--primary);
+.secret-stamp {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    border: 3px solid var(--primary);
     color: var(--primary);
-    padding: 0.2rem 0.8rem;
-    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8rem;
     font-weight: 900;
+    text-transform: uppercase;
+    transform: rotate(15deg);
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+    pointer-events: none;
     font-family: 'Nanum Gothic', sans-serif;
-    transform: rotate(-2deg);
+    z-index: 10;
+}
+
+.jokbo-header {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1.5rem;
     margin-bottom: 2rem;
 }
 
+.jokbo-meta {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+.jokbo-fields {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #ccc;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+.jokbo-field {
+    border-bottom: 1px solid #555;
+    padding: 0 0.5rem;
+    color: #fff;
+    min-width: 60px;
+}
+
+.sheet-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    font-family: 'Nanum Myeongjo', serif;
+}
+
+/* Section Numbering (①, ②, ③) */
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #ffb800;
+    /* Gold for section headers */
+    margin: 2.5rem 0 1.2rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Nanum Myeongjo', serif;
+}
+
+/* Highlights & Markers */
+.highlight-gold {
+    background: rgba(255, 184, 0, 0.2);
+    padding: 0.1rem 0.3rem;
+    border-bottom: 2px solid #ffb800;
+    color: #ffb800;
+    font-weight: 700;
+}
+
+.keyword-red {
+    color: var(--primary);
+    text-decoration: underline;
+    text-decoration-color: var(--primary);
+    text-underline-offset: 4px;
+    font-weight: 700;
+}
+
+.keyword-blue {
+    color: var(--accent-blue);
+    text-decoration: underline;
+    text-decoration-color: var(--accent-blue);
+    text-underline-offset: 4px;
+    font-weight: 700;
+}
+
+/* Academic Tables */
+.jokbo-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+.jokbo-table th {
+    padding: 0.6rem;
+    text-align: left;
+    border: 1px solid #444;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.jokbo-table td {
+    padding: 0.8rem 0.6rem;
+    border: 1px solid #333;
+    color: #bbb;
+}
+
+.th-red {
+    color: #ff6b6b;
+    border-bottom: 2px solid #ff6b6b !important;
+}
+
+.th-blue {
+    color: #4dabf7;
+    border-bottom: 2px solid #4dabf7 !important;
+}
+
+/* Tip Box & Ethics Box */
+.professor-tip {
+    background: rgba(0, 0, 0, 0.3);
+    border-left: 4px solid var(--primary);
+    padding: 1.2rem;
+    margin: 2rem 0;
+    font-size: 0.9rem;
+}
+
+.tip-label {
+    display: block;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.ethics-box {
+    border: 1px solid #444;
+    padding: 1.5rem;
+    margin-top: 3rem;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.ethics-title {
+    font-weight: 900;
+    color: #fff;
+    border-bottom: 1px solid #444;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    text-decoration: underline;
+}
+
+.jokbo-footer {
+    text-align: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #444;
+    margin-top: 4rem;
+    padding-bottom: 2rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
 .body-text {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     line-height: 1.8;
-    color: #333;
+    color: #ccc;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+.body-text b,
+.body-text strong {
+    color: #fff;
+    font-family: 'Nanum Myeongjo', serif;
+}
+
+.body-text h1,
+.body-text h2,
+.body-text h3 {
+    font-family: 'Nanum Myeongjo', serif;
+    color: #ffb800;
 }
 
 /* Professor's Marks */

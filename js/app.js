@@ -298,31 +298,49 @@ function openBottomSheet(item) {
         return `<span class="internal-link" onclick="handleInternalLink('${term}')">${term}</span>`;
     });
 
+    // Post-process for "Secret Jokbo" styling
+    let formattedBody = window.marked ? marked.parse(body) : body;
+    formattedBody = formatJokboContent(formattedBody);
+
     content.innerHTML = `
-        <div class="flex justify-between items-start mb-6 border-b border-ink/20 pb-4">
-            <div class="flex-1">
-                <span class="text-[10px] font-bold text-ink-dim mb-1 block uppercase tracking-widest">[ 해설지 / Supplementary Analysis ]</span>
-                <h2 class="sheet-title">${item.term}</h2>
+        <div class="secret-stamp">SECRET / 족보</div>
+        
+        <div class="jokbo-header">
+            <div class="jokbo-meta">202X SPRING SEMESTER / MAJOR SELECTIVE</div>
+            <h2 class="sheet-title">${item.term}</h2>
+            <div class="flex justify-between items-end mt-4">
+                <div class="text-[10px] font-bold text-ink-dim">담당교수: <span class="text-white">Dr. Anonymous</span></div>
+                <div class="jokbo-fields">
+                    <div class="flex items-center gap-1 font-sans">학번: <span class="jokbo-field">________</span></div>
+                    <div class="flex items-center gap-1 font-sans">성명: <span class="jokbo-field">________</span></div>
+                </div>
             </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-8">
+            <span class="category-chip">CATEGORY: ${item.category}</span>
             <button onclick="toggleBookmark('${item.id}')" class="p-2 ${isBookmarked ? 'text-primary' : 'text-ink-dim'}">
                 <i data-lucide="${isBookmarked ? 'star' : 'bookmark'}" class="w-8 h-8"></i>
             </button>
         </div>
-        <div class="mb-8">
-            <span class="category-chip">분류: ${item.category}</span>
+
+        <div class="body-text mb-10 whitespace-pre-wrap leading-relaxed prose prose-invert max-w-none">
+            ${formattedBody}
         </div>
-        <div class="body-text prose border-ink px-4 py-8 bg-paper-dark/30 mb-10 whitespace-pre-wrap leading-relaxed">
-            ${window.marked ? marked.parse(body) : body}
+
+        <div class="jokbo-footer">
+            CONFIDENTIAL / DO NOT DISTRIBUTE
         </div>
-        <div class="flex gap-4 mb-8 font-sans">
-            <button onclick="changeFontSize(-2)" class="flex-1 bg-paper-dark border-2 border-ink py-3 flex items-center justify-center gap-2 text-xs font-bold active:bg-ink active:text-paper transition-all">
+
+        <div class="flex gap-4 mb-8 font-sans mt-10">
+            <button onclick="changeFontSize(-2)" class="flex-1 bg-white/5 border border-white/10 py-3 flex items-center justify-center gap-2 text-xs font-bold active:bg-white/20 transition-all text-white">
                 글자 축소
             </button>
-            <button onclick="changeFontSize(2)" class="flex-1 bg-paper-dark border-2 border-ink py-3 flex items-center justify-center gap-2 text-xs font-bold active:bg-ink active:text-paper transition-all">
+            <button onclick="changeFontSize(2)" class="flex-1 bg-white/5 border border-white/10 py-3 flex items-center justify-center gap-2 text-xs font-bold active:bg-white/20 transition-all text-white">
                 글자 확대
             </button>
         </div>
-        ${window.isAdmin ? `<button class="w-full py-5 bg-ink text-paper font-black text-lg mt-4 active:scale-95 transition-all" onclick="enableEditMode('${item.id}')">항목 수정 (교수전용)</button>` : ''}
+        ${window.isAdmin ? `<button class="w-full py-5 bg-primary text-white font-black text-lg mt-4 active:scale-95 transition-all rounded-none" onclick="enableEditMode('${item.id}')">항목 수정 (교수전용)</button>` : ''}
     `;
 
     // Apply current font size
@@ -334,9 +352,43 @@ function openBottomSheet(item) {
 
     setTimeout(() => {
         overlay.classList.add('opacity-100');
-        sheet.classList.remove('translate-y-full');
+        sheet.classList.add('translate-y-0');
     }, 10);
     if (window.lucide) window.lucide.createIcons();
+}
+
+function formatJokboContent(html) {
+    if (!html) return '';
+
+    // 1. Wrap (n) or n. at the start of lines in .section-title
+    // Matches "(1) Title" or "1. Title"
+    html = html.replace(/^(<p>)?(\(?(\d+)\)?[\.\)]\s+)(.*?)(<\/p>)?/gm, (match, p1, p2, num, title, p3) => {
+        const circles = ['⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
+        const circle = circles[num] || num;
+        return `<div class="section-title"><span>${circle}</span> ${title}</div>`;
+    });
+
+    // 2. Highlight patterns like "text" or **text** 
+    // We already have bold from marked, let's wrap <strong> with our highlight
+    html = html.replace(/<strong>(.*?)<\/strong>/g, '<span class="highlight-gold">$1</span>');
+
+    // 3. Underline keywords (if patterns exist, e.g. using 'text')
+    html = html.replace(/'(.*?)'/g, '<span class="keyword-red">$1</span>');
+    html = html.replace(/`(.*?)`/g, '<span class="keyword-blue">$1</span>');
+
+    // 4. Professor's tip detection (lines starting with ★ or Tip:)
+    html = html.replace(/<p>(★|Tip:)(.*?)<\/p>/g, '<div class="professor-tip"><span class="tip-label">$1 PROFESSOR\'S TIP</span>$2</div>');
+
+    // 5. Table styling
+    html = html.replace(/<table>/g, '<table class="jokbo-table">');
+    html = html.replace(/<thead>/g, '<thead class="bg-black/20">');
+    // Alternating header colors (crude but effective for simple 2-col tables)
+    html = html.replace(/<th>(.*?)<\/th>/g, (match, content, offset, full) => {
+        const isSecond = full.indexOf(match) !== full.lastIndexOf(match);
+        return `<th class="${isSecond ? 'th-blue' : 'th-red'}">${content}</th>`;
+    });
+
+    return html;
 }
 
 window.enableEditMode = function (id) {
@@ -345,10 +397,10 @@ window.enableEditMode = function (id) {
 
     const content = document.getElementById('sheetContent');
     content.innerHTML = `
-        <h2 class="text-xl font-bold text-primary mb-6 flex items-center gap-2">
+        < h2 class="text-xl font-bold text-primary mb-6 flex items-center gap-2" >
             <i data-lucide="shield-check"></i>
             관리자 편집
-        </h2>
+        </h2 >
         <div class="mb-4">
             <label class="block text-xs text-gray-500 mb-1">용어명</label>
             <input type="text" id="editTerm" class="edit-input" value="${item.term}">
@@ -435,7 +487,7 @@ function closeBottomSheet() {
     const overlay = document.getElementById('bottomSheetOverlay');
 
     overlay.classList.remove('opacity-100');
-    sheet.classList.add('translate-y-full');
+    sheet.classList.remove('translate-y-0');
 
     setTimeout(() => {
         overlay.classList.add('hidden');
@@ -456,7 +508,7 @@ window.changeFontSize = function (delta) {
     const bodyEl = document.querySelector('#sheetContent .body-text');
     if (bodyEl) {
         bodyEl.style.fontSize = currentFontSize + 'px';
-        showToast(`글자 크기: ${currentFontSize}px`, 'info');
+        showToast(`글자 크기: ${currentFontSize} px`, 'info');
     }
 };
 
@@ -643,13 +695,13 @@ function showToast(msg, type = 'info') {
 }
 
 window.showNewItemForm = function () {
-    const categoriesOptions = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+    const categoriesOptions = categories.map(c => `< option value = "${c}" > ${c}</option > `).join('');
     const content = document.getElementById('sheetContent');
     content.innerHTML = `
-        <h2 class="text-xl font-bold text-primary mb-6 flex items-center gap-2">
+        < h2 class="text-xl font-bold text-primary mb-6 flex items-center gap-2" >
             <i data-lucide="plus-circle"></i>
             새 항목 추가
-        </h2>
+        </h2 >
         <div class="mb-4">
             <label class="block text-xs text-gray-500 mb-1">카테고리</label>
             <select id="newCategory" class="edit-input">
