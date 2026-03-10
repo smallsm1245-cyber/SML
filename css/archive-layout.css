@@ -1,152 +1,211 @@
 :root {
-    --archive-bg: #0b0c10;
-    --archive-bg-alt: #161a22;
-    --archive-ink: #ffffff;
+    --archive-bg: #1e1e1e;
+    /* Match reference academic dark */
+    --archive-bg-alt: #252528;
+    --archive-ink: #e2e8f0;
     --archive-ink-dim: #94a3b8;
     --archive-accent: #ffcc00;
     /* Gold */
-    --archive-danger: #ff4d4d;
-    /* Red */
-    --archive-info: #4da6ff;
-    /* Blue */
-    --archive-border: rgba(255, 255, 255, 0.1);
+    --archive-danger: #ff5555;
+    /* Red underline/text */
+    --archive-info: #58a6ff;
+    /* Academic Blue */
+    --archive-border: #444444;
 }
 
 .archive-container {
     background-color: var(--archive-bg);
     color: var(--archive-ink);
     font-family: 'Nanum Gothic', sans-serif;
-    line-height: 1.5;
-    padding: 1.25rem;
-    border-radius: 0.5rem;
+    line-height: 1.6;
+    padding: 1rem;
+    border-radius: 0;
+    text-align: left;
+    /* Essential: Left align everything */
 }
 
-/* High-Density Layout Adjustments */
+/* Compact Sections */
 .archive-section {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--archive-border);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
 }
 
-.archive-section:last-child {
-    border-bottom: none;
+/* Compact Headers with Blue Circles */
+.archive-section-header {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--archive-ink);
+    margin: 1.5rem 0 0.75rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-align: left;
+}
+
+.archive-circle-num {
+    background: transparent;
+    border: 1.5px solid var(--archive-info);
+    color: var(--archive-info);
+    width: 1.35rem;
+    height: 1.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 900;
+    flex-shrink: 0;
 }
 
 /* Section 1: Definition */
-.archive-definition {
-    border-left: 3px solid var(--archive-accent);
-    padding-left: 1rem;
-    margin: 1rem 0;
+.archive-definition-content {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #e2e8f0;
+    padding-left: 0.5rem;
 }
 
-.archive-definition-quote {
-    font-family: 'Nanum Myeongjo', serif;
-    font-size: 1.1rem;
-    font-style: italic;
+.archive-quote-box {
     color: var(--archive-accent);
-    display: block;
+    font-weight: 800;
+    font-size: 0.95rem;
     margin-bottom: 0.5rem;
+    display: block;
+    border-bottom: 1px solid rgba(255, 204, 0, 0.2);
+    padding-bottom: 0.25rem;
 }
 
-.archive-highlight {
-    background: linear-gradient(120deg, rgba(255, 204, 0, 0.2) 0%, rgba(255, 204, 0, 0.2) 100%);
-    color: var(--archive-accent);
+.archive-keyword-red {
+    color: var(--archive-danger);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
     font-weight: 700;
-    padding: 0 2px;
 }
 
-/* Section 2: Key Mechanisms (A, B, C) */
+/* Section 2: Key Mechanisms */
 .archive-mechanisms-list {
     list-style: none;
     padding: 0;
+    margin: 0;
+    padding-left: 0.5rem;
 }
 
 .archive-mechanism-item {
     display: flex;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+    align-items: center;
 }
 
 .archive-mechanism-label {
-    background: var(--archive-accent);
-    color: var(--archive-bg);
+    color: var(--archive-info);
     font-weight: 900;
-    width: 1.5rem;
-    height: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 2px;
-    flex-shrink: 0;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
 }
 
-.archive-mechanism-content {
-    font-size: 0.95rem;
+.archive-mechanism-title {
+    font-weight: 800;
+    color: #f8fafc;
+    font-size: 0.9rem;
 }
 
-/* Section 3: Comparison Table */
+.archive-mechanism-desc {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}
+
+/* Section 3: Comparison Table (High contrast white borders) */
 .archive-comparison-table {
     width: 100%;
+    border: 1px solid #ffffff;
     border-collapse: collapse;
-    font-size: 0.85rem;
     margin: 1rem 0;
 }
 
 .archive-comparison-table th {
-    text-align: left;
     padding: 0.5rem;
-    border-bottom: 2px solid var(--archive-border);
+    border: 1px solid #ffffff;
+    font-size: 0.7rem;
     font-weight: 900;
     text-transform: uppercase;
-}
-
-.archive-th-false {
-    color: var(--archive-danger);
-}
-
-.archive-th-true {
-    color: var(--archive-info);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .archive-comparison-table td {
-    padding: 0.75rem 0.5rem;
-    border-bottom: 1px solid var(--archive-border);
-    vertical-align: top;
+    padding: 0.6rem;
+    border: 1px solid #ffffff;
+    font-size: 0.8rem;
+    color: #e2e8f0;
 }
 
-/* Callouts */
-.archive-callout {
-    padding: 1rem;
-    margin: 1.5rem 0;
-    border-radius: 4px;
-    font-size: 0.85rem;
+.archive-th-false {
+    color: #ff5555;
 }
 
-.archive-callout-tip {
-    background: rgba(255, 204, 0, 0.05);
-    border: 1px solid var(--archive-accent);
+.archive-th-true {
+    color: #58a6ff;
 }
 
-.archive-callout-ethics {
-    background: rgba(255, 77, 77, 0.05);
-    border: 1px solid var(--archive-danger);
+/* Professor's Tip */
+.archive-tip-container {
+    margin-top: 1.5rem;
+    padding-left: 0.5rem;
 }
 
-.archive-callout-header {
-    display: block;
+.archive-tip-label {
+    font-size: 0.75rem;
     font-weight: 900;
+    color: var(--archive-info);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
     text-transform: uppercase;
-    margin-bottom: 0.5rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
 }
 
-.archive-callout-tip .archive-callout-header {
+.archive-tip-text {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #cbd5e0;
+}
+
+/* Ethics Box (Refined) */
+.archive-ethics-box {
+    margin-top: 2rem;
+    border: 1px solid #334155;
+    background: rgba(30, 41, 59, 0.3);
+    padding: 1rem;
+    border-radius: 2px;
+}
+
+.archive-ethics-title {
+    font-weight: 900;
+    font-size: 0.85rem;
+    color: #f1f5f9;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.75rem;
+}
+
+.archive-ethics-item {
+    font-size: 0.75rem;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+}
+
+.archive-ethics-tag {
+    color: var(--archive-info);
+    font-weight: 800;
+    margin-right: 0.3rem;
+}
+
+.archive-highlight {
     color: var(--archive-accent);
-}
-
-.archive-callout-ethics .archive-callout-header {
-    color: var(--archive-danger);
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 204, 0, 0.3);
 }
