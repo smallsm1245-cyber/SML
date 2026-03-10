@@ -306,6 +306,8 @@ function openBottomSheet(item) {
             formattedBody = formattedBody.replace(/\[([^\]]+)\]/g, (match, term) => {
                 return `<span class="internal-link" onclick="handleInternalLink('${term}')">${term}</span>`;
             });
+            // Refresh icons for archive content (e.g., star icon in tips)
+            setTimeout(() => { if (window.lucide) window.lucide.createIcons(); }, 0);
         } else {
             formattedBody = window.marked ? marked.parse(body) : body;
         }
