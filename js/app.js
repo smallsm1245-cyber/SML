@@ -292,19 +292,32 @@ function openBottomSheet(item) {
     const content = document.getElementById('sheetContent');
     const isBookmarked = bookmarkedIds.includes(item.id);
 
-    // Parse internal links [[Term]] or [Term]
+    // Parse content
     let body = item.content || '';
-    body = body.replace(/\[([^\]]+)\]/g, (match, term) => {
-        return `<span class="internal-link" onclick="handleInternalLink('${term}')">${term}</span>`;
-    });
-
-    // Post-process for "Secret Jokbo" styling
     let formattedBody = '';
-    if (body.includes('[ARCHIVE]')) {
+    const isArchive = body.includes('[ARCHIVE]');
+
+    if (isArchive) {
+        // For archive content, we first render the structure
         const archiveData = window.ArchiveRenderer ? ArchiveRenderer.parseContent(body) : null;
-        formattedBody = archiveData ? ArchiveRenderer.render(archiveData) : (window.marked ? marked.parse(body) : body);
+        if (archiveData) {
+            formattedBody = ArchiveRenderer.render(archiveData);
+            // Apply internal link conversion ONLY to the final rendered HTML content inside the archive
+            formattedBody = formattedBody.replace(/\[([^\]]+)\]/g, (match, term) => {
+                return `<span class="internal-link" onclick="handleInternalLink('${term}')">${term}</span>`;
+            });
+        } else {
+            formattedBody = window.marked ? marked.parse(body) : body;
+        }
     } else {
+        // Standard (Legacy) Processing
+        // 1. Internal Links
+        body = body.replace(/\[([^\]]+)\]/g, (match, term) => {
+            return `<span class="internal-link" onclick="handleInternalLink('${term}')">${term}</span>`;
+        });
+        // 2. Markdown
         formattedBody = window.marked ? marked.parse(body) : body;
+        // 3. Jokbo Styling
         formattedBody = formatJokboContent(formattedBody);
     }
 
