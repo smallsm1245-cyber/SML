@@ -345,7 +345,7 @@ function openBottomSheet(item) {
             </button>
         </div>
 
-        <div class="body-text mb-10 whitespace-pre-wrap leading-relaxed prose prose-invert max-w-none">
+        <div class="body-text mb-10 ${isArchive ? '' : 'whitespace-pre-wrap'} leading-relaxed prose prose-invert max-w-none">
             ${formattedBody}
         </div>
 
