@@ -1,0 +1,152 @@
+:root {
+    --archive-bg: #0b0c10;
+    --archive-bg-alt: #161a22;
+    --archive-ink: #ffffff;
+    --archive-ink-dim: #94a3b8;
+    --archive-accent: #ffcc00;
+    /* Gold */
+    --archive-danger: #ff4d4d;
+    /* Red */
+    --archive-info: #4da6ff;
+    /* Blue */
+    --archive-border: rgba(255, 255, 255, 0.1);
+}
+
+.archive-container {
+    background-color: var(--archive-bg);
+    color: var(--archive-ink);
+    font-family: 'Nanum Gothic', sans-serif;
+    line-height: 1.5;
+    padding: 1.25rem;
+    border-radius: 0.5rem;
+}
+
+/* High-Density Layout Adjustments */
+.archive-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--archive-border);
+}
+
+.archive-section:last-child {
+    border-bottom: none;
+}
+
+/* Section 1: Definition */
+.archive-definition {
+    border-left: 3px solid var(--archive-accent);
+    padding-left: 1rem;
+    margin: 1rem 0;
+}
+
+.archive-definition-quote {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--archive-accent);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.archive-highlight {
+    background: linear-gradient(120deg, rgba(255, 204, 0, 0.2) 0%, rgba(255, 204, 0, 0.2) 100%);
+    color: var(--archive-accent);
+    font-weight: 700;
+    padding: 0 2px;
+}
+
+/* Section 2: Key Mechanisms (A, B, C) */
+.archive-mechanisms-list {
+    list-style: none;
+    padding: 0;
+}
+
+.archive-mechanism-item {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    align-items: flex-start;
+}
+
+.archive-mechanism-label {
+    background: var(--archive-accent);
+    color: var(--archive-bg);
+    font-weight: 900;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    flex-shrink: 0;
+    font-size: 0.75rem;
+}
+
+.archive-mechanism-content {
+    font-size: 0.95rem;
+}
+
+/* Section 3: Comparison Table */
+.archive-comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 1rem 0;
+}
+
+.archive-comparison-table th {
+    text-align: left;
+    padding: 0.5rem;
+    border-bottom: 2px solid var(--archive-border);
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.archive-th-false {
+    color: var(--archive-danger);
+}
+
+.archive-th-true {
+    color: var(--archive-info);
+}
+
+.archive-comparison-table td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid var(--archive-border);
+    vertical-align: top;
+}
+
+/* Callouts */
+.archive-callout {
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.archive-callout-tip {
+    background: rgba(255, 204, 0, 0.05);
+    border: 1px solid var(--archive-accent);
+}
+
+.archive-callout-ethics {
+    background: rgba(255, 77, 77, 0.05);
+    border: 1px solid var(--archive-danger);
+}
+
+.archive-callout-header {
+    display: block;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+}
+
+.archive-callout-tip .archive-callout-header {
+    color: var(--archive-accent);
+}
+
+.archive-callout-ethics .archive-callout-header {
+    color: var(--archive-danger);
+}

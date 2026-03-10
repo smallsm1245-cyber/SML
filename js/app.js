@@ -299,8 +299,14 @@ function openBottomSheet(item) {
     });
 
     // Post-process for "Secret Jokbo" styling
-    let formattedBody = window.marked ? marked.parse(body) : body;
-    formattedBody = formatJokboContent(formattedBody);
+    let formattedBody = '';
+    if (body.includes('[ARCHIVE]')) {
+        const archiveData = window.ArchiveRenderer ? ArchiveRenderer.parseContent(body) : null;
+        formattedBody = archiveData ? ArchiveRenderer.render(archiveData) : (window.marked ? marked.parse(body) : body);
+    } else {
+        formattedBody = window.marked ? marked.parse(body) : body;
+        formattedBody = formatJokboContent(formattedBody);
+    }
 
     content.innerHTML = `
         <div class="secret-stamp">SECRET / 족보</div>
