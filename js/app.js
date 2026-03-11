@@ -88,7 +88,7 @@ function syncAdminUI() {
         const header = document.querySelector('header h1');
 
         if (window.isAdmin) {
-            console.log('🔓 Professor UI Sync: ON (User:', session.user.email, ')');
+            console.log('🔓 Admin UI Sync: ON (User:', session.user.email, ')');
             if (addBtn) {
                 addBtn.classList.remove('hidden');
                 addBtn.onclick = window.showNewItemForm;
@@ -102,7 +102,7 @@ function syncAdminUI() {
             if (header) {
                 const badge = document.createElement('span');
                 badge.className = 'admin-badge rounded-none align-middle ml-2 uppercase font-black';
-                badge.innerText = 'Professor';
+                badge.innerText = 'Admin';
                 header.appendChild(badge);
             }
         } else {
@@ -179,6 +179,7 @@ async function fetchData() {
             summary: extractSummary(p.content),
             content: p.content,
             category: categoryMap[p.category_id] || '기타',
+            tip: p.tip || '',
             updated_at: p.updated_at
         }));
 
@@ -330,7 +331,7 @@ function openBottomSheet(item) {
             <div class="jokbo-meta">202X SPRING SEMESTER / MAJOR SELECTIVE</div>
             <h2 class="sheet-title">${item.term}</h2>
             <div class="flex justify-between items-end mt-4">
-                <div class="text-[10px] font-bold text-ink-dim">담당교수: <span class="text-white">Dr. Anonymous</span></div>
+                <div class="text-[10px] font-bold text-ink-dim">아카이브 관리: <span class="text-white">Admin Anonymous</span></div>
                 <div class="jokbo-fields">
                     <div class="flex items-center gap-1 font-sans">학번: <span class="jokbo-field">________</span></div>
                     <div class="flex items-center gap-1 font-sans">성명: <span class="jokbo-field">________</span></div>
@@ -345,9 +346,16 @@ function openBottomSheet(item) {
             </button>
         </div>
 
-        <div class="body-text mb-10 ${isArchive ? '' : 'whitespace-pre-wrap'} leading-relaxed prose prose-invert max-w-none">
+        <div class="body-text mb-6 ${isArchive ? '' : 'whitespace-pre-wrap'} leading-relaxed prose prose-invert max-w-none">
             ${formattedBody}
         </div>
+
+        ${item.tip ? `
+        <div class="admin-tip">
+            <span class="tip-label">★ ARCHIVE TIP</span>
+            <div class="text-sm opacity-90">${item.tip}</div>
+        </div>
+        ` : ''}
 
         <div class="jokbo-footer">
             CONFIDENTIAL / DO NOT DISTRIBUTE
@@ -361,7 +369,7 @@ function openBottomSheet(item) {
                 글자 확대
             </button>
         </div>
-        ${window.isAdmin ? `<button class="w-full py-5 bg-primary text-white font-black text-lg mt-4 active:scale-95 transition-all rounded-none" onclick="enableEditMode('${item.id}')">항목 수정 (교수전용)</button>` : ''}
+        ${window.isAdmin ? `<button class="w-full py-5 bg-primary text-white font-black text-lg mt-4 active:scale-95 transition-all rounded-none" onclick="enableEditMode('${item.id}')">항목 수정 (관리 전용)</button>` : ''}
     `;
 
     // Apply current font size
@@ -398,8 +406,8 @@ function formatJokboContent(html) {
     // `text` -> Blue Underline (Admin Pen)
     html = html.replace(/`([^`]+)`/g, '<span class="keyword-blue">$1</span>');
 
-    // 4. Professor's tip detection (★ or Tip:)
-    html = html.replace(/<p>(★|Tip:)(.*?)<\/p>/g, '<div class="professor-tip"><span class="tip-label">$1 PROFESSOR\'S TIP</span>$2</div>');
+    // 4. Admin tip detection (★ or Tip:)
+    html = html.replace(/<p>(★|Tip:)(.*?)<\/p>/g, '<div class="admin-tip"><span class="tip-label">$1 ADMIN\'S TIP</span>$2</div>');
 
     // 5. Academic Table styling
     html = html.replace(/<table>/g, '<table class="jokbo-table">');
@@ -435,7 +443,11 @@ window.enableEditMode = function (id) {
         </div>
         <div class="mb-4">
             <label class="block text-xs text-gray-500 mb-1">상세 내용 (Markdown 지원)</label>
-            <textarea id="editContent" class="edit-input min-h-[200px] text-sm">${item.content}</textarea>
+            <textarea id="editContent" class="edit-input min-h-[150px] text-sm">${item.content}</textarea>
+        </div>
+        <div class="mb-4">
+            <label class="block text-xs text-gray-500 mb-1">Tip (한 줄 팁 또는 보충 설명)</label>
+            <textarea id="editTip" class="edit-input min-h-[60px] text-sm">${item.tip || ''}</textarea>
         </div>
         <div class="flex gap-2">
             <button class="flex-1 py-3 bg-primary text-dark font-bold rounded-lg" onclick="saveItem('${id}')">저장</button>
@@ -465,11 +477,17 @@ window.enableEditMode = function (id) {
 window.saveItem = async function (id) {
     const newTerm = document.getElementById('editTerm').value;
     const newContent = document.getElementById('editContent').value;
+    const newTip = document.getElementById('editTip').value;
 
     try {
         const { error } = await supabaseLocal
             .from('archive_posts')
-            .update({ title: newTerm, content: newContent, updated_at: new Date().toISOString() })
+            .update({
+                title: newTerm,
+                content: newContent,
+                tip: newTip,
+                updated_at: new Date().toISOString()
+            })
             .eq('id', id);
 
         if (error) throw error;
@@ -742,7 +760,11 @@ window.showNewItemForm = function () {
         </div>
         <div class="mb-4">
             <label class="block text-xs text-gray-500 mb-1">상세 내용</label>
-            <textarea id="newContent" class="edit-input min-h-[200px] text-sm" placeholder="내용을 입력하세요"></textarea>
+            <textarea id="newContent" class="edit-input min-h-[150px] text-sm" placeholder="내용을 입력하세요"></textarea>
+        </div>
+        <div class="mb-4">
+            <label class="block text-xs text-gray-500 mb-1">Tip</label>
+            <textarea id="newTip" class="edit-input min-h-[60px] text-sm" placeholder="팁을 입력하세요"></textarea>
         </div>
         <button class="w-full py-4 bg-primary text-dark font-bold rounded-xl" onclick="createNewItem()">추가하기</button>
     `;
@@ -767,6 +789,7 @@ window.showNewItemForm = function () {
 window.createNewItem = async function () {
     const term = document.getElementById('newTerm').value;
     const content = document.getElementById('newContent').value;
+    const tip = document.getElementById('newTip').value;
     const catName = document.getElementById('newCategory').value;
 
     try {
@@ -778,6 +801,7 @@ window.createNewItem = async function () {
             .insert([{
                 title: term,
                 content: content,
+                tip: tip,
                 category_id: catData.id,
                 is_private: false,
                 origin_free: false

@@ -43,8 +43,8 @@ body {
 }
 
 .dict-item {
-    padding: 2.5rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 2.2rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: transparent;
@@ -83,11 +83,11 @@ body {
 }
 
 .dict-summary {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--ink-dim);
-    line-height: 1.7;
+    line-height: 1.6;
     font-family: 'Nanum Gothic', sans-serif;
-    opacity: 0.8;
+    opacity: 0.6;
 }
 
 .list-category-chip {
@@ -231,12 +231,13 @@ body {
 
 /* Highlights & Markers */
 .highlight-gold {
-    background-color: var(--jokbo-gold) !important;
-    color: #000 !important;
-    padding: 0.1rem 0.5rem;
+    background-color: rgba(212, 175, 55, 0.35) !important;
+    color: inherit !important;
+    padding: 0 0.2rem;
     font-weight: 900;
-    display: inline-block;
+    display: inline;
     border-radius: 2px;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
 }
 
 .keyword-red {
@@ -292,7 +293,7 @@ body {
 }
 
 /* Tip Box & Ethics Box */
-.professor-tip {
+.admin-tip {
     background: rgba(212, 175, 55, 0.03);
     border-left: 2px solid var(--jokbo-gold);
     padding: 1.5rem;
