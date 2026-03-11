@@ -46,6 +46,8 @@ async function init() {
             window.SUPABASE_CONFIG.anonKey
         );
         console.log('✅ Supabase Client Ready');
+        // Load Global Site Settings
+        await loadSiteSettings();
     } else {
         const listContainer = document.getElementById('dictionaryList');
         listContainer.innerHTML = `
@@ -89,6 +91,8 @@ function syncAdminUI() {
 
         if (window.isAdmin) {
             console.log('🔓 Admin UI Sync: ON (User:', session.user.email, ')');
+            document.body.classList.add('admin-mode');
+            setupEditableFields();
             if (addBtn) {
                 addBtn.classList.remove('hidden');
                 addBtn.onclick = window.showNewItemForm;
@@ -107,6 +111,8 @@ function syncAdminUI() {
             }
         } else {
             console.log('🔒 Student View Sync: ON');
+            document.body.classList.remove('admin-mode');
+            disableEditableFields();
             if (addBtn) addBtn.classList.add('hidden');
             if (loginBtn) loginBtn.innerHTML = '<i data-lucide="key" class="w-6 h-6"></i>';
             const badge = document.querySelector('.admin-badge');
@@ -817,6 +823,83 @@ window.createNewItem = async function () {
         showToast('추가 실패: ' + e.message, 'error');
     }
 };
+
+// ═══════════════════════════════════════════════════
+// 7. SITE SETTINGS & DIRECT EDITING
+// ═══════════════════════════════════════════════════
+
+async function loadSiteSettings() {
+    try {
+        const { data, error } = await supabaseLocal
+            .from('archive_posts')
+            .select('*')
+            .eq('title', 'SITE_GLOBAL_CONFIG')
+            .single();
+
+        if (data && data.content) {
+            const config = JSON.parse(data.content);
+            Object.keys(config).forEach(key => {
+                const el = document.querySelector(`[data-key="${key}"]`);
+                if (el) el.innerText = config[key];
+            });
+            window.siteConfigPostId = data.id;
+        }
+    } catch (e) {
+        console.log('ℹ️ No global config found, using defaults.');
+    }
+}
+
+function setupEditableFields() {
+    const fields = document.querySelectorAll('.admin-editable');
+    fields.forEach(field => {
+        field.contentEditable = true;
+        field.onblur = () => saveSiteSettings();
+    });
+}
+
+function disableEditableFields() {
+    const fields = document.querySelectorAll('.admin-editable');
+    fields.forEach(field => {
+        field.contentEditable = false;
+    });
+}
+
+async function saveSiteSettings() {
+    const fields = document.querySelectorAll('.admin-editable');
+    const config = {};
+    fields.forEach(field => {
+        config[field.getAttribute('data-key')] = field.innerText.trim();
+    });
+
+    try {
+        if (window.siteConfigPostId) {
+            await supabaseLocal
+                .from('archive_posts')
+                .update({ content: JSON.stringify(config) })
+                .eq('id', window.siteConfigPostId);
+        } else {
+            // Need a category to save a post
+            const { data: catData } = await supabaseLocal.from('categories').select('id').limit(1).single();
+            if (!catData) return;
+
+            const { data } = await supabaseLocal
+                .from('archive_posts')
+                .insert([{
+                    title: 'SITE_GLOBAL_CONFIG',
+                    content: JSON.stringify(config),
+                    category_id: catData.id,
+                    is_private: true,
+                    origin_free: false
+                }])
+                .select()
+                .single();
+            if (data) window.siteConfigPostId = data.id;
+        }
+        showToast('사이트 설정이 저장되었습니다.', 'success');
+    } catch (e) {
+        console.error('Save failed', e);
+    }
+}
 
 // Start
 document.addEventListener('DOMContentLoaded', init);

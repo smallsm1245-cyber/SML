@@ -80,6 +80,7 @@ body {
     margin-bottom: 0.75rem;
     display: inline-block;
     letter-spacing: -0.02em;
+    font-family: 'Outfit', sans-serif;
 }
 
 .dict-summary {
@@ -136,6 +137,58 @@ body {
 
 .category-header::after {
     content: none;
+}
+
+/* English Premium Typography */
+.font-inter {
+    font-family: 'Inter', sans-serif;
+}
+
+.font-outfit {
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Admin Editable Styles */
+.admin-editable {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid transparent;
+}
+
+body.admin-mode .admin-editable {
+    cursor: text;
+    border-bottom: 1px dashed rgba(212, 175, 55, 0.4);
+}
+
+body.admin-mode .admin-editable:hover {
+    background: rgba(212, 175, 55, 0.05);
+    border-bottom-color: var(--jokbo-gold);
+}
+
+body.admin-mode .admin-editable:focus {
+    background: rgba(212, 175, 55, 0.1);
+    border-bottom-color: var(--jokbo-gold-bright);
+    outline: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Global Typography Overrides */
+[class*="uppercase"],
+[class*="tracking-"],
+.jokbo-meta,
+.tip-label,
+.jokbo-footer,
+.admin-badge,
+.list-category-chip {
+    font-family: 'Inter', sans-serif !important;
+    letter-spacing: 0.1em;
+}
+
+.sheet-title,
+.secret-stamp,
+header h1,
+.category-header {
+    font-family: 'Outfit', sans-serif !important;
+    letter-spacing: -0.02em;
 }
 
 /* Bottom Sheet (Secret Jokbo Document) */

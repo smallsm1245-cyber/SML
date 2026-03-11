@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&family=Noto+Sans+KR:wght@400;700;900&family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&display=swap"
         rel="stylesheet">
 
     <!-- CSS Framework (Tailwind) -->
@@ -35,6 +35,8 @@
                     fontFamily: {
                         serif: ['"Nanum Myeongjo"', 'serif'],
                         sans: ['"Nanum Gothic"', 'sans-serif'],
+                        inter: ['"Inter"', 'sans-serif'],
+                        outfit: ['"Outfit"', 'sans-serif'],
                     },
                     backdropBlur: {
                         xs: '2px',
@@ -75,8 +77,9 @@
         <!-- Premium Archive Header -->
         <header class="p-8 pt-12 border-b border-gold/20 bg-paper-dark relative overflow-hidden">
             <!-- Decorative "Archive" marker -->
-            <div
-                class="absolute top-4 right-6 text-[10px] font-black border border-gold/30 text-gold px-3 py-1 opacity-60 uppercase tracking-[0.2em] rounded-sm bg-gold/5 backdrop-blur-sm">
+            <div id="editable-series"
+                class="absolute top-4 right-6 text-[10px] font-black border border-gold/30 text-gold px-3 py-1 opacity-60 uppercase tracking-[0.2em] rounded-sm bg-gold/5 backdrop-blur-sm admin-editable"
+                data-key="site_series">
                 SERIES: TOP-TIER
             </div>
 
@@ -88,9 +91,12 @@
                     <div class="h-[1px] w-8 bg-gold/30"></div>
                 </div>
                 <h1 class="text-3xl font-black text-ink py-4 tracking-tighter leading-none">
-                    <span class="text-gold">성향학</span> 개론 <br />
-                    <span class="text-[10px] font-bold tracking-[0.1em] text-ink-dim opacity-50 uppercase">Advanced
-                        Characterology : Summary Notes</span>
+                    <span id="editable-title-main" class="text-gold admin-editable"
+                        data-key="site_title_main">성향학</span>
+                    <span id="editable-title-sub" class="admin-editable" data-key="site_title_sub">개론</span> <br />
+                    <span id="editable-subtitle"
+                        class="text-[10px] font-bold tracking-[0.1em] text-ink-dim opacity-50 uppercase admin-editable"
+                        data-key="site_subtitle">Advanced Characterology : Summary Notes</span>
                 </h1>
             </div>
 
@@ -98,12 +104,13 @@
                 <div class="flex items-center gap-2 border-r border-white/5 pr-4 group">
                     <span
                         class="text-gold/40 uppercase tracking-widest group-hover:text-gold transition-colors">Code:</span>
-                    <span class="tracking-widest text-ink/80">SML-A101</span>
+                    <span id="editable-code" class="tracking-widest text-ink/80 admin-editable"
+                        data-key="site_code">SML-A101</span>
                 </div>
                 <div class="flex items-center gap-2 pl-4 group">
                     <span
                         class="text-gold/40 uppercase tracking-widest group-hover:text-gold transition-colors">Ref:</span>
-                    <span class="text-ink/80">Antigravity</span>
+                    <span id="editable-ref" class="text-ink/80 admin-editable" data-key="site_ref">Antigravity</span>
                 </div>
             </div>
 
