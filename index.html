@@ -22,18 +22,23 @@
                     colors: {
                         paper: 'var(--bg-paper)',
                         'paper-dark': 'var(--bg-paper-dark)',
+                        card: 'var(--bg-card)',
                         ink: 'var(--ink)',
                         'ink-dim': 'var(--ink-dim)',
                         primary: 'var(--jokbo-red)',
-                        'primary-dim': '#b71c1c',
+                        'primary-dim': '#600000',
                         gold: 'var(--jokbo-gold)',
+                        'gold-bright': 'var(--jokbo-gold-bright)',
                         'accent-blue': 'var(--jokbo-blue)',
                         admin: 'var(--jokbo-blue)',
                     },
                     fontFamily: {
                         serif: ['"Nanum Myeongjo"', 'serif'],
                         sans: ['"Nanum Gothic"', 'sans-serif'],
-                    }
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    },
                 }
             }
         }
@@ -66,42 +71,53 @@
 
     <!-- Main Wrapper -->
     <div
-        class="flex flex-col h-screen max-w-2xl mx-auto border-x border-gray-200 shadow-2xl relative bg-paper overflow-hidden">
-        <!-- Official Exam Header -->
-        <header class="p-6 pt-10 border-b-4 border-double border-ink bg-paper relative overflow-hidden">
-            <!-- Decorative "Confidential" or "Official" markers -->
+        class="flex flex-col h-screen max-w-2xl mx-auto border-x border-white/5 shadow-2xl relative bg-paper overflow-hidden">
+        <!-- Premium Archive Header -->
+        <header class="p-8 pt-12 border-b border-gold/20 bg-paper-dark relative overflow-hidden">
+            <!-- Decorative "Archive" marker -->
             <div
-                class="absolute top-2 right-4 text-[10px] font-bold border border-ink px-2 py-0.5 opacity-40 uppercase tracking-widest">
-                [ 전공심화 ]
+                class="absolute top-4 right-6 text-[10px] font-black border border-gold/30 text-gold px-3 py-1 opacity-60 uppercase tracking-[0.2em] rounded-sm bg-gold/5 backdrop-blur-sm">
+                SERIES: TOP-TIER
             </div>
 
-            <div class="text-center mb-6">
-                <h2 class="text-sm font-bold tracking-[0.3em] mb-1">2026학년도 제1학기 기말고사</h2>
-                <h1 class="text-2xl font-extrabold border-y-2 border-ink py-2 my-2 tracking-tight">성향학 개론 (Advanced
-                    Characterology)</h1>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 text-xs font-bold border-t border-ink/20 pt-4">
-                <div class="flex items-center gap-2 border-r border-ink/20 pr-4">
-                    <span class="opacity-60 whitespace-nowrap">과목코드:</span>
-                    <span class="tracking-widest">SML-A101</span>
+            <div class="text-center mb-8">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <div class="h-[1px] w-8 bg-gold/30"></div>
+                    <h2 class="text-[11px] font-bold tracking-[0.4em] text-gold/80 uppercase">The Secret Jokbo Archive
+                    </h2>
+                    <div class="h-[1px] w-8 bg-gold/30"></div>
                 </div>
-                <div class="flex items-center gap-2 pl-2">
-                    <span class="opacity-60 whitespace-nowrap">담당교수:</span>
-                    <span>Antigravity</span>
+                <h1 class="text-3xl font-black text-ink py-4 tracking-tighter leading-none">
+                    <span class="text-gold">성향학</span> 개론 <br />
+                    <span class="text-[10px] font-bold tracking-[0.1em] text-ink-dim opacity-50 uppercase">Advanced
+                        Characterology : Summary Notes</span>
+                </h1>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-[10px] font-bold border-t border-white/5 pt-6">
+                <div class="flex items-center gap-2 border-r border-white/5 pr-4 group">
+                    <span
+                        class="text-gold/40 uppercase tracking-widest group-hover:text-gold transition-colors">Code:</span>
+                    <span class="tracking-widest text-ink/80">SML-A101</span>
+                </div>
+                <div class="flex items-center gap-2 pl-4 group">
+                    <span
+                        class="text-gold/40 uppercase tracking-widest group-hover:text-gold transition-colors">Prof:</span>
+                    <span class="text-ink/80">Antigravity</span>
                 </div>
             </div>
 
-            <div class="mt-6 relative">
-                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-dim"></i>
+            <div class="mt-8 relative group">
+                <i data-lucide="search"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold group-focus-within:text-gold-bright transition-colors"></i>
                 <input type="text" id="searchInput"
-                    class="w-full bg-paper-dark border-b-2 border-ink-dim/30 rounded-none pl-10 pr-4 py-3 text-sm focus:border-ink outline-none transition-all placeholder:text-ink-dim/50 font-sans"
-                    placeholder="검토할 용어 또는 시험 범위를 입력하세요...">
+                    class="w-full bg-card border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-gold/50 focus:ring-1 focus:ring-gold/20 outline-none transition-all placeholder:text-ink-dim/30 font-sans shadow-inner"
+                    placeholder="비밀 족보의 내용을 검색하세요...">
             </div>
         </header>
 
         <!-- High-Density List Container -->
-        <main class="flex-1 overflow-y-auto custom-scroll pb-20 bg-paper" id="dictionaryList">
+        <main class="flex-1 overflow-y-auto custom-scroll pb-24 bg-paper" id="dictionaryList">
             <!-- Items injected by JS -->
             <div class="p-10 text-center text-ink-dim py-32 italic">
                 <div class="animate-pulse">시험지를 배부하는 중입니다...</div>
@@ -116,18 +132,18 @@
 
         <!-- Bottom Controls -->
         <footer
-            class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl p-4 bg-gradient-to-t from-paper to-transparent pointer-events-none">
-            <div class="flex justify-center gap-6 pointer-events-auto">
+            class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl p-6 bg-gradient-to-t from-paper to-transparent pointer-events-none">
+            <div class="flex justify-center gap-8 pointer-events-auto">
                 <button id="bookmarkToggle"
-                    class="p-4 bg-paper border-2 border-ink rounded-full shadow-lg hover:bg-paper-dark transition-colors active:scale-90">
-                    <i data-lucide="star" class="w-6 h-6 text-ink"></i>
+                    class="p-5 bg-card border border-white/10 rounded-full shadow-2xl hover:bg-paper-dark transition-all active:scale-90 group">
+                    <i data-lucide="star" class="w-6 h-6 text-ink-dim group-hover:text-gold transition-colors"></i>
                 </button>
                 <button id="adminLoginBtn"
-                    class="p-4 bg-paper border-2 border-ink rounded-full shadow-lg hover:bg-paper-dark transition-colors active:scale-90">
-                    <i data-lucide="key" class="w-6 h-6 text-ink"></i>
+                    class="p-5 bg-card border border-white/10 rounded-full shadow-2xl hover:bg-paper-dark transition-all active:scale-90 group">
+                    <i data-lucide="key" class="w-6 h-6 text-ink-dim group-hover:text-gold transition-colors"></i>
                 </button>
                 <button id="addNewBtn"
-                    class="p-4 bg-primary text-paper rounded-full shadow-lg hover:bg-primary-dim transition-colors hidden active:scale-90">
+                    class="p-5 bg-primary text-white rounded-full shadow-2xl hover:bg-primary-dim transition-all hidden active:scale-90">
                     <i data-lucide="edit" class="w-6 h-6"></i>
                 </button>
             </div>
@@ -136,33 +152,39 @@
 
     <!-- Login Modal (Styled as Academic Integrity Pledge) -->
     <div id="loginModal"
-        class="fixed inset-0 bg-ink/70 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
-        <div class="bg-paper w-full max-w-sm border-4 border-ink p-8 shadow-2xl animate-fade-in">
-            <h2 class="text-xl font-extrabold text-ink mb-2 flex items-center gap-2 border-b-2 border-ink pb-2">
-                <i data-lucide="clipboard-check"></i>
-                교수인증 (Admin Login)
+        class="fixed inset-0 bg-paper/60 backdrop-blur-md z-[150] hidden items-center justify-center p-4">
+        <div
+            class="bg-card w-full max-w-sm border border-gold/30 p-10 shadow-[0_0_50px_rgba(212,175,55,0.15)] animate-fade-in rounded-3xl">
+            <h2 class="text-2xl font-black text-ink mb-2 flex items-center gap-3 border-b border-white/5 pb-4">
+                <i data-lucide="shield-check" class="text-gold"></i>
+                교수 인증
+                <span class="text-[9px] font-bold text-ink-dim opacity-50 ml-auto uppercase tracking-widest">Auth
+                    v2.0</span>
             </h2>
-            <p class="text-[10px] text-ink-dim mb-6 italic">* 본 시스템은 승인된 교수진만 접근 가능합니다.</p>
+            <p class="text-[10px] text-gold/60 mt-2 mb-8 italic font-bold">ACCESS RESTRICTED: AUTHORIZED PERSONNEL ONLY
+            </p>
             <div class="space-y-6 font-sans">
-                <div>
-                    <label class="block text-xs font-bold text-ink mb-1">ID (E-MAIL)</label>
+                <div class="relative group">
+                    <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Archive
+                        ID (E-mail)</label>
                     <input type="email" id="loginEmail"
-                        class="w-full bg-paper-dark border-b-2 border-ink px-4 py-3 text-sm outline-none transition-all placeholder:text-gray-400"
-                        placeholder="admin@univ.ac.kr">
+                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-gold/30 focus:ring-1 focus:ring-gold/20"
+                        placeholder="admin@sm-archive.ac.kr">
                 </div>
-                <div>
-                    <label class="block text-xs text-gray-500 mb-1 ml-1 font-bold">PASSWORD</label>
+                <div class="relative group">
+                    <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Access
+                        Token (Password)</label>
                     <input type="password" id="loginPassword"
-                        class="w-full bg-dark border border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary outline-none transition-all"
+                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-gold/30 focus:ring-1 focus:ring-gold/20"
                         placeholder="••••••••">
                 </div>
                 <button id="submitLoginBtn"
-                    class="w-full py-4 bg-primary text-dark font-black rounded-xl mt-4 hover:bg-primary-dim transition-all shadow-lg active:scale-95">
-                    로그인 하기
+                    class="w-full py-5 bg-gold text-paper font-black rounded-2xl mt-4 hover:bg-gold-bright transition-all shadow-xl active:scale-95 text-sm">
+                    인증 코드 제출
                 </button>
                 <button onclick="closeLoginModal()"
-                    class="w-full py-3 text-gray-500 text-sm hover:text-light transition-colors">
-                    취소
+                    class="w-full py-4 text-ink-dim text-[11px] font-bold hover:text-ink transition-colors uppercase tracking-widest">
+                    취소 (Exit)
                 </button>
             </div>
         </div>

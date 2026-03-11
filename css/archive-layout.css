@@ -1,17 +1,15 @@
 :root {
-    --archive-bg: #111111;
-    /* Even deeper academic dark for high contrast */
-    --archive-bg-alt: #1a1a1c;
-    --archive-ink: #f1f5f9;
-    --archive-ink-dim: #94a3b8;
-    --archive-accent: #ffcc00;
-    /* Modern Gold */
-    --archive-danger: #ff4d4d;
-    /* Red Accent */
-    --archive-info: #3b82f6;
-    /* Bright Modern Blue */
-    --archive-border: #334155;
-    --font-sans: 'Inter', 'Noto Sans KR', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --archive-bg: #0c0c0c;
+    --archive-bg-alt: #141414;
+    --archive-ink: #e2e8f0;
+    --archive-ink-dim: #718096;
+    --archive-accent: #D4AF37;
+    /* Metallic Gold */
+    --archive-danger: #8b0000;
+    --archive-info: #D4AF37;
+    /* Use Gold for info/bullets too */
+    --archive-border: rgba(255, 255, 255, 0.05);
+    --font-sans: 'Nanum Gothic', 'Inter', sans-serif;
 }
 
 .archive-container {

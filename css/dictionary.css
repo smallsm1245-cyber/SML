@@ -1,19 +1,25 @@
 :root {
-    --bg-paper: #fdfcf8;
-    --bg-paper-dark: #f4f1ea;
-    --ink: #1a1a1a;
-    --ink-dim: #4a4a4a;
+    /* Premium Dark Archive Palette */
+    --bg-paper: #0a0a0a;
+    --bg-paper-dark: #121212;
+    --bg-card: #161616;
+    --ink: #e8e8e8;
+    /* Silver/Off-white */
+    --ink-dim: #999999;
 
-    /* Unified Jokbo Palette */
-    --jokbo-gold: #ffcc00;
-    --jokbo-red: #cc3333;
-    --jokbo-red-bright: #ff4d4d;
-    --jokbo-blue: #4da6ff;
-    --jokbo-dark-bg: #1e1e1e;
-    --jokbo-paper: #fdfcf8;
-    --jokbo-ink: #1a1a1a;
+    /* Unified Jokbo Palette - Premium Tones */
+    --jokbo-gold: #D4AF37;
+    /* Metallic Gold */
+    --jokbo-gold-bright: #FFD700;
+    --jokbo-red: #8b0000;
+    /* Deep Blood Red */
+    --jokbo-red-bright: #cc3333;
+    --jokbo-blue: #2c5985;
 
-    /* Legacy Mappings (Redirect to new tokens) */
+    --glass-bg: rgba(20, 20, 20, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.05);
+
+    /* Legacy Mappings */
     --primary: var(--jokbo-red);
     --accent-blue: var(--jokbo-blue);
 }
@@ -24,9 +30,11 @@ body {
     background-color: var(--bg-paper);
     color: var(--ink);
     background-image:
-        linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
-    background-size: 20px 20px;
+        radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 70%),
+        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    background-size: 100% 100%, 30px 30px, 30px 30px;
+    background-attachment: fixed;
 }
 
 /* Question Numbering System */
@@ -35,94 +43,114 @@ body {
 }
 
 .dict-item {
-    padding: 2rem 1.5rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 2.5rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
     position: relative;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: transparent;
 }
 
 .dict-item:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: rgba(212, 175, 55, 0.02);
+    box-shadow: inset 4px 0 0 var(--jokbo-gold);
 }
 
 .dict-item::before {
     counter-increment: question-counter;
     content: "Q" counter(question-counter) ".";
     position: absolute;
-    left: 1rem;
-    top: 2rem;
+    left: 1.2rem;
+    top: 2.6rem;
     font-weight: 900;
-    font-size: 1.2rem;
-    color: var(--ink);
+    font-size: 1.1rem;
+    color: var(--jokbo-gold);
+    opacity: 0.6;
+    letter-spacing: -0.05em;
 }
 
 .dict-item>div {
-    padding-left: 2.5rem;
+    padding-left: 3rem;
 }
 
 .dict-term {
-    font-size: 1.25rem;
-    font-weight: 800;
+    font-size: 1.4rem;
+    font-weight: 900;
     color: var(--ink);
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-    display: block;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+    display: inline-block;
+    letter-spacing: -0.02em;
 }
 
 .dict-summary {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--ink-dim);
-    line-height: 1.6;
+    line-height: 1.7;
     font-family: 'Nanum Gothic', sans-serif;
+    opacity: 0.8;
 }
 
 .list-category-chip {
-    font-size: 0.65rem;
-    font-weight: 800;
-    border: 1px solid var(--ink);
-    color: var(--ink);
-    padding: 0.1rem 0.4rem;
+    font-size: 0.6rem;
+    font-weight: 900;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    background: rgba(212, 175, 55, 0.05);
+    color: var(--jokbo-gold);
+    padding: 0.15rem 0.6rem;
     text-transform: uppercase;
-    margin-left: 0.5rem;
+    margin-left: 0.75rem;
     vertical-align: middle;
     font-family: 'Nanum Gothic', sans-serif;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
 }
 
-/* Category Header (Styled as Section Instruction) */
+/* Category Header (Styled as Premium Divider) */
 .category-header {
-    background: var(--bg-paper-dark);
-    padding: 0.75rem 1.5rem;
-    font-size: 0.85rem;
-    font-weight: 800;
-    color: var(--ink);
-    border-top: 2px solid var(--ink);
-    border-bottom: 2px solid var(--ink);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 1rem 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--jokbo-gold);
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
     position: sticky;
     top: 0;
     z-index: 10;
     font-family: 'Nanum Gothic', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .category-header::before {
-    content: "[ ";
+    content: "";
+    width: 3px;
+    height: 12px;
+    background: var(--jokbo-gold);
 }
 
 .category-header::after {
-    content: " 관련 문항 ]";
+    content: none;
 }
 
 /* Bottom Sheet (Secret Jokbo Document) */
 #bottomSheet {
-    background: var(--jokbo-dark-bg);
-    border-top: 4px solid var(--jokbo-red);
-    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.9);
-    border-radius: 1.5rem 1.5rem 0 0;
-    color: #e0e0e0;
+    background: var(--bg-paper-dark);
+    border-top: 2px solid var(--jokbo-gold);
+    box-shadow: 0 -30px 100px rgba(0, 0, 0, 0.95);
+    border-radius: 2.5rem 2.5rem 0 0;
+    color: var(--ink);
     left: 50% !important;
     transform: translate(-50%, 100%);
     width: 100%;
     max-width: 42rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
 
 #bottomSheet.translate-y-0 {
@@ -131,20 +159,21 @@ body {
 
 .secret-stamp {
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    border: 3px solid var(--jokbo-red-bright);
-    color: var(--jokbo-red-bright);
-    padding: 0.2rem 0.6rem;
-    font-size: 0.8rem;
+    top: 2.5rem;
+    right: 2.5rem;
+    border: 2px solid var(--jokbo-red);
+    color: var(--jokbo-red);
+    padding: 0.3rem 0.8rem;
+    font-size: 0.7rem;
     font-weight: 900;
     text-transform: uppercase;
-    transform: rotate(15deg);
-    letter-spacing: 0.1em;
-    opacity: 0.8;
+    transform: rotate(8deg);
+    letter-spacing: 0.3em;
+    opacity: 0.5;
     pointer-events: none;
     font-family: 'Nanum Gothic', sans-serif;
     z-index: 10;
+    background: rgba(139, 0, 0, 0.05);
 }
 
 .jokbo-header {
@@ -165,18 +194,18 @@ body {
 
 .jokbo-fields {
     display: flex;
-    gap: 1.5rem;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #ccc;
+    gap: 2rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--ink-dim);
     font-family: 'Nanum Gothic', sans-serif;
 }
 
 .jokbo-field {
-    border-bottom: 1px solid #555;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 0 0.5rem;
-    color: #fff;
-    min-width: 60px;
+    color: var(--ink);
+    min-width: 80px;
 }
 
 .sheet-title {
@@ -204,17 +233,18 @@ body {
 .highlight-gold {
     background-color: var(--jokbo-gold) !important;
     color: #000 !important;
-    padding: 0.1rem 0.4rem;
-    font-weight: 800;
+    padding: 0.1rem 0.5rem;
+    font-weight: 900;
     display: inline-block;
+    border-radius: 2px;
 }
 
 .keyword-red {
     color: var(--jokbo-red-bright);
-    text-decoration: underline;
-    text-decoration-color: var(--jokbo-red-bright);
-    text-underline-offset: 4px;
-    font-weight: 800;
+    text-decoration: none;
+    border-bottom: 2px solid var(--jokbo-red);
+    padding-bottom: 1px;
+    font-weight: 900;
 }
 
 .keyword-blue {
@@ -263,11 +293,12 @@ body {
 
 /* Tip Box & Ethics Box */
 .professor-tip {
-    background: rgba(0, 0, 0, 0.3);
-    border-left: 4px solid var(--primary);
-    padding: 1.2rem;
-    margin: 2rem 0;
+    background: rgba(212, 175, 55, 0.03);
+    border-left: 2px solid var(--jokbo-gold);
+    padding: 1.5rem;
+    margin: 2.5rem 0;
     font-size: 0.9rem;
+    border-radius: 0 8px 8px 0;
 }
 
 .tip-label {
@@ -307,10 +338,11 @@ body {
 }
 
 .body-text {
-    font-size: 1.05rem;
-    line-height: 1.8;
-    color: #ccc;
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: var(--ink);
     font-family: 'Nanum Gothic', sans-serif;
+    opacity: 0.9;
 }
 
 .body-text b,
@@ -362,26 +394,29 @@ body {
 
 /* Custom Scrollbar */
 .custom-scroll::-webkit-scrollbar {
-    width: 4px;
+    width: 3px;
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-    background: var(--ink-dim);
+    background: rgba(212, 175, 55, 0.2);
+    border-radius: 10px;
 }
 
 /* Admin Elements */
 [data-lucide="key"],
 [data-lucide="edit"] {
-    color: var(--ink) !important;
+    color: var(--jokbo-gold) !important;
 }
 
 .admin-badge {
-    background: var(--accent-blue) !important;
-    color: white !important;
+    background: var(--jokbo-gold) !important;
+    color: #000 !important;
     font-family: 'Nanum Gothic', sans-serif;
-    padding: 0.1rem 0.4rem;
-    font-size: 10px;
-    font-weight: 800;
+    padding: 0.1rem 0.6rem;
+    font-size: 9px;
+    font-weight: 900;
+    border-radius: 2px;
+    text-transform: uppercase;
 }
 
 /* Toast (Official Notice) */
