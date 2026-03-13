@@ -336,15 +336,17 @@ function openBottomSheet(item) {
         <div class="jokbo-header">
             <div class="jokbo-meta">202X SPRING SEMESTER / MAJOR SELECTIVE</div>
             <h2 class="sheet-title">${item.term}</h2>
-            <div class="flex justify-between items-center mt-4">
-                <div class="text-[11px] font-bold text-ink-dim flex items-center gap-2">
-                    아카이브 관리: <span class="text-ink font-hand text-lg">SMALLSM</span>
+            <div class="flex justify-between items-end mt-4">
+                <div class="text-[10px] font-bold text-ink-dim">아카이브 관리: <span class="text-white">Admin Anonymous</span></div>
+                <div class="jokbo-fields">
+                    <div class="flex items-center gap-1 font-sans">학번: <span class="jokbo-field">________</span></div>
+                    <div class="flex items-center gap-1 font-sans">성명: <span class="jokbo-field">________</span></div>
                 </div>
-                <span class="category-chip text-[10px] bg-paper-dark border border-ink/10 px-3 py-1 rounded-sm">${item.category}</span>
             </div>
         </div>
 
-        <div class="flex justify-end items-center mb-4">
+        <div class="flex justify-between items-center mb-8">
+            <span class="category-chip">CATEGORY: ${item.category}</span>
             <button onclick="toggleBookmark('${item.id}')" class="p-2 ${isBookmarked ? 'text-primary' : 'text-ink-dim'}">
                 <i data-lucide="${isBookmarked ? 'star' : 'bookmark'}" class="w-8 h-8"></i>
             </button>
