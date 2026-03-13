@@ -16,9 +16,9 @@
     background-color: var(--archive-bg);
     color: var(--archive-ink);
     font-family: var(--font-sans);
-    line-height: 1.5;
-    padding: 0.75rem;
-    /* Even tighter for high density */
+    line-height: 1.6;
+    padding: 1.25rem 1rem 1.25rem 1.5rem;
+    /* Increased left padding and overall breathing room */
     border-radius: 0;
     text-align: left;
     -webkit-font-smoothing: antialiased;
@@ -32,15 +32,17 @@
 
 /* Section 1: Definition */
 .archive-section-header {
-    font-size: 0.9rem;
+    font-size: 1rem;
+    /* Slightly larger for clearer hierarchy */
     font-weight: 900;
-    color: var(--archive-ink);
-    margin: 0.5rem 0 0.4rem 0;
+    color: #ffffff;
+    /* Brighter white for headers */
+    margin: 1rem 0 0.6rem 0;
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
     text-transform: uppercase;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.02em;
 }
 
 .archive-circle-num {
@@ -59,19 +61,23 @@
 }
 
 .archive-definition-content {
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: #e2e8f0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #94a3b8;
+    /* Dimmed body text for better contrast with headers */
 }
 
 .archive-quote-box {
     color: var(--archive-accent);
     font-weight: 900;
-    font-size: 0.9rem;
-    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+    margin-bottom: 0.6rem;
     display: block;
-    border-left: 3px solid var(--archive-accent);
-    padding-left: 0.5rem;
+    border-left: 4px solid var(--archive-accent);
+    /* Thicker border for clear callout */
+    padding: 0.2rem 0 0.2rem 0.75rem;
+    background: rgba(212, 175, 55, 0.03);
+    /* Extremely subtle gold tint background */
 }
 
 /* Keywords */
@@ -142,9 +148,11 @@
 }
 
 .archive-comparison-table th {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
+    /* Larger table headers */
     font-weight: 900;
     background: #1a1a1a;
+    padding: 0.6rem 0.4rem;
 }
 
 .archive-comparison-table td {

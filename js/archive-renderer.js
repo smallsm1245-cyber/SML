@@ -61,7 +61,7 @@ const ArchiveRenderer = {
 
             html += `
                 <div class="archive-section">
-                    <div class="archive-section-header"><span class="archive-circle-num">1</span> 개념 정의 (Definition)</div>
+                    <div class="archive-section-header"><span class="archive-circle-num">1</span> 개념 정의</div>
                     <div class="archive-definition-content">
                         ${title ? `<span class="archive-quote-box">${title}</span>` : ''}
                         ${body}
@@ -83,7 +83,7 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <div class="archive-section">
-                    <div class="archive-section-header"><span class="archive-circle-num">2</span> 핵심 작동 메커니즘 (Key Mechanisms)</div>
+                    <div class="archive-section-header"><span class= "archive-circle-num">2</span> 핵심 작동 메커니즘</div>
                     <ul class="archive-mechanisms-list">${listItems}</ul>
                 </div>
             `;
@@ -97,7 +97,7 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <div class="archive-section">
-                    <div class="archive-section-header"><span class="archive-circle-num">3</span> 오해와 실제 비교 (Comparative Analysis)</div>
+                    <div class="archive-section-header"><span class="archive-circle-num">3</span> 오해와 실제 비교</div>
                     <table class="archive-comparison-table">
                         <thead><tr><th class="archive-th-false">COMMON MIS (오해)</th><th class="archive-th-true">DYNAMICS TRUTH (실제)</th></tr></thead>
                         <tbody>${rows}</tbody>
