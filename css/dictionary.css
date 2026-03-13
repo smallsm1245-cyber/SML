@@ -1,39 +1,38 @@
 :root {
-    /* Premium Dark Archive Palette */
-    --bg-paper: #0a0a0a;
-    --bg-paper-dark: #121212;
-    --bg-card: #161616;
-    --ink: #e8e8e8;
-    /* Silver/Off-white */
-    --ink-dim: #999999;
+    /* Analog Study Guide Palette */
+    --bg-paper: #fdfcf8;
+    --bg-paper-dark: #f5f2e9;
+    --bg-card: #ffffff;
+    --ink: #2c2c2c;
+    --ink-dim: #666666;
 
-    /* Unified Jokbo Palette - Premium Tones */
-    --jokbo-gold: #D4AF37;
-    /* Metallic Gold */
-    --jokbo-gold-bright: #FFD700;
-    --jokbo-red: #8b0000;
-    /* Deep Blood Red */
-    --jokbo-red-bright: #cc3333;
+    /* Focus Palette */
+    --highlight: #fff176;
+    /* Highlighter Yellow */
+    --jokbo-red: #cc3333;
+    /* Marking Red */
     --jokbo-blue: #2c5985;
+    /* Marking Blue */
+    --jokbo-gold: #D4AF37;
 
-    --glass-bg: rgba(20, 20, 20, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(0, 0, 0, 0.05);
 
-    /* Legacy Mappings */
     --primary: var(--jokbo-red);
     --accent-blue: var(--jokbo-blue);
 }
 
 body {
-    font-family: 'Nanum Myeongjo', serif;
+    font-family: 'Gowun Batang', serif;
     -webkit-font-smoothing: antialiased;
     background-color: var(--bg-paper);
     color: var(--ink);
+
+    /* Analog Grid Paper Background */
     background-image:
-        radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 70%),
-        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
-    background-size: 100% 100%, 30px 30px, 30px 30px;
+        linear-gradient(rgba(44, 89, 133, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(44, 89, 133, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
     background-attachment: fixed;
 }
 
@@ -43,96 +42,81 @@ body {
 }
 
 .dict-item {
-    padding: 2.2rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    padding: 2rem 1.5rem;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
     position: relative;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: transparent;
+    transition: all 0.3s ease;
 }
 
 .dict-item:hover {
-    background-color: rgba(212, 175, 55, 0.02);
-    box-shadow: inset 4px 0 0 var(--jokbo-gold);
+    background-color: rgba(255, 241, 118, 0.1);
 }
 
 .dict-item::before {
     counter-increment: question-counter;
-    content: "Q" counter(question-counter) ".";
+    content: counter(question-counter) ".";
     position: absolute;
-    left: 1.2rem;
-    top: 2.6rem;
-    font-weight: 900;
-    font-size: 1.1rem;
-    color: var(--jokbo-gold);
-    opacity: 0.6;
-    letter-spacing: -0.05em;
+    left: 1rem;
+    top: 2.2rem;
+    font-family: 'Nanum Pen Script', cursive;
+    font-weight: 400;
+    font-size: 1.5rem;
+    color: var(--jokbo-blue);
 }
 
 .dict-item>div {
-    padding-left: 3rem;
+    padding-left: 2.5rem;
 }
 
 .dict-term {
-    font-size: 1.4rem;
-    font-weight: 900;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: var(--ink);
-    line-height: 1.1;
-    margin-bottom: 0.75rem;
-    display: inline-block;
-    letter-spacing: -0.02em;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Nanum Pen Script', cursive;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
 }
 
 .dict-summary {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     color: var(--ink-dim);
     line-height: 1.6;
-    font-family: 'Nanum Gothic', sans-serif;
-    opacity: 0.6;
+    font-family: 'Gowun Batang', serif;
+    opacity: 0.8;
 }
 
 .list-category-chip {
-    font-size: 0.6rem;
-    font-weight: 900;
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    background: rgba(212, 175, 55, 0.05);
-    color: var(--jokbo-gold);
-    padding: 0.15rem 0.6rem;
-    text-transform: uppercase;
-    margin-left: 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    background: var(--bg-paper-dark);
+    color: var(--jokbo-blue);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
     vertical-align: middle;
-    font-family: 'Nanum Gothic', sans-serif;
-    border-radius: 2px;
-    letter-spacing: 0.05em;
+    border: 1px solid rgba(44, 89, 133, 0.2);
 }
 
 /* Category Header (Styled as Premium Divider) */
 .category-header {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 1rem 1.5rem;
-    font-size: 0.75rem;
-    font-weight: 900;
-    color: var(--jokbo-gold);
-    border-top: 1px solid var(--glass-border);
-    border-bottom: 1px solid var(--glass-border);
+    background: var(--bg-paper-dark);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--jokbo-blue);
+    border-bottom: 2px solid var(--jokbo-blue);
     position: sticky;
     top: 0;
     z-index: 10;
-    font-family: 'Nanum Gothic', sans-serif;
+    font-family: 'Outfit', sans-serif;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+    letter-spacing: 0.1em;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .category-header::before {
-    content: "";
-    width: 3px;
-    height: 12px;
-    background: var(--jokbo-gold);
+    content: "📌";
+    margin-right: 0.5rem;
 }
 
 .category-header::after {
@@ -177,18 +161,17 @@ body.admin-mode .admin-editable:focus {
 .jokbo-meta,
 .tip-label,
 .jokbo-footer,
-.admin-badge,
-.list-category-chip {
-    font-family: 'Inter', sans-serif !important;
-    letter-spacing: 0.1em;
+.admin-badge {
+    font-family: 'Outfit', sans-serif !important;
+    letter-spacing: 0.05em;
 }
 
 .sheet-title,
 .secret-stamp,
 header h1,
 .category-header {
-    font-family: 'Outfit', sans-serif !important;
-    letter-spacing: -0.02em;
+    font-family: 'Nanum Pen Script', cursive !important;
+    letter-spacing: 0;
 }
 
 /* Bottom Sheet (Secret Jokbo Document) */

@@ -113,7 +113,7 @@ const ArchiveRenderer = {
                 .replace(/^★\s*/, '');
             html += `
                 <div class="archive-tip-container">
-                    <div class="archive-tip-label"><i data-lucide="star" class="w-3 h-3 fill-current mr-1"></i>ADMIN'S CRITICAL TIP:</div>
+                    <div class="archive-tip-label"><i data-lucide="star" class="w-3 h-3 fill-current mr-1"></i>SMALLSM's CRITICAL TIP:</div>
                     <div class="archive-tip-text">"${processedTip}"</div>
                 </div>
             `;
