@@ -23,8 +23,8 @@ function extractSummary(content) {
     plainText = plainText.replace(/\s+/g, ' ');
     plainText = plainText.trim();
 
-    // Increased length limit to provide a richer preview like in the screenshot
-    return plainText.length > 90 ? plainText.substring(0, 87) + '...' : plainText;
+    // Shorter length limit to read like a brief tip
+    return plainText.length > 55 ? plainText.substring(0, 52) + '...' : plainText;
 }
 
 function extractTags(text) {
