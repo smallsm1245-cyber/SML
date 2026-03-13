@@ -5,14 +5,26 @@
 
 function extractSummary(content) {
     if (!content) return '';
+    let plainText = content;
+
+    // Remove Archive format tags before they lose their brackets
+    plainText = plainText.replace(/\[(ARCHIVE|DEFINITION|MECHANISMS|COMPARISON|TIP|ETHICS)\]/gi, '');
+
     // Strip HTML if any
-    let plainText = content.replace(/<[^>]*>/g, '');
-    // Strip Markdown symbols: #, ##, **, __, *, _, [, ], (, )
-    plainText = plainText.replace(/[#*_\(\)\[\]]/g, '');
-    // Replace newlines with spaces
-    plainText = plainText.replace(/\n/g, ' ');
+    plainText = plainText.replace(/<[^>]*>/g, '');
+
+    // Strip Markdown symbols but keep normal parenthesis () which was previously wrongly stripped
+    plainText = plainText.replace(/[#*_+~\[\]]/g, '');
+
+    // Remove unneeded double quotes that were used for subtitle in the Archive definition
+    plainText = plainText.replace(/"/g, '');
+
+    // Replace newlines with spaces and clean up spacing
+    plainText = plainText.replace(/\s+/g, ' ');
     plainText = plainText.trim();
-    return plainText.length > 60 ? plainText.substring(0, 57) + '...' : plainText;
+
+    // Increased length limit to provide a richer preview like in the screenshot
+    return plainText.length > 90 ? plainText.substring(0, 87) + '...' : plainText;
 }
 
 function extractTags(text) {
