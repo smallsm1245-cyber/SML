@@ -43,100 +43,116 @@ body {
 }
 
 .dict-item {
-    padding: 2.2rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    padding: 1.5rem 1.5rem 2.8rem 1.5rem;
     position: relative;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: transparent;
+    transition: all 0.2s ease;
 }
 
-.dict-item:hover {
-    background-color: rgba(212, 175, 55, 0.02);
-    box-shadow: inset 4px 0 0 var(--jokbo-gold);
-}
-
-.dict-item::before {
-    counter-increment: question-counter;
-    content: "Q" counter(question-counter) ".";
-    position: absolute;
-    left: 1.2rem;
-    top: 2.6rem;
-    font-weight: 900;
-    font-size: 1.1rem;
+.dict-item:hover .dict-title-text {
     color: var(--jokbo-gold);
-    opacity: 0.6;
-    letter-spacing: -0.05em;
 }
 
-.dict-item>div {
-    padding-left: 3rem;
+/* Title Area */
+.dict-term-container {
+    margin-bottom: 0.8rem;
 }
 
 .dict-term {
-    font-size: 1.4rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.dict-term::before {
+    counter-increment: question-counter;
+    content: "Q" counter(question-counter) ".";
+    color: var(--jokbo-gold);
+    font-style: italic;
     font-weight: 900;
-    color: var(--ink);
-    line-height: 1.1;
-    margin-bottom: 0.75rem;
-    display: inline-block;
-    letter-spacing: -0.02em;
+    font-size: 1.1rem;
+    margin-right: 0.2rem;
     font-family: 'Outfit', sans-serif;
 }
 
-.dict-summary {
-    font-size: 0.85rem;
-    color: var(--ink-dim);
-    line-height: 1.6;
+.dict-title-text {
+    transition: color 0.2s;
+    letter-spacing: -0.02em;
     font-family: 'Nanum Gothic', sans-serif;
-    opacity: 0.6;
 }
 
+/* Category Chip */
 .list-category-chip {
-    font-size: 0.6rem;
-    font-weight: 900;
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    background: rgba(212, 175, 55, 0.05);
+    font-size: 0.65rem;
+    font-weight: 800;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    background: rgba(0, 0, 0, 0.5);
     color: var(--jokbo-gold);
-    padding: 0.15rem 0.6rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
     text-transform: uppercase;
-    margin-left: 0.75rem;
-    vertical-align: middle;
-    font-family: 'Nanum Gothic', sans-serif;
-    border-radius: 2px;
     letter-spacing: 0.05em;
+    margin-left: 0.2rem;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+/* Content Wrapper */
+.dict-content-wrapper {
+    margin-left: 1.8rem;
+    /* Align under text */
+    padding-left: 1rem;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.dict-summary {
+    font-size: 0.95rem;
+    color: #999999;
+    line-height: 1.6;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+/* Tags */
+.dict-tags {
+    margin-top: 0.8rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.dict-tag {
+    font-size: 0.75rem;
+    color: #888;
+    background: #1a1a1a;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 700;
 }
 
 /* Category Header (Styled as Premium Divider) */
 .category-header {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 1rem 1.5rem;
-    font-size: 0.75rem;
+    background: transparent;
+    padding: 2.5rem 1.5rem 1rem 1.5rem;
+    font-size: 1rem;
     font-weight: 900;
     color: var(--jokbo-gold);
-    border-top: 1px solid var(--glass-border);
-    border-bottom: 1px solid var(--glass-border);
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    position: relative;
     font-family: 'Nanum Gothic', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .category-header::before {
     content: "";
-    width: 3px;
-    height: 12px;
+    width: 4px;
+    height: 18px;
     background: var(--jokbo-gold);
-}
-
-.category-header::after {
-    content: none;
+    border-radius: 2px;
 }
 
 /* English Premium Typography */

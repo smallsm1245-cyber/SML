@@ -11,9 +11,19 @@ function extractSummary(content) {
     plainText = plainText.replace(/[#*_\(\)\[\]]/g, '');
     // Replace newlines with spaces
     plainText = plainText.replace(/\n/g, ' ');
-    // Trim and take first 60 chars
     plainText = plainText.trim();
     return plainText.length > 60 ? plainText.substring(0, 57) + '...' : plainText;
+}
+
+function extractTags(text) {
+    if (!text) return '';
+    const words = text.split(/\s+/)
+        .map(w => w.replace(/[^가-힣]/g, ''))
+        .filter(w => w.length >= 2 && w.length <= 4)
+        .filter(w => !['하는', '입니다', '있는', '가장', '대한', '위해', '통해', '것이', '이러한', '그리고'].includes(w));
+    const unique = [...new Set(words)].slice(0, 4);
+    if (unique.length === 0) return '';
+    return '<div class="dict-tags">' + unique.map(w => `<span class="dict-tag">#${w}</span>`).join('') + '</div>';
 }
 
 let supabaseLocal = null;
@@ -235,19 +245,22 @@ function renderList(data) {
         listContainer.appendChild(header);
 
         // Items
-        items.forEach(item => {
+        items.forEach((item) => {
             const el = document.createElement('div');
             el.className = 'dict-item cursor-pointer animate-fade-in relative';
             el.innerHTML = `
-                <div>
-                    <div class="dict-term flex justify-between items-center">
-                        <div class="flex items-center">
-                            <span>${item.term}</span>
+                <div class="dict-item-inner">
+                    <div class="dict-term-container flex justify-between items-start">
+                        <div class="dict-term">
+                            <span class="dict-title-text">${item.term}</span>
                             <span class="list-category-chip">${item.category}</span>
                         </div>
-                        ${window.isAdmin ? '<i data-lucide="edit-2" class="w-4 h-4 text-ink-dim opacity-30"></i>' : ''}
+                        ${window.isAdmin ? '<i data-lucide="edit-2" class="w-4 h-4 text-ink-dim opacity-30 mt-1 flex-shrink-0"></i>' : ''}
                     </div>
-                    <div class="dict-summary italic p-2 border-l-2 border-ink/10 bg-black/5 mt-2">${item.summary}</div>
+                    <div class="dict-content-wrapper">
+                        <div class="dict-summary">${item.summary}</div>
+                        ${extractTags(item.summary)}
+                    </div>
                 </div>
             `;
             el.onclick = () => openBottomSheet(item);
