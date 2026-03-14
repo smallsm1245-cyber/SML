@@ -30,9 +30,9 @@ const UIRenderer = {
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="list-category-chip !m-0">${item.category}</span>
-                    <button class="p-2 hover:bg-white/5 rounded-lg transition-colors bookmark-btn ${window.bookmarkedIds.includes(item.id) ? 'text-gold' : 'text-ink-dim'}" 
+                    <button class="p-2 hover:bg-white/5 rounded-lg transition-colors bookmark-btn ${(window.bookmarkedIds || []).includes(item.id) ? 'text-gold' : 'text-ink-dim'}" 
                             onclick="window.toggleBookmark('${item.id}', this, event)">
-                        <i data-lucide="star" class="w-4 h-4 ${window.bookmarkedIds.includes(item.id) ? 'fill-current' : ''}"></i>
+                        <i data-lucide="star" class="w-4 h-4 ${(window.bookmarkedIds || []).includes(item.id) ? 'fill-current' : ''}"></i>
                     </button>
                     ${isAdmin ? `
                         <button class="p-2 hover:bg-gold/10 rounded-lg text-ink-dim hover:text-gold transition-colors" onclick="window.showEditForm('${item.id}')">
@@ -59,9 +59,9 @@ const UIRenderer = {
                 <div class="flex justify-between items-start mb-6">
                     <h2 class="sheet-title">${item.term}</h2>
                     <div class="flex gap-2">
-                         <button class="p-2 hover:bg-white/5 rounded-lg transition-colors bookmark-btn ${window.bookmarkedIds.includes(item.id) ? 'text-gold' : 'text-ink-dim'}" 
+                         <button class="p-2 hover:bg-white/5 rounded-lg transition-colors bookmark-btn ${(window.bookmarkedIds || []).includes(item.id) ? 'text-gold' : 'text-ink-dim'}" 
                                 onclick="window.toggleBookmark('${item.id}', this, event)">
-                            <i data-lucide="star" class="w-5 h-5 ${window.bookmarkedIds.includes(item.id) ? 'fill-current' : ''}"></i>
+                            <i data-lucide="star" class="w-5 h-5 ${(window.bookmarkedIds || []).includes(item.id) ? 'fill-current' : ''}"></i>
                         </button>
                         ${isAdmin ? `
                             <button class="p-2 hover:bg-gold/10 rounded-lg text-ink-dim hover:text-gold transition-colors" onclick="window.showEditForm('${item.id}')">

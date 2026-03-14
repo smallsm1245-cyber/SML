@@ -47,17 +47,26 @@ const ArchiveRenderer = {
 
     render(data) {
         if (!data) return '';
+
+        const format = (text) => {
+            if (!text) return '';
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\+\+(.*?)\+\+/g, '<span class="archive-highlight">$1</span>')
+                .replace(/'(.*?)'/g, '<span class="archive-keyword-red">$1</span>')
+                .replace(/\*\*/g, '') // Strip remaining literal stars
+                .trim();
+        };
+
         let html = '<article class="archive-container animate-fade-in">';
 
         if (data.definition) {
-            let processed = data.definition
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\+\+(.*?)\+\+/g, '<span class="archive-highlight">$1</span>')
-                .replace(/'(.*?)'/g, '<span class="archive-keyword-red">$1</span>');
-
-            const lines = processed.split('\n').filter(l => l.trim());
-            const title = lines[0] || '';
-            const body = lines.slice(1).join('<br>');
+            let processed = format(data.definition);
+            const lines = processed.split('<br>').map(l => l.trim()).filter(l => l);
+            // If the format(data.definition) didn't preserve <br>, split by \n first
+            const rawLines = data.definition.split('\n').filter(l => l.trim());
+            const title = format(rawLines[0]) || '';
+            const body = rawLines.slice(1).map(l => format(l)).join('<br>');
 
             html += `
                 <section class="archive-section">
@@ -73,15 +82,8 @@ const ArchiveRenderer = {
         if (data.mechanisms.length > 0) {
             const listItems = data.mechanisms.map((m, idx) => {
                 const parts = m.split(':');
-                const title = parts[0].trim();
-                let desc = parts[1] ? parts.slice(1).join(':').trim() : '';
-
-                if (desc) {
-                    desc = desc
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\+\+(.*?)\+\+/g, '<span class="archive-highlight">$1</span>')
-                        .replace(/'(.*?)'/g, '<span class="archive-keyword-red">$1</span>');
-                }
+                const title = format(parts[0]);
+                let desc = parts[1] ? format(parts.slice(1).join(':')) : '';
 
                 return `
                     <li class="archive-mechanism-item">
@@ -101,8 +103,8 @@ const ArchiveRenderer = {
 
         if (data.comparison.length > 0) {
             const rows = data.comparison.map(row => {
-                const c1 = row.c1.replace(/\*\*(.*?)\*\*/g, '<span class="archive-highlight">$1</span>');
-                const c2 = row.c2.replace(/\*\*(.*?)\*\*/g, '<span class="archive-highlight">$1</span>');
+                const c1 = format(row.c1).replace(/<strong>(.*?)<\/strong>/g, '<span class="archive-highlight">$1</span>');
+                const c2 = format(row.c2).replace(/<strong>(.*?)<\/strong>/g, '<span class="archive-highlight">$1</span>');
                 return `<tr><td>${c1}</td><td>${c2}</td></tr>`;
             }).join('');
             html += `
@@ -117,10 +119,7 @@ const ArchiveRenderer = {
         }
 
         if (data.tip) {
-            let processedTip = data.tip
-                .replace(/\*\*(.*?)\*\*/g, '<strong class="archive-highlight">$1</strong>')
-                .replace(/'(.*?)'/g, '<span class="archive-keyword-red">$1</span>')
-                .replace(/^★\s*/, '');
+            let processedTip = format(data.tip).replace(/^★\s*/, '');
             html += `
                 <aside class="archive-tip-container">
                     <div class="archive-tip-label"><i data-lucide="star" class="w-3 h-3 fill-current mr-1"></i>ADMIN'S CRITICAL TIP:</div>
@@ -132,7 +131,7 @@ const ArchiveRenderer = {
         if (data.ethics) {
             const items = data.ethics.split('\n').filter(l => l.trim()).map(l => {
                 const tagMatch = l.match(/\[(.*?)\]/);
-                const rest = l.replace(/\[.*?\]/, '').trim();
+                const rest = format(l.replace(/\[.*?\]/, ''));
                 return `<div class="archive-ethics-item"><span class="archive-ethics-tag">${tagMatch ? tagMatch[0] : ''}</span>${rest}</div>`;
             }).join('');
             html += `

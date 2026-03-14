@@ -5,9 +5,9 @@ let supabaseLocal = null;
 let dictionaryData = [];
 let categories = [];
 window.isAdmin = sessionStorage.getItem('admin_session') === 'true';
-let bookmarkedIds = JSON.parse(localStorage.getItem('bookmarks') || '[]');
-let showOnlyBookmarks = false;
-let currentFontSize = parseInt(localStorage.getItem('preferred_font_size') || '16');
+window.bookmarkedIds = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+window.showOnlyBookmarks = false;
+window.currentFontSize = parseInt(localStorage.getItem('preferred_font_size') || '16');
 
 // ═══════════════════════════════════════════════════
 // 1. INITIALIZATION
