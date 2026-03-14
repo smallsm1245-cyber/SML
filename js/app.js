@@ -516,7 +516,6 @@ window.saveItem = async function (id) {
             .update({
                 title: newTerm,
                 content: newContent,
-                tip: newTip,
                 updated_at: new Date().toISOString()
             })
             .eq('id', id);
@@ -832,7 +831,6 @@ window.createNewItem = async function () {
             .insert([{
                 title: term,
                 content: content,
-                tip: tip,
                 category_id: catData.id,
                 is_private: false,
                 origin_free: false
