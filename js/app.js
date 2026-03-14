@@ -7,7 +7,21 @@ function extractSummary(content) {
     if (!content) return '';
     let plainText = content;
 
-    // Remove Archive format tags before they lose their brackets
+    // Fast path for ARCHIVE content: Try to extract the first line of [DEFINITION]
+    if (plainText.includes('[ARCHIVE]')) {
+        const defMatch = plainText.match(/\[DEFINITION\]\s*([\s\S]*?)(?=\[|$)/i);
+        if (defMatch && defMatch[1]) {
+            let defClean = defMatch[1].replace(/[#*_+~\[\]'"]/g, '').trim();
+            const lines = defClean.split('\n').filter(l => l.trim());
+            if (lines.length > 0) {
+                // Return the first line of the definition (max ~60 chars)
+                let firstLine = lines[0].trim();
+                return firstLine.length > 60 ? firstLine.substring(0, 57) + '...' : firstLine;
+            }
+        }
+    }
+
+    // Fallback: Remove Archive format tags before they lose their brackets
     plainText = plainText.replace(/\[(ARCHIVE|DEFINITION|MECHANISMS|COMPARISON|TIP|ETHICS)\]/gi, '');
 
     // Strip HTML if any
@@ -23,7 +37,7 @@ function extractSummary(content) {
     plainText = plainText.replace(/\s+/g, ' ');
     plainText = plainText.trim();
 
-    // Shorter length limit to read like a brief tip
+    // Fallback length limit
     return plainText.length > 55 ? plainText.substring(0, 52) + '...' : plainText;
 }
 

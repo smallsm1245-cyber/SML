@@ -73,12 +73,23 @@ const ArchiveRenderer = {
         if (data.mechanisms.length > 0) {
             const listItems = data.mechanisms.map((m, idx) => {
                 const parts = m.split(':');
+                const title = parts[0].trim();
+                let desc = parts[1] ? parts.slice(1).join(':').trim() : '';
+
+                // Apply inline markdown processing to description
+                if (desc) {
+                    desc = desc
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\+\+(.*?)\+\+/g, '<span class="archive-highlight">$1</span>')
+                        .replace(/'(.*?)'/g, '<span class="archive-keyword-red">$1</span>');
+                }
+
                 return `
                     <li class="archive-mechanism-item">
                         <span class="archive-mechanism-label">${String.fromCharCode(65 + idx)}.</span>
-                        <div class="archive-mechanism-title">${parts[0].trim()}</div>
+                        <div class="archive-mechanism-title">${title}</div>
                     </li>
-                    ${parts[1] ? `<div class="archive-mechanism-desc">${parts.slice(1).join(':').trim()}</div>` : ''}
+                    ${desc ? `<div class="archive-mechanism-desc">${desc}</div>` : ''}
                 `;
             }).join('');
             html += `
