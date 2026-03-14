@@ -376,22 +376,20 @@ function openBottomSheet(item) {
             <div class="jokbo-meta">202X SPRING SEMESTER / MAJOR SELECTIVE</div>
             <h2 class="sheet-title">${item.term}</h2>
             <div class="flex justify-between items-end mt-4">
-                <div class="text-[10px] font-bold text-ink-dim">아카이브 관리: <span class="text-white">Admin Anonymous</span></div>
-                <div class="jokbo-fields">
-                    <div class="flex items-center gap-1 font-sans">학번: <span class="jokbo-field">________</span></div>
-                    <div class="flex items-center gap-1 font-sans">성명: <span class="jokbo-field">________</span></div>
+                <div class="text-[10px] font-bold text-ink-dim">
+                    아카이브 관리:<br/>
+                    <span class="text-white text-[11px]">SMALLSM</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="category-chip text-ink-dim text-[11px] tracking-widest uppercase">CATEGORY: <span class="text-white">${item.category}</span></span>
+                    <button onclick="toggleBookmark('${item.id}')" class="p-1 -mr-2 ${isBookmarked ? 'text-primary' : 'text-ink-dim'} transition-colors hover:text-white">
+                        <i data-lucide="${isBookmarked ? 'star' : 'bookmark'}" class="w-6 h-6"></i>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="flex justify-between items-center mb-8">
-            <span class="category-chip">CATEGORY: ${item.category}</span>
-            <button onclick="toggleBookmark('${item.id}')" class="p-2 ${isBookmarked ? 'text-primary' : 'text-ink-dim'}">
-                <i data-lucide="${isBookmarked ? 'star' : 'bookmark'}" class="w-8 h-8"></i>
-            </button>
-        </div>
-
-        <div class="body-text mb-6 ${isArchive ? '' : 'whitespace-pre-wrap'} leading-relaxed prose prose-invert max-w-none">
+        <div class="body-text mb-6 mt-8 ${isArchive ? '' : 'whitespace-pre-wrap'} leading-relaxed prose prose-invert max-w-none">
             ${formattedBody}
         </div>
 
