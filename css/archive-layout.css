@@ -1,14 +1,13 @@
 :root {
-    --archive-bg: #0c0c0c;
-    --archive-bg-alt: #141414;
-    --archive-ink: #e2e8f0;
-    --archive-ink-dim: #718096;
-    --archive-accent: #D4AF37;
-    /* Metallic Gold */
-    --archive-danger: #8b0000;
-    --archive-info: #D4AF37;
-    /* Use Gold for info/bullets too */
-    --archive-border: rgba(255, 255, 255, 0.05);
+    /* Map to centralized variables in dictionary.css */
+    --archive-bg: var(--bg-paper);
+    --archive-bg-alt: var(--bg-paper-dark);
+    --archive-ink: var(--ink);
+    --archive-ink-dim: var(--ink-dim);
+    --archive-accent: var(--gold);
+    --archive-danger: var(--red);
+    --archive-info: var(--gold);
+    --archive-border: var(--glass-border);
     --font-sans: 'Nanum Gothic', 'Inter', sans-serif;
 }
 

@@ -47,7 +47,7 @@ const ArchiveRenderer = {
 
     render(data) {
         if (!data) return '';
-        let html = '<div class="archive-container animate-fade-in">';
+        let html = '<article class="archive-container animate-fade-in">';
 
         if (data.definition) {
             let processed = data.definition
@@ -60,13 +60,13 @@ const ArchiveRenderer = {
             const body = lines.slice(1).join('<br>');
 
             html += `
-                <div class="archive-section">
-                    <div class="archive-section-header"><span class="archive-circle-num">1</span> 개념 정의</div>
+                <section class="archive-section">
+                    <h3 class="archive-section-header"><span class="archive-circle-num">1</span> 개념 정의</h3>
                     <div class="archive-definition-content">
                         ${title ? `<span class="archive-quote-box">${title}</span>` : ''}
                         ${body}
                     </div>
-                </div>
+                </section>
             `;
         }
 
@@ -76,7 +76,6 @@ const ArchiveRenderer = {
                 const title = parts[0].trim();
                 let desc = parts[1] ? parts.slice(1).join(':').trim() : '';
 
-                // Apply inline markdown processing to description
                 if (desc) {
                     desc = desc
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -93,10 +92,10 @@ const ArchiveRenderer = {
                 `;
             }).join('');
             html += `
-                <div class="archive-section">
-                    <div class="archive-section-header"><span class= "archive-circle-num">2</span> 핵심 작동 메커니즘</div>
+                <section class="archive-section">
+                    <h3 class="archive-section-header"><span class= "archive-circle-num">2</span> 핵심 작동 메커니즘</h3>
                     <ul class="archive-mechanisms-list">${listItems}</ul>
-                </div>
+                </section>
             `;
         }
 
@@ -107,13 +106,13 @@ const ArchiveRenderer = {
                 return `<tr><td>${c1}</td><td>${c2}</td></tr>`;
             }).join('');
             html += `
-                <div class="archive-section">
-                    <div class="archive-section-header"><span class="archive-circle-num">3</span> 오해와 실제 비교</div>
+                <section class="archive-section">
+                    <h3 class="archive-section-header"><span class="archive-circle-num">3</span> 오해와 실제 비교</h3>
                     <table class="archive-comparison-table">
                         <thead><tr><th class="archive-th-false">COMMON MIS (오해)</th><th class="archive-th-true">DYNAMICS TRUTH (실제)</th></tr></thead>
                         <tbody>${rows}</tbody>
                     </table>
-                </div>
+                </section>
             `;
         }
 
@@ -123,10 +122,10 @@ const ArchiveRenderer = {
                 .replace(/'(.*?)'/g, '<span class="archive-keyword-red">$1</span>')
                 .replace(/^★\s*/, '');
             html += `
-                <div class="archive-tip-container">
+                <aside class="archive-tip-container">
                     <div class="archive-tip-label"><i data-lucide="star" class="w-3 h-3 fill-current mr-1"></i>ADMIN'S CRITICAL TIP:</div>
                     <div class="archive-tip-text">"${processedTip}"</div>
-                </div>
+                </aside>
             `;
         }
 
@@ -137,14 +136,14 @@ const ArchiveRenderer = {
                 return `<div class="archive-ethics-item"><span class="archive-ethics-tag">${tagMatch ? tagMatch[0] : ''}</span>${rest}</div>`;
             }).join('');
             html += `
-                <div class="archive-ethics-box">
-                    <div class="archive-ethics-title">윤리적 책임 및 실전 주의사항</div>
+                <section class="archive-ethics-box">
+                    <h3 class="archive-ethics-title">윤리적 책임 및 실전 주의사항</h3>
                     ${items}
-                </div>
+                </section>
             `;
         }
 
-        html += '</div>';
+        html += '</article>';
         return html;
     }
 };

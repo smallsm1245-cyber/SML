@@ -1,56 +1,5 @@
-/**
- * SmallSM Dictionary - Core Application Logic
- * Vanilla JS + Supabase integration
- */
+// Utility and API logic has been moved to utils.js and api.js
 
-function extractSummary(content) {
-    if (!content) return '';
-    let plainText = content;
-
-    // Fast path for ARCHIVE content: Try to extract the first line of [DEFINITION]
-    if (plainText.includes('[ARCHIVE]')) {
-        const defMatch = plainText.match(/\[DEFINITION\]\s*([\s\S]*?)(?=\[|$)/i);
-        if (defMatch && defMatch[1]) {
-            let defClean = defMatch[1].replace(/[#*_+~\[\]'"]/g, '').trim();
-            const lines = defClean.split('\n').filter(l => l.trim());
-            if (lines.length > 0) {
-                // Return the first line of the definition (max ~60 chars)
-                let firstLine = lines[0].trim();
-                return firstLine.length > 60 ? firstLine.substring(0, 57) + '...' : firstLine;
-            }
-        }
-    }
-
-    // Fallback: Remove Archive format tags before they lose their brackets
-    plainText = plainText.replace(/\[(ARCHIVE|DEFINITION|MECHANISMS|COMPARISON|TIP|ETHICS)\]/gi, '');
-
-    // Strip HTML if any
-    plainText = plainText.replace(/<[^>]*>/g, '');
-
-    // Strip Markdown symbols but keep normal parenthesis () which was previously wrongly stripped
-    plainText = plainText.replace(/[#*_+~\[\]]/g, '');
-
-    // Remove unneeded double quotes that were used for subtitle in the Archive definition
-    plainText = plainText.replace(/"/g, '');
-
-    // Replace newlines with spaces and clean up spacing
-    plainText = plainText.replace(/\s+/g, ' ');
-    plainText = plainText.trim();
-
-    // Fallback length limit
-    return plainText.length > 55 ? plainText.substring(0, 52) + '...' : plainText;
-}
-
-function extractTags(text) {
-    if (!text) return '';
-    const words = text.split(/\s+/)
-        .map(w => w.replace(/[^가-힣]/g, ''))
-        .filter(w => w.length >= 2 && w.length <= 4)
-        .filter(w => !['하는', '입니다', '있는', '가장', '대한', '위해', '통해', '것이', '이러한', '그리고'].includes(w));
-    const unique = [...new Set(words)].slice(0, 4);
-    if (unique.length === 0) return '';
-    return '<div class="dict-tags">' + unique.map(w => `<span class="dict-tag">#${w}</span>`).join('') + '</div>';
-}
 
 let supabaseLocal = null;
 let dictionaryData = [];
@@ -193,34 +142,15 @@ async function loadConfig() {
 
 async function fetchData() {
     try {
-        // Fetch posts (dictionary terms)
-        const { data: posts, error: postError } = await supabaseLocal
-            .from('archive_posts')
-            .select('*, categories(name)')
-            .eq('is_private', false)
-            .order('title', { ascending: true });
-
-        if (postError) throw postError;
-
-        // Fetch categories to ensure we have the correct ordering
-        const { data: catData } = await supabaseLocal
-            .from('categories')
-            .select('*')
-            .order('display_order', { ascending: true });
-
-        // Map categories for quick access
-        const categoryMap = {};
-        if (catData) {
-            catData.forEach(c => categoryMap[c.id] = c.name);
-        }
+        const { posts, categories: catData } = await API.fetchData(supabaseLocal);
 
         // Map to our dictionary structure
         dictionaryData = posts.map(p => ({
             id: p.id,
             term: p.title,
-            summary: extractSummary(p.content),
+            summary: Utils.extractSummary(p.content),
             content: p.content,
-            category: categoryMap[p.category_id] || '기타',
+            category: p.categories?.name || '기타',
             tip: p.tip || '',
             updated_at: p.updated_at
         }));
@@ -239,8 +169,8 @@ async function fetchData() {
             });
 
     } catch (err) {
-        console.error('❌ Data Fetch Error 상세:', err);
-        showToast(`데이터 불러오기 실패: ${err.message || '알 수 없는 오류'}`, 'error');
+        console.error('❌ Data Fetch Error:', err);
+        Utils.showToast(`데이터 불러오기 실패: ${err.message || '알 수 없는 오류'}`, 'error');
     }
 }
 
@@ -263,34 +193,38 @@ function renderList(data) {
         const items = data.filter(item => item.category === cat);
         if (items.length === 0) return;
 
-        // Header
-        const header = document.createElement('div');
-        header.className = 'category-header animate-fade-in';
+        const section = document.createElement('section');
+        section.className = 'category-section animate-fade-in';
+        section.id = `section-${cat}`;
+
+        const header = document.createElement('h2');
+        header.className = 'category-header';
         header.id = `cat-${cat}`;
         header.innerText = cat;
-        listContainer.appendChild(header);
+        section.appendChild(header);
+        listContainer.appendChild(section);
 
         // Items
         items.forEach((item) => {
-            const el = document.createElement('div');
-            el.className = 'dict-item cursor-pointer animate-fade-in relative';
+            const el = document.createElement('article');
+            el.className = 'dict-item cursor-pointer relative';
             el.innerHTML = `
                 <div class="dict-item-inner">
                     <div class="dict-term-container flex justify-between items-start">
-                        <div class="dict-term">
-                            <span class="dict-title-text">${item.term}</span>
+                        <header class="dict-term">
+                            <h3 class="dict-title-text">${item.term}</h3>
                             <span class="list-category-chip">${item.category}</span>
-                        </div>
+                        </header>
                         ${window.isAdmin ? '<i data-lucide="edit-2" class="w-4 h-4 text-ink-dim opacity-30 mt-1 flex-shrink-0"></i>' : ''}
                     </div>
                     <div class="dict-content-wrapper">
-                        <div class="dict-summary">${item.summary}</div>
-                        ${extractTags(item.summary)}
+                        <p class="dict-summary">${item.summary}</p>
+                        ${Utils.extractTags(item.summary)}
                     </div>
                 </div>
             `;
             el.onclick = () => openBottomSheet(item);
-            listContainer.appendChild(el);
+            section.appendChild(el);
         });
     });
 }
@@ -315,105 +249,18 @@ function renderToolkit() {
 // 3. INTERACTIONS & LOGIC
 // ═══════════════════════════════════════════════════
 
-function toggleBookmark(id) {
-    const idx = bookmarkedIds.indexOf(id);
-    if (idx > -1) {
-        bookmarkedIds.splice(idx, 1);
-    } else {
-        bookmarkedIds.push(id);
-    }
-    localStorage.setItem('bookmarks', JSON.stringify(bookmarkedIds));
-
-    // UI Refresh
-    renderList(showOnlyBookmarks ? dictionaryData.filter(d => bookmarkedIds.includes(d.id)) : dictionaryData);
-
-    // If bottom sheet is open, refresh it too
-    const item = dictionaryData.find(d => d.id === id);
-    if (item) openBottomSheet(item);
-}
-
-function openBottomSheet(item) {
-    const sheet = document.getElementById('bottomSheet');
+async function openBottomSheet(item) {
     const overlay = document.getElementById('bottomSheetOverlay');
+    const sheet = document.getElementById('bottomSheet');
     const content = document.getElementById('sheetContent');
-    const isBookmarked = bookmarkedIds.includes(item.id);
 
-    // Parse content
-    let body = item.content || '';
-    let formattedBody = '';
-    const isArchive = body.includes('[ARCHIVE]');
+    const isArchive = item.content.includes('[ARCHIVE]');
 
     if (isArchive) {
-        // For archive content, we first render the structure
-        const archiveData = window.ArchiveRenderer ? ArchiveRenderer.parseContent(body) : null;
-        if (archiveData) {
-            formattedBody = ArchiveRenderer.render(archiveData);
-            // Apply internal link conversion ONLY to the final rendered HTML content inside the archive
-            formattedBody = formattedBody.replace(/\[([^\]]+)\]/g, (match, term) => {
-                return `<span class="internal-link" onclick="handleInternalLink('${term}')">${term}</span>`;
-            });
-            // Refresh icons for archive content (e.g., star icon in tips)
-            setTimeout(() => { if (window.lucide) window.lucide.createIcons(); }, 0);
-        } else {
-            formattedBody = window.marked ? marked.parse(body) : body;
-        }
+        content.innerHTML = UIRenderer.renderArchiveSheet(item, window.isAdmin);
     } else {
-        // Standard (Legacy) Processing
-        // 1. Internal Links
-        body = body.replace(/\[([^\]]+)\]/g, (match, term) => {
-            return `<span class="internal-link" onclick="handleInternalLink('${term}')">${term}</span>`;
-        });
-        // 2. Markdown
-        formattedBody = window.marked ? marked.parse(body) : body;
-        // 3. Jokbo Styling
-        formattedBody = formatJokboContent(formattedBody);
+        content.innerHTML = UIRenderer.renderJokboSheet(item, window.isAdmin);
     }
-
-    content.innerHTML = `
-        <div class="secret-stamp">SECRET / 족보</div>
-        
-        <div class="jokbo-header">
-            <div class="jokbo-meta">202X SPRING SEMESTER / MAJOR SELECTIVE</div>
-            <h2 class="sheet-title">${item.term}</h2>
-            <div class="flex justify-between items-end mt-4">
-                <div class="text-[10px] font-bold text-ink-dim">
-                    아카이브 관리:<br/>
-                    <span class="text-white text-[11px]">SMALLSM</span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span class="category-chip text-ink-dim text-[11px] tracking-widest uppercase">CATEGORY: <span class="text-white">${item.category}</span></span>
-                    <button onclick="toggleBookmark('${item.id}')" class="p-1 -mr-2 ${isBookmarked ? 'text-primary' : 'text-ink-dim'} transition-colors hover:text-white">
-                        <i data-lucide="${isBookmarked ? 'star' : 'bookmark'}" class="w-6 h-6"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="body-text mb-6 mt-8 ${isArchive ? '' : 'whitespace-pre-wrap'} leading-relaxed prose prose-invert max-w-none">
-            ${formattedBody}
-        </div>
-
-        ${item.tip ? `
-        <div class="admin-tip">
-            <span class="tip-label">★ ARCHIVE TIP</span>
-            <div class="text-sm opacity-90">${item.tip}</div>
-        </div>
-        ` : ''}
-
-        <div class="jokbo-footer">
-            CONFIDENTIAL / DO NOT DISTRIBUTE
-        </div>
-
-        <div class="flex gap-4 mb-8 font-sans mt-10">
-            <button onclick="changeFontSize(-2)" class="flex-1 bg-white/5 border border-white/10 py-3 flex items-center justify-center gap-2 text-xs font-bold active:bg-white/20 transition-all text-white">
-                글자 축소
-            </button>
-            <button onclick="changeFontSize(2)" class="flex-1 bg-white/5 border border-white/10 py-3 flex items-center justify-center gap-2 text-xs font-bold active:bg-white/20 transition-all text-white">
-                글자 확대
-            </button>
-        </div>
-        ${window.isAdmin ? `<button class="w-full py-5 bg-primary text-white font-black text-lg mt-4 active:scale-95 transition-all rounded-none" onclick="enableEditMode('${item.id}')">항목 수정 (관리 전용)</button>` : ''}
-    `;
 
     // Apply current font size
     const bodyEl = content.querySelector('.body-text');
@@ -429,76 +276,12 @@ function openBottomSheet(item) {
     if (window.lucide) window.lucide.createIcons();
 }
 
-function formatJokboContent(html) {
-    if (!html) return '';
-
-    // 1. Convert leading numbers/letters to Circles (①, ②...)
-    // Applied to paragraphs starting with (1), 1. etc.
-    html = html.replace(/<p>(\(?([0-9]|[A-Z])\)?[\.\)]\s+)(.*?)(<\/p>)/gm, (match, p1, num, title, p2) => {
-        const circles = ['⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
-        const label = circles[parseInt(num)] || (num + '.');
-        return `<div class="section-title"><span>${label}</span> ${title}</div>`;
-    });
-
-    // 2. Highlights (Strong tags from **bold** -> Gold Highlighter)
-    html = html.replace(/<strong>(.*?)<\/strong>/g, '<span class="highlight-gold">$1</span>');
-
-    // 3. Underline keywords
-    // 'text' -> Red Underline (Professor's Pen)
-    html = html.replace(/'([^']+)'/g, '<span class="keyword-red">$1</span>');
-    // `text` -> Blue Underline (Admin Pen)
-    html = html.replace(/`([^`]+)`/g, '<span class="keyword-blue">$1</span>');
-
-    // 4. Admin tip detection (★ or Tip:)
-    html = html.replace(/<p>(★|Tip:)(.*?)<\/p>/g, '<div class="admin-tip"><span class="tip-label">$1 ADMIN\'S TIP</span>$2</div>');
-
-    // 5. Academic Table styling
-    html = html.replace(/<table>/g, '<table class="jokbo-table">');
-    html = html.replace(/<thead>/g, '<thead class="bg-black/20">');
-    // Apply alternating red/blue headers for 2-column tables
-    html = html.replace(/<tr>\s*<th>(.*?)<\/th>\s*<th>(.*?)<\/th>\s*<\/tr>/g, (match, c1, c2) => {
-        return `<tr><th class="th-red">${c1}</th><th class="th-blue">${c2}</th></tr>`;
-    });
-
-    return html;
-}
-
-window.enableEditMode = function (id) {
+window.showEditForm = function (id) {
     const item = dictionaryData.find(d => d.id === id);
     if (!item) return;
 
     const content = document.getElementById('sheetContent');
-    content.innerHTML = `
-        < h2 class="text-xl font-bold text-primary mb-6 flex items-center gap-2" >
-            <i data-lucide="shield-check"></i>
-            관리자 편집
-        </h2 >
-        <div class="mb-4">
-            <label class="block text-xs text-gray-500 mb-1">용어명</label>
-            <input type="text" id="editTerm" class="edit-input" value="${item.term}">
-        </div>
-        <div class="mb-4">
-            <label class="block text-xs text-gray-500 mb-1">이미지 업로드</label>
-            <input type="file" id="imageUpload" class="hidden" accept="image/*" onchange="handleImageUpload(this)">
-            <button onclick="document.getElementById('imageUpload').click()" class="w-full py-3 bg-dark border border-gray-800 rounded-lg flex items-center justify-center gap-2 text-sm text-gray-400">
-                <i data-lucide="image" class="w-4 h-4"></i> 이미지 선택 (Supabase Storage)
-            </button>
-        </div>
-        <div class="mb-4">
-            <label class="block text-xs text-gray-500 mb-1">상세 내용 (Markdown 지원)</label>
-            <textarea id="editContent" class="edit-input min-h-[150px] text-sm">${item.content}</textarea>
-        </div>
-        <div class="mb-4">
-            <label class="block text-xs text-gray-500 mb-1">Tip (한 줄 팁 또는 보충 설명)</label>
-            <textarea id="editTip" class="edit-input min-h-[60px] text-sm">${item.tip || ''}</textarea>
-        </div>
-        <div class="flex gap-2">
-            <button class="flex-1 py-3 bg-primary text-dark font-bold rounded-lg" onclick="saveItem('${id}')">저장</button>
-            <button class="px-4 py-3 bg-red-900/50 text-red-500 rounded-lg" onclick="deleteItem('${id}')">
-                <i data-lucide="trash-2"></i>
-            </button>
-        </div>
-    `;
+    content.innerHTML = UIRenderer.renderEditForm(item);
 
     // Auto-resize logic for textarea
     const textarea = document.getElementById('editContent');
@@ -507,39 +290,59 @@ window.enableEditMode = function (id) {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
         });
-        // Initial trigger
         setTimeout(() => {
             textarea.style.height = 'auto';
             textarea.style.height = (textarea.scrollHeight) + 'px';
         }, 0);
     }
-
     if (window.lucide) window.lucide.createIcons();
 };
+
+window.toggleBookmark = async function (id, btnEl, event) {
+    if (event) event.stopPropagation();
+    const idx = bookmarkedIds.indexOf(id);
+    if (idx === -1) {
+        bookmarkedIds.push(id);
+        Utils.showToast('북마크에 추가되었습니다.', 'success');
+    } else {
+        bookmarkedIds.splice(idx, 1);
+        Utils.showToast('북마크가 해제되었습니다.', 'info');
+    }
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarkedIds));
+
+    // Update UI if btnEl provided
+    if (btnEl) {
+        const icon = btnEl.querySelector('i');
+        const isBookmarked = bookmarkedIds.includes(id);
+        btnEl.classList.toggle('text-gold', isBookmarked);
+        btnEl.classList.toggle('text-ink-dim', !isBookmarked);
+        if (icon) {
+            icon.classList.toggle('fill-current', isBookmarked);
+        }
+    } else {
+        // Fallback for calls from inside sheets or outside list
+        renderList(showOnlyBookmarks ? dictionaryData.filter(d => bookmarkedIds.includes(d.id)) : dictionaryData);
+        // Refresh the sheet if it's open
+        const item = dictionaryData.find(d => d.id === id);
+        if (item) openBottomSheet(item);
+    }
+};
+
+// Formatting logic moved to Utils.js
+
 
 window.saveItem = async function (id) {
     const newTerm = document.getElementById('editTerm').value;
     const newContent = document.getElementById('editContent').value;
-    const newTip = document.getElementById('editTip').value;
 
     try {
-        const { error } = await supabaseLocal
-            .from('archive_posts')
-            .update({
-                title: newTerm,
-                content: newContent,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', id);
-
-        if (error) throw error;
-
-        showToast('저장되었습니다.', 'success');
+        await API.saveItem(supabaseLocal, id, { title: newTerm, content: newContent });
+        Utils.showToast('저장되었습니다.', 'success');
         await fetchData();
         renderList(dictionaryData);
         closeBottomSheet();
     } catch (e) {
-        showToast('저장 실패: ' + e.message, 'error');
+        Utils.showToast('저장 실패: ' + e.message, 'error');
     }
 };
 
@@ -547,19 +350,13 @@ window.deleteItem = async function (id) {
     if (!confirm('정말로 이 항목을 삭제하시겠습니까?')) return;
 
     try {
-        const { error } = await supabaseLocal
-            .from('archive_posts')
-            .delete()
-            .eq('id', id);
-
-        if (error) throw error;
-
-        showToast('삭제되었습니다.', 'success');
+        await API.deleteItem(supabaseLocal, id);
+        Utils.showToast('삭제되었습니다.', 'success');
         await fetchData();
         renderList(dictionaryData);
         closeBottomSheet();
     } catch (e) {
-        showToast('삭제 실패: ' + e.message, 'error');
+        Utils.showToast('삭제 실패: ' + e.message, 'error');
     }
 };
 
@@ -683,7 +480,7 @@ function setupEventListeners() {
                     supabaseLocal.auth.signOut().then(() => {
                         syncAdminUI();
                         renderList(dictionaryData);
-                        showToast('로그아웃 되었습니다.', 'success');
+                        Utils.showToast('로그아웃 되었습니다.', 'success');
                     });
                 }
                 return;
@@ -723,7 +520,7 @@ window.handleLogin = async function () {
     const btn = document.getElementById('submitLoginBtn');
 
     if (!email || !password) {
-        showToast('이메일과 비밀번호를 입력해주세요.', 'error');
+        Utils.showToast('이메일과 비밀번호를 입력해주세요.', 'error');
         return;
     }
 
@@ -732,20 +529,16 @@ window.handleLogin = async function () {
     btn.innerText = '로그인 중...';
 
     try {
-        const { error } = await supabaseLocal.auth.signInWithPassword({
-            email,
-            password
-        });
-
+        const { error } = await supabaseLocal.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
-        showToast('로그인 성공!', 'success');
+        Utils.showToast('로그인 성공!', 'success');
         window.closeLoginModal();
         syncAdminUI();
         renderList(dictionaryData);
     } catch (e) {
         console.error('❌ Login Error:', e);
-        showToast('로그인 실패: ' + (e.message || '다시 시도해주세요.'), 'error');
+        Utils.showToast('로그인 실패: ' + (e.message || '다시 시도해주세요.'), 'error');
     } finally {
         btn.disabled = false;
         btn.innerText = originalText;
@@ -756,24 +549,8 @@ window.handleLogin = async function () {
 // 5. TOAST & UTILS
 // ═══════════════════════════════════════════════════
 
-function showToast(msg, type = 'info') {
-    let toast = document.getElementById('toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'toast';
-        toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-sm font-bold z-[200] transition-all transform translate-y-20 opacity-0';
-        document.body.appendChild(toast);
-    }
+// Toast function moved to utils.js
 
-    toast.innerText = msg;
-    toast.style.backgroundColor = type === 'success' ? 'var(--bg-paper)' : (type === 'error' ? 'var(--primary)' : 'var(--bg-paper-dark)');
-    toast.style.color = type === 'success' ? 'var(--ink)' : (type === 'error' ? 'white' : 'var(--ink)');
-
-    toast.classList.remove('translate-y-20', 'opacity-0');
-    setTimeout(() => {
-        toast.classList.add('translate-y-20', 'opacity-0');
-    }, 3000);
-}
 
 window.showNewItemForm = function () {
     const categoriesOptions = categories.map(c => `< option value = "${c}" > ${c}</option > `).join('');
@@ -831,31 +608,16 @@ window.showNewItemForm = function () {
 window.createNewItem = async function () {
     const term = document.getElementById('newTerm').value;
     const content = document.getElementById('newContent').value;
-    const tip = document.getElementById('newTip').value;
     const catName = document.getElementById('newCategory').value;
 
     try {
-        // Need to find category ID
-        const { data: catData } = await supabaseLocal.from('categories').select('id').eq('name', catName).single();
-
-        const { error } = await supabaseLocal
-            .from('archive_posts')
-            .insert([{
-                title: term,
-                content: content,
-                category_id: catData.id,
-                is_private: false,
-                origin_free: false
-            }]);
-
-        if (error) throw error;
-
-        showToast('항목이 추가되었습니다.', 'success');
+        await API.createItem(supabaseLocal, { title: term, content, categoryName: catName });
+        Utils.showToast('항목이 추가되었습니다.', 'success');
         await fetchData();
         renderList(dictionaryData);
         closeBottomSheet();
     } catch (e) {
-        showToast('추가 실패: ' + e.message, 'error');
+        Utils.showToast('추가 실패: ' + e.message, 'error');
     }
 };
 
@@ -913,7 +675,6 @@ async function saveSiteSettings() {
                 .update({ content: JSON.stringify(config) })
                 .eq('id', window.siteConfigPostId);
         } else {
-            // Need a category to save a post
             const { data: catData } = await supabaseLocal.from('categories').select('id').limit(1).single();
             if (!catData) return;
 
@@ -930,9 +691,10 @@ async function saveSiteSettings() {
                 .single();
             if (data) window.siteConfigPostId = data.id;
         }
-        showToast('사이트 설정이 저장되었습니다.', 'success');
+        Utils.showToast('사이트 설정이 저장되었습니다.', 'success');
     } catch (e) {
         console.error('Save failed', e);
+        Utils.showToast('설정 저장 실패', 'error');
     }
 }
 

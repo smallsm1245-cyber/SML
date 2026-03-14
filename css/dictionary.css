@@ -1,27 +1,31 @@
 :root {
-    /* Premium Dark Archive Palette */
+    /* Base Colors - Cinematic Dark */
     --bg-paper: #0a0a0a;
     --bg-paper-dark: #121212;
     --bg-card: #161616;
     --ink: #e8e8e8;
-    /* Silver/Off-white */
     --ink-dim: #999999;
 
-    /* Unified Jokbo Palette - Premium Tones */
-    --jokbo-gold: #D4AF37;
-    /* Metallic Gold */
-    --jokbo-gold-bright: #FFD700;
-    --jokbo-red: #8b0000;
-    /* Deep Blood Red */
-    --jokbo-red-bright: #cc3333;
-    --jokbo-blue: #2c5985;
+    /* Semantic Accent Colors (Unified Jokbo Palette) */
+    --gold: #D4AF37;
+    --gold-bright: #FFD700;
+    --red: #8b0000;
+    --red-bright: #cc3333;
+    --blue: #2c5985;
 
+    /* Visual Effects */
     --glass-bg: rgba(20, 20, 20, 0.7);
     --glass-border: rgba(255, 255, 255, 0.05);
 
-    /* Legacy Mappings */
-    --primary: var(--jokbo-red);
-    --accent-blue: var(--jokbo-blue);
+    /* Functional Mappings (for backward compatibility and readability) */
+    --jokbo-gold: var(--gold);
+    --jokbo-gold-bright: var(--gold-bright);
+    --jokbo-red: var(--red);
+    --jokbo-red-bright: var(--red-bright);
+    --jokbo-blue: var(--blue);
+
+    --primary: var(--red);
+    --accent-blue: var(--blue);
 }
 
 body {
