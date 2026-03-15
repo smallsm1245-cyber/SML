@@ -1,16 +1,16 @@
 :root {
     /* Base Colors - Cinematic Dark Note */
-    --bg-paper: #0f0f11;
-    --bg-paper-dark: #050505;
-    --bg-card: #16161a;
-    --ink: #e2e8f0;
-    --ink-dim: #94a3b8;
+    --bg-paper: #18181b; /* slightly lighter dark grey for paper */
+    --bg-paper-dark: #09090b; /* Binding color */
+    --bg-card: #27272a;
+    --ink: #f8fafc; /* Crisp white text */
+    --ink-dim: #a1a1aa; /* Dimmed text */
 
     /* Semantic Accent Colors (Highlighter Palette) */
-    --gold: #fbbf24;
-    --gold-bright: #fde047;
-    --red: #ef4444; /* Neon red/pink highlighter */
-    --red-bright: #f87171;
+    --gold: #fde047; /* Bright neon highlighter yellow */
+    --gold-bright: #fef08a;
+    --red: #f43f5e; /* Neon pinkish red */
+    --red-bright: #fb7185;
     --blue: #38bdf8; /* Neon blue highlighter */
 
     /* Visual Effects */
@@ -31,13 +31,18 @@
 body {
     font-family: 'Nanum Gothic', sans-serif; /* Cleaner sans-serif for notes */
     -webkit-font-smoothing: antialiased;
-    background-color: var(--bg-paper);
+    background-color: var(--bg-paper-dark);
     color: var(--ink);
+}
+
+/* Notebook Paper Background Texture */
+.bg-paper {
+    background-color: var(--bg-paper);
     /* Dark Line Note Background */
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 100% 32px; /* Line spacing */
-    background-attachment: fixed;
+        linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 100% 28px; /* Classic college ruled line spacing */
+    background-attachment: local;
     background-position: 0 0;
 }
 
@@ -90,19 +95,22 @@ body {
     font-family: 'Nanum Gothic', sans-serif;
 }
 
-/* Category Chip */
+/* Category Chip (Post-it style index tab) */
 .list-category-chip {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 800;
-    border: 1px solid rgba(212, 175, 55, 0.4);
-    background: rgba(0, 0, 0, 0.5);
-    color: var(--jokbo-gold);
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
+    border: none;
+    background: var(--gold);
+    color: #000;
+    padding: 0.25rem 0.6rem;
+    border-radius: 2px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-left: 0.2rem;
+    margin-left: 0.4rem;
     font-family: 'Nanum Gothic', sans-serif;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    transform: rotate(-2deg);
+    display: inline-block;
 }
 
 /* Content Wrapper */
@@ -171,17 +179,18 @@ body {
 /* Admin Editable Styles */
 .admin-editable {
     transition: all 0.2s ease;
-    border-bottom: 1px solid transparent;
+    border-bottom: 2px solid transparent;
 }
 
 body.admin-mode .admin-editable {
     cursor: text;
-    border-bottom: 1px dashed rgba(212, 175, 55, 0.4);
+    border-bottom: 2px dashed rgba(253, 224, 71, 0.6);
 }
 
 body.admin-mode .admin-editable:hover {
-    background: rgba(212, 175, 55, 0.05);
+    background: rgba(253, 224, 71, 0.1);
     border-bottom-color: var(--jokbo-gold);
+    border-radius: 4px;
 }
 
 body.admin-mode .admin-editable:focus {
@@ -304,13 +313,13 @@ header h1,
 
 /* Highlights & Markers - Owner's Highlighter */
 .highlight-gold {
-    background-color: var(--gold) !important;
-    color: #000000 !important;
+    background-color: rgba(253, 224, 71, 0.6) !important; /* Semi-transparent highlighter */
+    color: inherit !important;
     padding: 0 0.3rem;
     font-weight: 900;
     display: inline;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 8px rgba(253, 224, 71, 0.4);
 }
 
 .keyword-red {
@@ -415,10 +424,10 @@ header h1,
 
 .body-text {
     font-size: 1.1rem;
-    line-height: 1.9;
+    line-height: 2; /* 28px line height matches the 28px background grid */
     color: var(--ink);
     font-family: 'Nanum Gothic', sans-serif;
-    opacity: 0.9;
+    opacity: 0.95;
 }
 
 .body-text b,

@@ -12,12 +12,11 @@
 }
 
 .archive-container {
-    background-color: var(--archive-bg);
+    background-color: transparent; /* Rely on body bg */
     color: var(--archive-ink);
     font-family: var(--font-sans);
-    line-height: 1.6;
+    line-height: 2;
     padding: 1.25rem 1rem 1.25rem 1.5rem;
-    /* Increased left padding and overall breathing room */
     border-radius: 0;
     text-align: left;
     -webkit-font-smoothing: antialiased;
@@ -139,19 +138,17 @@
 
 .archive-comparison-table th,
 .archive-comparison-table td {
-    padding: 0.4rem;
-    border: 1px solid var(--archive-border);
+    padding: 0.5rem;
+    border: 1px solid rgba(255,255,255,0.1);
     word-break: keep-all;
-    /* Prevent awkward breaks in Korean */
     overflow-wrap: break-word;
 }
 
 .archive-comparison-table th {
-    font-size: 0.75rem;
-    /* Larger table headers */
+    font-size: 0.8rem;
     font-weight: 900;
-    background: #1a1a1a;
-    padding: 0.6rem 0.4rem;
+    background: rgba(0,0,0,0.3);
+    padding: 0.6rem 0.5rem;
 }
 
 .archive-comparison-table td {
@@ -191,22 +188,24 @@
     color: #cbd5e0;
 }
 
-/* Ethics Section */
+/* Ethics Section (Sticky Note Style) */
 .archive-ethics-box {
-    margin-top: 1rem;
-    border: 1px solid var(--archive-border);
-    background: #0f172a;
-    /* Deeper blue-dark for ethics */
-    padding: 0.6rem;
+    margin-top: 1.5rem;
+    background: #fef08a; /* Yellow sticky note */
+    color: #1c1917;
+    padding: 1rem;
+    border-radius: 2px 2px 10px 2px;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.4);
+    transform: rotate(1deg);
 }
 
 .archive-ethics-title {
     font-weight: 900;
-    font-size: 0.8rem;
-    color: var(--archive-info);
-    border-bottom: 1px solid var(--archive-border);
-    padding-bottom: 0.25rem;
-    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    color: #b45309;
+    border-bottom: 2px dashed #b45309;
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.8rem;
 }
 
 .archive-ethics-item {
