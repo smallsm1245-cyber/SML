@@ -54,8 +54,8 @@ const UIRenderer = {
 
         return `
             <div class="jokbo-header p-8 relative overflow-hidden">
-                <div class="secret-stamp">TOP SECRET</div>
-                <div class="jokbo-meta">CLASSIFIED ARCHIVE // ITEM #${item.id.substring(0, 8)}</div>
+                <div class="secret-stamp">MASTER'S NOTE</div>
+                <div class="jokbo-meta">SUMMARY NOTE // ITEM #${item.id.substring(0, 8)}</div>
                 <div class="flex justify-between items-start mb-6">
                     <h2 class="sheet-title">${item.term}</h2>
                     <div class="flex gap-2">
@@ -85,12 +85,12 @@ const UIRenderer = {
                 ${contentHtml}
                 ${item.tip ? `
                     <aside class="admin-tip mt-8">
-                        <span class="tip-label">ARCHIVE ADVISORY:</span>
+                        <span class="tip-label">주인장의 한마디:</span>
                         ${item.tip}
                     </aside>
                 ` : ''}
             </div>
-            <div class="jokbo-footer">SmallSM PRIVATE ARCHIVE - UNAUTHORIZED DISCLOSURE IS PROHIBITED</div>
+            <div class="jokbo-footer">주인장의 요점 정리 노트 - 불펌 및 무단 복제 금지</div>
         `;
     },
 

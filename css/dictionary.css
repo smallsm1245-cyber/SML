@@ -1,17 +1,17 @@
 :root {
-    /* Base Colors - Cinematic Dark */
-    --bg-paper: #0a0a0a;
-    --bg-paper-dark: #121212;
-    --bg-card: #161616;
-    --ink: #e8e8e8;
-    --ink-dim: #999999;
+    /* Base Colors - Cinematic Dark Note */
+    --bg-paper: #0f0f11;
+    --bg-paper-dark: #050505;
+    --bg-card: #16161a;
+    --ink: #e2e8f0;
+    --ink-dim: #94a3b8;
 
-    /* Semantic Accent Colors (Unified Jokbo Palette) */
-    --gold: #D4AF37;
-    --gold-bright: #FFD700;
-    --red: #8b0000;
-    --red-bright: #cc3333;
-    --blue: #2c5985;
+    /* Semantic Accent Colors (Highlighter Palette) */
+    --gold: #fbbf24;
+    --gold-bright: #fde047;
+    --red: #ef4444; /* Neon red/pink highlighter */
+    --red-bright: #f87171;
+    --blue: #38bdf8; /* Neon blue highlighter */
 
     /* Visual Effects */
     --glass-bg: rgba(20, 20, 20, 0.7);
@@ -29,16 +29,16 @@
 }
 
 body {
-    font-family: 'Nanum Myeongjo', serif;
+    font-family: 'Nanum Gothic', sans-serif; /* Cleaner sans-serif for notes */
     -webkit-font-smoothing: antialiased;
     background-color: var(--bg-paper);
     color: var(--ink);
+    /* Dark Line Note Background */
     background-image:
-        radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 70%),
-        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
-    background-size: 100% 100%, 30px 30px, 30px 30px;
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 100% 32px; /* Line spacing */
     background-attachment: fixed;
+    background-position: 0 0;
 }
 
 /* Question Numbering System */
@@ -287,7 +287,7 @@ header h1,
     color: #ffffff;
     line-height: 1.2;
     margin-bottom: 1rem;
-    font-family: 'Nanum Myeongjo', serif;
+    font-family: 'Nanum Gothic', sans-serif;
 }
 
 /* Section Numbering (①, ②, ③) */
@@ -299,26 +299,28 @@ header h1,
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    font-family: 'Nanum Myeongjo', serif;
+    font-family: 'Nanum Gothic', sans-serif;
 }
 
-/* Highlights & Markers */
+/* Highlights & Markers - Owner's Highlighter */
 .highlight-gold {
-    background-color: rgba(212, 175, 55, 0.35) !important;
-    color: inherit !important;
-    padding: 0 0.2rem;
+    background-color: var(--gold) !important;
+    color: #000000 !important;
+    padding: 0 0.3rem;
     font-weight: 900;
     display: inline;
-    border-radius: 2px;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .keyword-red {
-    color: var(--jokbo-red-bright);
+    background-color: var(--red);
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 0 0.3rem;
     text-decoration: none;
-    border-bottom: 2px solid var(--jokbo-red);
-    padding-bottom: 1px;
     font-weight: 900;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .keyword-blue {
@@ -421,14 +423,15 @@ header h1,
 
 .body-text b,
 .body-text strong {
-    color: #fff;
-    font-family: 'Nanum Myeongjo', serif;
+    color: #ffffff;
+    font-family: 'Nanum Gothic', sans-serif;
+    font-weight: 900;
 }
 
 .body-text h1,
 .body-text h2,
 .body-text h3 {
-    font-family: 'Nanum Myeongjo', serif;
+    font-family: 'Nanum Gothic', sans-serif;
     color: var(--jokbo-gold) !important;
     margin-top: 2rem;
     margin-bottom: 1rem;

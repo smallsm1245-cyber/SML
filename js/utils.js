@@ -88,7 +88,7 @@ const Utils = {
         html = html.replace(/`([^`]+)`/g, '<span class="keyword-blue">$1</span>');
 
         // 4. Admin tip detection (★ or Tip:)
-        html = html.replace(/<p>(★|Tip:)(.*?)<\/p>/g, '<div class="admin-tip"><span class="tip-label">$1 ADMIN\'S TIP</span>$2</div>');
+        html = html.replace(/<p>(★|Tip:)(.*?)<\/p>/g, '<div class="admin-tip"><span class="tip-label">$1 주인장의 꿀팁</span>$2</div>');
 
         // 5. Academic Table styling
         html = html.replace(/<table>/g, '<table class="jokbo-table">');

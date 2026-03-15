@@ -75,8 +75,8 @@
     border-left: 4px solid var(--archive-accent);
     /* Thicker border for clear callout */
     padding: 0.2rem 0 0.2rem 0.75rem;
-    background: rgba(212, 175, 55, 0.03);
-    /* Extremely subtle gold tint background */
+    background: rgba(251, 191, 36, 0.05);
+    /* Subtle neon yellow tint background */
 }
 
 /* Keywords */
@@ -90,7 +90,7 @@
     color: var(--archive-accent);
     font-weight: 900;
     text-decoration: underline;
-    text-decoration-color: rgba(255, 204, 0, 0.4);
+    text-decoration-color: rgba(251, 191, 36, 0.6);
     text-underline-offset: 2px;
 }
 
