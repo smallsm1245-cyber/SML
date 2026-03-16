@@ -70,18 +70,6 @@ const Utils = {
         }, 3000);
     },
 
-    copyToClipboard(text) {
-        if (!navigator.clipboard) {
-            Utils.showToast('클립보드 복사를 지원하지 않는 브라우저입니다.', 'error');
-            return;
-        }
-        navigator.clipboard.writeText(text).then(() => {
-            Utils.showToast('문구가 클립보드에 복사되었습니다.', 'success');
-        }).catch(err => {
-            Utils.showToast('복사에 실패했습니다.', 'error');
-        });
-    },
-
     formatJokboContent(html) {
         if (!html) return '';
 
