@@ -4,10 +4,10 @@
     --archive-bg-alt: var(--bg-card);
     --archive-ink: var(--ink);
     --archive-ink-dim: var(--ink-dim);
-    --archive-accent: var(--crimson);
-    --archive-danger: var(--crimson-bright);
+    --archive-accent: var(--gold);
+    --archive-danger: var(--gold-bright);
     --archive-info: var(--ink-dim);
-    --archive-border: rgba(183, 28, 28, 0.2);
+    --archive-border: rgba(255, 255, 255, 0.05);
     --font-sans: 'Nanum Gothic', 'Inter', sans-serif;
 }
 
@@ -46,16 +46,16 @@
 
 .archive-circle-num {
     background: transparent;
-    border: 1.5px solid var(--archive-accent);
+    border: 1px solid var(--archive-accent);
     color: var(--archive-accent);
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.15rem;
+    height: 1.15rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 2px;
-    font-size: 0.7rem;
-    font-weight: 900;
+    font-size: 0.65rem;
+    font-weight: 950;
     flex-shrink: 0;
 }
 
@@ -74,7 +74,7 @@
     display: block;
     border-left: 2px solid var(--archive-accent);
     padding: 0.4rem 0 0.4rem 1rem;
-    background: rgba(183, 28, 28, 0.05);
+    background: rgba(0, 0, 0, 0.2);
 }
 
 /* Keywords */
@@ -191,11 +191,11 @@
 /* Ethics Section (Dungeon Caution Style) */
 .archive-ethics-box {
     margin-top: 2rem;
-    background: rgba(183, 28, 28, 0.03);
+    background: rgba(0, 0, 0, 0.1);
     color: var(--archive-ink);
     padding: 1.25rem;
     border-radius: 4px;
-    border: 1px solid rgba(183, 28, 28, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     position: relative;
 }
 
@@ -203,15 +203,15 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, transparent 80%, rgba(183, 28, 28, 0.05));
+    background: linear-gradient(135deg, transparent 80%, rgba(255, 255, 255, 0.03));
     pointer-events: none;
 }
 
 .archive-ethics-title {
     font-weight: 950;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--archive-accent);
-    border-bottom: 1px solid rgba(183, 28, 28, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     padding-bottom: 0.6rem;
     margin-bottom: 1rem;
     text-transform: uppercase;

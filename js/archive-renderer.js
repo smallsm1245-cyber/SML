@@ -87,13 +87,13 @@ const ArchiveRenderer = {
             const body = rawLines.slice(1).map(l => format(l)).join('<br>');
 
             html += `
-                <section class="archive-section">
-                    <h3 class="archive-section-header">코덱스 기입 (Codex Entry)</h3>
+                <div class="archive-section">
+                    <h3 class="archive-section-header">장부 기입 (Ledger Entry)</h3>
                     <div class="archive-definition-content">
                         ${title ? `<span class="archive-quote-box">${title}</span>` : ''}
                         ${body}
                     </div>
-                </section>
+                </div>
             `;
         }
 
@@ -140,7 +140,8 @@ const ArchiveRenderer = {
             let processedTip = format(data.tip).replace(/^★\s*/, '');
             html += `
                 <aside class="archive-tip-container">
-                    <div class="archive-tip-label"><i data-lucide="info" class="w-3 h-3 fill-current mr-1"></i>MASTER'S DIRECTIVE:</div>
+                    <div class="secret-stamp">LEDGER ENTRY</div>
+                    <div class="archive-tip-label"><i data-lucide="shield-check" class="w-3 h-3 fill-current mr-1"></i>지침 (Instructions):</div>
                     <div class="archive-tip-text">"${processedTip}"</div>
                 </aside>
             `;
@@ -153,10 +154,10 @@ const ArchiveRenderer = {
                 return `<div class="archive-ethics-item"><span class="archive-ethics-tag">${tagMatch ? tagMatch[0] : ''}</span>${rest}</div>`;
             }).join('');
             html += `
-                <section class="archive-ethics-box">
-                    <h3 class="archive-ethics-title">주의사항 및 제약 (Codex Caution)</h3>
+                <div class="ethics-box">
+                    <h3 class="ethics-title">장부 기록 시 주의사항 (Ledger Caution)</h3>
                     ${items}
-                </section>
+                </div>
             `;
         }
 

@@ -90,8 +90,8 @@ function syncAdminUI() {
             if (oldBadge) oldBadge.remove();
             if (header) {
                 const badge = document.createElement('span');
-                badge.className = 'admin-badge rounded-none align-middle ml-2 uppercase font-black text-primary border border-primary/30 px-2 py-0.5 text-[10px] bg-primary/10';
-                badge.innerText = 'Master';
+                badge.className = 'admin-badge rounded-none align-middle ml-2 uppercase font-black text-ink/40 border border-white/10 px-2 py-0.5 text-[10px] bg-white/5';
+                badge.innerText = 'Archivist';
                 header.appendChild(badge);
             }
         } else {
@@ -231,11 +231,11 @@ function renderList(data) {
 function renderToolkit() {
     const bar = document.getElementById('toolkitBar');
     bar.innerHTML = '';
-    bar.className = 'flex flex-row overflow-x-auto custom-scroll-hide gap-1 px-4 py-2 bg-paper/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-40';
+    bar.className = 'flex flex-row overflow-x-auto custom-scroll-hide gap-1 px-4 py-2 bg-paper/95 backdrop-blur-md border-b border-white/5 sticky top-0 z-40 shadow-sm';
 
     categories.forEach(cat => {
         const btn = document.createElement('button');
-        btn.className = 'w-10 h-10 flex-shrink-0 flex items-center justify-center text-ink-dim hover:text-primary transition-all rounded-lg hover:bg-primary/5 border border-transparent hover:border-primary/10';
+        btn.className = 'w-10 h-10 flex-shrink-0 flex items-center justify-center text-ink/30 hover:text-ink transition-all rounded-lg hover:bg-white/5 border border-transparent';
         btn.innerHTML = `<span class="text-[10px] font-black">${cat.substring(0, 2).toUpperCase()}</span>`;
         btn.onclick = () => {
             const target = document.getElementById(`cat-${cat}`);

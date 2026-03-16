@@ -20,21 +20,22 @@
             theme: {
                 extend: {
                     colors: {
-                        paper: '#0A0000', // Deepest black-red
-                        'paper-dark': '#000000', // Pure black
-                        card: '#111111', // Deep charcoal/leather
-                        ink: '#E0E0E0', // Warm white
-                        'ink-dim': '#B0A8A8', // Greyish muted text
-                        primary: '#B71C1C', // Crimson red
-                        'primary-dim': '#7F1D1D',
-                        gold: '#C41E3A', // Blood red accent
-                        'gold-bright': '#FF1744', // Neon red glow/active
-                        'accent-blue': '#455A64', // Metallic grey
-                        admin: '#C62828',
-                        'light-yellow': '#D32F2F',
-                        'light-pink': '#FF5252',
-                        'light-blue': '#37474F',
-                        'light-purple': '#4A148C',
+                        paper: '#121212', // Material dark gray-black
+                        'paper-dark': '#0A0A0A', 
+                        card: '#1A1A1A', // Understated ledger entry
+                        'border-ledger': '#2A2A2A',
+                        ink: '#E0D4C2', // Warm Ivory/Cream
+                        'ink-dim': '#A0988E', // Muted warm grey
+                        primary: '#4A0000', // Deep burgundy red
+                        'primary-dim': '#330000',
+                        gold: '#8B0000', // Dark red accent
+                        'gold-bright': '#A52A2A', // Active/Hover red
+                        'accent-blue': '#37474F', 
+                        admin: '#8B0000',
+                        'light-yellow': '#5D4037',
+                        'light-pink': '#7B1FA2',
+                        'light-blue': '#263238',
+                        'light-purple': '#311B92',
                         'light-green': '#1B5E20',
                         'light-gray': '#212121',
                     },
@@ -74,7 +75,7 @@
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0A0000">
+    <meta name="theme-color" content="#121212">
 
     <!-- Styles -->
     <link rel="stylesheet" href="css/dictionary.css">
@@ -91,7 +92,7 @@
 
     <!-- Main Wrapper (Notebook Style) -->
     <div
-        class="flex flex-col min-h-screen max-w-2xl mx-auto shadow-[0_0_100px_rgba(183,28,28,0.2)] relative bg-paper overflow-hidden border-x border-red-900/20">
+        class="flex flex-col min-h-screen max-w-2xl mx-auto shadow-[0_0_80px_rgba(0,0,0,0.8)] relative bg-paper overflow-hidden border-x border-white/5">
 
         <!-- Binding replaced with Metallic Chain Aesthetic -->
         <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-r from-red-900/40 to-transparent z-50 pointer-events-none"></div>
@@ -99,38 +100,38 @@
         <!-- Premium Archive Header -->
         <header class="pl-24 pr-8 pt-12 pb-8 border-b border-primary/20 bg-paper/90 backdrop-blur-md sticky top-0 overflow-hidden z-[60] shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
             <div id="editable-series"
-                class="absolute top-4 right-6 text-[10px] font-black border border-primary/40 text-primary px-3 py-1 opacity-70 uppercase tracking-[0.2em] rounded-sm bg-primary/10 backdrop-blur-sm admin-editable"
+                class="absolute top-4 right-6 text-[10px] font-black border border-white/5 text-ink/30 px-3 py-1 uppercase tracking-[0.2em] rounded-sm bg-white/5 backdrop-blur-sm admin-editable"
                 data-key="site_series">
-                CRIMSON DUNGEON CODEX
+                PRIVATE DUNGEON LEDGER
             </div>
 
             <div class="text-center mb-8">
                 <div class="flex items-center justify-center gap-2 mb-2">
                     <div class="h-[1px] w-8 bg-gold/30"></div>
-                    <h2 class="text-[11px] font-bold tracking-[0.2em] text-primary uppercase">던전 마스터의 금기된 기록
+                    <h2 class="text-[11px] font-bold tracking-[0.2em] text-ink/30 uppercase">익명의 장부 관리자가 기록함
                     </h2>
                     <div class="h-[1px] w-8 bg-gold/30"></div>
                 </div>
                 <h1 class="text-3xl font-black text-ink py-4 tracking-tighter leading-none">
                     <span id="editable-title-main" class="text-primary admin-editable"
-                        data-key="site_title_main">던전</span>
-                    <span id="editable-title-sub" class="admin-editable" data-key="site_title_sub">코덱스</span> <br />
+                        data-key="site_title_main">프라이빗</span>
+                    <span id="editable-title-sub" class="admin-editable" data-key="site_title_sub">장부</span> <br />
                     <span id="editable-subtitle"
-                        class="text-[10px] font-bold tracking-[0.1em] text-primary/40 uppercase admin-editable"
-                        data-key="site_subtitle">Forbidden Ritual & Codex</span>
+                        class="text-[10px] font-bold tracking-[0.1em] text-ink/20 uppercase admin-editable"
+                        data-key="site_subtitle">Hidden Records & Archives</span>
                 </h1>
             </div>
 
             <div class="grid grid-cols-2 gap-4 text-[10px] font-bold border-t border-white/5 pt-6">
                 <div class="flex items-center gap-2 border-r border-white/5 pr-4 group">
                     <span
-                        class="text-primary/40 uppercase tracking-widest group-hover:text-primary transition-colors">CODEX:</span>
+                        class="text-ink/20 uppercase tracking-widest group-hover:text-ink/40 transition-colors">ENTRY:</span>
                     <span id="editable-code" class="tracking-widest text-ink/80 admin-editable"
                         data-key="site_code">SML-A101</span>
                 </div>
                 <div class="flex items-center gap-2 pl-4 group">
                     <span
-                        class="text-primary/40 uppercase tracking-widest group-hover:text-primary transition-colors">MASTER:</span>
+                        class="text-ink/20 uppercase tracking-widest group-hover:text-ink/40 transition-colors">ARCHivist:</span>
                     <span id="editable-ref" class="text-ink/80 admin-editable" data-key="site_ref">Antigravity</span>
                 </div>
             </div>
@@ -139,8 +140,8 @@
                 <i data-lucide="search"
                     class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/60 group-focus-within:text-gold transition-colors"></i>
                 <input type="text" id="searchInput"
-                    class="w-full bg-card border border-primary/20 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-primary/50 outline-none transition-all placeholder:text-ink-dim/50 font-sans shadow-[0_0_15px_rgba(183,28,28,0.1)]"
-                    placeholder="던전 용어 검색... (e.g. impact play, collaring)">
+                    class="w-full bg-card border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-white/10 outline-none transition-all placeholder:text-ink/20 font-sans shadow-inner"
+                    placeholder="장부 기록 검색... (e.g. impact play, collaring)">
             </div>
         </header>
 
@@ -182,12 +183,12 @@
     <div id="loginModal"
         class="fixed inset-0 bg-paper/60 backdrop-blur-md z-[150] hidden items-center justify-center p-4">
         <div
-            class="bg-card w-full max-w-sm border border-primary/40 p-10 shadow-[0_0_50px_rgba(183,28,28,0.1)] animate-fade-in rounded-3xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+            class="bg-card w-full max-w-sm border border-white/5 p-10 shadow-[0_30px_60px_rgba(0,0,0,0.5)] animate-fade-in rounded-3xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
             <h2 class="text-2xl font-black text-ink mb-2 flex items-center gap-3 border-b border-white/5 pb-4">
-                <i data-lucide="lock" class="text-primary"></i>
-                마스터 접속
-                <span class="text-[9px] font-bold text-primary/40 ml-auto uppercase tracking-widest">Master
+                <i data-lucide="shield-check" class="text-primary"></i>
+                장부 관리자 접속
+                <span class="text-[9px] font-bold text-ink/20 ml-auto uppercase tracking-widest">Authorized
                     Only</span>
             </h2>
             <p class="text-[10px] text-ink/40 mt-2 mb-8 italic font-bold">RESTRICTED ACCESS
@@ -197,8 +198,8 @@
                     <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Admin
                         E-mail</label>
                     <input type="email" id="loginEmail"
-                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-primary/40 focus:ring-1 focus:ring-primary/20"
-                        placeholder="master@dungeon-codex.com">
+                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink/10 focus:border-primary/40 focus:ring-1 focus:ring-primary/20"
+                        placeholder="archivist@dungeon-ledger.private">
                 </div>
                 <div class="relative group">
                     <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Password</label>
@@ -207,8 +208,8 @@
                         placeholder="••••••••">
                 </div>
                 <button id="submitLoginBtn"
-                    class="w-full py-5 bg-primary text-white font-black rounded-2xl mt-4 hover:bg-red-600 transition-all shadow-xl active:scale-95 text-sm uppercase tracking-widest">
-                    Enter the Dungeon
+                    class="w-full py-5 bg-primary text-ink font-black rounded-2xl mt-4 hover:bg-neutral-800 transition-all shadow-xl active:scale-95 text-sm uppercase tracking-widest">
+                    Open the Ledger
                 </button>
                 <button onclick="closeLoginModal()"
                     class="w-full py-4 text-ink-dim text-[11px] font-bold hover:text-ink transition-colors uppercase tracking-widest">
@@ -225,8 +226,8 @@
 
     <!-- Bottom Sheet -->
     <div id="bottomSheet"
-        class="fixed bottom-0 left-0 w-full max-h-[90vh] bg-card rounded-t-[2.5rem] border-t border-primary/30 z-[101] transform translate-y-full transition-transform duration-500 ease-out flex flex-col">
-        <div class="w-12 h-1 bg-primary/20 rounded-full mx-auto my-6 flex-shrink-0"></div>
+        class="fixed bottom-0 left-0 w-full max-h-[90vh] bg-[#1A1A1A] rounded-t-[2.5rem] border-t border-white/5 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] z-[101] transform translate-y-full transition-transform duration-500 ease-out flex flex-col">
+        <div class="w-12 h-1 bg-white/10 rounded-full mx-auto my-6 flex-shrink-0"></div>
         <div class="overflow-y-auto px-6 pb-12 flex-1 custom-scroll" id="sheetContent">
             <!-- Detailed content injected by JS -->
         </div>
