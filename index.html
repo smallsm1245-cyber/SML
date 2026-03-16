@@ -1,61 +1,264 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BDSM Encyclopedia | 비디에스엠 백과사전</title>
-    <meta name="description" content="BDSM 용어와 안전, 동의에 관한 전문 정보를 제공하는 백과사전입니다.">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SmallSM Dictionary</title>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&family=Noto+Sans+KR:wght@400;700;900&family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS Framework (Tailwind) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: '#FDFCF8', // Soft cream/off-white
+                        'paper-dark': '#F5F2E9', // Binder color
+                        card: '#FFFFFF', // Pure white surfacing
+                        ink: '#262626', // Deep charcoal ink
+                        'ink-dim': '#737373', // Grey 보조 텍스트
+                        primary: '#4f46e5', // Premium Indigo
+                        'primary-dim': '#4338ca',
+                        gold: '#6366f1', // Indigo highlight instead of gold
+                        'gold-bright': '#818cf8',
+                        'accent-blue': '#0ea5e9',
+                        admin: '#000000',
+                        'light-yellow': '#6366f1',
+                        'light-pink': '#991b1b',
+                        'light-blue': '#075985',
+                        'light-purple': '#5b21b6',
+                        'light-green': '#166534',
+                        'light-gray': '#4b5563',
+                    },
+                    fontFamily: {
+                        serif: ['"Nanum Myeongjo"', 'serif'],
+                        sans: ['"Nanum Gothic"', 'sans-serif'],
+                        inter: ['"Inter"', 'sans-serif'],
+                        outfit: ['"Outfit"', 'sans-serif'],
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FDFCF8">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/dictionary.css">
+    <link rel="stylesheet" href="css/archive-layout.css">
 </head>
-<body>
-    <div id="app" class="app-container">
-        <!-- Sidebar for Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1 class="logo">BDSM<span>Encyclo.</span></h1>
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="용어 검색...">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </div>
-            </div>
-            <nav class="category-nav">
-                <ul id="categoryList">
-                    <!-- Categories will be injected here -->
-                </ul>
-            </nav>
-            <div class="sidebar-footer">
-                <p>&copy; 2026 BDSM Encyclopedia</p>
-                <small>Safety First. Consent Always.</small>
-            </div>
-        </aside>
 
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <header class="content-header">
-                <div class="breadcrumb" id="breadcrumb">Home / Encyclopedia</div>
-                <div class="theme-toggle" id="themeToggle">
-                    <!-- Theme toggle icon -->
-                </div>
-            </header>
-            
-            <article id="articleContent" class="article">
-                <!-- Content will be injected here -->
-                <div class="welcome-screen">
-                    <h2>환영합니다</h2>
-                    <p>검색어나 카테고리를 선택하여 정보를 찾아보세요.</p>
-                </div>
-            </article>
-
-            <section id="relatedTerms" class="related-section">
-                <!-- Related terms will be injected here -->
-            </section>
-        </main>
+<body class="bg-paper text-ink overflow-hidden font-sans">
+    <!-- Emergency Exit -->
+    <div id="emergencyExit"
+        class="fixed top-4 left-4 z-[100] cursor-pointer opacity-20 hover:opacity-100 transition-opacity p-4">
+        <i data-lucide="x-circle" class="w-6 h-6 text-ink"></i>
     </div>
 
-    <script src="data.js"></script>
-    <script src="app.js"></script>
+    <!-- Main Wrapper (Notebook Style) -->
+    <div
+        class="flex flex-col h-screen sm:h-[calc(100vh-2rem)] sm:my-4 w-full sm:max-w-2xl mx-auto sm:rounded-r-3xl sm:rounded-l-md shadow-none sm:shadow-[0_10px_50px_rgba(0,0,0,0.15)] relative bg-paper overflow-hidden border-none sm:border sm:border-black/5 sm:border-l-black/10">
+
+        <!-- Notebook Binding (Spring/Binder illusion) -->
+        <div
+            class="absolute left-0 top-0 bottom-0 w-8 bg-paper-dark border-r border-black/5 z-50 flex flex-col justify-evenly py-8 opacity-90 pointer-events-none">
+            <!-- Binding holes -->
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+        </div>
+
+        <!-- Margin Line (Red vertical line common in notebooks) - Hidden on smallest screens -->
+        <div class="absolute left-10 sm:left-16 top-0 bottom-0 w-px bg-red-900/10 z-0 pointer-events-none hidden sm:block"></div>
+
+        <!-- Premium Archive Header -->
+        <header class="pl-12 sm:pl-24 pr-8 pt-12 pb-8 border-b border-black/5 bg-transparent relative overflow-hidden z-10">
+            <!-- Decorative marker removed -->
+            <div id="editable-series"
+                class="absolute top-4 right-6 text-[10px] font-black border border-ink/20 text-ink/40 px-3 py-1 uppercase tracking-[0.2em] rounded-sm bg-black/5 admin-editable"
+                data-key="site_series">
+                PERSONAL NOTE
+            </div>
+
+            <div class="text-center mb-8">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <div class="h-[1px] w-8 bg-gold/30"></div>
+                    <h2 class="text-[10px] font-bold tracking-[0.2em] text-ink/30 uppercase">나만의 학습 기록 노트
+                    </h2>
+                    <div class="h-[1px] w-8 bg-gold/30"></div>
+                </div>
+                <h1 class="text-3xl font-black text-ink py-4 tracking-tighter leading-none">
+                    <span id="editable-title-main" class="admin-editable"
+                        data-key="site_title_main">학습</span>
+                    <span id="editable-title-sub" class="admin-editable" data-key="site_title_sub">정리</span> <br />
+                    <span id="editable-subtitle"
+                        class="text-[10px] font-bold tracking-[0.1em] text-ink-dim opacity-50 uppercase admin-editable"
+                        data-key="site_subtitle">Personal Study Note</span>
+                </h1>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-[10px] font-bold border-t border-white/5 pt-6">
+                <div class="flex items-center gap-2 border-r border-white/5 pr-4 group">
+                    <span
+                        class="text-ink/20 uppercase tracking-widest group-hover:text-ink/40 transition-colors">ID:</span>
+                    <span id="editable-code" class="tracking-widest text-ink/80 admin-editable"
+                        data-key="site_code">SML-A101</span>
+                </div>
+                <div class="flex items-center gap-2 pl-4 group">
+                    <span
+                        class="text-ink/20 uppercase tracking-widest group-hover:text-ink/40 transition-colors">By:</span>
+                    <span id="editable-ref" class="text-ink/80 admin-editable" data-key="site_ref">Antigravity</span>
+                </div>
+            </div>
+
+            <div class="mt-8 relative group">
+                <i data-lucide="search"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/60 group-focus-within:text-gold transition-colors"></i>
+                <input type="text" id="searchInput"
+                    class="w-full bg-card border border-black/5 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-ink/20 outline-none transition-all placeholder:text-ink-dim/50 font-sans shadow-sm"
+                    placeholder="필요한 기록을 검색해 보세요...">
+            </div>
+        </header>
+
+        <!-- High-Density List Container -->
+        <main class="flex-1 overflow-y-auto custom-scroll pb-24 bg-transparent z-10 pl-4 sm:pl-16" id="dictionaryList">
+            <!-- Items injected by JS -->
+            <div class="p-10 text-center text-ink-dim py-32 italic">
+                <div class="animate-pulse">노트를 펼치는 중입니다...</div>
+            </div>
+        </main>
+
+        <!-- Right Toolkit Bar (Styled as margin notes or index tags) -->
+        <nav class="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 p-1 bg-paper border-2 border-ink/10 rounded-lg shadow-md z-40"
+            id="toolkitBar">
+            <!-- Category icons injected by JS -->
+        </nav>
+
+        <!-- Bottom Controls -->
+        <footer
+            class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl p-6 bg-gradient-to-t from-paper to-transparent pointer-events-none z-[100]">
+            <div class="flex justify-center gap-8 pointer-events-auto">
+                <button id="bookmarkToggle"
+                    class="p-5 bg-card border border-white/10 rounded-full shadow-2xl hover:bg-paper-dark transition-all active:scale-90 group">
+                    <i data-lucide="star" class="w-6 h-6 text-ink-dim group-hover:text-gold transition-colors"></i>
+                </button>
+                <button id="adminLoginBtn"
+                    class="p-5 bg-card border border-white/10 rounded-full shadow-2xl hover:bg-paper-dark transition-all active:scale-90 group">
+                    <i data-lucide="key" class="w-6 h-6 text-ink-dim group-hover:text-gold transition-colors"></i>
+                </button>
+                <button id="addNewBtn"
+                    class="p-5 bg-gold text-paper-dark font-black rounded-full shadow-2xl hover:bg-gold-bright transition-all hidden active:scale-90">
+                    <i data-lucide="edit" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Login Modal (Styled as Academic Integrity Pledge) -->
+    <div id="loginModal"
+        class="fixed inset-0 bg-paper/60 backdrop-blur-md z-[150] hidden items-center justify-center p-4">
+        <div
+            class="bg-card w-full max-w-sm border border-gold/30 p-10 shadow-[0_0_50px_rgba(212,175,55,0.15)] animate-fade-in rounded-3xl">
+            <h2 class="text-2xl font-black text-ink mb-2 flex items-center gap-3 border-b border-white/5 pb-4">
+                <i data-lucide="shield-check" class="text-gold"></i>
+                관리자 접속
+                <span class="text-[9px] font-bold text-ink-dim opacity-50 ml-auto uppercase tracking-widest">Admin
+                    Access</span>
+            </h2>
+            <p class="text-[10px] text-ink/40 mt-2 mb-8 italic font-bold">RESTRICTED ACCESS
+            </p>
+            <div class="space-y-6 font-sans">
+                <div class="relative group">
+                    <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Admin
+                        E-mail</label>
+                    <input type="email" id="loginEmail"
+                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-gold/30 focus:ring-1 focus:ring-gold/20"
+                        placeholder="admin@sm-archive.ac.kr">
+                </div>
+                <div class="relative group">
+                    <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Password</label>
+                    <input type="password" id="loginPassword"
+                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-gold/30 focus:ring-1 focus:ring-gold/20"
+                        placeholder="••••••••">
+                </div>
+                <button id="submitLoginBtn"
+                    class="w-full py-5 bg-gold text-paper font-black rounded-2xl mt-4 hover:bg-gold-bright transition-all shadow-xl active:scale-95 text-sm">
+                    접속 하기
+                </button>
+                <button onclick="closeLoginModal()"
+                    class="w-full py-4 text-ink-dim text-[11px] font-bold hover:text-ink transition-colors uppercase tracking-widest">
+                    취소 (Exit)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Sheet Overlay -->
+    <div id="bottomSheetOverlay"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden opacity-0 transition-opacity duration-300">
+    </div>
+
+    <!-- Bottom Sheet -->
+    <div id="bottomSheet"
+        class="fixed bottom-0 left-0 w-full max-h-[90vh] bg-dark-alt rounded-t-[2rem] border-t border-gray-800 z-[101] transform translate-y-full transition-transform duration-300 ease-out flex flex-col">
+        <div class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto my-4 flex-shrink-0"></div>
+        <div class="overflow-y-auto px-6 pb-12 flex-1 custom-scroll" id="sheetContent">
+            <!-- Detailed content injected by JS -->
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui-renderer.js"></script>
+    <script src="js/archive-renderer.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- PWA Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('🚀 Service Worker registered');
+                }).catch(err => {
+                    console.warn('❌ Service Worker failed:', err);
+                });
+            });
+        }
+    </script>
 </body>
+
 </html>
