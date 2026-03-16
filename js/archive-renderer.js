@@ -87,13 +87,13 @@ const ArchiveRenderer = {
             const body = rawLines.slice(1).map(l => format(l)).join('<br>');
 
             html += `
-                <div class="archive-section">
-                    <h3 class="archive-section-header">장부 기입 (Ledger Entry)</h3>
+                <section class="archive-section">
+                    <h3 class="archive-section-header">설명</h3>
                     <div class="archive-definition-content">
                         ${title ? `<span class="archive-quote-box">${title}</span>` : ''}
                         ${body}
                     </div>
-                </div>
+                </section>
             `;
         }
 
@@ -113,7 +113,7 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <section class="archive-section">
-                    <h3 class="archive-section-header">수행 메커니즘</h3>
+                    <h3 class="archive-section-header">주요 내용</h3>
                     <ul class="archive-mechanisms-list">${listItems}</ul>
                 </section>
             `;
@@ -127,9 +127,9 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <section class="archive-section">
-                    <h3 class="archive-section-header">비교 데이터</h3>
+                    <h3 class="archive-section-header">비교 및 확인</h3>
                     <table class="archive-comparison-table">
-                        <thead><tr><th class="archive-th-false">COMMON ERROR</th><th class="archive-th-true">MASTER TRUTH</th></tr></thead>
+                        <thead><tr><th class="archive-th-false">기존 생각</th><th class="archive-th-true">핵심 포인트</th></tr></thead>
                         <tbody>${rows}</tbody>
                     </table>
                 </section>
@@ -140,8 +140,7 @@ const ArchiveRenderer = {
             let processedTip = format(data.tip).replace(/^★\s*/, '');
             html += `
                 <aside class="archive-tip-container">
-                    <div class="secret-stamp">LEDGER ENTRY</div>
-                    <div class="archive-tip-label"><i data-lucide="shield-check" class="w-3 h-3 fill-current mr-1"></i>지침 (Instructions):</div>
+                    <div class="archive-tip-label"><i data-lucide="info" class="w-3 h-3 fill-current mr-1"></i>참고 메모:</div>
                     <div class="archive-tip-text">"${processedTip}"</div>
                 </aside>
             `;
@@ -154,10 +153,10 @@ const ArchiveRenderer = {
                 return `<div class="archive-ethics-item"><span class="archive-ethics-tag">${tagMatch ? tagMatch[0] : ''}</span>${rest}</div>`;
             }).join('');
             html += `
-                <div class="ethics-box">
-                    <h3 class="ethics-title">장부 기록 시 주의사항 (Ledger Caution)</h3>
+                <section class="archive-ethics-box">
+                    <h3 class="archive-ethics-title">주의사항</h3>
                     ${items}
-                </div>
+                </section>
             `;
         }
 

@@ -10,33 +10,33 @@ const UIRenderer = {
         html = Utils.convertInternalLinks(html);
 
         return `
-            <div class="archive-sheet-header p-6 border-b border-white/5 bg-paper flex justify-between items-start">
+            <div class="archive-sheet-header p-6 border-b border-white/5 bg-paper-dark flex justify-between items-start">
                 <div class="flex items-center gap-3">
                     <div class="relative">
-                        <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                            <i data-lucide="shield-check" class="w-5 h-5 text-ink/40"></i>
+                        <div class="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center border border-gold/20">
+                            <i data-lucide="user" class="w-5 h-5 text-gold"></i>
                         </div>
-                        <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-primary border-2 border-paper"></div>
+                        <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-paper-dark ring-2 ring-green-500/20"></div>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-black text-ink tracking-widest uppercase">ARCHIVIST</span>
-                            <span class="px-1.5 py-0.5 rounded-sm bg-primary text-[8px] font-black text-ink uppercase">PRIVATE</span>
+                            <span class="text-xs font-black text-ink tracking-widest uppercase">SMALLSM</span>
+                            <span class="px-1.5 py-0.5 rounded-sm bg-gold text-[8px] font-black text-paper uppercase">ADMIN</span>
                         </div>
-                        <div class="text-[9px] font-bold text-ink/20 uppercase tracking-tighter mt-0.5">
-                            Private Ledger Registry Level: 1
+                        <div class="text-[9px] font-bold text-ink-dim opacity-50 uppercase tracking-tighter mt-0.5">
+                            Level 7 Archive Clearance
                         </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="list-category-chip !m-0">${item.category}</span>
-                    <button class="p-2 hover:bg-white/5 rounded-lg transition-colors bookmark-btn ${(window.bookmarkedIds || []).includes(item.id) ? 'text-primary' : 'text-ink-dim'}" 
+                    <button class="p-2 hover:bg-white/5 rounded-lg transition-colors bookmark-btn ${(window.bookmarkedIds || []).includes(item.id) ? 'text-gold' : 'text-ink-dim'}" 
                             onclick="window.toggleBookmark('${item.id}', this, event)">
-                        <i data-lucide="bookmark" class="w-4 h-4 ${(window.bookmarkedIds || []).includes(item.id) ? 'fill-current' : ''}"></i>
+                        <i data-lucide="star" class="w-4 h-4 ${(window.bookmarkedIds || []).includes(item.id) ? 'fill-current' : ''}"></i>
                     </button>
                     ${isAdmin ? `
-                        <button class="p-2 hover:bg-white/5 rounded-lg text-ink/20 hover:text-primary transition-colors" onclick="window.showEditForm('${item.id}')">
-                            <i data-lucide="lock" class="w-4 h-4"></i>
+                        <button class="p-2 hover:bg-gold/10 rounded-lg text-ink-dim hover:text-gold transition-colors" onclick="window.showEditForm('${item.id}')">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
                         </button>
                     ` : ''}
                 </div>
@@ -90,7 +90,7 @@ const UIRenderer = {
                     </aside>
                 ` : ''}
             </div>
-            <div class="jokbo-footer border-t border-white/5 mt-8 pt-4 italic opacity-30 text-[9px] tracking-widest uppercase">SECURE PRIVATE LEDGER RECORD // AUTHORIZED ACCESS ONLY</div>
+            <div class="jokbo-footer">주인장의 요점 정리 노트 - 불펌 및 무단 복제 금지</div>
         `;
     },
 
@@ -98,8 +98,8 @@ const UIRenderer = {
         return `
             <div class="p-8">
                 <header class="flex justify-between items-center mb-8 pb-4 border-b border-white/5">
-                    <h2 class="text-xl font-black text-ink">장부 기록 수정</h2>
-                    <button class="text-ink/20 text-xs font-bold hover:text-primary transition-colors" onclick="deleteItem('${item.id}')">기록 말소</button>
+                    <h2 class="text-xl font-black text-gold">기록 수정</h2>
+                    <button class="text-primary text-xs font-bold hover:underline" onclick="deleteItem('${item.id}')">항목 삭제</button>
                 </header>
                 <div class="space-y-6">
                     <div>
@@ -111,8 +111,8 @@ const UIRenderer = {
                         <textarea id="editContent" class="edit-input !mb-0 min-h-[300px] leading-relaxed">${item.content}</textarea>
                     </div>
                     <div class="flex gap-4 pt-4">
-                        <button onclick="saveItem('${item.id}')" class="flex-1 py-4 bg-primary text-ink font-black rounded-xl hover:opacity-80 transition-all shadow-lg active:scale-95 uppercase tracking-widest">Update Ledger</button>
-                        <button onclick="closeBottomSheet()" class="px-6 py-4 bg-paper-dark text-ink/30 font-bold rounded-xl hover:text-ink transition-colors">Close</button>
+                        <button onclick="saveItem('${item.id}')" class="flex-1 py-4 bg-gold text-paper font-black rounded-xl hover:bg-gold-bright transition-all shadow-lg active:scale-95">변동사항 저장</button>
+                        <button onclick="closeBottomSheet()" class="px-6 py-4 bg-paper-dark text-ink-dim font-bold rounded-xl hover:text-ink transition-colors">취소</button>
                     </div>
                 </div>
             </div>

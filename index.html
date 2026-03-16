@@ -20,24 +20,23 @@
             theme: {
                 extend: {
                     colors: {
-                        paper: '#121212', // Material dark gray-black
-                        'paper-dark': '#0A0A0A', 
-                        card: '#1A1A1A', // Understated ledger entry
-                        'border-ledger': '#2A2A2A',
-                        ink: '#E0D4C2', // Warm Ivory/Cream
-                        'ink-dim': '#A0988E', // Muted warm grey
-                        primary: '#4A0000', // Deep burgundy red
-                        'primary-dim': '#330000',
-                        gold: '#8B0000', // Dark red accent
-                        'gold-bright': '#A52A2A', // Active/Hover red
-                        'accent-blue': '#37474F', 
-                        admin: '#8B0000',
-                        'light-yellow': '#5D4037',
-                        'light-pink': '#7B1FA2',
-                        'light-blue': '#263238',
-                        'light-purple': '#311B92',
-                        'light-green': '#1B5E20',
-                        'light-gray': '#212121',
+                        paper: '#FDFCF8', // Soft cream/off-white
+                        'paper-dark': '#F5F2E9', // Binder color
+                        card: '#FFFFFF', // Pure white surfacing
+                        ink: '#2D2D2E', // Dark charcoal ink
+                        'ink-dim': '#666666', // Grey 보조 텍스트
+                        primary: '#65a30d', // Darker green for light bg
+                        'primary-dim': '#4d7c0f',
+                        gold: '#ca8a04', // Darker yellow/gold highlighter
+                        'gold-bright': '#eab308',
+                        'accent-blue': '#0284c7', // Darker blue highlighter
+                        admin: '#0284c7',
+                        'light-yellow': '#854d0e',
+                        'light-pink': '#991b1b',
+                        'light-blue': '#075985',
+                        'light-purple': '#5b21b6',
+                        'light-green': '#3f6212',
+                        'light-gray': '#4b5563',
                     },
                     fontFamily: {
                         serif: ['"Nanum Myeongjo"', 'serif'],
@@ -61,29 +60,17 @@
 
     <!-- Markdown Rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <style>
-        .leather-overlay {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 99;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.08;
-            mix-blend-mode: soft-light;
-        }
-    </style>
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#121212">
+    <meta name="theme-color" content="#FDFCF8">
 
     <!-- Styles -->
     <link rel="stylesheet" href="css/dictionary.css">
     <link rel="stylesheet" href="css/archive-layout.css">
 </head>
 
-<body class="bg-paper text-ink overflow-auto font-sans">
-    <div class="leather-overlay"></div>
+<body class="bg-paper text-ink overflow-hidden font-sans">
     <!-- Emergency Exit -->
     <div id="emergencyExit"
         class="fixed top-4 left-4 z-[100] cursor-pointer opacity-20 hover:opacity-100 transition-opacity p-4">
@@ -92,46 +79,66 @@
 
     <!-- Main Wrapper (Notebook Style) -->
     <div
-        class="flex flex-col min-h-screen max-w-2xl mx-auto shadow-[0_0_80px_rgba(0,0,0,0.8)] relative bg-paper overflow-hidden border-x border-white/5">
+        class="flex flex-col h-[calc(100vh-2rem)] my-4 max-w-2xl mx-auto rounded-r-3xl rounded-l-md shadow-[0_10px_50px_rgba(0,0,0,0.15)] relative bg-paper overflow-hidden border border-black/5 border-l-black/10">
 
-        <!-- Binding replaced with Metallic Chain Aesthetic -->
-        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-r from-red-900/40 to-transparent z-50 pointer-events-none"></div>
+        <!-- Notebook Binding (Spring/Binder illusion) -->
+        <div
+            class="absolute left-0 top-0 bottom-0 w-8 bg-paper-dark border-r border-black/5 z-50 flex flex-col justify-evenly py-8 opacity-90 pointer-events-none">
+            <!-- Binding holes -->
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
+        </div>
+
+        <!-- Margin Line (Red vertical line common in notebooks) -->
+        <div class="absolute left-16 top-0 bottom-0 w-px bg-red-900/40 z-0 pointer-events-none"></div>
 
         <!-- Premium Archive Header -->
-        <header class="pl-24 pr-8 pt-12 pb-8 border-b border-primary/20 bg-paper/90 backdrop-blur-md sticky top-0 overflow-hidden z-[60] shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+        <header class="pl-24 pr-8 pt-12 pb-8 border-b border-white/10 bg-transparent relative overflow-hidden z-10">
+            <!-- Decorative marker removed -->
             <div id="editable-series"
-                class="absolute top-4 right-6 text-[10px] font-black border border-white/5 text-ink/30 px-3 py-1 uppercase tracking-[0.2em] rounded-sm bg-white/5 backdrop-blur-sm admin-editable"
+                class="absolute top-4 right-6 text-[10px] font-black border border-ink/20 text-ink/40 px-3 py-1 uppercase tracking-[0.2em] rounded-sm bg-black/5 admin-editable"
                 data-key="site_series">
-                PRIVATE DUNGEON LEDGER
+                PERSONAL NOTE
             </div>
 
             <div class="text-center mb-8">
                 <div class="flex items-center justify-center gap-2 mb-2">
                     <div class="h-[1px] w-8 bg-gold/30"></div>
-                    <h2 class="text-[11px] font-bold tracking-[0.2em] text-ink/30 uppercase">익명의 장부 관리자가 기록함
+                    <h2 class="text-[11px] font-bold tracking-[0.2em] text-ink/40 uppercase">나만의 학습 기록 노트
                     </h2>
                     <div class="h-[1px] w-8 bg-gold/30"></div>
                 </div>
                 <h1 class="text-3xl font-black text-ink py-4 tracking-tighter leading-none">
-                    <span id="editable-title-main" class="text-primary admin-editable"
-                        data-key="site_title_main">프라이빗</span>
-                    <span id="editable-title-sub" class="admin-editable" data-key="site_title_sub">장부</span> <br />
+                    <span id="editable-title-main" class="admin-editable"
+                        data-key="site_title_main">학습</span>
+                    <span id="editable-title-sub" class="admin-editable" data-key="site_title_sub">정리</span> <br />
                     <span id="editable-subtitle"
-                        class="text-[10px] font-bold tracking-[0.1em] text-ink/20 uppercase admin-editable"
-                        data-key="site_subtitle">Hidden Records & Archives</span>
+                        class="text-[10px] font-bold tracking-[0.1em] text-ink-dim opacity-50 uppercase admin-editable"
+                        data-key="site_subtitle">Personal Study Note</span>
                 </h1>
             </div>
 
             <div class="grid grid-cols-2 gap-4 text-[10px] font-bold border-t border-white/5 pt-6">
                 <div class="flex items-center gap-2 border-r border-white/5 pr-4 group">
                     <span
-                        class="text-ink/20 uppercase tracking-widest group-hover:text-ink/40 transition-colors">ENTRY:</span>
+                        class="text-ink/20 uppercase tracking-widest group-hover:text-ink/40 transition-colors">ID:</span>
                     <span id="editable-code" class="tracking-widest text-ink/80 admin-editable"
                         data-key="site_code">SML-A101</span>
                 </div>
                 <div class="flex items-center gap-2 pl-4 group">
                     <span
-                        class="text-ink/20 uppercase tracking-widest group-hover:text-ink/40 transition-colors">ARCHivist:</span>
+                        class="text-ink/20 uppercase tracking-widest group-hover:text-ink/40 transition-colors">By:</span>
                     <span id="editable-ref" class="text-ink/80 admin-editable" data-key="site_ref">Antigravity</span>
                 </div>
             </div>
@@ -140,13 +147,13 @@
                 <i data-lucide="search"
                     class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/60 group-focus-within:text-gold transition-colors"></i>
                 <input type="text" id="searchInput"
-                    class="w-full bg-card border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-white/10 outline-none transition-all placeholder:text-ink/20 font-sans shadow-inner"
-                    placeholder="장부 기록 검색... (e.g. impact play, collaring)">
+                    class="w-full bg-card border border-black/5 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-ink/20 outline-none transition-all placeholder:text-ink-dim/50 font-sans shadow-sm"
+                    placeholder="필요한 기록을 검색해 보세요...">
             </div>
         </header>
 
-        <!-- Scrollable Main Content -->
-        <main class="flex-1 overflow-y-auto custom-scroll pb-24 bg-transparent z-10" id="dictionaryList">
+        <!-- High-Density List Container -->
+        <main class="flex-1 overflow-y-auto custom-scroll pb-24 bg-transparent z-10 pl-16" id="dictionaryList">
             <!-- Items injected by JS -->
             <div class="p-10 text-center text-ink-dim py-32 italic">
                 <div class="animate-pulse">노트를 펼치는 중입니다...</div>
@@ -183,13 +190,12 @@
     <div id="loginModal"
         class="fixed inset-0 bg-paper/60 backdrop-blur-md z-[150] hidden items-center justify-center p-4">
         <div
-            class="bg-card w-full max-w-sm border border-white/5 p-10 shadow-[0_30px_60px_rgba(0,0,0,0.5)] animate-fade-in rounded-3xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+            class="bg-card w-full max-w-sm border border-gold/30 p-10 shadow-[0_0_50px_rgba(212,175,55,0.15)] animate-fade-in rounded-3xl">
             <h2 class="text-2xl font-black text-ink mb-2 flex items-center gap-3 border-b border-white/5 pb-4">
-                <i data-lucide="shield-check" class="text-primary"></i>
-                장부 관리자 접속
-                <span class="text-[9px] font-bold text-ink/20 ml-auto uppercase tracking-widest">Authorized
-                    Only</span>
+                <i data-lucide="shield-check" class="text-gold"></i>
+                관리자 접속
+                <span class="text-[9px] font-bold text-ink-dim opacity-50 ml-auto uppercase tracking-widest">Admin
+                    Access</span>
             </h2>
             <p class="text-[10px] text-ink/40 mt-2 mb-8 italic font-bold">RESTRICTED ACCESS
             </p>
@@ -198,18 +204,18 @@
                     <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Admin
                         E-mail</label>
                     <input type="email" id="loginEmail"
-                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink/10 focus:border-primary/40 focus:ring-1 focus:ring-primary/20"
-                        placeholder="archivist@dungeon-ledger.private">
+                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-gold/30 focus:ring-1 focus:ring-gold/20"
+                        placeholder="admin@sm-archive.ac.kr">
                 </div>
                 <div class="relative group">
                     <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Password</label>
                     <input type="password" id="loginPassword"
-                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-primary/40 focus:ring-1 focus:ring-primary/20"
+                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-gold/30 focus:ring-1 focus:ring-gold/20"
                         placeholder="••••••••">
                 </div>
                 <button id="submitLoginBtn"
-                    class="w-full py-5 bg-primary text-ink font-black rounded-2xl mt-4 hover:bg-neutral-800 transition-all shadow-xl active:scale-95 text-sm uppercase tracking-widest">
-                    Open the Ledger
+                    class="w-full py-5 bg-gold text-paper font-black rounded-2xl mt-4 hover:bg-gold-bright transition-all shadow-xl active:scale-95 text-sm">
+                    접속 하기
                 </button>
                 <button onclick="closeLoginModal()"
                     class="w-full py-4 text-ink-dim text-[11px] font-bold hover:text-ink transition-colors uppercase tracking-widest">
@@ -226,8 +232,8 @@
 
     <!-- Bottom Sheet -->
     <div id="bottomSheet"
-        class="fixed bottom-0 left-0 w-full max-h-[90vh] bg-[#1A1A1A] rounded-t-[2.5rem] border-t border-white/5 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] z-[101] transform translate-y-full transition-transform duration-500 ease-out flex flex-col">
-        <div class="w-12 h-1 bg-white/10 rounded-full mx-auto my-6 flex-shrink-0"></div>
+        class="fixed bottom-0 left-0 w-full max-h-[90vh] bg-dark-alt rounded-t-[2rem] border-t border-gray-800 z-[101] transform translate-y-full transition-transform duration-300 ease-out flex flex-col">
+        <div class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto my-4 flex-shrink-0"></div>
         <div class="overflow-y-auto px-6 pb-12 flex-1 custom-scroll" id="sheetContent">
             <!-- Detailed content injected by JS -->
         </div>
