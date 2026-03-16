@@ -81,7 +81,7 @@ const ArchiveRenderer = {
         if (data.definition) {
             const rawLines = data.definition.split('\n').filter(l => l.trim());
             const title = format(rawLines[0]) || '';
-            const body = rawLines.slice(1).map(l => format(l)).join('<br>');
+            const body = rawLines.slice(1).map(l => format(l)).join(' ');
 
             html += `
                 <section class="archive-section segment-definition">
@@ -171,7 +171,6 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <section class="archive-ethics-box">
-                    <h3 class="archive-ethics-title">주의사항</h3>
                     ${items}
                 </section>
             `;

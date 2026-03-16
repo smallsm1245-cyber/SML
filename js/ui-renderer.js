@@ -10,7 +10,7 @@ const UIRenderer = {
         html = Utils.convertInternalLinks(html);
 
         return `
-            <div class="archive-sheet-header p-6 border-b border-white/5 bg-paper-dark flex justify-between items-start">
+            <div class="archive-sheet-header p-4 pb-2 border-b border-white/5 bg-paper-dark flex justify-between items-start">
                 <div class="flex items-center gap-3">
                     <div class="relative">
                         <div class="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center border border-gold/20">
@@ -41,7 +41,7 @@ const UIRenderer = {
                     ` : ''}
                 </div>
             </div>
-            <div class="p-6">
+            <div class="p-2 sm:p-4">
                 ${html}
             </div>
         `;
