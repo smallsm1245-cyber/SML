@@ -1,21 +1,19 @@
 :root {
-    /* Base Colors - Cinematic Dark Note (Updated Design Guide) */
-    --bg-paper: #1A1A1B; /* 짙은 차콜 */
-    --bg-paper-dark: #101011; /* Binding color - slightly darker */
-    --bg-card: #2D2D2E; /* 섹션 구분용 Surface/Card */
-    --ink: #EDE2B7; /* 연노랑 기본 텍스트 */
-    --ink-dim: #B2B2B2; /* 연회색 보조 텍스트 */
+    /* Base Colors - Cinematic Dark Note */
+    --bg-paper: #18181b; /* slightly lighter dark grey for paper */
+    --bg-paper-dark: #09090b; /* Binding color */
+    --bg-card: #27272a;
+    --ink: #f8fafc; /* Crisp white text */
+    --ink-dim: #a1a1aa; /* Dimmed text */
 
-    /* Semantic Accent Colors (Pastel Palette) */
-    --gold: #fde047; /* Bright neon highlighter yellow (Legacy/Icons) */
+    /* Semantic Accent Colors (Highlighter Palette) */
+    --gold: #fde047; /* Bright neon highlighter yellow */
     --gold-bright: #fef08a;
+    --red: #f43f5e; /* Neon pinkish red */
+    --red-bright: #fb7185;
+    --blue: #38bdf8; /* Neon blue highlighter */
 
-    --highlight-pink: #E1BBBB; /* 중요 표시/하이라이트 */
-    --link-blue: #ADCCE9;      /* 링크/체크박스 활성화 */
-    --success-green: #B9C487;  /* 완료/긍정적 알림 */
-    --tag-purple: #ADA3DA;     /* 태그/카테고리 구분 */
-
-    /* Pastel Dark Mode Colors (Direct Selection) */
+    /* Pastel Dark Mode Colors */
     --light-yellow: #ede2b7;
     --light-pink: #e1bbbb;
     --light-blue: #adcce9;
@@ -24,18 +22,18 @@
     --light-gray: #b2b2b2;
 
     /* Visual Effects */
-    --glass-bg: rgba(26, 26, 27, 0.7);
+    --glass-bg: rgba(20, 20, 20, 0.7);
     --glass-border: rgba(255, 255, 255, 0.05);
 
     /* Functional Mappings (for backward compatibility and readability) */
-    --jokbo-gold: var(--ink); /* Swapping gold headers to the base text color */
-    --jokbo-gold-bright: var(--light-yellow);
-    --jokbo-red: var(--highlight-pink);
-    --jokbo-red-bright: var(--light-pink);
-    --jokbo-blue: var(--link-blue);
+    --jokbo-gold: var(--gold);
+    --jokbo-gold-bright: var(--gold-bright);
+    --jokbo-red: var(--red);
+    --jokbo-red-bright: var(--red-bright);
+    --jokbo-blue: var(--blue);
 
-    --primary: var(--success-green);
-    --accent-blue: var(--link-blue);
+    --primary: var(--red);
+    --accent-blue: var(--blue);
 }
 
 body {
@@ -110,14 +108,16 @@ body {
     font-size: 0.7rem;
     font-weight: 800;
     border: none;
-    background: var(--tag-purple);
-    color: #1A1A1B;
+    background: var(--gold);
+    color: #000;
     padding: 0.25rem 0.6rem;
-    border-radius: 4px;
+    border-radius: 2px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-left: 0.4rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-family: 'Nanum Gothic', sans-serif;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    transform: rotate(-2deg);
     display: inline-block;
 }
 
@@ -131,7 +131,7 @@ body {
 
 .dict-summary {
     font-size: 0.95rem;
-    color: var(--ink-dim);
+    color: #999999;
     line-height: 1.6;
     font-family: 'Nanum Gothic', sans-serif;
 }
@@ -267,7 +267,7 @@ header h1,
 }
 
 .jokbo-header {
-    border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 1.5rem;
     margin-bottom: 2rem;
 }
@@ -321,22 +321,23 @@ header h1,
 
 /* Highlights & Markers - Owner's Highlighter */
 .highlight-gold {
-    background-color: rgba(225, 187, 187, 0.3) !important; /* Semi-transparent Pink highlighter */
-    color: var(--highlight-pink) !important;
+    background-color: rgba(253, 224, 71, 0.6) !important; /* Semi-transparent highlighter */
+    color: inherit !important;
     padding: 0 0.3rem;
     font-weight: 900;
     display: inline;
     border-radius: 4px;
+    box-shadow: 0 0 8px rgba(253, 224, 71, 0.4);
 }
 
 .keyword-red {
-    background-color: var(--highlight-pink);
-    color: #1A1A1B;
+    background-color: var(--red);
+    color: #ffffff;
     border-radius: 4px;
     padding: 0 0.3rem;
     text-decoration: none;
     font-weight: 900;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .keyword-blue {
@@ -436,13 +437,12 @@ header h1,
 
 /* Tip Box & Ethics Box */
 .admin-tip {
-    background: var(--bg-card);
-    border-left: 3px solid var(--highlight-pink);
+    background: rgba(212, 175, 55, 0.03);
+    border-left: 2px solid var(--jokbo-gold);
     padding: 1.5rem;
     margin: 2.5rem 0;
     font-size: 0.9rem;
     border-radius: 0 8px 8px 0;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .tip-label {
@@ -491,7 +491,7 @@ header h1,
 
 .body-text b,
 .body-text strong {
-    color: var(--highlight-pink);
+    color: #ffffff;
     font-family: 'Nanum Gothic', sans-serif;
     font-weight: 900;
 }
@@ -522,21 +522,19 @@ header h1,
 /* Inputs & Forms (Academic Style) */
 .edit-input {
     width: 100%;
-    background: var(--bg-card);
+    background: var(--bg-paper-dark);
     border: none;
-    border-bottom: 2px solid rgba(255,255,255,0.1);
-    border-radius: 8px 8px 0 0;
+    border-bottom: 2px solid var(--ink);
     padding: 0.75rem;
     font-family: 'Nanum Gothic', sans-serif;
     color: var(--ink);
     outline: none;
     margin-bottom: 1.5rem;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .edit-input:focus {
     background: rgba(255, 255, 255, 0.05);
-    border-bottom-color: var(--link-blue);
+    border-bottom-color: var(--primary);
 }
 
 /* Custom Scrollbar */
