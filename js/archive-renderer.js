@@ -7,40 +7,63 @@ const ArchiveRenderer = {
     parseContent(raw) {
         if (!raw || !raw.includes('[ARCHIVE]')) return null;
 
-        const data = { definition: null, mechanisms: [], comparison: [], tip: null, ethics: null };
-        const sections = {
-            definition: /\[DEFINITION\]\s*([\s\S]*?)(?=\[|$)/i,
-            mechanisms: /\[MECHANISMS\]\s*([\s\S]*?)(?=\[|$)/i,
-            comparison: /\[COMPARISON\]\s*([\s\S]*?)(?=\[|$)/i,
-            tip: /\[TIP\]\s*([\s\S]*?)(?=\[|$)/i,
-            ethics: /\[ETHICS\]\s*([\s\S]*?)(?=\[|$)/i
-        };
-
-        const defMatch = raw.match(sections.definition);
-        if (defMatch) data.definition = defMatch[1].trim();
-
-        const techMatch = raw.match(sections.mechanisms);
-        if (techMatch) {
-            data.mechanisms = techMatch[1].trim().split('\n')
-                .filter(i => i.trim() && !i.startsWith('---'))
-                .map(i => i.replace(/^[A-Z0-9][\.\)]\s*/i, '').trim());
+        // Reset data with sections and prologue
+        const data = { prologue: '', sections: [] };
+        
+        // Find all tags in [TAG] format
+        const tagRegex = /\[([A-Z가-힣0-9_\s]+)\]/g;
+        let matches = [];
+        let match;
+        
+        while ((match = tagRegex.exec(raw)) !== null) {
+            matches.push({
+                tag: match[1].trim(),
+                index: match.index,
+                fullTag: match[0]
+            });
         }
 
-        const compMatch = raw.match(sections.comparison);
-        if (compMatch) {
-            data.comparison = compMatch[1].trim().split('\n')
-                .filter(l => l.includes('|'))
-                .map(l => {
-                    const [c1, c2] = l.split('|').map(s => s.trim().replace(/^['">|]+|['">|]+$/g, '').trim());
-                    return { c1, c2 };
-                });
+        if (matches.length === 0) return { prologue: raw, sections: [], raw };
+
+        // Everything before the first tag is prologue (excluding [ARCHIVE])
+        const firstTagIndex = matches[0].index;
+        data.prologue = raw.substring(0, firstTagIndex).replace('[ARCHIVE]', '').trim();
+
+        // Extract content for each tag
+        for (let i = 0; i < matches.length; i++) {
+            const current = matches[i];
+            const next = matches[i + 1];
+            const end = next ? next.index : raw.length;
+            
+            const content = raw.substring(current.index + current.fullTag.length, end).trim();
+            
+            // Map known tags to structural data, others to generic sections
+            const tagUpper = current.tag.toUpperCase();
+            
+            if (tagUpper === 'DEFINITION') {
+                data.definition = content;
+            } else if (tagUpper === 'MECHANISMS') {
+                data.mechanisms = content.split('\n')
+                    .filter(i => i.trim() && !i.startsWith('---'))
+                    .map(i => i.replace(/^[A-Z0-9][\.\)]\s*/i, '').trim());
+            } else if (tagUpper === 'COMPARISON') {
+                data.comparison = content.split('\n')
+                    .filter(l => l.includes('|'))
+                    .map(l => {
+                        const [c1, c2] = l.split('|').map(s => s.trim().replace(/^['">|]+|['">|]+$/g, '').trim());
+                        return { c1, c2 };
+                    });
+            } else if (tagUpper === 'TIP') {
+                data.tip = content;
+            } else if (tagUpper === 'ETHICS') {
+                data.ethics = content;
+            } else if (tagUpper === 'SIDE') {
+                data.side = content;
+            } else if (tagUpper !== 'ARCHIVE') {
+                // Custom tag: treat as a generic section
+                data.sections.push({ title: current.tag, content });
+            }
         }
-
-        const tipMatch = raw.match(sections.tip);
-        if (tipMatch) data.tip = tipMatch[1].trim();
-
-        const ethicsMatch = raw.match(sections.ethics);
-        if (ethicsMatch) data.ethics = ethicsMatch[1].trim();
 
         return { ...data, raw };
     },
@@ -56,28 +79,22 @@ const ArchiveRenderer = {
                 .replace(/~~(.*?)~~/g, '<span class="hand-strike">$1</span>')
                 .replace(/__(.*?)__/g, '<span class="hand-underline">$1</span>')
                 .replace(/'(.*?)'/g, '<span class="archive-keyword-red">$1</span>')
-                .replace(/\*\*/g, '') // Strip remaining literal stars
+                .replace(/\*\*/g, '') 
                 .trim();
         };
 
-        const sections = {
-            definition: /\[DEFINITION\]\s*([\s\S]*?)(?=\[|$)/i,
-            mechanisms: /\[MECHANISMS\]\s*([\s\S]*?)(?=\[|$)/i,
-            comparison: /\[COMPARISON\]\s*([\s\S]*?)(?=\[|$)/i,
-            tip: /\[TIP\]\s*([\s\S]*?)(?=\[|$)/i,
-            ethics: /\[ETHICS\]\s*([\s\S]*?)(?=\[|$)/i,
-            side: /\[SIDE\]\s*([\s\S]*?)(?=\[|$)/i
-        };
-
-        const sideMatch = data.raw ? data.raw.match(sections.side) : null;
-        const sideNote = sideMatch ? format(sideMatch[1]) : '';
-
         let html = '<article class="archive-container animate-fade-in relative">';
         
-        if (sideNote) {
-            html += `<div class="marginalia">${sideNote}</div>`;
+        if (data.side) {
+            html += `<div class="marginalia">${format(data.side)}</div>`;
         }
 
+        // 1. Prologue (Loose text at top)
+        if (data.prologue) {
+            html += `<div class="archive-role-description mb-6">${format(data.prologue)}</div>`;
+        }
+
+        // 2. Definition
         if (data.definition) {
             const rawLines = data.definition.split('\n').filter(l => l.trim());
             const title = format(rawLines[0]) || '';
@@ -94,7 +111,20 @@ const ArchiveRenderer = {
             `;
         }
 
-        if (data.mechanisms.length > 0) {
+        // 3. Custom Sections (Unknown tags like [글 내용])
+        if (data.sections && data.sections.length > 0) {
+            data.sections.forEach(sec => {
+                html += `
+                    <section class="archive-section">
+                        <h3 class="archive-section-header">${sec.title}</h3>
+                        <div class="archive-role-description">${format(sec.content).replace(/\n/g, '<br>')}</div>
+                    </section>
+                `;
+            });
+        }
+
+        // 4. Mechanisms
+        if (data.mechanisms && data.mechanisms.length > 0) {
             const cards = data.mechanisms.map((m, idx) => {
                 const parts = m.split(':');
                 const title = format(parts[0]);
@@ -119,16 +149,15 @@ const ArchiveRenderer = {
             `;
         }
 
-        if (data.comparison.length > 0) {
+        // 5. Comparison
+        if (data.comparison && data.comparison.length > 0) {
             const rows = data.comparison.map((row, idx) => {
                 const c1 = format(row.c1).replace(/<strong>(.*?)<\/strong>/g, '<span class="archive-highlight">$1</span>');
                 const c2 = format(row.c2).replace(/<strong>(.*?)<\/strong>/g, '<span class="archive-highlight">$1</span>');
                 
-                // Special handling for the first row if it's a category header
                 if (idx === 0 && (row.c1.includes('(') || row.c2.includes('('))) {
                     return `<tr class="comparison-sub-header"><td>${c1}</td><td>${c2}</td></tr>`;
                 }
-                
                 return `<tr><td>${c1}</td><td>${c2}</td></tr>`;
             }).join('');
             
@@ -150,6 +179,7 @@ const ArchiveRenderer = {
             `;
         }
 
+        // 6. Tip
         if (data.tip) {
             let processedTip = format(data.tip).replace(/^★\s*/, '');
             html += `
@@ -163,6 +193,7 @@ const ArchiveRenderer = {
             `;
         }
 
+        // 7. Ethics
         if (data.ethics) {
             const items = data.ethics.split('\n').filter(l => l.trim()).map(l => {
                 const tagMatch = l.match(/\[(.*?)\]/);
@@ -179,6 +210,6 @@ const ArchiveRenderer = {
         html += '</article>';
         return html;
     }
-};
+};;
 
 window.ArchiveRenderer = ArchiveRenderer;

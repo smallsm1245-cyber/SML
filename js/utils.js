@@ -10,21 +10,30 @@ const Utils = {
         if (!content) return '';
         let plainText = content;
 
-        // Fast path for ARCHIVE content: Try to extract the first line of [DEFINITION]
+        // Fast path for ARCHIVE content
         if (plainText.includes('[ARCHIVE]')) {
+            // 1. Try DEFINITION first
             const defMatch = plainText.match(/\[DEFINITION\]\s*([\s\S]*?)(?=\[|$)/i);
             if (defMatch && defMatch[1]) {
                 let defClean = defMatch[1].replace(/[#*_+~\[\]'"]/g, '').trim();
                 const lines = defClean.split('\n').filter(l => l.trim());
-                if (lines.length > 0) {
-                    let firstLine = lines[0].trim();
-                    return firstLine.length > 60 ? firstLine.substring(0, 57) + '...' : firstLine;
-                }
+                if (lines.length > 0) return lines[0].trim().substring(0, 60);
             }
+            
+            // 2. Fallback: Try the very first generic [TAG] if no definition
+            const anyTagMatch = plainText.match(/\[(?!ARCHIVE)([A-Z가-힣0-9_\s]+)\]\s*([\s\S]*?)(?=\[|$)/i);
+            if (anyTagMatch && anyTagMatch[2]) {
+                let tagClean = anyTagMatch[2].replace(/[#*_+~\[\]'"]/g, '').trim();
+                const lines = tagClean.split('\n').filter(l => l.trim());
+                if (lines.length > 0) return lines[0].trim().substring(0, 60);
+            }
+            
+            // 3. Fallback: Just take anything after [ARCHIVE] but before another tag
+            plainText = plainText.replace('[ARCHIVE]', '');
         }
 
-        // Fallback: Remove Archive format tags
-        plainText = plainText.replace(/\[(ARCHIVE|DEFINITION|MECHANISMS|COMPARISON|TIP|ETHICS)\]/gi, '');
+        // Fallback: Remove all square brackets and special symbols
+        plainText = plainText.replace(/\[.*?\]/g, ''); 
         plainText = plainText.replace(/<[^>]*>/g, '');
         plainText = plainText.replace(/[#*_+~\[\]]/g, '');
         plainText = plainText.replace(/"/g, '');
