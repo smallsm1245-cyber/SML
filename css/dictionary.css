@@ -1,34 +1,34 @@
 :root {
-    /* Base Colors - Premium Minimal Note */
-    --bg-paper: #FDFCF8;
-    --bg-paper-dark: #F5F2E9;
-    --bg-card: #FFFFFF;
-    --ink: #262626;
-    --ink-dim: #737373;
+    /* Base Colors - Cinematic Dark */
+    --bg-paper: #0f172a;
+    --bg-paper-dark: #020617;
+    --bg-card: #1e293b;
+    --ink: #f8fafc;
+    --ink-dim: #94a3b8;
 
-    /* Premium Indigo Palette */
-    --indigo-primary: #4f46e5;
-    --indigo-soft: #eef2ff;
-    --indigo-border: #c7d2fe;
-    --indigo-text: #4338ca;
+    /* Premium Indigo palette adapted for Dark */
+    --indigo-primary: #818cf8;
+    --indigo-soft: rgba(79, 70, 229, 0.15);
+    --indigo-border: #4338ca;
+    --indigo-text: #c7d2fe;
 
-    --gold: var(--indigo-primary);
-    --gold-bright: #818cf8;
+    --gold: #f59e0b;
+    --gold-bright: #fbbf24;
 
-    --highlight-pink: var(--indigo-primary);
-    --link-blue: #0ea5e9;
-    --success-green: #166534;
-    --tag-purple: #f1f5f9; /* Muted Slate for chips */
+    --highlight-pink: #f43f5e;
+    --link-blue: #38bdf8;
+    --success-green: #34d399;
+    --tag-purple: #1e293b;
 
     /* Visual Effects */
-    --glass-bg: rgba(253, 252, 248, 0.8);
-    --glass-border: rgba(0, 0, 0, 0.05);
+    --glass-bg: rgba(15, 23, 42, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.05);
 
     /* Functional Mappings */
-    --jokbo-gold: var(--ink);
-    --jokbo-gold-bright: #6366f1;
-    --jokbo-red: var(--indigo-primary);
-    --jokbo-red-bright: #dc2626;
+    --jokbo-gold: var(--gold);
+    --jokbo-gold-bright: var(--gold-bright);
+    --jokbo-red: #fb7185;
+    --jokbo-red-bright: #f43f5e;
     --jokbo-blue: var(--link-blue);
 
     --primary: var(--indigo-primary);
@@ -37,18 +37,17 @@
 
 body {
     font-family: 'Nanum Gothic', sans-serif;
-    /* Cleaner sans-serif for notes */
     -webkit-font-smoothing: antialiased;
     background-color: var(--bg-paper-dark);
     color: var(--ink);
 }
 
-/* Notebook Paper Background Texture - Squared/Grid Pattern */
+/* Notebook Paper Background Texture - Refined for Dark Mode */
 .bg-paper {
     background-color: var(--bg-paper);
     background-image:
-        linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 28px 28px;
     background-attachment: local;
     background-position: 0 0;

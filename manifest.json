@@ -4,8 +4,8 @@
     "description": "Essential Dictionary for SmallSM Community",
     "start_url": "/index.html",
     "display": "standalone",
-    "background_color": "#0b0c10",
-    "theme_color": "#1f2833",
+    "background_color": "#020617",
+    "theme_color": "#0f172a",
     "icons": [
         {
             "src": "/icons/icon-192x192.png",
