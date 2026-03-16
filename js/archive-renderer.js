@@ -42,7 +42,7 @@ const ArchiveRenderer = {
         const ethicsMatch = raw.match(sections.ethics);
         if (ethicsMatch) data.ethics = ethicsMatch[1].trim();
 
-        return data;
+        return { ...data, raw };
     },
 
     render(data) {
@@ -53,12 +53,30 @@ const ArchiveRenderer = {
             return text
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\+\+(.*?)\+\+/g, '<span class="archive-highlight">$1</span>')
+                .replace(/~~(.*?)~~/g, '<span class="hand-strike">$1</span>')
+                .replace(/__(.*?)__/g, '<span class="hand-underline">$1</span>')
                 .replace(/'(.*?)'/g, '<span class="archive-keyword-red">$1</span>')
                 .replace(/\*\*/g, '') // Strip remaining literal stars
                 .trim();
         };
 
-        let html = '<article class="archive-container animate-fade-in">';
+        const sections = {
+            definition: /\[DEFINITION\]\s*([\s\S]*?)(?=\[|$)/i,
+            mechanisms: /\[MECHANISMS\]\s*([\s\S]*?)(?=\[|$)/i,
+            comparison: /\[COMPARISON\]\s*([\s\S]*?)(?=\[|$)/i,
+            tip: /\[TIP\]\s*([\s\S]*?)(?=\[|$)/i,
+            ethics: /\[ETHICS\]\s*([\s\S]*?)(?=\[|$)/i,
+            side: /\[SIDE\]\s*([\s\S]*?)(?=\[|$)/i
+        };
+
+        const sideMatch = raw.match(sections.side);
+        const sideNote = sideMatch ? format(sideMatch[1]) : '';
+
+        let html = '<article class="archive-container animate-fade-in relative">';
+        
+        if (sideNote) {
+            html += `<div class="marginalia">${sideNote}</div>`;
+        }
 
         if (data.definition) {
             let processed = format(data.definition);

@@ -57,16 +57,7 @@
     font-size: 0.7rem;
     font-weight: 900;
     flex-shrink: 0;
-    transition: all 0.2s ease;
 }
-
-/* Circle Color Variations */
-.archive-circle-yellow { border-color: var(--light-yellow); color: var(--light-yellow); }
-.archive-circle-pink   { border-color: var(--light-pink); color: var(--light-pink); }
-.archive-circle-blue   { border-color: var(--light-blue); color: var(--light-blue); }
-.archive-circle-purple { border-color: var(--light-purple); color: var(--light-purple); }
-.archive-circle-green  { border-color: var(--light-green); color: var(--light-green); }
-.archive-circle-gray   { border-color: var(--light-gray); color: var(--light-gray); }
 
 .archive-definition-content {
     font-size: 0.9rem;
@@ -88,35 +79,11 @@
     /* Subtle pink tint background */
 }
 
-/* Keywords & Highlights */
+/* Keywords */
 .archive-keyword-red {
     color: var(--archive-danger);
     font-weight: 700;
     border-bottom: 1.5px solid var(--archive-danger);
-}
-
-.archive-keyword-blue {
-    color: var(--light-blue);
-    font-weight: 700;
-    border-bottom: 1.5px solid var(--light-blue);
-}
-
-.archive-keyword-green {
-    color: var(--light-green);
-    font-weight: 700;
-    border-bottom: 1.5px solid var(--light-green);
-}
-
-.archive-keyword-purple {
-    color: var(--light-purple);
-    font-weight: 700;
-    border-bottom: 1.5px solid var(--light-purple);
-}
-
-.archive-keyword-yellow {
-    color: var(--light-yellow);
-    font-weight: 700;
-    border-bottom: 1.5px solid var(--light-yellow);
 }
 
 .archive-highlight {
@@ -145,13 +112,6 @@
     color: var(--archive-info);
     font-weight: 900;
 }
-
-/* Label Color Variations */
-.archive-label-blue   { color: var(--light-blue); }
-.archive-label-pink   { color: var(--light-pink); }
-.archive-label-purple { color: var(--light-purple); }
-.archive-label-green  { color: var(--light-green); }
-.archive-label-yellow { color: var(--light-yellow); }
 
 .archive-mechanism-title {
     font-weight: 800;
@@ -203,13 +163,6 @@
 .archive-th-true {
     color: var(--archive-info);
 }
-
-/* Table Header Color Variations */
-.archive-th-yellow { color: var(--light-yellow); border-bottom: 2px solid var(--light-yellow) !important; }
-.archive-th-pink   { color: var(--light-pink); border-bottom: 2px solid var(--light-pink) !important; }
-.archive-th-blue   { color: var(--light-blue); border-bottom: 2px solid var(--light-blue) !important; }
-.archive-th-purple { color: var(--light-purple); border-bottom: 2px solid var(--light-purple) !important; }
-.archive-th-green  { color: var(--light-green); border-bottom: 2px solid var(--light-green) !important; }
 
 /* Tip Section */
 .archive-tip-container {
