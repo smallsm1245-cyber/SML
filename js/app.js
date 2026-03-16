@@ -83,15 +83,15 @@ function syncAdminUI() {
                 addBtn.onclick = window.showNewItemForm;
             }
             if (loginBtn) {
-                loginBtn.innerHTML = '<i data-lucide="unlock" class="w-6 h-6 text-admin"></i>';
+                loginBtn.innerHTML = '<i data-lucide="lock" class="w-6 h-6 text-primary"></i>';
             }
             // Badge logic
             const oldBadge = document.querySelector('.admin-badge');
             if (oldBadge) oldBadge.remove();
             if (header) {
                 const badge = document.createElement('span');
-                badge.className = 'admin-badge rounded-none align-middle ml-2 uppercase font-black';
-                badge.innerText = 'Admin';
+                badge.className = 'admin-badge rounded-none align-middle ml-2 uppercase font-black text-primary border border-primary/30 px-2 py-0.5 text-[10px] bg-primary/10';
+                badge.innerText = 'Master';
                 header.appendChild(badge);
             }
         } else {
@@ -99,7 +99,7 @@ function syncAdminUI() {
             document.body.classList.remove('admin-mode');
             disableEditableFields();
             if (addBtn) addBtn.classList.add('hidden');
-            if (loginBtn) loginBtn.innerHTML = '<i data-lucide="key" class="w-6 h-6"></i>';
+            if (loginBtn) loginBtn.innerHTML = '<i data-lucide="key" class="w-6 h-6 opacity-30"></i>';
             const badge = document.querySelector('.admin-badge');
             if (badge) badge.remove();
         }
@@ -215,7 +215,7 @@ function renderList(data) {
                             <h3 class="dict-title-text">${item.term}</h3>
                             <span class="list-category-chip">${item.category}</span>
                         </header>
-                        ${window.isAdmin ? '<i data-lucide="edit-2" class="w-4 h-4 text-ink-dim opacity-30 mt-1 flex-shrink-0"></i>' : ''}
+                        ${window.isAdmin ? '<i data-lucide="lock" class="w-4 h-4 text-primary opacity-30 mt-1 flex-shrink-0"></i>' : ''}
                     </div>
                     <div class="dict-content-wrapper">
                         <p class="dict-summary">${item.summary}</p>
@@ -231,11 +231,12 @@ function renderList(data) {
 function renderToolkit() {
     const bar = document.getElementById('toolkitBar');
     bar.innerHTML = '';
+    bar.className = 'flex flex-row overflow-x-auto custom-scroll-hide gap-1 px-4 py-2 bg-paper/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-40';
 
     categories.forEach(cat => {
         const btn = document.createElement('button');
-        btn.className = 'w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors';
-        btn.innerHTML = `<span class="text-[10px] font-bold">${cat.substring(0, 2)}</span>`;
+        btn.className = 'w-10 h-10 flex-shrink-0 flex items-center justify-center text-ink-dim hover:text-primary transition-all rounded-lg hover:bg-primary/5 border border-transparent hover:border-primary/10';
+        btn.innerHTML = `<span class="text-[10px] font-black">${cat.substring(0, 2).toUpperCase()}</span>`;
         btn.onclick = () => {
             const target = document.getElementById(`cat-${cat}`);
             if (target) target.scrollIntoView({ behavior: 'smooth' });

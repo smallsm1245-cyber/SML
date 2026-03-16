@@ -88,7 +88,7 @@ const ArchiveRenderer = {
 
             html += `
                 <section class="archive-section">
-                    <h3 class="archive-section-header">설명</h3>
+                    <h3 class="archive-section-header">코덱스 기입 (Codex Entry)</h3>
                     <div class="archive-definition-content">
                         ${title ? `<span class="archive-quote-box">${title}</span>` : ''}
                         ${body}
@@ -113,7 +113,7 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <section class="archive-section">
-                    <h3 class="archive-section-header">주요 내용</h3>
+                    <h3 class="archive-section-header">수행 메커니즘</h3>
                     <ul class="archive-mechanisms-list">${listItems}</ul>
                 </section>
             `;
@@ -127,9 +127,9 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <section class="archive-section">
-                    <h3 class="archive-section-header">비교 및 확인</h3>
+                    <h3 class="archive-section-header">비교 데이터</h3>
                     <table class="archive-comparison-table">
-                        <thead><tr><th class="archive-th-false">기존 생각</th><th class="archive-th-true">핵심 포인트</th></tr></thead>
+                        <thead><tr><th class="archive-th-false">COMMON ERROR</th><th class="archive-th-true">MASTER TRUTH</th></tr></thead>
                         <tbody>${rows}</tbody>
                     </table>
                 </section>
@@ -140,7 +140,7 @@ const ArchiveRenderer = {
             let processedTip = format(data.tip).replace(/^★\s*/, '');
             html += `
                 <aside class="archive-tip-container">
-                    <div class="archive-tip-label"><i data-lucide="info" class="w-3 h-3 fill-current mr-1"></i>참고 메모:</div>
+                    <div class="archive-tip-label"><i data-lucide="info" class="w-3 h-3 fill-current mr-1"></i>MASTER'S DIRECTIVE:</div>
                     <div class="archive-tip-text">"${processedTip}"</div>
                 </aside>
             `;
@@ -154,7 +154,7 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <section class="archive-ethics-box">
-                    <h3 class="archive-ethics-title">주의사항</h3>
+                    <h3 class="archive-ethics-title">주의사항 및 제약 (Codex Caution)</h3>
                     ${items}
                 </section>
             `;
