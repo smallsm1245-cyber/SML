@@ -50,13 +50,18 @@ const ArchiveRenderer = {
 
         const format = (text) => {
             if (!text) return '';
-            return text
+            let cleaned = text
+                // 1. Initial safety: remove stray brackets and attribute-like patterns first
+                .replace(/[<>]/g, '') 
+                .replace(/[a-z-]+=".*?"/g, '')
+                .replace(/text-\[.*?\]|tracking-.*?|border-.*?|font-.*?|uppercase|p-\d+|rounded-.*?|opacity-.*?|transition-.*?|group-hover:.*?/g, '');
+            
+            // 2. Apply markdown-style formatting
+            return cleaned
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\+\+(.*?)\+\+/g, '<span class="archive-highlight">$1</span>')
                 .replace(/'(.*?)'/g, '<span class="archive-keyword-red">$1</span>')
                 .replace(/\*\*/g, '') // Strip remaining literal stars
-                .replace(/uppercase font-bold text-white tracking-widest border border-white\/10/g, '') // Remove injected user tailwind
-                .replace(/>$/, '') // Remove trailing bracket if any
                 .trim();
         };
 
@@ -76,10 +81,10 @@ const ArchiveRenderer = {
                     <h3 class="archive-section-header"><span class="archive-circle-num">1</span> 개념 정의</h3>
                     <div class="archive-definition-content">
                         ${title ? `<span class="archive-quote-box cursor-pointer relative group transition-all" title="클릭하여 복사" onclick="typeof Utils !== 'undefined' && Utils.copyToClipboard('${rawTitle}')">
-                            ${title}
-                            <span class="absolute top-1/2 -translate-y-1/2 right-2 opacity-0 group-hover:opacity-60 transition-opacity bg-black/40 p-1.5 rounded-md flex items-center gap-1 text-[10px] uppercase font-bold text-white tracking-widest border border-white/10">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                Copy
+                            <span class="relative z-10">${title}</span>
+                            <span class="absolute top-1/2 -translate-y-1/2 right-2 opacity-0 group-hover:opacity-100 transition-all bg-black/60 px-2 py-1.5 rounded-md flex items-center gap-1.5 text-[10px] uppercase font-black text-white tracking-[0.2em] border border-white/10 pointer-events-none scale-90 group-hover:scale-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-gold"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                <span>Copy</span>
                             </span>
                         </span>` : ''}
                         ${body}
