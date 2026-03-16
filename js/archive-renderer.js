@@ -55,6 +55,8 @@ const ArchiveRenderer = {
                 .replace(/\+\+(.*?)\+\+/g, '<span class="archive-highlight">$1</span>')
                 .replace(/'(.*?)'/g, '<span class="archive-keyword-red">$1</span>')
                 .replace(/\*\*/g, '') // Strip remaining literal stars
+                .replace(/uppercase font-bold text-white tracking-widest border border-white\/10/g, '') // Remove injected user tailwind
+                .replace(/>$/, '') // Remove trailing bracket if any
                 .trim();
         };
 
@@ -90,7 +92,7 @@ const ArchiveRenderer = {
             const listItems = data.mechanisms.map((m, idx) => {
                 const parts = m.split(':');
                 const title = format(parts[0]);
-                let desc = parts[1] ? format(parts.slice(1).join(':')) : '';
+                let desc = parts.length > 1 ? format(parts.slice(1).join(':')) : '';
 
                 return `
                     <li class="archive-mechanism-item">
