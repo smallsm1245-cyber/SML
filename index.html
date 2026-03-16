@@ -23,19 +23,19 @@
                         paper: '#FDFCF8', // Soft cream/off-white
                         'paper-dark': '#F5F2E9', // Binder color
                         card: '#FFFFFF', // Pure white surfacing
-                        ink: '#2D2D2E', // Dark charcoal ink
-                        'ink-dim': '#666666', // Grey 보조 텍스트
-                        primary: '#65a30d', // Darker green for light bg
-                        'primary-dim': '#4d7c0f',
-                        gold: '#ca8a04', // Darker yellow/gold highlighter
-                        'gold-bright': '#eab308',
-                        'accent-blue': '#0284c7', // Darker blue highlighter
-                        admin: '#0284c7',
-                        'light-yellow': '#854d0e',
+                        ink: '#262626', // Deep charcoal ink
+                        'ink-dim': '#737373', // Grey 보조 텍스트
+                        primary: '#4f46e5', // Premium Indigo
+                        'primary-dim': '#4338ca',
+                        gold: '#6366f1', // Indigo highlight instead of gold
+                        'gold-bright': '#818cf8',
+                        'accent-blue': '#0ea5e9',
+                        admin: '#000000',
+                        'light-yellow': '#6366f1',
                         'light-pink': '#991b1b',
                         'light-blue': '#075985',
                         'light-purple': '#5b21b6',
-                        'light-green': '#3f6212',
+                        'light-green': '#166534',
                         'light-gray': '#4b5563',
                     },
                     fontFamily: {
@@ -79,7 +79,7 @@
 
     <!-- Main Wrapper (Notebook Style) -->
     <div
-        class="flex flex-col h-[calc(100vh-2rem)] my-4 max-w-2xl mx-auto rounded-r-3xl rounded-l-md shadow-[0_10px_50px_rgba(0,0,0,0.15)] relative bg-paper overflow-hidden border border-black/5 border-l-black/10">
+        class="flex flex-col h-screen sm:h-[calc(100vh-2rem)] sm:my-4 w-full sm:max-w-2xl mx-auto sm:rounded-r-3xl sm:rounded-l-md shadow-none sm:shadow-[0_10px_50px_rgba(0,0,0,0.15)] relative bg-paper overflow-hidden border-none sm:border sm:border-black/5 sm:border-l-black/10">
 
         <!-- Notebook Binding (Spring/Binder illusion) -->
         <div
@@ -100,11 +100,11 @@
             <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
         </div>
 
-        <!-- Margin Line (Red vertical line common in notebooks) -->
-        <div class="absolute left-16 top-0 bottom-0 w-px bg-red-900/40 z-0 pointer-events-none"></div>
+        <!-- Margin Line (Red vertical line common in notebooks) - Hidden on smallest screens -->
+        <div class="absolute left-10 sm:left-16 top-0 bottom-0 w-px bg-red-900/10 z-0 pointer-events-none hidden sm:block"></div>
 
         <!-- Premium Archive Header -->
-        <header class="pl-24 pr-8 pt-12 pb-8 border-b border-white/10 bg-transparent relative overflow-hidden z-10">
+        <header class="pl-12 sm:pl-24 pr-8 pt-12 pb-8 border-b border-black/5 bg-transparent relative overflow-hidden z-10">
             <!-- Decorative marker removed -->
             <div id="editable-series"
                 class="absolute top-4 right-6 text-[10px] font-black border border-ink/20 text-ink/40 px-3 py-1 uppercase tracking-[0.2em] rounded-sm bg-black/5 admin-editable"
@@ -115,7 +115,7 @@
             <div class="text-center mb-8">
                 <div class="flex items-center justify-center gap-2 mb-2">
                     <div class="h-[1px] w-8 bg-gold/30"></div>
-                    <h2 class="text-[11px] font-bold tracking-[0.2em] text-ink/40 uppercase">나만의 학습 기록 노트
+                    <h2 class="text-[10px] font-bold tracking-[0.2em] text-ink/30 uppercase">나만의 학습 기록 노트
                     </h2>
                     <div class="h-[1px] w-8 bg-gold/30"></div>
                 </div>
@@ -153,7 +153,7 @@
         </header>
 
         <!-- High-Density List Container -->
-        <main class="flex-1 overflow-y-auto custom-scroll pb-24 bg-transparent z-10 pl-16" id="dictionaryList">
+        <main class="flex-1 overflow-y-auto custom-scroll pb-24 bg-transparent z-10 pl-4 sm:pl-16" id="dictionaryList">
             <!-- Items injected by JS -->
             <div class="p-10 text-center text-ink-dim py-32 italic">
                 <div class="animate-pulse">노트를 펼치는 중입니다...</div>

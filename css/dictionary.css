@@ -1,19 +1,24 @@
 :root {
-    /* Base Colors - Premium Light Note */
+    /* Base Colors - Premium Minimal Note */
     --bg-paper: #FDFCF8;
     --bg-paper-dark: #F5F2E9;
     --bg-card: #FFFFFF;
-    --ink: #2D2D2E;
-    --ink-dim: #666666;
+    --ink: #262626;
+    --ink-dim: #737373;
 
-    /* Semantic Accent Colors (Light Palette) */
-    --gold: #ca8a04;
-    --gold-bright: #eab308;
+    /* Premium Indigo Palette */
+    --indigo-primary: #4f46e5;
+    --indigo-soft: #eef2ff;
+    --indigo-border: #c7d2fe;
+    --indigo-text: #4338ca;
 
-    --highlight-pink: #991b1b; /* Darker red for light bg */
-    --link-blue: #075985;
-    --success-green: #3f6212;
-    --tag-purple: #5b21b6;
+    --gold: var(--indigo-primary);
+    --gold-bright: #818cf8;
+
+    --highlight-pink: var(--indigo-primary);
+    --link-blue: #0ea5e9;
+    --success-green: #166534;
+    --tag-purple: #f1f5f9; /* Muted Slate for chips */
 
     /* Visual Effects */
     --glass-bg: rgba(253, 252, 248, 0.8);
@@ -21,12 +26,12 @@
 
     /* Functional Mappings */
     --jokbo-gold: var(--ink);
-    --jokbo-gold-bright: #854d0e;
-    --jokbo-red: var(--highlight-pink);
+    --jokbo-gold-bright: #6366f1;
+    --jokbo-red: var(--indigo-primary);
     --jokbo-red-bright: #dc2626;
     --jokbo-blue: var(--link-blue);
 
-    --primary: var(--success-green);
+    --primary: var(--indigo-primary);
     --accent-blue: var(--link-blue);
 }
 
@@ -177,17 +182,16 @@ body {
 
 /* Category Chip (Post-it style index tab) */
 .list-category-chip {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 800;
     border: none;
-    background: var(--tag-purple);
-    color: #1A1A1B;
-    padding: 0.25rem 0.6rem;
+    background: #f1f5f9 !important; /* Forces soft slate */
+    color: #64748b !important;
+    padding: 0.2rem 0.5rem;
     border-radius: 4px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.02em;
     margin-left: 0.4rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     display: inline-block;
 }
 
@@ -519,14 +523,27 @@ header h1,
 }
 
 /* Tip Box & Ethics Box */
-.admin-tip {
-    background: var(--bg-card);
-    border-left: 3px solid var(--highlight-pink);
-    padding: 1.5rem;
-    margin: 2.5rem 0;
-    font-size: 0.9rem;
-    border-radius: 0 8px 8px 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+/* Tip Box Refinement */
+.archive-tip-container {
+    background: #eef2ff !important; /* Soft Indigo Light */
+    color: #312e81 !important;
+    padding: 1.25rem !important;
+    margin: 1.5rem 0 !important;
+    border-radius: 0.5rem !important;
+    position: relative !important;
+    box-shadow: none !important;
+    border: 1px solid #c7d2fe !important;
+    transform: none !important;
+    font-family: 'Nanum Gothic', sans-serif !important;
+}
+
+.archive-tip-container::before {
+    display: none;
+}
+
+.archive-tip-label {
+    color: #4338ca !important;
+    font-weight: 900 !important;
 }
 
 .tip-label {
@@ -622,6 +639,17 @@ header h1,
 .edit-input:focus {
     background: rgba(255, 255, 255, 0.05);
     border-bottom-color: var(--link-blue);
+}
+
+/* Notebook Binding - Adjusted for Responsiveness */
+.absolute.left-0.top-0.bottom-0.w-8.bg-paper-dark {
+    width: 2rem;
+}
+
+@media (max-width: 640px) {
+    .absolute.left-0.top-0.bottom-0.w-8.bg-paper-dark {
+        width: 0.5rem;
+    }
 }
 
 /* Custom Scrollbar */
