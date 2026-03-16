@@ -66,13 +66,20 @@ const ArchiveRenderer = {
             // If the format(data.definition) didn't preserve <br>, split by \n first
             const rawLines = data.definition.split('\n').filter(l => l.trim());
             const title = format(rawLines[0]) || '';
+            const rawTitle = rawLines[0] ? rawLines[0].replace(/[\*\+']/g, '').replace(/"/g, '&quot;').replace(/'/g, "\\'").trim() : '';
             const body = rawLines.slice(1).map(l => format(l)).join('<br>');
 
             html += `
                 <section class="archive-section">
                     <h3 class="archive-section-header"><span class="archive-circle-num">1</span> 개념 정의</h3>
                     <div class="archive-definition-content">
-                        ${title ? `<span class="archive-quote-box">${title}</span>` : ''}
+                        ${title ? `<span class="archive-quote-box cursor-pointer relative group transition-all" title="클릭하여 복사" onclick="typeof Utils !== 'undefined' && Utils.copyToClipboard('${rawTitle}')">
+                            ${title}
+                            <span class="absolute top-1/2 -translate-y-1/2 right-2 opacity-0 group-hover:opacity-60 transition-opacity bg-black/40 p-1.5 rounded-md flex items-center gap-1 text-[10px] uppercase font-bold text-white tracking-widest border border-white/10">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                Copy
+                            </span>
+                        </span>` : ''}
                         ${body}
                     </div>
                 </section>
