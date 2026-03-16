@@ -69,7 +69,7 @@ const ArchiveRenderer = {
             side: /\[SIDE\]\s*([\s\S]*?)(?=\[|$)/i
         };
 
-        const sideMatch = raw.match(sections.side);
+        const sideMatch = data.raw ? data.raw.match(sections.side) : null;
         const sideNote = sideMatch ? format(sideMatch[1]) : '';
 
         let html = '<article class="archive-container animate-fade-in relative">';
