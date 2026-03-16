@@ -132,9 +132,9 @@ body {
 }
 
 
-/* Question Numbering System */
+/* Main List Container */
 #dictionaryList {
-    counter-reset: question-counter;
+    padding-bottom: 5rem;
 }
 
 .dict-item {
@@ -164,15 +164,9 @@ body {
     gap: 0.4rem;
 }
 
+/* Question Numbering removed */
 .dict-term::before {
-    counter-increment: question-counter;
-    content: "Q" counter(question-counter) ".";
-    color: var(--jokbo-gold);
-    font-style: italic;
-    font-weight: 900;
-    font-size: 1.1rem;
-    margin-right: 0.2rem;
-    font-family: 'Outfit', sans-serif;
+    display: none;
 }
 
 .dict-title-text {
@@ -199,8 +193,7 @@ body {
 
 /* Content Wrapper */
 .dict-content-wrapper {
-    margin-left: 1.8rem;
-    /* Align under text */
+    margin-left: 0.5rem;
     padding-left: 1rem;
     border-left: 2px solid rgba(0, 0, 0, 0.05);
 }
@@ -229,13 +222,12 @@ body {
     font-weight: 700;
 }
 
-/* Category Header (Styled as Premium Divider) */
 .category-header {
     background: transparent;
     padding: 2.5rem 1.5rem 1rem 1.5rem;
     font-size: 1rem;
     font-weight: 900;
-    color: var(--jokbo-gold);
+    color: var(--ink); /* Changed from jokbo-gold */
     position: relative;
     font-family: 'Nanum Gothic', sans-serif;
     display: flex;
@@ -245,10 +237,11 @@ body {
 
 .category-header::before {
     content: "";
-    width: 4px;
-    height: 18px;
-    background: var(--jokbo-gold);
-    border-radius: 2px;
+    width: 3px;
+    height: 14px;
+    background: var(--ink-dim);
+    border-radius: 1px;
+    opacity: 0.3;
 }
 
 /* English Premium Typography */
@@ -268,7 +261,7 @@ body {
 
 body.admin-mode .admin-editable {
     cursor: text;
-    border-bottom: 2px dashed rgba(253, 224, 71, 0.6);
+    border-bottom: 2px dashed rgba(0, 0, 0, 0.1);
 }
 
 body.admin-mode .admin-editable:hover {
@@ -323,23 +316,9 @@ header h1,
     transform: translate(-50%, 0);
 }
 
+/* Secret Stamp Removed */
 .secret-stamp {
-    position: absolute;
-    top: 2.5rem;
-    right: 2.5rem;
-    border: 2px solid var(--jokbo-red);
-    color: var(--jokbo-red);
-    padding: 0.3rem 0.8rem;
-    font-size: 0.7rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    transform: rotate(8deg);
-    letter-spacing: 0.3em;
-    opacity: 0.5;
-    pointer-events: none;
-    font-family: 'Nanum Gothic', sans-serif;
-    z-index: 10;
-    background: rgba(139, 0, 0, 0.05);
+    display: none;
 }
 
 .jokbo-header {
@@ -383,11 +362,11 @@ header h1,
     font-family: 'Nanum Gothic', sans-serif;
 }
 
-/* Section Numbering (①, ②, ③) */
+/* Section Title */
 .section-title {
     font-size: 1.35rem;
     font-weight: 800;
-    color: var(--jokbo-gold) !important;
+    color: var(--ink) !important;
     margin: 2.8rem 0 1.2rem 0;
     display: flex;
     align-items: center;
@@ -397,11 +376,10 @@ header h1,
 
 /* Highlights & Markers - Owner's Highlighter */
 .highlight-gold {
-    background-color: rgba(225, 187, 187, 0.3) !important;
-    /* Semi-transparent Pink highlighter */
-    color: var(--highlight-pink) !important;
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: var(--ink) !important;
     padding: 0 0.3rem;
-    font-weight: 900;
+    font-weight: 700;
     display: inline;
     border-radius: 4px;
 }
@@ -607,7 +585,7 @@ header h1,
 .body-text h2,
 .body-text h3 {
     font-family: 'Nanum Gothic', sans-serif;
-    color: var(--jokbo-gold) !important;
+    color: var(--ink) !important;
     margin-top: 2rem;
     margin-bottom: 1rem;
     font-weight: 800;

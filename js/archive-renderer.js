@@ -88,7 +88,7 @@ const ArchiveRenderer = {
 
             html += `
                 <section class="archive-section">
-                    <h3 class="archive-section-header"><span class="archive-circle-num">1</span> 개념 정의</h3>
+                    <h3 class="archive-section-header">설명</h3>
                     <div class="archive-definition-content">
                         ${title ? `<span class="archive-quote-box">${title}</span>` : ''}
                         ${body}
@@ -105,7 +105,7 @@ const ArchiveRenderer = {
 
                 return `
                     <li class="archive-mechanism-item">
-                        <span class="archive-mechanism-label">${String.fromCharCode(65 + idx)}.</span>
+                        <span class="archive-mechanism-label">${idx + 1}.</span>
                         <div class="archive-mechanism-title">${title}</div>
                     </li>
                     ${desc ? `<div class="archive-mechanism-desc">${desc}</div>` : ''}
@@ -113,7 +113,7 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <section class="archive-section">
-                    <h3 class="archive-section-header"><span class= "archive-circle-num">2</span> 핵심 작동 메커니즘</h3>
+                    <h3 class="archive-section-header">주요 내용</h3>
                     <ul class="archive-mechanisms-list">${listItems}</ul>
                 </section>
             `;
@@ -127,9 +127,9 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <section class="archive-section">
-                    <h3 class="archive-section-header"><span class="archive-circle-num">3</span> 오해와 실제 비교</h3>
+                    <h3 class="archive-section-header">비교 및 확인</h3>
                     <table class="archive-comparison-table">
-                        <thead><tr><th class="archive-th-false">COMMON MIS (오해)</th><th class="archive-th-true">DYNAMICS TRUTH (실제)</th></tr></thead>
+                        <thead><tr><th class="archive-th-false">기존 생각</th><th class="archive-th-true">핵심 포인트</th></tr></thead>
                         <tbody>${rows}</tbody>
                     </table>
                 </section>
@@ -140,7 +140,7 @@ const ArchiveRenderer = {
             let processedTip = format(data.tip).replace(/^★\s*/, '');
             html += `
                 <aside class="archive-tip-container">
-                    <div class="archive-tip-label"><i data-lucide="star" class="w-3 h-3 fill-current mr-1"></i>ADMIN'S CRITICAL TIP:</div>
+                    <div class="archive-tip-label"><i data-lucide="info" class="w-3 h-3 fill-current mr-1"></i>참고 메모:</div>
                     <div class="archive-tip-text">"${processedTip}"</div>
                 </aside>
             `;
@@ -154,7 +154,7 @@ const ArchiveRenderer = {
             }).join('');
             html += `
                 <section class="archive-ethics-box">
-                    <h3 class="archive-ethics-title">윤리적 책임 및 실전 주의사항</h3>
+                    <h3 class="archive-ethics-title">주의사항</h3>
                     ${items}
                 </section>
             `;

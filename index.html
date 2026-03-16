@@ -105,40 +105,40 @@
 
         <!-- Premium Archive Header -->
         <header class="pl-24 pr-8 pt-12 pb-8 border-b border-white/10 bg-transparent relative overflow-hidden z-10">
-            <!-- Decorative "Archive" marker -->
+            <!-- Decorative marker removed -->
             <div id="editable-series"
-                class="absolute top-4 right-6 text-[10px] font-black border border-gold/40 text-gold px-3 py-1 opacity-70 uppercase tracking-[0.2em] rounded-sm bg-gold/10 backdrop-blur-sm admin-editable"
+                class="absolute top-4 right-6 text-[10px] font-black border border-ink/20 text-ink/40 px-3 py-1 uppercase tracking-[0.2em] rounded-sm bg-black/5 admin-editable"
                 data-key="site_series">
-                SERIES: MASTER'S NOTE
+                PERSONAL NOTE
             </div>
 
             <div class="text-center mb-8">
                 <div class="flex items-center justify-center gap-2 mb-2">
                     <div class="h-[1px] w-8 bg-gold/30"></div>
-                    <h2 class="text-[11px] font-bold tracking-[0.2em] text-gold/80 uppercase">주인장의 요점 정리 노트
+                    <h2 class="text-[11px] font-bold tracking-[0.2em] text-ink/40 uppercase">나만의 학습 기록 노트
                     </h2>
                     <div class="h-[1px] w-8 bg-gold/30"></div>
                 </div>
                 <h1 class="text-3xl font-black text-ink py-4 tracking-tighter leading-none">
-                    <span id="editable-title-main" class="text-gold admin-editable"
-                        data-key="site_title_main">성향학</span>
-                    <span id="editable-title-sub" class="admin-editable" data-key="site_title_sub">개론</span> <br />
+                    <span id="editable-title-main" class="admin-editable"
+                        data-key="site_title_main">학습</span>
+                    <span id="editable-title-sub" class="admin-editable" data-key="site_title_sub">정리</span> <br />
                     <span id="editable-subtitle"
                         class="text-[10px] font-bold tracking-[0.1em] text-ink-dim opacity-50 uppercase admin-editable"
-                        data-key="site_subtitle">Master's Summary Note</span>
+                        data-key="site_subtitle">Personal Study Note</span>
                 </h1>
             </div>
 
             <div class="grid grid-cols-2 gap-4 text-[10px] font-bold border-t border-white/5 pt-6">
                 <div class="flex items-center gap-2 border-r border-white/5 pr-4 group">
                     <span
-                        class="text-gold/40 uppercase tracking-widest group-hover:text-gold transition-colors">Code:</span>
+                        class="text-ink/20 uppercase tracking-widest group-hover:text-ink/40 transition-colors">ID:</span>
                     <span id="editable-code" class="tracking-widest text-ink/80 admin-editable"
                         data-key="site_code">SML-A101</span>
                 </div>
                 <div class="flex items-center gap-2 pl-4 group">
                     <span
-                        class="text-gold/40 uppercase tracking-widest group-hover:text-gold transition-colors">Ref:</span>
+                        class="text-ink/20 uppercase tracking-widest group-hover:text-ink/40 transition-colors">By:</span>
                     <span id="editable-ref" class="text-ink/80 admin-editable" data-key="site_ref">Antigravity</span>
                 </div>
             </div>
@@ -147,8 +147,8 @@
                 <i data-lucide="search"
                     class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/60 group-focus-within:text-gold transition-colors"></i>
                 <input type="text" id="searchInput"
-                    class="w-full bg-card border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-gold/50 outline-none transition-all placeholder:text-ink-dim/50 font-sans shadow-md"
-                    placeholder="주인장의 요점 정리를 검색하세요...">
+                    class="w-full bg-card border border-black/5 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-ink/20 outline-none transition-all placeholder:text-ink-dim/50 font-sans shadow-sm"
+                    placeholder="필요한 기록을 검색해 보세요...">
             </div>
         </header>
 
@@ -193,30 +193,29 @@
             class="bg-card w-full max-w-sm border border-gold/30 p-10 shadow-[0_0_50px_rgba(212,175,55,0.15)] animate-fade-in rounded-3xl">
             <h2 class="text-2xl font-black text-ink mb-2 flex items-center gap-3 border-b border-white/5 pb-4">
                 <i data-lucide="shield-check" class="text-gold"></i>
-                관리자 인증
-                <span class="text-[9px] font-bold text-ink-dim opacity-50 ml-auto uppercase tracking-widest">Auth
-                    v2.0</span>
+                관리자 접속
+                <span class="text-[9px] font-bold text-ink-dim opacity-50 ml-auto uppercase tracking-widest">Admin
+                    Access</span>
             </h2>
-            <p class="text-[10px] text-gold/60 mt-2 mb-8 italic font-bold">ACCESS RESTRICTED: AUTHORIZED PERSONNEL ONLY
+            <p class="text-[10px] text-ink/40 mt-2 mb-8 italic font-bold">RESTRICTED ACCESS
             </p>
             <div class="space-y-6 font-sans">
                 <div class="relative group">
-                    <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Archive
-                        ID (E-mail)</label>
+                    <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Admin
+                        E-mail</label>
                     <input type="email" id="loginEmail"
                         class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-gold/30 focus:ring-1 focus:ring-gold/20"
                         placeholder="admin@sm-archive.ac.kr">
                 </div>
                 <div class="relative group">
-                    <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Access
-                        Token (Password)</label>
+                    <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Password</label>
                     <input type="password" id="loginPassword"
                         class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-gold/30 focus:ring-1 focus:ring-gold/20"
                         placeholder="••••••••">
                 </div>
                 <button id="submitLoginBtn"
                     class="w-full py-5 bg-gold text-paper font-black rounded-2xl mt-4 hover:bg-gold-bright transition-all shadow-xl active:scale-95 text-sm">
-                    인증 코드 제출
+                    접속 하기
                 </button>
                 <button onclick="closeLoginModal()"
                     class="w-full py-4 text-ink-dim text-[11px] font-bold hover:text-ink transition-colors uppercase tracking-widest">
