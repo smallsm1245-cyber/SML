@@ -13,6 +13,14 @@
     --red-bright: #fb7185;
     --blue: #38bdf8; /* Neon blue highlighter */
 
+    /* Pastel Dark Mode Colors */
+    --light-yellow: #ede2b7;
+    --light-pink: #e1bbbb;
+    --light-blue: #adcce9;
+    --light-purple: #ada3da;
+    --light-green: #b9c487;
+    --light-gray: #b2b2b2;
+
     /* Visual Effects */
     --glass-bg: rgba(20, 20, 20, 0.7);
     --glass-border: rgba(255, 255, 255, 0.05);
@@ -338,6 +346,57 @@ header h1,
     text-decoration-color: var(--jokbo-blue);
     text-underline-offset: 4px;
     font-weight: 800;
+}
+
+/* Pastel Dark Mode Typography & Highlights */
+.text-light-yellow { color: var(--light-yellow) !important; font-weight: 800; }
+.text-light-pink { color: var(--light-pink) !important; font-weight: 800; }
+.text-light-blue { color: var(--light-blue) !important; font-weight: 800; }
+.text-light-purple { color: var(--light-purple) !important; font-weight: 800; }
+.text-light-green { color: var(--light-green) !important; font-weight: 800; }
+.text-light-gray { color: var(--light-gray) !important; font-weight: 800; }
+
+.highlight-light-yellow {
+    background-color: rgba(237, 226, 183, 0.25) !important;
+    color: var(--light-yellow) !important;
+    padding: 0.1rem 0.3rem;
+    font-weight: 800;
+    border-radius: 4px;
+}
+.highlight-light-pink {
+    background-color: rgba(225, 187, 187, 0.25) !important;
+    color: var(--light-pink) !important;
+    padding: 0.1rem 0.3rem;
+    font-weight: 800;
+    border-radius: 4px;
+}
+.highlight-light-blue {
+    background-color: rgba(173, 204, 233, 0.25) !important;
+    color: var(--light-blue) !important;
+    padding: 0.1rem 0.3rem;
+    font-weight: 800;
+    border-radius: 4px;
+}
+.highlight-light-purple {
+    background-color: rgba(173, 163, 218, 0.25) !important;
+    color: var(--light-purple) !important;
+    padding: 0.1rem 0.3rem;
+    font-weight: 800;
+    border-radius: 4px;
+}
+.highlight-light-green {
+    background-color: rgba(185, 196, 135, 0.25) !important;
+    color: var(--light-green) !important;
+    padding: 0.1rem 0.3rem;
+    font-weight: 800;
+    border-radius: 4px;
+}
+.highlight-light-gray {
+    background-color: rgba(178, 178, 178, 0.25) !important;
+    color: var(--light-gray) !important;
+    padding: 0.1rem 0.3rem;
+    font-weight: 800;
+    border-radius: 4px;
 }
 
 /* Academic Tables */
