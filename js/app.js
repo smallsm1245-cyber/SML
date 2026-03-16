@@ -219,7 +219,6 @@ function renderList(data) {
                     </div>
                     <div class="dict-content-wrapper">
                         <p class="dict-summary">${item.summary}</p>
-                        ${Utils.extractTags(item.summary)}
                     </div>
                 </div>
             `;

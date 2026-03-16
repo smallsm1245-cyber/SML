@@ -7,11 +7,11 @@
     --ink-dim: #a1a1aa; /* Dimmed text */
 
     /* Semantic Accent Colors (Highlighter Palette) */
-    --gold: #fde047; /* Bright neon highlighter yellow */
-    --gold-bright: #fef08a;
-    --red: #f43f5e; /* Neon pinkish red */
-    --red-bright: #fb7185;
-    --blue: #38bdf8; /* Neon blue highlighter */
+    --gold: #ede2b7; /* Pastel Yellow */
+    --gold-bright: #fcf6da;
+    --red: #e1bbbb; /* Pastel Pink */
+    --red-bright: #fbebeb;
+    --blue: #adcce9; /* Pastel Blue */
 
     /* Pastel Dark Mode Colors */
     --light-yellow: #ede2b7;
@@ -32,8 +32,8 @@
     --jokbo-red-bright: var(--red-bright);
     --jokbo-blue: var(--blue);
 
-    --primary: var(--red);
-    --accent-blue: var(--blue);
+    --primary: var(--light-green);
+    --accent-blue: var(--light-purple);
 }
 
 body {
@@ -192,17 +192,17 @@ body {
 
 body.admin-mode .admin-editable {
     cursor: text;
-    border-bottom: 2px dashed rgba(253, 224, 71, 0.6);
+    border-bottom: 2px dashed rgba(237, 226, 183, 0.6);
 }
 
 body.admin-mode .admin-editable:hover {
-    background: rgba(253, 224, 71, 0.1);
+    background: rgba(237, 226, 183, 0.1);
     border-bottom-color: var(--jokbo-gold);
     border-radius: 4px;
 }
 
 body.admin-mode .admin-editable:focus {
-    background: rgba(212, 175, 55, 0.1);
+    background: rgba(237, 226, 183, 0.2);
     border-bottom-color: var(--jokbo-gold-bright);
     outline: none;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -321,13 +321,13 @@ header h1,
 
 /* Highlights & Markers - Owner's Highlighter */
 .highlight-gold {
-    background-color: rgba(253, 224, 71, 0.6) !important; /* Semi-transparent highlighter */
+    background-color: rgba(237, 226, 183, 0.5) !important; /* Semi-transparent highlighter */
     color: inherit !important;
     padding: 0 0.3rem;
     font-weight: 900;
     display: inline;
     border-radius: 4px;
-    box-shadow: 0 0 8px rgba(253, 224, 71, 0.4);
+    box-shadow: 0 0 8px rgba(237, 226, 183, 0.3);
 }
 
 .keyword-red {
@@ -543,7 +543,7 @@ header h1,
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-    background: rgba(212, 175, 55, 0.2);
+    background: rgba(237, 226, 183, 0.2);
     border-radius: 10px;
 }
 
