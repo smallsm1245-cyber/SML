@@ -79,59 +79,73 @@ const ArchiveRenderer = {
         }
 
         if (data.definition) {
-            let processed = format(data.definition);
-            const lines = processed.split('<br>').map(l => l.trim()).filter(l => l);
-            // If the format(data.definition) didn't preserve <br>, split by \n first
             const rawLines = data.definition.split('\n').filter(l => l.trim());
             const title = format(rawLines[0]) || '';
             const body = rawLines.slice(1).map(l => format(l)).join('<br>');
 
             html += `
-                <section class="archive-section">
+                <section class="archive-section segment-definition">
                     <h3 class="archive-section-header">설명</h3>
                     <div class="archive-definition-content">
-                        ${title ? `<span class="archive-quote-box">${title}</span>` : ''}
-                        ${body}
+                        ${title ? `<div class="archive-primary-role-box">${title}</div>` : ''}
+                        <div class="archive-role-description">${body}</div>
                     </div>
                 </section>
             `;
         }
 
         if (data.mechanisms.length > 0) {
-            const listItems = data.mechanisms.map((m, idx) => {
+            const cards = data.mechanisms.map((m, idx) => {
                 const parts = m.split(':');
                 const title = format(parts[0]);
                 let desc = parts[1] ? format(parts.slice(1).join(':')) : '';
 
                 return `
-                    <li class="archive-mechanism-item">
-                        <span class="archive-mechanism-label">${idx + 1}.</span>
-                        <div class="archive-mechanism-title">${title}</div>
-                    </li>
-                    ${desc ? `<div class="archive-mechanism-desc">${desc}</div>` : ''}
+                    <div class="archive-mechanism-card">
+                        <div class="mechanism-header">
+                            <span class="mechanism-index">${idx + 1}.</span>
+                            <h4 class="mechanism-title">${title}</h4>
+                        </div>
+                        ${desc ? `<p class="mechanism-body">${desc}</p>` : ''}
+                    </div>
                 `;
             }).join('');
+            
             html += `
-                <section class="archive-section">
+                <section class="archive-section segment-mechanisms">
                     <h3 class="archive-section-header">주요 내용</h3>
-                    <ul class="archive-mechanisms-list">${listItems}</ul>
+                    <div class="archive-mechanisms-grid">${cards}</div>
                 </section>
             `;
         }
 
         if (data.comparison.length > 0) {
-            const rows = data.comparison.map(row => {
+            const rows = data.comparison.map((row, idx) => {
                 const c1 = format(row.c1).replace(/<strong>(.*?)<\/strong>/g, '<span class="archive-highlight">$1</span>');
                 const c2 = format(row.c2).replace(/<strong>(.*?)<\/strong>/g, '<span class="archive-highlight">$1</span>');
+                
+                // Special handling for the first row if it's a category header
+                if (idx === 0 && (row.c1.includes('(') || row.c2.includes('('))) {
+                    return `<tr class="comparison-sub-header"><td>${c1}</td><td>${c2}</td></tr>`;
+                }
+                
                 return `<tr><td>${c1}</td><td>${c2}</td></tr>`;
             }).join('');
+            
             html += `
-                <section class="archive-section">
+                <section class="archive-section segment-comparison">
                     <h3 class="archive-section-header">비교 및 확인</h3>
-                    <table class="archive-comparison-table">
-                        <thead><tr><th class="archive-th-false">기존 생각</th><th class="archive-th-true">핵심 포인트</th></tr></thead>
-                        <tbody>${rows}</tbody>
-                    </table>
+                    <div class="archive-table-wrapper">
+                        <table class="archive-comparison-table">
+                            <thead>
+                                <tr>
+                                    <th class="archive-th-false">기존 생각</th>
+                                    <th class="archive-th-true">핵심 포인트</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
                 </section>
             `;
         }
@@ -139,9 +153,12 @@ const ArchiveRenderer = {
         if (data.tip) {
             let processedTip = format(data.tip).replace(/^★\s*/, '');
             html += `
-                <aside class="archive-tip-container">
-                    <div class="archive-tip-label"><i data-lucide="info" class="w-3 h-3 fill-current mr-1"></i>참고 메모:</div>
-                    <div class="archive-tip-text">"${processedTip}"</div>
+                <aside class="archive-premium-tip">
+                    <div class="tip-header">
+                        <i data-lucide="lightbulb" class="w-4 h-4 text-gold"></i>
+                        <span>참고 메모</span>
+                    </div>
+                    <div class="tip-content">"${processedTip}"</div>
                 </aside>
             `;
         }
