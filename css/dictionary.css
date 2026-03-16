@@ -1,48 +1,29 @@
 :root {
-    /* Base Colors - Cinematic Dark Note (Updated Design Guide) */
-    --bg-paper: #1A1A1B;
-    /* 짙은 차콜 */
-    --bg-paper-dark: #101011;
-    /* Binding color - slightly darker */
-    --bg-card: #2D2D2E;
-    /* 섹션 구분용 Surface/Card */
-    --ink: #EDE2B7;
-    /* 연노랑 기본 텍스트 */
-    --ink-dim: #B2B2B2;
-    /* 연회색 보조 텍스트 */
+    /* Base Colors - Premium Light Note */
+    --bg-paper: #FDFCF8;
+    --bg-paper-dark: #F5F2E9;
+    --bg-card: #FFFFFF;
+    --ink: #2D2D2E;
+    --ink-dim: #666666;
 
-    /* Semantic Accent Colors (Pastel Palette) */
-    --gold: #fde047;
-    /* Bright neon highlighter yellow (Legacy/Icons) */
-    --gold-bright: #fef08a;
+    /* Semantic Accent Colors (Light Palette) */
+    --gold: #ca8a04;
+    --gold-bright: #eab308;
 
-    --highlight-pink: #E1BBBB;
-    /* 중요 표시/하이라이트 */
-    --link-blue: #ADCCE9;
-    /* 링크/체크박스 활성화 */
-    --success-green: #B9C487;
-    /* 완료/긍정적 알림 */
-    --tag-purple: #ADA3DA;
-    /* 태그/카테고리 구분 */
-
-    /* Pastel Dark Mode Colors (Direct Selection) */
-    --light-yellow: #ede2b7;
-    --light-pink: #e1bbbb;
-    --light-blue: #adcce9;
-    --light-purple: #ada3da;
-    --light-green: #b9c487;
-    --light-gray: #b2b2b2;
+    --highlight-pink: #991b1b; /* Darker red for light bg */
+    --link-blue: #075985;
+    --success-green: #3f6212;
+    --tag-purple: #5b21b6;
 
     /* Visual Effects */
-    --glass-bg: rgba(26, 26, 27, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-bg: rgba(253, 252, 248, 0.8);
+    --glass-border: rgba(0, 0, 0, 0.05);
 
-    /* Functional Mappings (for backward compatibility and readability) */
+    /* Functional Mappings */
     --jokbo-gold: var(--ink);
-    /* Swapping gold headers to the base text color */
-    --jokbo-gold-bright: var(--light-yellow);
+    --jokbo-gold-bright: #854d0e;
     --jokbo-red: var(--highlight-pink);
-    --jokbo-red-bright: var(--light-pink);
+    --jokbo-red-bright: #dc2626;
     --jokbo-blue: var(--link-blue);
 
     --primary: var(--success-green);
@@ -61,8 +42,8 @@ body {
 .bg-paper {
     background-color: var(--bg-paper);
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
     background-size: 28px 28px;
     background-attachment: local;
     background-position: 0 0;
@@ -99,11 +80,11 @@ body {
     right: 0;
     bottom: -2px;
     height: 3px;
-    background: var(--jokbo-gold);
+    background: #eab308;
     mask-image: url("data:image/svg+xml,%3Csvg width='100' height='10' viewBox='0 0 100 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 5 Q 25 0, 50 5 T 100 5' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
     mask-size: 40px 100%;
     mask-repeat: repeat-x;
-    opacity: 0.8;
+    opacity: 0.6;
 }
 
 /* Side Margin Notes (Marginalia) */
@@ -175,7 +156,7 @@ body {
 .dict-term {
     font-size: 1.25rem;
     font-weight: 800;
-    color: #ffffff;
+    color: var(--ink);
     line-height: 1.3;
     display: flex;
     align-items: center;
@@ -221,7 +202,7 @@ body {
     margin-left: 1.8rem;
     /* Align under text */
     padding-left: 1rem;
-    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    border-left: 2px solid rgba(0, 0, 0, 0.05);
 }
 
 .dict-summary {
@@ -534,16 +515,17 @@ header h1,
 .jokbo-table th {
     padding: 0.6rem;
     text-align: left;
-    border: 1px solid #444;
+    border: 1px solid #ddd;
     font-weight: 900;
     text-transform: uppercase;
     font-size: 0.75rem;
+    color: var(--ink);
 }
 
 .jokbo-table td {
     padding: 0.8rem 0.6rem;
-    border: 1px solid #333;
-    color: #bbb;
+    border: 1px solid #eee;
+    color: var(--ink-dim);
 }
 
 .th-red {
@@ -578,16 +560,16 @@ header h1,
 }
 
 .ethics-box {
-    border: 1px solid #444;
+    border: 1px solid #ddd;
     padding: 1.5rem;
     margin-top: 3rem;
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .ethics-title {
     font-weight: 900;
-    color: #fff;
-    border-bottom: 1px solid #444;
+    color: var(--ink);
+    border-bottom: 1px solid #ddd;
     padding-bottom: 0.5rem;
     margin-bottom: 1rem;
     display: block;
@@ -598,7 +580,7 @@ header h1,
     text-align: center;
     font-size: 0.65rem;
     font-weight: 700;
-    color: #444;
+    color: #999;
     margin-top: 4rem;
     padding-bottom: 2rem;
     letter-spacing: 0.2em;
@@ -670,7 +652,7 @@ header h1,
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-    background: rgba(212, 175, 55, 0.2);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
 }
 
