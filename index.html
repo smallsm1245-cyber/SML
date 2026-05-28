@@ -1,248 +1,427 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SmallSM Dictionary</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&family=Noto+Sans+KR:wght@400;700;900&family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&display=swap"
-        rel="stylesheet">
-
-    <!-- CSS Framework (Tailwind) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        paper: '#0f172a', // Deep Slate 900
-                        'paper-dark': '#020617', // Obsidian Slate 950
-                        card: '#1e293b', // Slate 800
-                        ink: '#f8fafc', // Slate 50
-                        'ink-dim': '#94a3b8', // Slate 400
-                        primary: '#6366f1', // Indigo 500
-                        'primary-dim': '#4f46e5',
-                        gold: '#f59e0b', // Amber 500 for better contrast
-                        'gold-bright': '#fbbf24',
-                        'accent-blue': '#38bdf8',
-                        admin: '#ffffff',
-                        'light-yellow': '#f59e0b',
-                        'light-pink': '#fb7185',
-                        'light-blue': '#38bdf8',
-                        'light-purple': '#a78bfa',
-                        'light-green': '#34d399',
-                        'light-gray': '#94a3b8',
-                    },
-                    fontFamily: {
-                        serif: ['"Nanum Myeongjo"', 'serif'],
-                        sans: ['"Nanum Gothic"', 'sans-serif'],
-                        inter: ['"Inter"', 'sans-serif'],
-                        outfit: ['"Outfit"', 'sans-serif'],
-                    },
-                    backdropBlur: {
-                        xs: '2px',
-                    },
-                }
-            }
-        }
-    </script>
-
-    <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <!-- Markdown Rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <!-- PWA -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0f172a">
-
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/dictionary.css">
-    <link rel="stylesheet" href="css/archive-layout.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BDSM 관계 계약서</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;background:#f5f4f0;color:#1a1a1a;padding:2rem 1rem}
+.doc{max-width:720px;margin:0 auto;background:#fff;border:1px solid #ddd;border-radius:12px;padding:2.5rem}
+h1{font-size:24px;font-weight:600;margin-bottom:0.4rem}
+.subtitle{font-size:13px;color:#666;margin-bottom:2rem;line-height:1.6;border-left:3px solid #ccc;padding-left:10px}
+h2{font-size:16px;font-weight:600;color:#1a1a1a;margin:2rem 0 0.75rem;padding-bottom:6px;border-bottom:2px solid #1a1a1a}
+h3{font-size:13px;font-weight:600;color:#555;margin:1rem 0 0.5rem;text-transform:uppercase;letter-spacing:0.03em}
+.card{border:1px solid #e5e5e5;border-radius:8px;padding:1.25rem;margin-bottom:1rem}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-weight:600;color:#555;text-align:left;padding:7px 10px;background:#f8f7f4;font-size:12px;border-bottom:1px solid #e5e5e5}
+td{padding:6px 10px;border-bottom:1px solid #f0f0f0;color:#1a1a1a;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+input[type=text],input[type=date],textarea,select{width:100%;border:1px solid #ddd;border-radius:6px;padding:6px 10px;font-size:13px;background:#fff;color:#1a1a1a;font-family:inherit;resize:vertical;transition:border-color 0.15s}
+input[type=text]:focus,input[type=date]:focus,textarea:focus{outline:none;border-color:#888}
+.check-group{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0}
+.check-item{display:flex;align-items:center;gap:5px;font-size:13px;color:#1a1a1a;cursor:pointer}
+.check-item input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:#1a1a1a}
+.check-item input[type=radio]{width:15px;height:15px;cursor:pointer;accent-color:#1a1a1a}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field-label{font-size:12px;color:#666;margin-bottom:3px;font-weight:500}
+.field-row{margin-bottom:10px}
+.check-col{display:flex;flex-direction:column;gap:7px}
+.extra-list{list-style:none;padding:0}
+.extra-list li{display:flex;gap:6px;align-items:center;margin-bottom:7px}
+.extra-list li input{flex:1}
+.remove-btn{border:none;background:none;color:#bbb;cursor:pointer;font-size:18px;line-height:1;padding:0 3px;transition:color 0.1s}
+.remove-btn:hover{color:#c00}
+.add-btn{font-size:12px;color:#888;border:1px dashed #ccc;border-radius:6px;padding:5px 12px;background:#fff;cursor:pointer;margin-top:4px;transition:all 0.15s}
+.add-btn:hover{background:#f5f4f0;border-color:#aaa;color:#555}
+.safeword-row{display:grid;grid-template-columns:90px 1fr 180px;gap:12px;align-items:center;margin-bottom:10px;font-size:13px}
+.sw-green{color:#2a7a4b;font-weight:600}
+.sw-yellow{color:#a06500;font-weight:600}
+.sw-red{color:#a32d2d;font-weight:600}
+.sig-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:1rem}
+.sig-block{border-top:1px solid #1a1a1a;padding-top:8px}
+.sig-name{font-size:12px;color:#666;margin-bottom:6px}
+.sig-line{height:48px;border-bottom:1px solid #1a1a1a}
+.print-area{margin-top:2rem;text-align:center}
+.print-btn{padding:10px 28px;border:1px solid #1a1a1a;border-radius:6px;background:#1a1a1a;color:#fff;font-size:14px;cursor:pointer;font-family:inherit;transition:background 0.15s}
+.print-btn:hover{background:#333}
+.note{font-size:12px;color:#888;margin-top:0.5rem}
+@media print{
+  body{background:#fff;padding:0}
+  .doc{border:none;border-radius:0;padding:1.5rem;max-width:100%}
+  .add-btn,.remove-btn,.print-area{display:none!important}
+  input,textarea{border:none!important;border-bottom:1px solid #ccc!important;border-radius:0!important;padding:2px 4px!important}
+  .card{border:none;padding:0.5rem 0}
+  h2{page-break-after:avoid}
+}
+</style>
 </head>
+<body>
+<div class="doc">
+<h1>BDSM 관계 계약서</h1>
+<p class="subtitle">본 계약서는 상호 합의와 존중을 기반으로 합니다. 법적 강제력을 목적으로 하지 않으며, 양측의 의사·경계·책임·안전 기준을 정리하기 위한 합의 문서입니다.</p>
 
-<body class="bg-paper text-ink overflow-hidden font-sans">
-    <!-- Emergency Exit -->
-    <div id="emergencyExit"
-        class="fixed top-4 left-4 z-[100] cursor-pointer opacity-20 hover:opacity-100 transition-opacity p-4">
-        <i data-lucide="x-circle" class="w-6 h-6 text-ink"></i>
+<h2>1. 기본 정보</h2>
+<div class="card">
+  <div class="row3">
+    <div class="field-row"><div class="field-label">작성일</div><input type="date" id="doc-date"></div>
+    <div class="field-row"><div class="field-label">계약 시작일</div><input type="date" id="start-date"></div>
+    <div class="field-row"><div class="field-label">계약 종료일</div><input type="date" id="end-date"></div>
+  </div>
+  <div class="field-row" style="margin-top:8px">
+    <div class="field-label">갱신 여부</div>
+    <div class="check-group">
+      <label class="check-item"><input type="radio" name="renew" value="auto"> 자동 갱신</label>
+      <label class="check-item"><input type="radio" name="renew" value="manual"> 재합의 필요</label>
     </div>
-
-    <!-- Main Wrapper (Notebook Style) -->
-    <div
-        class="flex flex-col h-screen sm:h-[calc(100vh-2rem)] sm:my-4 w-full sm:max-w-2xl mx-auto sm:rounded-r-3xl sm:rounded-l-md shadow-none sm:shadow-[0_10px_50px_rgba(0,0,0,0.15)] relative bg-paper overflow-hidden border-none sm:border sm:border-black/5 sm:border-l-black/10">
-
-        <!-- Notebook Binding (Spring/Binder illusion) -->
-        <div
-            class="absolute left-0 top-0 bottom-0 w-8 bg-paper-dark border-r border-black/5 z-50 flex flex-col justify-evenly py-8 opacity-90 pointer-events-none">
-            <!-- Binding holes -->
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-            <div class="w-3 h-3 rounded-full bg-black mx-auto shadow-inner ring-1 ring-white/10"></div>
-        </div>
-
-        <!-- Margin Line (Red vertical line common in notebooks) - Hidden on smallest screens -->
-        <div class="absolute left-10 sm:left-16 top-0 bottom-0 w-px bg-red-900/10 z-0 pointer-events-none hidden sm:block"></div>
-
-        <!-- Premium Archive Header -->
-        <header class="pl-12 sm:pl-24 pr-8 pt-12 pb-8 border-b border-black/5 bg-transparent relative overflow-hidden z-10">
-            <!-- Decorative marker removed -->
-            <div id="editable-series"
-                class="absolute top-4 right-6 text-[10px] font-black border border-ink/20 text-ink/40 px-3 py-1 uppercase tracking-[0.2em] rounded-sm bg-black/5 admin-editable"
-                data-key="site_series">
-                PERSONAL NOTE
-            </div>
-
-            <div class="text-center mb-8">
-                <div class="flex items-center justify-center gap-2 mb-2">
-                    <div class="h-[1px] w-8 bg-gold/30"></div>
-                    <h2 class="text-[10px] font-bold tracking-[0.2em] text-ink/30 uppercase">나만의 학습 기록 노트
-                    </h2>
-                    <div class="h-[1px] w-8 bg-gold/30"></div>
-                </div>
-                <h1 class="text-3xl font-black text-ink py-4 tracking-tighter leading-none">
-                    <span id="editable-title-main" class="admin-editable"
-                        data-key="site_title_main">학습</span>
-                    <span id="editable-title-sub" class="admin-editable" data-key="site_title_sub">정리</span>
-                </h1>
-            </div>
-
-
-            <div class="mt-8 relative group">
-                <i data-lucide="search"
-                    class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/60 group-focus-within:text-gold transition-colors"></i>
-                <input type="text" id="searchInput"
-                    class="w-full bg-card border border-black/5 rounded-2xl pl-12 pr-4 py-4 text-sm focus:border-ink/20 outline-none transition-all placeholder:text-ink-dim/50 font-sans shadow-sm"
-                    placeholder="필요한 기록을 검색해 보세요...">
-            </div>
-        </header>
-
-        <!-- High-Density List Container -->
-        <main class="flex-1 overflow-y-auto custom-scroll pb-24 bg-transparent z-10 pl-4 sm:pl-16" id="dictionaryList">
-            <!-- Items injected by JS -->
-            <div class="p-10 text-center text-ink-dim py-32 italic">
-                <div class="animate-pulse">노트를 펼치는 중입니다...</div>
-            </div>
-        </main>
-
-        <!-- Right Toolkit Bar (Styled as margin notes or index tags) -->
-        <nav class="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 p-1 bg-paper border-2 border-ink/10 rounded-lg shadow-md z-40"
-            id="toolkitBar">
-            <!-- Category icons injected by JS -->
-        </nav>
-
-        <!-- Bottom Controls -->
-        <footer
-            class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl p-6 bg-gradient-to-t from-paper to-transparent pointer-events-none z-[100]">
-            <div class="flex justify-center gap-8 pointer-events-auto">
-                <button id="bookmarkToggle"
-                    class="p-5 bg-card border border-white/10 rounded-full shadow-2xl hover:bg-paper-dark transition-all active:scale-90 group">
-                    <i data-lucide="star" class="w-6 h-6 text-ink-dim group-hover:text-gold transition-colors"></i>
-                </button>
-                <button id="adminLoginBtn"
-                    class="p-5 bg-card border border-white/10 rounded-full shadow-2xl hover:bg-paper-dark transition-all active:scale-90 group">
-                    <i data-lucide="key" class="w-6 h-6 text-ink-dim group-hover:text-gold transition-colors"></i>
-                </button>
-                <button id="addNewBtn"
-                    class="p-5 bg-gold text-paper-dark font-black rounded-full shadow-2xl hover:bg-gold-bright transition-all hidden active:scale-90">
-                    <i data-lucide="edit" class="w-6 h-6"></i>
-                </button>
-            </div>
-        </footer>
+  </div>
+  <div class="row2" style="margin-top:14px">
+    <div>
+      <h3>상위 역할</h3>
+      <div class="field-row"><div class="field-label">닉네임</div><input type="text" placeholder="닉네임 입력"></div>
+      <div class="field-row"><div class="field-label">역할 성향</div><input type="text" placeholder="성향 입력"></div>
+      <div class="field-row"><div class="field-label">연락 방식</div><input type="text" placeholder="카카오톡, 텔레그램 등"></div>
     </div>
-
-    <!-- Login Modal (Styled as Academic Integrity Pledge) -->
-    <div id="loginModal"
-        class="fixed inset-0 bg-paper/60 backdrop-blur-md z-[150] hidden items-center justify-center p-4">
-        <div
-            class="bg-card w-full max-w-sm border border-gold/30 p-10 shadow-[0_0_50px_rgba(212,175,55,0.15)] animate-fade-in rounded-3xl">
-            <h2 class="text-2xl font-black text-ink mb-2 flex items-center gap-3 border-b border-white/5 pb-4">
-                <i data-lucide="shield-check" class="text-gold"></i>
-                관리자 접속
-                <span class="text-[9px] font-bold text-ink-dim opacity-50 ml-auto uppercase tracking-widest">Admin
-                    Access</span>
-            </h2>
-            <p class="text-[10px] text-ink/40 mt-2 mb-8 italic font-bold">RESTRICTED ACCESS
-            </p>
-            <div class="space-y-6 font-sans">
-                <div class="relative group">
-                    <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Admin
-                        E-mail</label>
-                    <input type="email" id="loginEmail"
-                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-gold/30 focus:ring-1 focus:ring-gold/20"
-                        placeholder="admin@sm-archive.ac.kr">
-                </div>
-                <div class="relative group">
-                    <label class="block text-[10px] font-black text-ink-dim uppercase tracking-widest mb-2 ml-1">Password</label>
-                    <input type="password" id="loginPassword"
-                        class="w-full bg-paper border border-white/5 rounded-2xl px-5 py-4 text-sm outline-none transition-all placeholder:text-ink-dim/30 focus:border-gold/30 focus:ring-1 focus:ring-gold/20"
-                        placeholder="••••••••">
-                </div>
-                <button id="submitLoginBtn"
-                    class="w-full py-5 bg-gold text-paper font-black rounded-2xl mt-4 hover:bg-gold-bright transition-all shadow-xl active:scale-95 text-sm">
-                    접속 하기
-                </button>
-                <button onclick="closeLoginModal()"
-                    class="w-full py-4 text-ink-dim text-[11px] font-bold hover:text-ink transition-colors uppercase tracking-widest">
-                    취소 (Exit)
-                </button>
-            </div>
-        </div>
+    <div>
+      <h3>하위 역할</h3>
+      <div class="field-row"><div class="field-label">닉네임</div><input type="text" placeholder="닉네임 입력"></div>
+      <div class="field-row"><div class="field-label">역할 성향</div><input type="text" placeholder="성향 입력"></div>
+      <div class="field-row"><div class="field-label">연락 방식</div><input type="text" placeholder="카카오톡, 텔레그램 등"></div>
     </div>
+  </div>
+</div>
 
-    <!-- Bottom Sheet Overlay -->
-    <div id="bottomSheetOverlay"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden opacity-0 transition-opacity duration-300">
+<h2>2. 관계 정의</h2>
+<div class="card">
+  <div class="row2">
+    <div>
+      <h3>관계 목적 (복수 선택)</h3>
+      <div class="check-col">
+        <label class="check-item"><input type="checkbox"> 디엣 중심</label>
+        <label class="check-item"><input type="checkbox"> 플레이 중심</label>
+        <label class="check-item"><input type="checkbox"> 멘탈 케어 중심</label>
+        <label class="check-item"><input type="checkbox"> 훈련 중심</label>
+        <label class="check-item"><input type="checkbox"> 생활 통제 포함</label>
+        <label class="check-item"><input type="checkbox"> 장기 관계 지향</label>
+        <label class="check-item"><input type="checkbox"> 기타:</label>
+        <input type="text" placeholder="직접 입력">
+      </div>
     </div>
-
-    <!-- Bottom Sheet -->
-    <div id="bottomSheet"
-        class="fixed bottom-0 left-0 w-full max-h-[90vh] bg-dark-alt rounded-t-[2rem] border-t border-gray-800 z-[101] transform translate-y-full transition-transform duration-300 ease-out flex flex-col">
-        <div class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto my-4 flex-shrink-0"></div>
-        <div class="overflow-y-auto px-6 pb-12 flex-1 custom-scroll" id="sheetContent">
-            <!-- Detailed content injected by JS -->
-        </div>
+    <div>
+      <h3>관계 지향성 (복수 선택)</h3>
+      <div class="check-col">
+        <label class="check-item"><input type="checkbox"> 1:1 관계</label>
+        <label class="check-item"><input type="checkbox"> 오픈 관계</label>
+        <label class="check-item"><input type="checkbox"> 논모노 관계</label>
+        <label class="check-item"><input type="checkbox"> 플레이 파트너 중심</label>
+        <label class="check-item"><input type="checkbox"> 온라인 중심</label>
+        <label class="check-item"><input type="checkbox"> 오프라인 중심</label>
+        <label class="check-item"><input type="checkbox"> 기타:</label>
+        <input type="text" placeholder="직접 입력">
+      </div>
     </div>
+  </div>
+  <h3 style="margin-top:1.25rem">호칭 규칙</h3>
+  <table>
+    <tr><th>상황</th><th>사용 호칭</th></tr>
+    <tr><td>일상</td><td><input type="text" placeholder="입력"></td></tr>
+    <tr><td>플레이 중</td><td><input type="text" placeholder="입력"></td></tr>
+    <tr><td>공공장소</td><td><input type="text" placeholder="입력"></td></tr>
+    <tr><td>온라인</td><td><input type="text" placeholder="입력"></td></tr>
+  </table>
+</div>
 
-    <!-- Core Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/ui-renderer.js"></script>
-    <script src="js/archive-renderer.js"></script>
-    <script src="js/app.js"></script>
+<h2>3. 핵심 원칙</h2>
+<div class="card">
+  <div class="check-col">
+    <label class="check-item"><input type="checkbox" checked> 모든 행위는 명확한 동의 하에서만 진행합니다.</label>
+    <label class="check-item"><input type="checkbox" checked> 동의는 언제든 철회 가능합니다.</label>
+    <label class="check-item"><input type="checkbox" checked> 침묵은 동의로 간주하지 않습니다.</label>
+    <label class="check-item"><input type="checkbox" checked> 신체적·정신적 안전을 우선합니다.</label>
+    <label class="check-item"><input type="checkbox" checked> 무리한 강요 및 압박을 금지합니다.</label>
+    <label class="check-item"><input type="checkbox" checked> 컨디션 저하 시 플레이를 중단할 수 있습니다.</label>
+    <label class="check-item"><input type="checkbox" checked> 인격 비하와 실제 모욕은 구분합니다.</label>
+    <label class="check-item"><input type="checkbox" checked> 사적인 정보 및 사진은 허가 없이 공유하지 않습니다.</label>
+  </div>
+</div>
 
-    <!-- PWA Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(reg => {
-                    console.log('🚀 Service Worker registered');
-                }).catch(err => {
-                    console.warn('❌ Service Worker failed:', err);
-                });
-            });
-        }
-    </script>
+<h2>4. 세이프워드 및 중단 규칙</h2>
+<div class="card">
+  <div class="safeword-row">
+    <span class="sw-green">🟢 Green</span>
+    <span style="font-size:13px;color:#666">현재 상태 양호, 진행 가능</span>
+    <input type="text" placeholder="커스텀 워드 (선택)">
+  </div>
+  <div class="safeword-row">
+    <span class="sw-yellow">🟡 Yellow</span>
+    <span style="font-size:13px;color:#666">강도 조절 필요</span>
+    <input type="text" placeholder="커스텀 워드 (선택)">
+  </div>
+  <div class="safeword-row">
+    <span class="sw-red">🔴 Red</span>
+    <span style="font-size:13px;color:#666">즉시 중단</span>
+    <input type="text" placeholder="커스텀 워드 (선택)">
+  </div>
+
+  <h3 style="margin-top:1rem">비언어 신호</h3>
+  <div class="row2">
+    <div class="field-row"><div class="field-label">손짓</div><input type="text" placeholder="예: 주먹 쥐기"></div>
+    <div class="field-row"><div class="field-label">물건 떨어뜨리기</div><input type="text" placeholder="예: 지정 물건"></div>
+  </div>
+  <div class="field-row"><div class="field-label">기타</div><input type="text" placeholder="직접 입력"></div>
+
+  <h3 style="margin-top:1rem">즉시 중단 조건 (복수 선택)</h3>
+  <div class="check-group">
+    <label class="check-item"><input type="checkbox" checked> 호흡 이상</label>
+    <label class="check-item"><input type="checkbox" checked> 마비감 또는 심한 통증</label>
+    <label class="check-item"><input type="checkbox" checked> 공황 증상</label>
+    <label class="check-item"><input type="checkbox" checked> 과호흡</label>
+    <label class="check-item"><input type="checkbox" checked> 감정 붕괴</label>
+    <label class="check-item"><input type="checkbox"> 기타:</label>
+    <input type="text" placeholder="직접 입력" style="width:160px">
+  </div>
+</div>
+
+<h2>5. 플레이 가능 범위</h2>
+<div class="card">
+  <h3>선호 플레이</h3>
+  <ul class="extra-list" id="prefer-list">
+    <li><input type="text" placeholder="항목 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
+    <li><input type="text" placeholder="항목 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
+  </ul>
+  <button class="add-btn" onclick="addItem('prefer-list')">+ 항목 추가</button>
+
+  <h3 style="margin-top:1.25rem">조건부 가능 플레이</h3>
+  <table>
+    <tr><th>항목</th><th>조건</th></tr>
+    <tbody id="cond-table">
+      <tr><td><input type="text" placeholder="항목"></td><td><input type="text" placeholder="조건"></td></tr>
+      <tr><td><input type="text" placeholder="항목"></td><td><input type="text" placeholder="조건"></td></tr>
+    </tbody>
+  </table>
+  <button class="add-btn" onclick="addTableRow('cond-table')">+ 행 추가</button>
+
+  <h3 style="margin-top:1.25rem">금지 플레이</h3>
+  <ul class="extra-list" id="ban-list">
+    <li><input type="text" placeholder="항목 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
+    <li><input type="text" placeholder="항목 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
+  </ul>
+  <button class="add-btn" onclick="addItem('ban-list')">+ 항목 추가</button>
+</div>
+
+<h2>6. 신체 경계</h2>
+<div class="card">
+  <table>
+    <tr><th>부위/항목</th><th style="width:160px">가능 여부</th><th>비고</th></tr>
+    <tbody id="body-table">
+      <tr><td>목</td><td>
+        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b1" value="ok"> 가능</label>
+        <label class="check-item" style="display:inline-flex"><input type="radio" name="b1" value="no"> 불가</label>
+      </td><td><input type="text" placeholder="비고"></td></tr>
+      <tr><td>얼굴</td><td>
+        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b2" value="ok"> 가능</label>
+        <label class="check-item" style="display:inline-flex"><input type="radio" name="b2" value="no"> 불가</label>
+      </td><td><input type="text" placeholder="비고"></td></tr>
+      <tr><td>가슴</td><td>
+        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b3" value="ok"> 가능</label>
+        <label class="check-item" style="display:inline-flex"><input type="radio" name="b3" value="no"> 불가</label>
+      </td><td><input type="text" placeholder="비고"></td></tr>
+      <tr><td>허벅지</td><td>
+        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b4" value="ok"> 가능</label>
+        <label class="check-item" style="display:inline-flex"><input type="radio" name="b4" value="no"> 불가</label>
+      </td><td><input type="text" placeholder="비고"></td></tr>
+      <tr><td>손목 결박</td><td>
+        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b5" value="ok"> 가능</label>
+        <label class="check-item" style="display:inline-flex"><input type="radio" name="b5" value="no"> 불가</label>
+      </td><td><input type="text" placeholder="비고"></td></tr>
+      <tr><td>발목 결박</td><td>
+        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b6" value="ok"> 가능</label>
+        <label class="check-item" style="display:inline-flex"><input type="radio" name="b6" value="no"> 불가</label>
+      </td><td><input type="text" placeholder="비고"></td></tr>
+    </tbody>
+  </table>
+  <button class="add-btn" onclick="addBodyRow()" style="margin-top:8px">+ 항목 추가</button>
+
+  <h3 style="margin-top:1.25rem">건강 관련 주의사항</h3>
+  <div class="row2">
+    <div class="field-row"><div class="field-label">복용 중 약</div><input type="text" placeholder="없으면 '해당 없음'"></div>
+    <div class="field-row"><div class="field-label">알레르기</div><input type="text" placeholder="없으면 '해당 없음'"></div>
+    <div class="field-row"><div class="field-label">기존 질환</div><input type="text" placeholder="없으면 '해당 없음'"></div>
+    <div class="field-row"><div class="field-label">응급 상황 시 대응</div><input type="text" placeholder="예: 119 즉시 신고"></div>
+  </div>
+</div>
+
+<h2>7. 정신적 경계</h2>
+<div class="card">
+  <h3>금지 요소 (복수 선택)</h3>
+  <div class="check-group">
+    <label class="check-item"><input type="checkbox"> 트라우마 자극</label>
+    <label class="check-item"><input type="checkbox"> 현실 비하</label>
+    <label class="check-item"><input type="checkbox"> 가족 관련 언급</label>
+    <label class="check-item"><input type="checkbox"> 외모 비하</label>
+    <label class="check-item"><input type="checkbox"> 강한 방치</label>
+    <label class="check-item"><input type="checkbox"> 기타:</label>
+    <input type="text" placeholder="직접 입력" style="width:160px">
+  </div>
+  <h3 style="margin-top:1rem">허용 가능한 연출 범위</h3>
+  <ul class="extra-list" id="mental-allow-list">
+    <li><input type="text" placeholder="허용 연출 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
+    <li><input type="text" placeholder="허용 연출 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
+  </ul>
+  <button class="add-btn" onclick="addItem('mental-allow-list')">+ 항목 추가</button>
+</div>
+
+<h2>8. 통제 및 생활 규칙</h2>
+<div class="card">
+  <table>
+    <tr><th>항목</th><th style="width:90px">적용</th><th>상세 내용</th></tr>
+    <tr><td>기상 보고</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
+    <tr><td>수면 관리</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
+    <tr><td>식사 관리</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
+    <tr><td>복장 지정</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
+    <tr><td>외출 보고</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
+    <tr><td>연락 주기</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
+    <tr><td>SNS 공개 범위</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
+  </table>
+  <h3 style="margin-top:1rem">금지 사항 (복수 선택)</h3>
+  <div class="check-group">
+    <label class="check-item"><input type="checkbox" checked> 무단 잠수</label>
+    <label class="check-item"><input type="checkbox" checked> 일방적 압박</label>
+    <label class="check-item"><input type="checkbox" checked> 강제 인증 요구</label>
+    <label class="check-item"><input type="checkbox" checked> 사생활 침해</label>
+    <label class="check-item"><input type="checkbox"> 기타:</label>
+    <input type="text" placeholder="직접 입력" style="width:160px">
+  </div>
+</div>
+
+<h2>9. 애프터케어 기준</h2>
+<div class="card">
+  <h3>플레이 후 케어 (복수 선택)</h3>
+  <div class="check-group">
+    <label class="check-item"><input type="checkbox" checked> 물 제공</label>
+    <label class="check-item"><input type="checkbox" checked> 상태 확인</label>
+    <label class="check-item"><input type="checkbox" checked> 감정 안정</label>
+    <label class="check-item"><input type="checkbox"> 포옹 및 신체 접촉</label>
+    <label class="check-item"><input type="checkbox"> 대화</label>
+  </div>
+  <div class="field-row" style="margin-top:8px"><div class="field-label">추가 케어 사항</div><input type="text" placeholder="기타 케어 내용"></div>
+  <h3 style="margin-top:1rem">사후 점검</h3>
+  <table>
+    <tr><th>항목</th><th>내용</th></tr>
+    <tr><td>다음날 상태 확인</td><td><input type="text" placeholder="방법 입력 (카톡, 전화 등)"></td></tr>
+    <tr><td>멘탈 체크</td><td><input type="text" placeholder="주기 또는 방법 입력"></td></tr>
+    <tr><td>피드백 시간</td><td><input type="text" placeholder="예: 플레이 후 24시간 내"></td></tr>
+  </table>
+</div>
+
+<h2>10. 사진 및 기록</h2>
+<div class="card">
+  <div class="row2">
+    <div>
+      <h3>촬영 여부</h3>
+      <div class="check-col">
+        <label class="check-item"><input type="radio" name="photo" value="ok"> 허용</label>
+        <label class="check-item"><input type="radio" name="photo" value="cond"> 조건부 허용</label>
+        <label class="check-item"><input type="radio" name="photo" value="no"> 금지</label>
+      </div>
+    </div>
+    <div>
+      <h3>공개 범위</h3>
+      <div class="check-col">
+        <label class="check-item"><input type="checkbox"> 개인 보관만 가능</label>
+        <label class="check-item"><input type="checkbox"> 상대 동의 후 업로드 가능</label>
+        <label class="check-item"><input type="checkbox"> 얼굴 공개 금지</label>
+        <label class="check-item"><input type="checkbox"> 특정 플랫폼 금지</label>
+      </div>
+    </div>
+  </div>
+  <h3 style="margin-top:1rem">삭제 규칙 (복수 선택)</h3>
+  <div class="check-group">
+    <label class="check-item"><input type="checkbox"> 요청 시 즉시 삭제</label>
+    <label class="check-item"><input type="checkbox"> 관계 종료 시 전부 삭제</label>
+    <label class="check-item"><input type="checkbox"> 백업 보관 금지</label>
+  </div>
+</div>
+
+<h2>11. 관계 종료 규칙</h2>
+<div class="card">
+  <h3>종료 가능 조건 (복수 선택)</h3>
+  <div class="check-group">
+    <label class="check-item"><input type="checkbox"> 신뢰 붕괴</label>
+    <label class="check-item"><input type="checkbox"> 반복적인 경계 침범</label>
+    <label class="check-item"><input type="checkbox"> 안전 위협</label>
+    <label class="check-item"><input type="checkbox"> 일방적 통제 악용</label>
+    <label class="check-item"><input type="checkbox"> 감정 소진</label>
+    <label class="check-item"><input type="checkbox"> 기타:</label>
+    <input type="text" placeholder="직접 입력" style="width:160px">
+  </div>
+  <h3 style="margin-top:1rem">종료 절차</h3>
+  <div class="check-col">
+    <label class="check-item"><input type="checkbox"> 종료 의사 전달</label>
+    <label class="check-item"><input type="checkbox"> 보유 자료 삭제</label>
+    <label class="check-item"><input type="checkbox"> 연락 정리 여부 결정</label>
+    <label class="check-item"><input type="checkbox"> 공개 언급 여부 협의</label>
+  </div>
+</div>
+
+<h2>12. 추가 합의 사항</h2>
+<div class="card">
+  <ul class="extra-list" id="extra-list">
+    <li><input type="text" placeholder="합의 내용 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
+    <li><input type="text" placeholder="합의 내용 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
+  </ul>
+  <button class="add-btn" onclick="addItem('extra-list')">+ 항목 추가</button>
+</div>
+
+<h2>13. 최종 확인 및 서명</h2>
+<div class="card">
+  <p style="font-size:13px;color:#555;margin-bottom:1.25rem;line-height:1.7">본 계약서는 강압 없이 작성되었으며, 양측은 내용을 충분히 이해하고 동의한 상태에서 서명합니다.</p>
+  <div class="sig-section">
+    <div>
+      <div class="field-label" style="margin-bottom:6px">상위 역할 — 이름/닉네임</div>
+      <input type="text" placeholder="이름 또는 닉네임" style="margin-bottom:16px">
+      <div class="field-label">서명</div>
+      <div class="sig-line"></div>
+    </div>
+    <div>
+      <div class="field-label" style="margin-bottom:6px">하위 역할 — 이름/닉네임</div>
+      <input type="text" placeholder="이름 또는 닉네임" style="margin-bottom:16px">
+      <div class="field-label">서명</div>
+      <div class="sig-line"></div>
+    </div>
+  </div>
+</div>
+
+<div class="print-area">
+  <button class="print-btn" onclick="window.print()">🖨 인쇄 / PDF로 저장</button>
+  <p class="note">브라우저의 인쇄 기능을 이용해 PDF로 저장할 수 있습니다</p>
+</div>
+
+</div>
+
+<script>
+function removeItem(btn){btn.closest('li').remove()}
+function addItem(listId){
+  const li=document.createElement('li');
+  li.innerHTML='<input type="text" placeholder="항목 입력"><button class="remove-btn" onclick="removeItem(this)">×</button>';
+  document.getElementById(listId).appendChild(li);
+}
+function addTableRow(tbodyId){
+  const tr=document.createElement('tr');
+  tr.innerHTML='<td><input type="text" placeholder="항목"></td><td><input type="text" placeholder="조건"></td>';
+  document.getElementById(tbodyId).appendChild(tr);
+}
+let bodyCount=6;
+function addBodyRow(){
+  bodyCount++;
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input type="text" placeholder="부위/항목"></td><td>
+    <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b${bodyCount}" value="ok"> 가능</label>
+    <label class="check-item" style="display:inline-flex"><input type="radio" name="b${bodyCount}" value="no"> 불가</label>
+  </td><td><input type="text" placeholder="비고"></td>`;
+  document.getElementById('body-table').appendChild(tr);
+}
+</script>
 </body>
-
 </html>
