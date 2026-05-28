@@ -3,424 +3,1789 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BDSM 관계 계약서</title>
+<title>프리미엄 BDSM 관계 합의 계약서 (관리자 제어 에디션)</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Lucide Icons CDN -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- Supabase JS Client CDN -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;background:#f5f4f0;color:#1a1a1a;padding:2rem 1rem}
-.doc{max-width:720px;margin:0 auto;background:#fff;border:1px solid #ddd;border-radius:12px;padding:2.5rem}
-h1{font-size:24px;font-weight:600;margin-bottom:0.4rem}
-.subtitle{font-size:13px;color:#666;margin-bottom:2rem;line-height:1.6;border-left:3px solid #ccc;padding-left:10px}
-h2{font-size:16px;font-weight:600;color:#1a1a1a;margin:2rem 0 0.75rem;padding-bottom:6px;border-bottom:2px solid #1a1a1a}
-h3{font-size:13px;font-weight:600;color:#555;margin:1rem 0 0.5rem;text-transform:uppercase;letter-spacing:0.03em}
-.card{border:1px solid #e5e5e5;border-radius:8px;padding:1.25rem;margin-bottom:1rem}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{font-weight:600;color:#555;text-align:left;padding:7px 10px;background:#f8f7f4;font-size:12px;border-bottom:1px solid #e5e5e5}
-td{padding:6px 10px;border-bottom:1px solid #f0f0f0;color:#1a1a1a;vertical-align:middle}
-tr:last-child td{border-bottom:none}
-input[type=text],input[type=date],textarea,select{width:100%;border:1px solid #ddd;border-radius:6px;padding:6px 10px;font-size:13px;background:#fff;color:#1a1a1a;font-family:inherit;resize:vertical;transition:border-color 0.15s}
-input[type=text]:focus,input[type=date]:focus,textarea:focus{outline:none;border-color:#888}
-.check-group{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0}
-.check-item{display:flex;align-items:center;gap:5px;font-size:13px;color:#1a1a1a;cursor:pointer}
-.check-item input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:#1a1a1a}
-.check-item input[type=radio]{width:15px;height:15px;cursor:pointer;accent-color:#1a1a1a}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.field-label{font-size:12px;color:#666;margin-bottom:3px;font-weight:500}
-.field-row{margin-bottom:10px}
-.check-col{display:flex;flex-direction:column;gap:7px}
-.extra-list{list-style:none;padding:0}
-.extra-list li{display:flex;gap:6px;align-items:center;margin-bottom:7px}
-.extra-list li input{flex:1}
-.remove-btn{border:none;background:none;color:#bbb;cursor:pointer;font-size:18px;line-height:1;padding:0 3px;transition:color 0.1s}
-.remove-btn:hover{color:#c00}
-.add-btn{font-size:12px;color:#888;border:1px dashed #ccc;border-radius:6px;padding:5px 12px;background:#fff;cursor:pointer;margin-top:4px;transition:all 0.15s}
-.add-btn:hover{background:#f5f4f0;border-color:#aaa;color:#555}
-.safeword-row{display:grid;grid-template-columns:90px 1fr 180px;gap:12px;align-items:center;margin-bottom:10px;font-size:13px}
-.sw-green{color:#2a7a4b;font-weight:600}
-.sw-yellow{color:#a06500;font-weight:600}
-.sw-red{color:#a32d2d;font-weight:600}
-.sig-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:1rem}
-.sig-block{border-top:1px solid #1a1a1a;padding-top:8px}
-.sig-name{font-size:12px;color:#666;margin-bottom:6px}
-.sig-line{height:48px;border-bottom:1px solid #1a1a1a}
-.print-area{margin-top:2rem;text-align:center}
-.print-btn{padding:10px 28px;border:1px solid #1a1a1a;border-radius:6px;background:#1a1a1a;color:#fff;font-size:14px;cursor:pointer;font-family:inherit;transition:background 0.15s}
-.print-btn:hover{background:#333}
-.note{font-size:12px;color:#888;margin-top:0.5rem}
-@media print{
-  body{background:#fff;padding:0}
-  .doc{border:none;border-radius:0;padding:1.5rem;max-width:100%}
-  .add-btn,.remove-btn,.print-area{display:none!important}
-  input,textarea{border:none!important;border-bottom:1px solid #ccc!important;border-radius:0!important;padding:2px 4px!important}
-  .card{border:none;padding:0.5rem 0}
-  h2{page-break-after:avoid}
-}
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+  
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #0b0f19;
+    color: #e2e8f0;
+  }
+  .brand-font {
+    font-family: 'Cinzel', serif;
+  }
+  /* 스크롤바 디자인 */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #e11d48;
+  }
+  /* 잠금 모드일 때 입력 필드 스타일 제어 */
+  .locked-input:disabled {
+    background-color: #0f172a/40 !important;
+    border-color: #1e293b !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+  /* 인쇄 전용 스타일 */
+  @media print {
+    body {
+      background: #ffffff !important;
+      color: #000000 !important;
+    }
+    .no-print {
+      display: none !important;
+    }
+    .print-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      color: #000000 !important;
+      box-shadow: none !important;
+      margin-bottom: 1.5rem !important;
+      page-break-inside: avoid;
+    }
+    input, textarea, select {
+      border: none !important;
+      border-bottom: 1px solid #cbd5e1 !important;
+      background: transparent !important;
+      color: #000000 !important;
+      padding-left: 0 !important;
+      border-radius: 0 !important;
+    }
+    .print-title {
+      color: #000000 !important;
+    }
+    .print-badge {
+      border: 1px solid #000 !important;
+      color: #000 !important;
+      background: transparent !important;
+    }
+  }
 </style>
 </head>
-<body>
-<div class="doc">
-<h1>BDSM 관계 계약서</h1>
-<p class="subtitle">본 계약서는 상호 합의와 존중을 기반으로 합니다. 법적 강제력을 목적으로 하지 않으며, 양측의 의사·경계·책임·안전 기준을 정리하기 위한 합의 문서입니다.</p>
+<body class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-radial-gradient">
 
-<h2>1. 기본 정보</h2>
-<div class="card">
-  <div class="row3">
-    <div class="field-row"><div class="field-label">작성일</div><input type="date" id="doc-date"></div>
-    <div class="field-row"><div class="field-label">계약 시작일</div><input type="date" id="start-date"></div>
-    <div class="field-row"><div class="field-label">계약 종료일</div><input type="date" id="end-date"></div>
-  </div>
-  <div class="field-row" style="margin-top:8px">
-    <div class="field-label">갱신 여부</div>
-    <div class="check-group">
-      <label class="check-item"><input type="radio" name="renew" value="auto"> 자동 갱신</label>
-      <label class="check-item"><input type="radio" name="renew" value="manual"> 재합의 필요</label>
-    </div>
-  </div>
-  <div class="row2" style="margin-top:14px">
-    <div>
-      <h3>상위 역할</h3>
-      <div class="field-row"><div class="field-label">닉네임</div><input type="text" placeholder="닉네임 입력"></div>
-      <div class="field-row"><div class="field-label">역할 성향</div><input type="text" placeholder="성향 입력"></div>
-      <div class="field-row"><div class="field-label">연락 방식</div><input type="text" placeholder="카카오톡, 텔레그램 등"></div>
-    </div>
-    <div>
-      <h3>하위 역할</h3>
-      <div class="field-row"><div class="field-label">닉네임</div><input type="text" placeholder="닉네임 입력"></div>
-      <div class="field-row"><div class="field-label">역할 성향</div><input type="text" placeholder="성향 입력"></div>
-      <div class="field-row"><div class="field-label">연락 방식</div><input type="text" placeholder="카카오톡, 텔레그램 등"></div>
-    </div>
-  </div>
-</div>
-
-<h2>2. 관계 정의</h2>
-<div class="card">
-  <div class="row2">
-    <div>
-      <h3>관계 목적 (복수 선택)</h3>
-      <div class="check-col">
-        <label class="check-item"><input type="checkbox"> 디엣 중심</label>
-        <label class="check-item"><input type="checkbox"> 플레이 중심</label>
-        <label class="check-item"><input type="checkbox"> 멘탈 케어 중심</label>
-        <label class="check-item"><input type="checkbox"> 훈련 중심</label>
-        <label class="check-item"><input type="checkbox"> 생활 통제 포함</label>
-        <label class="check-item"><input type="checkbox"> 장기 관계 지향</label>
-        <label class="check-item"><input type="checkbox"> 기타:</label>
-        <input type="text" placeholder="직접 입력">
+<div class="max-w-4xl mx-auto">
+  
+  <!-- 상단 컨트롤러 (모바일 대응 플로팅 바) -->
+  <div class="no-print sticky top-4 z-50 mb-8 bg-slate-900/95 backdrop-blur-md border border-slate-800 rounded-2xl p-4 shadow-2xl flex flex-wrap gap-3 items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" id="conn-indicator"></div>
+      <div class="flex flex-col">
+        <span class="text-xs text-slate-400 font-semibold flex items-center gap-1.5" id="save-status">
+          SQL 연동 상태 확인 중...
+        </span>
+        <span class="text-[10px] text-slate-500 font-mono tracking-wider" id="db-display">DATABASE: 연결 안 됨</span>
       </div>
     </div>
-    <div>
-      <h3>관계 지향성 (복수 선택)</h3>
-      <div class="check-col">
-        <label class="check-item"><input type="checkbox"> 1:1 관계</label>
-        <label class="check-item"><input type="checkbox"> 오픈 관계</label>
-        <label class="check-item"><input type="checkbox"> 논모노 관계</label>
-        <label class="check-item"><input type="checkbox"> 플레이 파트너 중심</label>
-        <label class="check-item"><input type="checkbox"> 온라인 중심</label>
-        <label class="check-item"><input type="checkbox"> 오프라인 중심</label>
-        <label class="check-item"><input type="checkbox"> 기타:</label>
-        <input type="text" placeholder="직접 입력">
+    
+    <div class="flex flex-wrap gap-2 items-center">
+      <!-- 관리자 모드 잠금/해제 버튼 -->
+      <button onclick="handleAdminAuthToggle()" id="btn-admin-lock" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-rose-950/40 border border-rose-800/60 hover:bg-rose-900/40 active:scale-95 transition text-xs font-semibold rounded-lg text-rose-300">
+        <i data-lucide="lock" class="w-3.5 h-3.5" id="lock-icon"></i> <span id="lock-text">관리자 모드 로그인</span>
+      </button>
+
+      <!-- SQL 환경설정 패널 버튼 -->
+      <button onclick="showConfigModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 transition text-xs font-semibold rounded-lg text-slate-200">
+        <i data-lucide="database" class="w-3.5 h-3.5 text-rose-400"></i> SQL DB 설정
+      </button>
+
+      <!-- 고유 링크 복사 버튼 -->
+      <button onclick="copyDocumentLink()" id="btn-share" class="hidden flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-850 hover:bg-slate-700 active:scale-95 transition text-xs font-semibold rounded-lg text-slate-200">
+        <i data-lucide="share-2" class="w-3.5 h-3.5 text-rose-400"></i> 실시간 공유 링크 복사
+      </button>
+
+      <!-- 내보내기/불러오기 백업 -->
+      <button onclick="exportData()" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-850 hover:bg-slate-700 active:scale-95 transition text-xs font-semibold rounded-lg text-slate-200">
+        <i data-lucide="download" class="w-3.5 h-3.5 text-rose-400"></i> JSON 백업
+      </button>
+      <button onclick="triggerImport()" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-850 hover:bg-slate-700 active:scale-95 transition text-xs font-semibold rounded-lg text-slate-200">
+        <i data-lucide="upload" class="w-3.5 h-3.5 text-rose-400"></i> 백업 복원
+      </button>
+      <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
+      
+      <button onclick="showResetModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-850/50 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 active:scale-95 transition text-xs font-semibold rounded-lg">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 전체 초기화
+      </button>
+      <button onclick="window.print()" class="flex items-center gap-1.5 px-4 py-1.5 bg-rose-600 hover:bg-rose-500 active:scale-95 transition text-xs font-bold rounded-lg text-white shadow-lg shadow-rose-950/50">
+        <i data-lucide="printer" class="w-3.5 h-3.5"></i> PDF 다운로드 / 인쇄
+      </button>
+    </div>
+  </div>
+
+  <!-- 문서 헤더 -->
+  <header class="text-center mb-12 relative">
+    <div class="absolute inset-0 flex items-center justify-center -z-10 opacity-10">
+      <div class="w-72 h-72 rounded-full bg-rose-700 filter blur-3xl"></div>
+    </div>
+    <h1 class="brand-font text-3xl sm:text-4xl font-extrabold tracking-widest text-slate-100 print-title flex items-center justify-center gap-3">
+      <i data-lucide="shield-alert" class="w-8 h-8 text-rose-600 no-print"></i>
+      BDSM RELATIONSHIP CONTRACT
+    </h1>
+    <div class="h-0.5 w-24 bg-gradient-to-r from-transparent via-rose-600 to-transparent mx-auto mt-4"></div>
+    <p class="mt-4 text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed font-light">
+      본 협약서는 실시간 PostgreSQL 관계형 SQL 데이터베이스 하에 영구히 저장 및 수정됩니다. 상호 권리와 한계를 존중하기 위한 서약서입니다.
+    </p>
+  </header>
+
+  <!-- 메인 양식 폼 시작 -->
+  <form id="contract-form" onsubmit="event.preventDefault();" class="space-y-8">
+    
+    <!-- 관리자 비밀번호 데이터 보관을 위한 숨김 필드 -->
+    <input type="hidden" name="admin_password" id="admin_password_field">
+
+    <!-- 1. 기본 정보 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">01.</span> 기본 정보 및 기간
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">작성일</label>
+          <input type="date" name="doc_date" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">효력 시작일</label>
+          <input type="date" name="start_date" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">효력 종료일</label>
+          <input type="date" name="end_date" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+      </div>
+      
+      <div class="mb-6">
+        <span class="block text-xs font-semibold text-slate-400 mb-2.5">갱신 규정</span>
+        <div class="flex gap-4">
+          <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-300">
+            <input type="radio" name="renew" value="auto" class="locked-input w-4 h-4 accent-rose-600 bg-slate-950 border-slate-800">
+            <span>만료 시 자동 연장</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-300">
+            <input type="radio" name="renew" value="manual" class="locked-input w-4 h-4 accent-rose-600 bg-slate-950 border-slate-800">
+            <span>만료 시 상호 합의 후 재작성</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-800/50">
+        <!-- 상위 역할 -->
+        <div class="space-y-3.5">
+          <h3 class="text-sm font-bold text-rose-400 flex items-center gap-1.5">
+            <i data-lucide="crown" class="w-4 h-4"></i> 상위 역할 (Dominant / Owner 등)
+          </h3>
+          <div>
+            <input type="text" name="dom_name" placeholder="닉네임 또는 호칭" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-rose-500 transition">
+          </div>
+          <div>
+            <input type="text" name="dom_tendency" placeholder="세부 성향 (예: Rigorous Dominant)" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-rose-500 transition">
+          </div>
+          <div>
+            <input type="text" name="dom_contact" placeholder="보안 연락처 (메신저 등)" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-rose-500 transition">
+          </div>
+        </div>
+        <!-- 하위 역할 -->
+        <div class="space-y-3.5">
+          <h3 class="text-sm font-bold text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="link" class="w-4 h-4 text-slate-500"></i> 하위 역할 (Submissive / Slave 등)
+          </h3>
+          <div>
+            <input type="text" name="sub_name" placeholder="닉네임 또는 호칭" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-rose-500 transition">
+          </div>
+          <div>
+            <input type="text" name="sub_tendency" placeholder="세부 성향 (예: Loyal Submissive)" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-rose-500 transition">
+          </div>
+          <div>
+            <input type="text" name="sub_contact" placeholder="보안 연락처 (메신저 등)" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-rose-500 transition">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 관계 정의 및 규칙 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">02.</span> 관계 정의 및 지향점
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <h3 class="text-xs font-semibold text-slate-400 mb-3">주요 관계 목적 (복수 선택 가능)</h3>
+          <div class="space-y-2.5 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60">
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="purpose_ds" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>디엣(D/s) 라이프스타일 중심</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="purpose_play" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>오프라인 플레이 위주 관계</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="purpose_care" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>멘탈 케어 및 정서적 지지</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="purpose_train" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>훈련 및 루틴 강제</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="purpose_control" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>생활 전반의 통제권 부여</span>
+            </label>
+            <div class="pt-1.5 flex items-center gap-2">
+              <span class="text-xs text-slate-500 shrink-0">기타:</span>
+              <input type="text" name="purpose_other" placeholder="직접 입력" class="locked-input w-full bg-transparent border-b border-slate-800 py-1 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-semibold text-slate-400 mb-3">관계 운영 형태</h3>
+          <div class="space-y-2.5 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60">
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="type_monogamy" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>독점적 1:1 관계 (바닐라 연애 포함)</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="type_playpartner" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>비연애 성향의 플레이 파트너</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="type_polyamory" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>합의된 다자간 관계 (폴리아모리 등)</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="type_online" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>온라인 중심 메신저 통제 관계</span>
+            </label>
+            <div class="pt-1.5 flex items-center gap-2">
+              <span class="text-xs text-slate-500 shrink-0">기타:</span>
+              <input type="text" name="type_other" placeholder="직접 입력" class="locked-input w-full bg-transparent border-b border-slate-800 py-1 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-xs font-semibold text-slate-400 mb-3">상황별 호칭 정의</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="flex items-center gap-3 bg-slate-950/30 p-2.5 rounded-xl border border-slate-800/40">
+            <span class="text-xs font-semibold text-slate-400 w-16">일상 생활</span>
+            <input type="text" name="call_daily" placeholder="예: 오빠, 자기, 닉네임" class="locked-input flex-1 bg-slate-950/90 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition">
+          </div>
+          <div class="flex items-center gap-3 bg-slate-950/30 p-2.5 rounded-xl border border-slate-800/40">
+            <span class="text-xs font-semibold text-slate-400 w-16">플레이 중</span>
+            <input type="text" name="call_play" placeholder="예: 주인님, 마스터, 서브" class="locked-input flex-1 bg-slate-950/90 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition">
+          </div>
+          <div class="flex items-center gap-3 bg-slate-950/30 p-2.5 rounded-xl border border-slate-800/40">
+            <span class="text-xs font-semibold text-slate-400 w-16">외부 공공장소</span>
+            <input type="text" name="call_public" placeholder="예: 일상용 일반적 호칭" class="locked-input flex-1 bg-slate-950/90 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition">
+          </div>
+          <div class="flex items-center gap-3 bg-slate-950/30 p-2.5 rounded-xl border border-slate-800/40">
+            <span class="text-xs font-semibold text-slate-400 w-16">메신저/온라인</span>
+            <input type="text" name="call_online" placeholder="예: 주인님, OO아" class="locked-input flex-1 bg-slate-950/90 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 핵심 합의 원칙 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">03.</span> 절대 준수 원칙 (SSC & RACK)
+      </h2>
+      <div class="space-y-3 bg-slate-950/40 p-5 rounded-2xl border border-slate-800/50">
+        <label class="flex items-start gap-3 cursor-pointer text-sm text-slate-300">
+          <input type="checkbox" name="rule_consent" checked class="locked-input mt-0.5 w-4.5 h-4.5 rounded accent-rose-600 bg-slate-900 border-slate-800">
+          <div>
+            <strong class="text-rose-400 block font-medium">명확하고 지속적인 상호 동의</strong>
+            <span class="text-xs text-slate-400">모든 행위는 일방의 강요가 아닌 명확한 동의하에 개시되며, 동의는 언제든 무조건 철회될 수 있습니다.</span>
+          </div>
+        </label>
+        <hr class="border-slate-900">
+        <label class="flex items-start gap-3 cursor-pointer text-sm text-slate-300">
+          <input type="checkbox" name="rule_safeword" checked class="locked-input mt-0.5 w-4.5 h-4.5 rounded accent-rose-600 bg-slate-900 border-slate-800">
+          <div>
+            <strong class="text-rose-400 block font-medium">세이프워드의 무결성과 절대 권위</strong>
+            <span class="text-xs text-slate-400">세이프워드가 선언되면 상위 역할자는 장난, 컨셉, 지시의 지속 여부와 상관없이 그 즉시 모든 행위를 전면 중단합니다.</span>
+          </div>
+        </label>
+        <hr class="border-slate-900">
+        <label class="flex items-start gap-3 cursor-pointer text-sm text-slate-300">
+          <input type="checkbox" name="rule_privacy" checked class="locked-input mt-0.5 w-4.5 h-4.5 rounded accent-rose-600 bg-slate-900 border-slate-800">
+          <div>
+            <strong class="text-rose-400 block font-medium">철저한 비밀 유지 및 미디어 보안</strong>
+            <span class="text-xs text-slate-400">상대의 인적 사항, 직무 정보, 대화 캡처본 및 음성/사진/영상의 기록물은 일방의 허가 없이 절대 외부공개 및 제3자 전송을 금지합니다.</span>
+          </div>
+        </label>
+        <hr class="border-slate-900">
+        <label class="flex items-start gap-3 cursor-pointer text-sm text-slate-300">
+          <input type="checkbox" name="rule_abuse" checked class="locked-input mt-0.5 w-4.5 h-4.5 rounded accent-rose-600 bg-slate-900 border-slate-800">
+          <div>
+            <strong class="text-rose-400 block font-medium">현실 일상 영역의 안전 존중</strong>
+            <span class="text-xs text-slate-400">플레이 요소가 당사자들의 생업, 학업, 사회적 인간관계 및 신체/정신 건강을 영구적으로 손상시키는 강도로 가동되는 것을 지양합니다.</span>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- 4. 세이프워드 & 비상 프로토콜 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">04.</span> 세이프워드 & 비상 장치
+      </h2>
+      <div class="space-y-4 mb-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-emerald-950/20 border border-emerald-900/40 p-4 rounded-xl">
+          <span class="px-3 py-1 bg-emerald-900/40 text-emerald-400 text-xs font-bold rounded-lg print-badge">🟢 Green</span>
+          <span class="text-xs text-slate-400 flex-1">모든 상태 우수 및 통증 강도 유지 또는 증가 수용 가능 상태</span>
+          <input type="text" name="sw_green" placeholder="커스텀 지정 단어 (기본: 그린)" class="locked-input bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500 w-full sm:w-48">
+        </div>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-amber-950/20 border border-amber-900/40 p-4 rounded-xl">
+          <span class="px-3 py-1 bg-amber-900/40 text-amber-400 text-xs font-bold rounded-lg print-badge">🟡 Yellow</span>
+          <span class="text-xs text-slate-400 flex-1">한계에 도달하는 중, 플레이 강도 혹은 템포 일시 완화 필요</span>
+          <input type="text" name="sw_yellow" placeholder="커스텀 지정 단어 (기본: 옐로우)" class="locked-input bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500 w-full sm:w-48">
+        </div>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-rose-950/20 border border-rose-900/40 p-4 rounded-xl">
+          <span class="px-3 py-1 bg-rose-900/40 text-rose-400 text-xs font-bold rounded-lg print-badge">🔴 Red</span>
+          <span class="text-xs text-slate-400 flex-1">지극히 긴급하며 플레이 그 즉시 전면 및 영구 중단 명령</span>
+          <input type="text" name="sw_red" placeholder="커스텀 지정 단어 (기본: 레드)" class="locked-input bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500 w-full sm:w-48">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">비언어적 신호 (말을 못할 때의 수신호)</label>
+          <input type="text" name="sw_nonverbal" placeholder="예: 볼을 두 번 연속 떨어트리기, 주먹 세 번 쥐기" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">행동 중단 기기/도구</label>
+          <input type="text" name="sw_tool" placeholder="예: 안대 제거, 수갑 열쇠 인근 배치" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-xs font-semibold text-slate-400 mb-3">자동 즉각 중단 사유</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950/30 p-4 rounded-xl border border-slate-800/40">
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="stop_breath" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>호흡 곤란 증세</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="stop_clonus" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>과호흡/공황발작</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="stop_bleeding" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>비정상 출혈</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="stop_dissociation" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>극심한 멘탈 붕괴</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 플레이 가능 범위 및 리스트 관리 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">05.</span> 플레이 허용 성향 리스트
+      </h2>
+      
+      <!-- 선호 플레이 -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs font-semibold text-rose-400 flex items-center gap-1.5">
+            <i data-lucide="heart" class="w-4 h-4 text-rose-500"></i> 극히 선호하는 장르 / 플레이
+          </h3>
+          <button type="button" onclick="addItem('prefer-list')" class="no-print text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 list-action-btn">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> 추가
+          </button>
+        </div>
+        <ul id="prefer-list" class="space-y-2">
+          <!-- 기본 아이템 -->
+          <li class="flex items-center gap-2">
+            <input type="text" name="prefer_items[]" placeholder="선호하는 행동을 적어주세요." class="locked-input flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+            <button type="button" onclick="removeItem(this)" class="no-print p-2.5 text-slate-500 hover:text-rose-400 transition list-action-btn">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 조건부 플레이 -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs font-semibold text-amber-400 flex items-center gap-1.5">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i> 합의 하에 조율 가능한 영역 (조건부 가능)
+          </h3>
+          <button type="button" onclick="addTableRow('cond-table')" class="no-print text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1 list-action-btn">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> 추가
+          </button>
+        </div>
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="p-3 w-1/2">플레이 항목</th>
+                <th class="p-3 w-1/2">가능 요구 조건 (강도, 소품 등)</th>
+                <th class="p-3 w-12 no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="cond-table" class="divide-y divide-slate-800 bg-slate-950/40">
+              <tr>
+                <td class="p-2"><input type="text" name="cond_key[]" placeholder="예: 뺨 때리기(스팽킹)" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 p-1"></td>
+                <td class="p-2"><input type="text" name="cond_val[]" placeholder="예: 손바닥으로 가볍게만, 장난식으로 유도 시" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 p-1"></td>
+                <td class="p-2 text-center no-print"><button type="button" onclick="removeItem(this)" class="text-slate-500 hover:text-rose-400 list-action-btn"><i data-lucide="x" class="w-4 h-4 mx-auto"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 절대 금지 플레이 -->
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs font-semibold text-rose-500 flex items-center gap-1.5">
+            <i data-lucide="ban" class="w-4 h-4 text-rose-600"></i> 하드 아웃 / 절대 불가능 영역 (Hard Limit)
+          </h3>
+          <button type="button" onclick="addItem('ban-list')" class="no-print text-xs text-rose-500 hover:text-rose-400 flex items-center gap-1 list-action-btn">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> 추가
+          </button>
+        </div>
+        <ul id="ban-list" class="space-y-2">
+          <li class="flex items-center gap-2">
+            <input type="text" name="ban_items[]" placeholder="절대 용납하지 않을 한계점을 명확히 작성해 주세요." class="locked-input flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+            <button type="button" onclick="removeItem(this)" class="no-print p-2.5 text-slate-500 hover:text-rose-400 transition list-action-btn">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6. 신체적 안전 & 신체 경계 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">06.</span> 신체 접촉 및 부위별 한계선
+      </h2>
+      
+      <div class="overflow-x-auto rounded-xl border border-slate-800 mb-6">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+            <tr>
+              <th class="p-3 w-1/3">부위 또는 행위</th>
+              <th class="p-3 w-1/3">수용 여부</th>
+              <th class="p-3 w-1/3">비고 및 조율 사항</th>
+              <th class="p-3 w-12 no-print"></th>
+            </tr>
+          </thead>
+          <tbody id="body-table" class="divide-y divide-slate-800 bg-slate-950/40">
+            <!-- 고정 항목 1 -->
+            <tr>
+              <td class="p-3 font-semibold text-slate-300">목 압박 / 목 조르기 (Choking)</td>
+              <td class="p-3">
+                <div class="flex gap-3">
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="body_b1" value="ok" class="locked-input accent-rose-600"> 가능</label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="body_b1" value="no" class="locked-input accent-rose-600" checked> 절대 불가</label>
+                </div>
+              </td>
+              <td class="p-2"><input type="text" name="body_note_b1" placeholder="안전상의 한계 적기" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 text-xs"></td>
+              <td class="p-2 text-center no-print"></td>
+            </tr>
+            <!-- 고정 항목 2 -->
+            <tr>
+              <td class="p-3 font-semibold text-slate-300">얼굴 및 뺨 타격 (Slapping)</td>
+              <td class="p-3">
+                <div class="flex gap-3">
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="body_b2" value="ok" class="locked-input accent-rose-600"> 가능</label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="body_b2" value="no" class="locked-input accent-rose-600" checked> 절대 불가</label>
+                </div>
+              </td>
+              <td class="p-2"><input type="text" name="body_note_b2" placeholder="안전상의 한계 적기" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 text-xs"></td>
+              <td class="p-2 text-center no-print"></td>
+            </tr>
+            <!-- 고정 항목 3 -->
+            <tr>
+              <td class="p-3 font-semibold text-slate-300">손목 결박 (수갑, 밧줄 등)</td>
+              <td class="p-3">
+                <div class="flex gap-3">
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="body_b3" value="ok" class="locked-input accent-rose-600" checked> 가능</label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="body_b3" value="no" class="locked-input accent-rose-600"> 절대 불가</label>
+                </div>
+              </td>
+              <td class="p-2"><input type="text" name="body_note_b3" placeholder="안전상의 한계 적기" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 text-xs"></td>
+              <td class="p-2 text-center no-print"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" onclick="addBodyRow()" class="no-print flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 list-action-btn">
+        <i data-lucide="plus-circle" class="w-4 h-4"></i> 행 직접 추가
+      </button>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-slate-800/50 mt-6">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">복용 약물 및 지병 여부</label>
+          <input type="text" name="health_meds" placeholder="주의가 필요한 상시 복용약" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">알레르기 (음식, 오일, 금속)</label>
+          <input type="text" name="health_allergy" placeholder="예: 라텍스 알레르기 있음" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">비상상황 긴급 조치 가이드</label>
+          <input type="text" name="health_emergency" placeholder="예: 무조건 119 소환, 비상용 약 위치" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. 정신적 경계 및 정서적 룰 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">07.</span> 정신적 한계 및 감정 제어
+      </h2>
+      <div class="mb-6">
+        <h3 class="text-xs font-semibold text-slate-400 mb-3">심리적 금기 장르 (복수 선택 가능)</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-950/30 p-4 rounded-xl border border-slate-800/40">
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="mental_limit_family" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>가족/지인 언급 모욕</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="mental_limit_physical" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>외모/신체 컴플렉스 자극</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="mental_limit_real_insult" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>플레이를 벗어난 현실 비하</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="mental_limit_abandon" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>동의 없는 과도한 장기 방치</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="mental_limit_trauma" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>개인 과거 트라우마 연출</span>
+          </label>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-500 shrink-0">기타:</span>
+            <input type="text" name="mental_limit_other" placeholder="직접 입력" class="locked-input w-full bg-transparent border-b border-slate-800 py-1 text-xs text-slate-200 focus:outline-none focus:border-rose-500 transition">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-4 h-4 text-emerald-500"></i> 적극 허용하는 연출 방식 / 선호 상황
+          </h3>
+          <button type="button" onclick="addItem('mental-allow-list')" class="no-print text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 list-action-btn">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> 추가
+          </button>
+        </div>
+        <ul id="mental-allow-list" class="space-y-2">
+          <li class="flex items-center gap-2">
+            <input type="text" name="mental_allow_items[]" placeholder="연출 상의 좋은 기법을 자유롭게 서술해 주세요." class="locked-input flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+            <button type="button" onclick="removeItem(this)" class="no-print p-2.5 text-slate-500 hover:text-rose-400 transition list-action-btn">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8. 통제 및 생활 규칙 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">08.</span> 일상 라이프 통제 규정
+      </h2>
+      <div class="overflow-x-auto rounded-xl border border-slate-800 mb-6">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+            <tr>
+              <th class="p-3 w-1/4">수행 영역</th>
+              <th class="p-3 w-20">적용 여부</th>
+              <th class="p-3 w-2/3">통제 한계 및 루틴 세부 규칙</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 bg-slate-950/40">
+            <tr>
+              <td class="p-3 font-semibold text-slate-300">기상 / 취침 보고</td>
+              <td class="p-3"><input type="checkbox" name="rule_wake_status" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800"></td>
+              <td class="p-2"><input type="text" name="rule_wake_desc" placeholder="예: 기상 후 10분 내로 문자 보고하기" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 text-xs"></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-300">일정 / 외출 보고</td>
+              <td class="p-3"><input type="checkbox" name="rule_schedule_status" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800"></td>
+              <td class="p-2"><input type="text" name="rule_schedule_desc" placeholder="예: 주요 이동 전에 목적지 및 동행자 공유" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 text-xs"></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-300">식단 및 복장 제어</td>
+              <td class="p-3"><input type="checkbox" name="rule_diet_status" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800"></td>
+              <td class="p-2"><input type="text" name="rule_diet_desc" placeholder="예: 술자리 착장 인증 및 메뉴 승인받기" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 text-xs"></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-300">연락 피드백 속도</td>
+              <td class="p-3"><input type="checkbox" name="rule_response_status" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800"></td>
+              <td class="p-2"><input type="text" name="rule_response_desc" placeholder="예: 근무 시간 외에는 1시간 이내에 칼답 의무" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 text-xs"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3 class="text-xs font-semibold text-rose-500 mb-3">절대 엄금 행동</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950/30 p-4 rounded-xl border border-slate-800/40">
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="ban_ghost" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>무단 잠수 / 연락 차단</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="ban_threat" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>가스라이팅 악용</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="ban_private" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>동의 없는 사생활 노출</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="ban_verify" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>도 넘은 모욕성 인증 요구</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. 애프터케어 및 피드백 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">09.</span> 플레이 직후 애프터케어
+      </h2>
+      <div class="mb-6">
+        <span class="block text-xs font-semibold text-slate-400 mb-3">즉각 케어 구성 필수 요소</span>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 bg-slate-950/30 p-4 rounded-xl border border-slate-800/40">
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="care_water" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>수분 공급</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="care_hug" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>포옹 및 체온 보온</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="care_talk" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>피드백 및 대화</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="care_check" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>상처 및 알코올 소독</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="care_sugar" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>초콜릿 등 당 충전</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">플레이 다음날 체크 루틴</label>
+          <input type="text" name="care_nextday" placeholder="예: 다음날 아침 컨디션 상세 연락 확인" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">상대방 서브 드롭(Sub Drop) 방지 대책</label>
+          <input type="text" name="care_drop" placeholder="예: 플레이 이틀 내 정성스러운 피드백 타임 가질 것" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. 사진 및 기록 파일 영구 삭제 보증 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">10.</span> 프라이버시 미디어 약관
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <h3 class="text-xs font-semibold text-slate-400 mb-3">촬영 수용 수준</h3>
+          <div class="space-y-2 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60">
+            <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-300">
+              <input type="radio" name="media_level" value="ok" class="locked-input w-4 h-4 accent-rose-600 bg-slate-900 border-slate-800">
+              <span>상호 전면적 허용</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-300">
+              <input type="radio" name="media_level" value="cond" class="locked-input w-4 h-4 accent-rose-600 bg-slate-900 border-slate-800">
+              <span>소장 전용 및 사전 협의 건만 가능</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-300">
+              <input type="radio" name="media_level" value="no" checked class="locked-input w-4 h-4 accent-rose-600 bg-slate-900 border-slate-800">
+              <span>일체 촬영 및 녹음 영구 불가</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-semibold text-slate-400 mb-3">종료 및 파기 프로세스 (복수 선택 가능)</h3>
+          <div class="space-y-2 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60">
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="media_del_req" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>요청 시 지체없이 24시간 내 즉시 파기</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="media_del_end" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>관계 만료 및 계약 파기 시 올인원 일제 삭제</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-slate-300">
+              <input type="checkbox" name="media_no_cloud" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+              <span>보안 위험 있는 상용 클라우드 동기화 비활성</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. 계약의 해지 및 정리 규칙 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">11.</span> 계약의 효력 소멸 및 해지 절차
+      </h2>
+      <div class="mb-6">
+        <h3 class="text-xs font-semibold text-slate-400 mb-3">즉각 일방 해지 권원 사유</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950/30 p-4 rounded-xl border border-slate-800/40">
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="end_cause_abuse" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>안전수칙 위반 및 고의적 가해성 가학</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="end_cause_lie" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>심각한 수준의 기만 및 비밀 누설 행위</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="end_cause_force" checked class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>세이프워드 묵살 및 강압적 가압 동작 실행</span>
+          </label>
+          <label class="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300">
+            <input type="checkbox" name="end_cause_loss" class="locked-input w-4 h-4 rounded accent-rose-600 bg-slate-900 border-slate-800">
+            <span>감정 식음 및 지향점 상실에 따른 합의 이별</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">해지 통보 방식</label>
+          <input type="text" name="end_notify" placeholder="예: 서면 또는 확실한 음성 통화로 직접 소통" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">해지 후 상호 관계 유지 기준</label>
+          <input type="text" name="end_relation" placeholder="예: 바닐라 복귀 또는 완벽한 인연 영구 정리" class="locked-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition">
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. 상호 특약 및 추가 조율 합의 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-6">
+        <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2">
+          <span class="text-rose-500 font-mono text-sm">12.</span> 커스텀 특약 / 추가 합의 사항
+        </h2>
+        <button type="button" onclick="addItem('extra-list')" class="no-print text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 list-action-btn">
+          <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> 항목 추가
+        </button>
+      </div>
+      <ul id="extra-list" class="space-y-2">
+        <li class="flex items-center gap-2">
+          <input type="text" name="extra_items[]" placeholder="두 분만의 특수 규칙이나 세부 합의 사항을 작성해 주세요." class="locked-input flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+          <button type="button" onclick="removeItem(this)" class="no-print p-2.5 text-slate-500 hover:text-rose-400 transition list-action-btn">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 13. 최종 선언 및 리얼 캔버스 서명 -->
+    <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl print-card">
+      <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 mb-6 flex items-center gap-2">
+        <span class="text-rose-500 font-mono text-sm">13.</span> 최종 엄숙 선언 및 서명
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-400 leading-relaxed mb-8">
+        본 합의 계약에 명시된 규칙과 주의점은 양 당사자가 맑은 정신 상태와 합의 하에 정밀 검토 후 자발적으로 날인한 내용입니다. 성적 교감과 파트너십을 극대화하되 생명과 자유 및 신체적 안전의 중요함을 잊지 않고 늘 아끼고 배려할 것임을 엄격히 다짐합니다.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- 상위 서명 칸 -->
+        <div class="bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+          <span class="block text-xs font-bold text-rose-400 mb-2">상위 역할자 서명 (Signature)</span>
+          <!-- 캔버스 드로잉 영역 -->
+          <div class="relative bg-slate-950 rounded-lg border border-slate-800 overflow-hidden" style="height: 120px;">
+            <canvas id="canvas-dom" class="w-full h-full cursor-crosshair block touch-none"></canvas>
+            <input type="hidden" name="sig_dom_img" id="sig_dom_img">
+            <button type="button" onclick="clearCanvas('dom')" class="no-print absolute bottom-2 right-2 text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded hover:bg-rose-950/50 hover:text-rose-300">
+              지우기
+            </button>
+          </div>
+          <div class="mt-3">
+            <input type="text" name="sig_dom_name" id="sig_dom_name" placeholder="상위 성함 / 닉네임 기입" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+          </div>
+        </div>
+
+        <!-- 하위 서명 칸 -->
+        <div class="bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">
+          <span class="block text-xs font-bold text-slate-400 mb-2">하위 역할자 서명 (Signature)</span>
+          <!-- 캔버스 드로잉 영역 -->
+          <div class="relative bg-slate-950 rounded-lg border border-slate-800 overflow-hidden" style="height: 120px;">
+            <canvas id="canvas-sub" class="w-full h-full cursor-crosshair block touch-none"></canvas>
+            <input type="hidden" name="sig_sub_img" id="sig_sub_img">
+            <button type="button" onclick="clearCanvas('sub')" class="no-print absolute bottom-2 right-2 text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded hover:bg-rose-950/50 hover:text-rose-300">
+              지우기
+            </button>
+          </div>
+          <div class="mt-3">
+            <input type="text" name="sig_sub_name" id="sig_sub_name" placeholder="하위 성함 / 닉네임 기입" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </form>
+
+</div>
+
+<!-- 1. 리셋 확인 모달 -->
+<div id="reset-modal" class="no-print hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+  <div class="bg-slate-900 border border-slate-800 max-w-sm w-full rounded-2xl p-6 shadow-2xl">
+    <div class="text-rose-500 mb-4 flex justify-center"><i data-lucide="alert-triangle" class="w-12 h-12"></i></div>
+    <h3 class="text-md font-bold text-slate-100 text-center mb-2">합의서 데이터 영구 삭제</h3>
+    <p class="text-xs text-slate-400 text-center leading-relaxed mb-6">
+      SQL 데이터베이스 및 작성 중인 로컬 내용이 전부 삭제되며 복구할 수 없습니다. 정말 진행하시겠습니까?
+    </p>
+    <div class="flex gap-2">
+      <button onclick="hideResetModal()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl text-slate-300 transition">취소</button>
+      <button onclick="resetAll()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-500 text-xs font-bold rounded-xl text-white shadow-lg transition">삭제 확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. SQL DB 설정 환경 매핑 모달 -->
+<div id="config-modal" class="no-print hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+  <div class="bg-slate-900 border border-slate-800 max-w-lg w-full rounded-2xl p-6 shadow-2xl space-y-4 my-8">
+    <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
+      <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+        <i data-lucide="database-backup" class="text-rose-500 w-5 h-5"></i> PostgreSQL(Supabase) 설정 가이드
+      </h3>
+      <button onclick="hideConfigModal()" class="text-slate-400 hover:text-rose-400 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    
+    <div class="space-y-3">
+      <p class="text-xs text-slate-400 leading-relaxed">
+        본 앱은 프라이빗한 SQL 연동을 위해 **Supabase(PostgreSQL 무료)**를 사용합니다. Supabase 프로젝트를 생성한 후 아래 정보를 기입해 주세요.
+      </p>
+
+      <!-- SQL 스키마 스크립트 박스 -->
+      <div class="bg-slate-950 p-3 rounded-xl border border-slate-850">
+        <span class="block text-[10px] font-bold text-rose-400 mb-1.5">1단계: Supabase SQL Editor에 아래 쿼리를 입력해 실행하세요.</span>
+        <pre class="text-[9px] text-slate-400 font-mono select-all bg-slate-900 p-2 rounded border border-slate-800/60 overflow-x-auto max-h-24">
+CREATE TABLE contracts (
+  id TEXT PRIMARY KEY,
+  data JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);</pre>
+      </div>
+
+      <!-- 기입 정보 폼 -->
+      <div class="space-y-3 pt-2">
+        <span class="block text-[10px] font-bold text-rose-400">2단계: 연결 주소 자격증명 기입</span>
+        <div>
+          <label class="block text-[10px] text-slate-500 mb-1">SUPABASE URL</label>
+          <input type="text" id="db-url" placeholder="https://your-project.supabase.co" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+        </div>
+        <div>
+          <label class="block text-[10px] text-slate-500 mb-1">SUPABASE ANON KEY (API Key)</label>
+          <input type="password" id="db-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+        </div>
       </div>
     </div>
-  </div>
-  <h3 style="margin-top:1.25rem">호칭 규칙</h3>
-  <table>
-    <tr><th>상황</th><th>사용 호칭</th></tr>
-    <tr><td>일상</td><td><input type="text" placeholder="입력"></td></tr>
-    <tr><td>플레이 중</td><td><input type="text" placeholder="입력"></td></tr>
-    <tr><td>공공장소</td><td><input type="text" placeholder="입력"></td></tr>
-    <tr><td>온라인</td><td><input type="text" placeholder="입력"></td></tr>
-  </table>
-</div>
 
-<h2>3. 핵심 원칙</h2>
-<div class="card">
-  <div class="check-col">
-    <label class="check-item"><input type="checkbox" checked> 모든 행위는 명확한 동의 하에서만 진행합니다.</label>
-    <label class="check-item"><input type="checkbox" checked> 동의는 언제든 철회 가능합니다.</label>
-    <label class="check-item"><input type="checkbox" checked> 침묵은 동의로 간주하지 않습니다.</label>
-    <label class="check-item"><input type="checkbox" checked> 신체적·정신적 안전을 우선합니다.</label>
-    <label class="check-item"><input type="checkbox" checked> 무리한 강요 및 압박을 금지합니다.</label>
-    <label class="check-item"><input type="checkbox" checked> 컨디션 저하 시 플레이를 중단할 수 있습니다.</label>
-    <label class="check-item"><input type="checkbox" checked> 인격 비하와 실제 모욕은 구분합니다.</label>
-    <label class="check-item"><input type="checkbox" checked> 사적인 정보 및 사진은 허가 없이 공유하지 않습니다.</label>
-  </div>
-</div>
-
-<h2>4. 세이프워드 및 중단 규칙</h2>
-<div class="card">
-  <div class="safeword-row">
-    <span class="sw-green">🟢 Green</span>
-    <span style="font-size:13px;color:#666">현재 상태 양호, 진행 가능</span>
-    <input type="text" placeholder="커스텀 워드 (선택)">
-  </div>
-  <div class="safeword-row">
-    <span class="sw-yellow">🟡 Yellow</span>
-    <span style="font-size:13px;color:#666">강도 조절 필요</span>
-    <input type="text" placeholder="커스텀 워드 (선택)">
-  </div>
-  <div class="safeword-row">
-    <span class="sw-red">🔴 Red</span>
-    <span style="font-size:13px;color:#666">즉시 중단</span>
-    <input type="text" placeholder="커스텀 워드 (선택)">
-  </div>
-
-  <h3 style="margin-top:1rem">비언어 신호</h3>
-  <div class="row2">
-    <div class="field-row"><div class="field-label">손짓</div><input type="text" placeholder="예: 주먹 쥐기"></div>
-    <div class="field-row"><div class="field-label">물건 떨어뜨리기</div><input type="text" placeholder="예: 지정 물건"></div>
-  </div>
-  <div class="field-row"><div class="field-label">기타</div><input type="text" placeholder="직접 입력"></div>
-
-  <h3 style="margin-top:1rem">즉시 중단 조건 (복수 선택)</h3>
-  <div class="check-group">
-    <label class="check-item"><input type="checkbox" checked> 호흡 이상</label>
-    <label class="check-item"><input type="checkbox" checked> 마비감 또는 심한 통증</label>
-    <label class="check-item"><input type="checkbox" checked> 공황 증상</label>
-    <label class="check-item"><input type="checkbox" checked> 과호흡</label>
-    <label class="check-item"><input type="checkbox" checked> 감정 붕괴</label>
-    <label class="check-item"><input type="checkbox"> 기타:</label>
-    <input type="text" placeholder="직접 입력" style="width:160px">
-  </div>
-</div>
-
-<h2>5. 플레이 가능 범위</h2>
-<div class="card">
-  <h3>선호 플레이</h3>
-  <ul class="extra-list" id="prefer-list">
-    <li><input type="text" placeholder="항목 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
-    <li><input type="text" placeholder="항목 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
-  </ul>
-  <button class="add-btn" onclick="addItem('prefer-list')">+ 항목 추가</button>
-
-  <h3 style="margin-top:1.25rem">조건부 가능 플레이</h3>
-  <table>
-    <tr><th>항목</th><th>조건</th></tr>
-    <tbody id="cond-table">
-      <tr><td><input type="text" placeholder="항목"></td><td><input type="text" placeholder="조건"></td></tr>
-      <tr><td><input type="text" placeholder="항목"></td><td><input type="text" placeholder="조건"></td></tr>
-    </tbody>
-  </table>
-  <button class="add-btn" onclick="addTableRow('cond-table')">+ 행 추가</button>
-
-  <h3 style="margin-top:1.25rem">금지 플레이</h3>
-  <ul class="extra-list" id="ban-list">
-    <li><input type="text" placeholder="항목 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
-    <li><input type="text" placeholder="항목 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
-  </ul>
-  <button class="add-btn" onclick="addItem('ban-list')">+ 항목 추가</button>
-</div>
-
-<h2>6. 신체 경계</h2>
-<div class="card">
-  <table>
-    <tr><th>부위/항목</th><th style="width:160px">가능 여부</th><th>비고</th></tr>
-    <tbody id="body-table">
-      <tr><td>목</td><td>
-        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b1" value="ok"> 가능</label>
-        <label class="check-item" style="display:inline-flex"><input type="radio" name="b1" value="no"> 불가</label>
-      </td><td><input type="text" placeholder="비고"></td></tr>
-      <tr><td>얼굴</td><td>
-        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b2" value="ok"> 가능</label>
-        <label class="check-item" style="display:inline-flex"><input type="radio" name="b2" value="no"> 불가</label>
-      </td><td><input type="text" placeholder="비고"></td></tr>
-      <tr><td>가슴</td><td>
-        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b3" value="ok"> 가능</label>
-        <label class="check-item" style="display:inline-flex"><input type="radio" name="b3" value="no"> 불가</label>
-      </td><td><input type="text" placeholder="비고"></td></tr>
-      <tr><td>허벅지</td><td>
-        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b4" value="ok"> 가능</label>
-        <label class="check-item" style="display:inline-flex"><input type="radio" name="b4" value="no"> 불가</label>
-      </td><td><input type="text" placeholder="비고"></td></tr>
-      <tr><td>손목 결박</td><td>
-        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b5" value="ok"> 가능</label>
-        <label class="check-item" style="display:inline-flex"><input type="radio" name="b5" value="no"> 불가</label>
-      </td><td><input type="text" placeholder="비고"></td></tr>
-      <tr><td>발목 결박</td><td>
-        <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b6" value="ok"> 가능</label>
-        <label class="check-item" style="display:inline-flex"><input type="radio" name="b6" value="no"> 불가</label>
-      </td><td><input type="text" placeholder="비고"></td></tr>
-    </tbody>
-  </table>
-  <button class="add-btn" onclick="addBodyRow()" style="margin-top:8px">+ 항목 추가</button>
-
-  <h3 style="margin-top:1.25rem">건강 관련 주의사항</h3>
-  <div class="row2">
-    <div class="field-row"><div class="field-label">복용 중 약</div><input type="text" placeholder="없으면 '해당 없음'"></div>
-    <div class="field-row"><div class="field-label">알레르기</div><input type="text" placeholder="없으면 '해당 없음'"></div>
-    <div class="field-row"><div class="field-label">기존 질환</div><input type="text" placeholder="없으면 '해당 없음'"></div>
-    <div class="field-row"><div class="field-label">응급 상황 시 대응</div><input type="text" placeholder="예: 119 즉시 신고"></div>
-  </div>
-</div>
-
-<h2>7. 정신적 경계</h2>
-<div class="card">
-  <h3>금지 요소 (복수 선택)</h3>
-  <div class="check-group">
-    <label class="check-item"><input type="checkbox"> 트라우마 자극</label>
-    <label class="check-item"><input type="checkbox"> 현실 비하</label>
-    <label class="check-item"><input type="checkbox"> 가족 관련 언급</label>
-    <label class="check-item"><input type="checkbox"> 외모 비하</label>
-    <label class="check-item"><input type="checkbox"> 강한 방치</label>
-    <label class="check-item"><input type="checkbox"> 기타:</label>
-    <input type="text" placeholder="직접 입력" style="width:160px">
-  </div>
-  <h3 style="margin-top:1rem">허용 가능한 연출 범위</h3>
-  <ul class="extra-list" id="mental-allow-list">
-    <li><input type="text" placeholder="허용 연출 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
-    <li><input type="text" placeholder="허용 연출 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
-  </ul>
-  <button class="add-btn" onclick="addItem('mental-allow-list')">+ 항목 추가</button>
-</div>
-
-<h2>8. 통제 및 생활 규칙</h2>
-<div class="card">
-  <table>
-    <tr><th>항목</th><th style="width:90px">적용</th><th>상세 내용</th></tr>
-    <tr><td>기상 보고</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
-    <tr><td>수면 관리</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
-    <tr><td>식사 관리</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
-    <tr><td>복장 지정</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
-    <tr><td>외출 보고</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
-    <tr><td>연락 주기</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
-    <tr><td>SNS 공개 범위</td><td><label class="check-item"><input type="checkbox"> 적용</label></td><td><input type="text" placeholder="내용 입력"></td></tr>
-  </table>
-  <h3 style="margin-top:1rem">금지 사항 (복수 선택)</h3>
-  <div class="check-group">
-    <label class="check-item"><input type="checkbox" checked> 무단 잠수</label>
-    <label class="check-item"><input type="checkbox" checked> 일방적 압박</label>
-    <label class="check-item"><input type="checkbox" checked> 강제 인증 요구</label>
-    <label class="check-item"><input type="checkbox" checked> 사생활 침해</label>
-    <label class="check-item"><input type="checkbox"> 기타:</label>
-    <input type="text" placeholder="직접 입력" style="width:160px">
-  </div>
-</div>
-
-<h2>9. 애프터케어 기준</h2>
-<div class="card">
-  <h3>플레이 후 케어 (복수 선택)</h3>
-  <div class="check-group">
-    <label class="check-item"><input type="checkbox" checked> 물 제공</label>
-    <label class="check-item"><input type="checkbox" checked> 상태 확인</label>
-    <label class="check-item"><input type="checkbox" checked> 감정 안정</label>
-    <label class="check-item"><input type="checkbox"> 포옹 및 신체 접촉</label>
-    <label class="check-item"><input type="checkbox"> 대화</label>
-  </div>
-  <div class="field-row" style="margin-top:8px"><div class="field-label">추가 케어 사항</div><input type="text" placeholder="기타 케어 내용"></div>
-  <h3 style="margin-top:1rem">사후 점검</h3>
-  <table>
-    <tr><th>항목</th><th>내용</th></tr>
-    <tr><td>다음날 상태 확인</td><td><input type="text" placeholder="방법 입력 (카톡, 전화 등)"></td></tr>
-    <tr><td>멘탈 체크</td><td><input type="text" placeholder="주기 또는 방법 입력"></td></tr>
-    <tr><td>피드백 시간</td><td><input type="text" placeholder="예: 플레이 후 24시간 내"></td></tr>
-  </table>
-</div>
-
-<h2>10. 사진 및 기록</h2>
-<div class="card">
-  <div class="row2">
-    <div>
-      <h3>촬영 여부</h3>
-      <div class="check-col">
-        <label class="check-item"><input type="radio" name="photo" value="ok"> 허용</label>
-        <label class="check-item"><input type="radio" name="photo" value="cond"> 조건부 허용</label>
-        <label class="check-item"><input type="radio" name="photo" value="no"> 금지</label>
-      </div>
-    </div>
-    <div>
-      <h3>공개 범위</h3>
-      <div class="check-col">
-        <label class="check-item"><input type="checkbox"> 개인 보관만 가능</label>
-        <label class="check-item"><input type="checkbox"> 상대 동의 후 업로드 가능</label>
-        <label class="check-item"><input type="checkbox"> 얼굴 공개 금지</label>
-        <label class="check-item"><input type="checkbox"> 특정 플랫폼 금지</label>
-      </div>
-    </div>
-  </div>
-  <h3 style="margin-top:1rem">삭제 규칙 (복수 선택)</h3>
-  <div class="check-group">
-    <label class="check-item"><input type="checkbox"> 요청 시 즉시 삭제</label>
-    <label class="check-item"><input type="checkbox"> 관계 종료 시 전부 삭제</label>
-    <label class="check-item"><input type="checkbox"> 백업 보관 금지</label>
-  </div>
-</div>
-
-<h2>11. 관계 종료 규칙</h2>
-<div class="card">
-  <h3>종료 가능 조건 (복수 선택)</h3>
-  <div class="check-group">
-    <label class="check-item"><input type="checkbox"> 신뢰 붕괴</label>
-    <label class="check-item"><input type="checkbox"> 반복적인 경계 침범</label>
-    <label class="check-item"><input type="checkbox"> 안전 위협</label>
-    <label class="check-item"><input type="checkbox"> 일방적 통제 악용</label>
-    <label class="check-item"><input type="checkbox"> 감정 소진</label>
-    <label class="check-item"><input type="checkbox"> 기타:</label>
-    <input type="text" placeholder="직접 입력" style="width:160px">
-  </div>
-  <h3 style="margin-top:1rem">종료 절차</h3>
-  <div class="check-col">
-    <label class="check-item"><input type="checkbox"> 종료 의사 전달</label>
-    <label class="check-item"><input type="checkbox"> 보유 자료 삭제</label>
-    <label class="check-item"><input type="checkbox"> 연락 정리 여부 결정</label>
-    <label class="check-item"><input type="checkbox"> 공개 언급 여부 협의</label>
-  </div>
-</div>
-
-<h2>12. 추가 합의 사항</h2>
-<div class="card">
-  <ul class="extra-list" id="extra-list">
-    <li><input type="text" placeholder="합의 내용 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
-    <li><input type="text" placeholder="합의 내용 입력"><button class="remove-btn" onclick="removeItem(this)">×</button></li>
-  </ul>
-  <button class="add-btn" onclick="addItem('extra-list')">+ 항목 추가</button>
-</div>
-
-<h2>13. 최종 확인 및 서명</h2>
-<div class="card">
-  <p style="font-size:13px;color:#555;margin-bottom:1.25rem;line-height:1.7">본 계약서는 강압 없이 작성되었으며, 양측은 내용을 충분히 이해하고 동의한 상태에서 서명합니다.</p>
-  <div class="sig-section">
-    <div>
-      <div class="field-label" style="margin-bottom:6px">상위 역할 — 이름/닉네임</div>
-      <input type="text" placeholder="이름 또는 닉네임" style="margin-bottom:16px">
-      <div class="field-label">서명</div>
-      <div class="sig-line"></div>
-    </div>
-    <div>
-      <div class="field-label" style="margin-bottom:6px">하위 역할 — 이름/닉네임</div>
-      <input type="text" placeholder="이름 또는 닉네임" style="margin-bottom:16px">
-      <div class="field-label">서명</div>
-      <div class="sig-line"></div>
+    <div class="flex gap-2 pt-2 border-t border-slate-800/60">
+      <button onclick="hideConfigModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl text-slate-300 transition">취소</button>
+      <button onclick="saveConfigCredentials()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-xs font-bold rounded-xl text-white shadow-lg transition">연동 및 저장</button>
     </div>
   </div>
 </div>
 
-<div class="print-area">
-  <button class="print-btn" onclick="window.print()">🖨 인쇄 / PDF로 저장</button>
-  <p class="note">브라우저의 인쇄 기능을 이용해 PDF로 저장할 수 있습니다</p>
+<!-- 3. 관리자 비밀번호 검증 및 초기 설정 모달 -->
+<div id="admin-auth-modal" class="no-print hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+  <div class="bg-slate-900 border border-slate-800 max-w-sm w-full rounded-2xl p-6 shadow-2xl">
+    <div class="text-rose-500 mb-4 flex justify-center" id="admin-modal-icon"><i data-lucide="shield-check" class="w-12 h-12"></i></div>
+    <h3 class="text-md font-bold text-slate-100 text-center mb-2" id="admin-modal-title">관리자 확인</h3>
+    <p class="text-xs text-slate-400 text-center leading-relaxed mb-4" id="admin-modal-desc">
+      이 문서는 관리자 전용 편집 비밀번호로 안전하게 잠겨 있습니다. 잠금을 해제하려면 비밀번호를 입력해 주세요.
+    </p>
+    <div class="space-y-3 mb-6">
+      <input type="password" id="admin-auth-password" placeholder="비밀번호 입력" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+    </div>
+    <div class="flex gap-2">
+      <button onclick="hideAdminAuthModal()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl text-slate-300 transition">취소</button>
+      <button onclick="submitAdminAuth()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-500 text-xs font-bold rounded-xl text-white shadow-lg transition" id="admin-modal-submit-btn">확인</button>
+    </div>
+  </div>
 </div>
 
+<!-- 4. 토스트 팝업 -->
+<div id="toast" class="no-print fixed bottom-6 right-6 z-50 pointer-events-none transform translate-y-12 opacity-0 transition-all duration-300 flex items-center gap-2.5 bg-slate-900 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl shadow-2xl">
+  <div id="toast-icon-box"><i data-lucide="save" class="w-4 h-4 text-emerald-400"></i></div>
+  <span id="toast-message" class="text-xs font-semibold">데이터가 저장되었습니다.</span>
 </div>
 
 <script>
-function removeItem(btn){btn.closest('li').remove()}
-function addItem(listId){
-  const li=document.createElement('li');
-  li.innerHTML='<input type="text" placeholder="항목 입력"><button class="remove-btn" onclick="removeItem(this)">×</button>';
-  document.getElementById(listId).appendChild(li);
+// Supabase 및 상태 관리 전역 변수
+let supabaseClient = null;
+let currentDocId = null;
+let isIncomingUpdate = false;
+
+// 관리자 자격 증명 관련 상태 변수
+let isAdminAuthenticated = false; // 현재 관리자 모드로 로그인 상태인지 여부
+let documentHasPassword = false; // DB 상의 문서에 관리자 비밀번호가 지정되어 있는지 여부
+
+// 1. 초기화 및 통합 흐름 제어
+window.onload = function() {
+  lucide.createIcons();
+  
+  // 캔버스 초기화
+  initSignatureCanvas('dom');
+  initSignatureCanvas('sub');
+
+  // URL에서 공유 계약서 ID(contractId) 획득 시도
+  const urlParams = new URLSearchParams(window.location.search);
+  currentDocId = urlParams.get('contractId');
+
+  if (!currentDocId) {
+    // 지정된 ID가 없는 경우 영구 신규 고유 ID 발급 (UUID 기반)
+    currentDocId = localStorage.getItem('bdsm_sql_current_id') || crypto.randomUUID();
+    localStorage.setItem('bdsm_sql_current_id', currentDocId);
+    
+    // 신규 작성자는 기본적으로 관리자 상태로 간주
+    isAdminAuthenticated = true;
+  }
+
+  // 데이터베이스 연결 초기화
+  initSQLDatabase();
 }
-function addTableRow(tbodyId){
-  const tr=document.createElement('tr');
-  tr.innerHTML='<td><input type="text" placeholder="항목"></td><td><input type="text" placeholder="조건"></td>';
-  document.getElementById(tbodyId).appendChild(tr);
+
+// 2. PostgreSQL(Supabase) 연동 초기화 함수
+function initSQLDatabase() {
+  const savedUrl = localStorage.getItem('bdsm_supabase_url');
+  const savedKey = localStorage.getItem('bdsm_supabase_key');
+
+  if (savedUrl && savedKey) {
+    try {
+      supabaseClient = supabase.createClient(savedUrl, savedKey);
+      
+      document.getElementById('db-display').innerText = "DATABASE: PostgreSQL 연동됨";
+      document.getElementById('db-display').className = "text-[10px] text-emerald-400 font-mono tracking-wider";
+      document.getElementById('conn-indicator').className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
+      
+      document.getElementById('btn-share').classList.remove('hidden');
+
+      loadFromSQLDatabase();
+      setupAutoSaveSQL();
+    } catch (e) {
+      console.error("SQL DB 연결 실패:", e);
+      fallbackToLocal();
+    }
+  } else {
+    fallbackToLocal();
+  }
 }
-let bodyCount=6;
-function addBodyRow(){
-  bodyCount++;
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td><input type="text" placeholder="부위/항목"></td><td>
-    <label class="check-item" style="display:inline-flex;margin-right:10px"><input type="radio" name="b${bodyCount}" value="ok"> 가능</label>
-    <label class="check-item" style="display:inline-flex"><input type="radio" name="b${bodyCount}" value="no"> 불가</label>
-  </td><td><input type="text" placeholder="비고"></td>`;
-  document.getElementById('body-table').appendChild(tr);
+
+function fallbackToLocal() {
+  document.getElementById('save-status').innerText = '클라우드 DB 미연결 (로컬 저장)';
+  document.getElementById('db-display').innerText = "DATABASE: 로컬 가상 스토리지";
+  document.getElementById('db-display').className = "text-[10px] text-amber-500 font-mono tracking-wider";
+  document.getElementById('conn-indicator').className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+  
+  // 로컬 단독 구동 시 잠금 우회
+  isAdminAuthenticated = true;
+  
+  loadDataLocalBackup();
+  setupAutoSaveLocalFallback();
+  applyLockState();
+}
+
+// 3. PostgreSQL 데이터 원격 가져오기 및 폼 실시간 파싱
+async function loadFromSQLDatabase() {
+  if (!supabaseClient || !currentDocId) return;
+
+  try {
+    document.getElementById('save-status').innerText = '클라우드 데이터 확인 중...';
+    
+    // PostgreSQL SELECT
+    const { data, error } = await supabaseClient
+      .from('contracts')
+      .select('data')
+      .eq('id', currentDocId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        document.getElementById('save-status').innerText = '새로운 계약서 작성 시작됨';
+        isAdminAuthenticated = true; // 최초 생성자는 즉시 관리자 권한 부여
+        loadDataLocalBackup();
+      } else {
+        throw error;
+      }
+    } else if (data && data.data) {
+      isIncomingUpdate = true;
+      populateForm(data.data);
+      isIncomingUpdate = false;
+
+      // 불러온 문서 데이터에 관리자 비밀번호가 적용되어 있는지 검사
+      if (data.data.admin_password && data.data.admin_password.trim() !== "") {
+        documentHasPassword = true;
+        // 공유 링크로 접속한 유저는 기본적으로 잠금(비로그인) 상태로 시작
+        if (!localStorage.getItem(`bdsm_admin_session_${currentDocId}`)) {
+          isAdminAuthenticated = false;
+        } else {
+          isAdminAuthenticated = true;
+        }
+      } else {
+        documentHasPassword = false;
+        isAdminAuthenticated = true; // 비밀번호 미등록 시 편집 오픈
+      }
+
+      document.getElementById('save-status').innerText = '클라우드 SQL 동기화 완료';
+    }
+    applyLockState();
+  } catch (err) {
+    console.error("SQL SELECT 실패:", err);
+    showToast('alert-triangle', 'SQL 데이터 조회에 실패했습니다. 로컬 데이터를 유지합니다.');
+    loadDataLocalBackup();
+    applyLockState();
+  }
+}
+
+// 4. PostgreSQL(Supabase) 실시간 자동 동기화 업로드 셋업
+function setupAutoSaveSQL() {
+  const form = document.getElementById('contract-form');
+  let debouncedTimer = null;
+
+  form.addEventListener('input', () => {
+    if (isIncomingUpdate) return;
+    if (!isAdminAuthenticated) return; // 관리자 모드가 아니면 편집 내용 저장 불허
+
+    clearTimeout(debouncedTimer);
+    document.getElementById('save-status').innerText = '데이터 변경 감지됨...';
+    
+    debouncedTimer = setTimeout(async () => {
+      await saveToSQLDatabase();
+    }, 1000);
+  });
+}
+
+async function saveToSQLDatabase() {
+  if (!supabaseClient || !currentDocId) return;
+  if (!isAdminAuthenticated) return;
+
+  try {
+    const payload = serializeForm();
+    
+    // PostgreSQL UPSERT (동일 ID가 있으면 UPDATE, 없으면 INSERT)
+    const { error } = await supabaseClient
+      .from('contracts')
+      .upsert({ 
+        id: currentDocId, 
+        data: payload,
+        updated_at: new Date().toISOString()
+      });
+
+    if (error) throw error;
+
+    document.getElementById('save-status').innerText = 'PostgreSQL 실시간 백업 완료';
+    
+    // 로컬 백업 갱신
+    localStorage.setItem('bdsm_premium_contract_backup', JSON.stringify(payload));
+  } catch (err) {
+    console.error("SQL UPSERT 실패:", err);
+    document.getElementById('save-status').innerText = '원격 저장 지연 (로컬 보호 모드)';
+  }
+}
+
+// 5. 로컬 세션 예비 핸들링
+function loadDataLocalBackup() {
+  const raw = localStorage.getItem('bdsm_premium_contract_backup');
+  if (raw) {
+    const data = JSON.parse(raw);
+    populateForm(data);
+  }
+}
+
+function setupAutoSaveLocalFallback() {
+  const form = document.getElementById('contract-form');
+  form.addEventListener('input', () => {
+    const data = serializeForm();
+    localStorage.setItem('bdsm_premium_contract_backup', JSON.stringify(data));
+    document.getElementById('save-status').innerText = '로컬 브라우저 저장됨 (미동기)';
+  });
+}
+
+// 6. 관리자 권한 관리 및 잠금/해제 인터랙션 제어
+function handleAdminAuthToggle() {
+  if (isAdminAuthenticated) {
+    // 이미 관리자 모드인 경우: 로그아웃 및 잠금 처리
+    isAdminAuthenticated = false;
+    localStorage.removeItem(`bdsm_admin_session_${currentDocId}`);
+    applyLockState();
+    showToast('lock', '관리자 모드가 해제되고 읽기 전용 상태로 전환되었습니다.');
+  } else {
+    // 관리자 모드로 전환 시도
+    showAdminAuthModal();
+  }
+}
+
+function showAdminAuthModal() {
+  const modal = document.getElementById('admin-auth-modal');
+  const title = document.getElementById('admin-modal-title');
+  const desc = document.getElementById('admin-modal-desc');
+  const passwordInput = document.getElementById('admin-auth-password');
+  const submitBtn = document.getElementById('admin-modal-submit-btn');
+
+  passwordInput.value = "";
+  modal.classList.remove('hidden');
+
+  if (documentHasPassword) {
+    title.innerText = "관리자 잠금 해제";
+    desc.innerText = "이전에 설정한 마스터 관리자 비밀번호를 입력해 주세요.";
+    submitBtn.innerText = "잠금 해제";
+  } else {
+    title.innerText = "마스터 비밀번호 초기 등록";
+    desc.innerText = "이 문서를 안전하게 보호하기 위한 신규 비밀번호를 설정하세요. 이후 비밀번호가 있어야만 수정 가능합니다.";
+    submitBtn.innerText = "비밀번호 설정 및 로그인";
+  }
+}
+
+function hideAdminAuthModal() {
+  document.getElementById('admin-auth-modal').classList.add('hidden');
+}
+
+async function submitAdminAuth() {
+  const inputPassword = document.getElementById('admin-auth-password').value.trim();
+  const storedPassword = document.getElementById('admin_password_field').value;
+
+  if (!inputPassword) {
+    showToast('alert-triangle', '비밀번호를 입력해 주세요.');
+    return;
+  }
+
+  if (documentHasPassword) {
+    // 비밀번호 검증 진행
+    if (inputPassword === storedPassword) {
+      isAdminAuthenticated = true;
+      localStorage.setItem(`bdsm_admin_session_${currentDocId}`, "true");
+      hideAdminAuthModal();
+      applyLockState();
+      showToast('unlock', '관리자 인증 성공! 실시간 자유 편집 권한을 획득했습니다.');
+    } else {
+      showToast('alert-triangle', '비밀번호가 올바르지 않습니다.');
+    }
+  } else {
+    // 비밀번호 신규 설정 등록 진행
+    document.getElementById('admin_password_field').value = inputPassword;
+    isAdminAuthenticated = true;
+    documentHasPassword = true;
+    localStorage.setItem(`bdsm_admin_session_${currentDocId}`, "true");
+    
+    // DB 동기화 저장
+    await saveToSQLDatabase();
+    
+    hideAdminAuthModal();
+    applyLockState();
+    showToast('shield-check', '관리자 비밀번호가 클라우드에 성공적으로 기록되었습니다!');
+  }
+}
+
+// 7. 실시간 락 상태 UI 자동 적용 제어
+function applyLockState() {
+  const inputs = document.querySelectorAll('.locked-input');
+  const actionBtns = document.querySelectorAll('.list-action-btn');
+  const domLockBtn = document.getElementById('btn-admin-lock');
+  const lockIcon = document.getElementById('lock-icon');
+  const lockText = document.getElementById('lock-text');
+
+  if (isAdminAuthenticated) {
+    // 편집 허용 모드
+    inputs.forEach(input => {
+      input.removeAttribute('disabled');
+    });
+    actionBtns.forEach(btn => {
+      btn.classList.remove('hidden');
+    });
+    
+    // 잠금 상태창 버튼 갱신
+    domLockBtn.className = "flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-950/40 border border-emerald-800/60 hover:bg-emerald-900/40 active:scale-95 transition text-xs font-semibold rounded-lg text-emerald-300";
+    lockIcon.setAttribute('data-lucide', 'unlock');
+    lockText.innerText = "관리자 모드 활성 중 (잠그기)";
+  } else {
+    // 읽기 전용 보호 모드
+    inputs.forEach(input => {
+      input.setAttribute('disabled', 'true');
+    });
+    actionBtns.forEach(btn => {
+      btn.classList.add('hidden');
+    });
+    
+    domLockBtn.className = "flex items-center gap-1.5 px-3.5 py-1.5 bg-rose-950/40 border border-rose-800/60 hover:bg-rose-900/40 active:scale-95 transition text-xs font-semibold rounded-lg text-rose-300";
+    lockIcon.setAttribute('data-lucide', 'lock');
+    lockText.innerText = "편집 잠김 (관리자 권한 해제)";
+  }
+  lucide.createIcons();
+}
+
+// 8. DB 설정 모달 제어 및 자격증명 저장
+function showConfigModal() {
+  document.getElementById('db-url').value = localStorage.getItem('bdsm_supabase_url') || '';
+  document.getElementById('db-key').value = localStorage.getItem('bdsm_supabase_key') || '';
+  document.getElementById('config-modal').classList.remove('hidden');
+}
+
+function hideConfigModal() {
+  document.getElementById('config-modal').classList.add('hidden');
+}
+
+function saveConfigCredentials() {
+  const url = document.getElementById('db-url').value.trim();
+  const key = document.getElementById('db-key').value.trim();
+
+  if (!url || !key) {
+    showToast('alert-triangle', '연결 주소와 API Key를 전부 채워주세요.');
+    return;
+  }
+
+  localStorage.setItem('bdsm_supabase_url', url);
+  localStorage.setItem('bdsm_supabase_key', key);
+  
+  hideConfigModal();
+  showToast('database', '데이터베이스 정보가 연동되었습니다. 페이지가 새로고침됩니다.');
+  
+  setTimeout(() => {
+    location.reload();
+  }, 1500);
+}
+
+// 9. 파트너 전용 고유 링크 공유 모듈
+function copyDocumentLink() {
+  if (!currentDocId) return;
+
+  const baseUrl = window.location.origin + window.location.pathname;
+  const partnerLink = `${baseUrl}?contractId=${currentDocId}`;
+  
+  const tempInput = document.createElement('input');
+  tempInput.value = partnerLink;
+  document.body.appendChild(tempInput);
+  tempInput.select();
+  document.execCommand('copy');
+  document.body.removeChild(tempInput);
+
+  showToast('copy', '실시간 상호 공유 편집 링크가 클립보드에 복사되었습니다!');
+}
+
+// 10. 동적 테이블 및 추가 아이템 바인딩
+function removeItem(btn) {
+  if (!isAdminAuthenticated) return;
+  const item = btn.closest('li, tr');
+  if (item) {
+    item.remove();
+    if (supabaseClient) {
+      saveToSQLDatabase();
+    } else {
+      const data = serializeForm();
+      localStorage.setItem('bdsm_premium_contract_backup', JSON.stringify(data));
+    }
+  }
+}
+
+function addItem(listId) {
+  if (!isAdminAuthenticated) return;
+  const list = document.getElementById(listId);
+  if (!list) return;
+
+  const li = document.createElement('li');
+  li.className = 'flex items-center gap-2';
+  
+  let placeholderText = "내용을 입력해 주세요.";
+  let inputName = "extra_items[]";
+  
+  if (listId === 'prefer-list') {
+    placeholderText = "선호하는 행동을 적어주세요.";
+    inputName = "prefer_items[]";
+  } else if (listId === 'ban-list') {
+    placeholderText = "절대 금지할 한계점을 작성해 주세요.";
+    inputName = "ban_items[]";
+  } else if (listId === 'mental-allow-list') {
+    placeholderText = "허용하는 마인드 플레이 내용을 서술해 주세요.";
+    inputName = "mental_allow_items[]";
+  }
+
+  li.innerHTML = `
+    <input type="text" name="${inputName}" placeholder="${placeholderText}" class="locked-input flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+    <button type="button" onclick="removeItem(this)" class="no-print p-2.5 text-slate-500 hover:text-rose-400 transition list-action-btn">
+      <i data-lucide="x" class="w-4 h-4"></i>
+    </button>
+  `;
+  list.appendChild(li);
+  lucide.createIcons();
+  
+  if (supabaseClient) saveToSQLDatabase();
+}
+
+function addTableRow(tbodyId) {
+  if (!isAdminAuthenticated) return;
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="p-2"><input type="text" name="cond_key[]" placeholder="성향 항목" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 p-1"></td>
+    <td class="p-2"><input type="text" name="cond_val[]" placeholder="수행 조건" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 p-1"></td>
+    <td class="p-2 text-center no-print"><button type="button" onclick="removeItem(this)" class="text-slate-500 hover:text-rose-400 list-action-btn"><i data-lucide="x" class="w-4 h-4 mx-auto"></i></button></td>
+  `;
+  tbody.appendChild(tr);
+  lucide.createIcons();
+  
+  if (supabaseClient) saveToSQLDatabase();
+}
+
+let bodyCustomIndex = 100;
+function addBodyRow() {
+  if (!isAdminAuthenticated) return;
+  const tbody = document.getElementById('body-table');
+  if (!tbody) return;
+  
+  bodyCustomIndex++;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="p-2"><input type="text" name="body_custom_label[]" placeholder="신체 부위 또는 기구" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 p-1 font-semibold"></td>
+    <td class="p-3">
+      <div class="flex gap-3">
+        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="body_custom_${bodyCustomIndex}" value="ok" class="locked-input accent-rose-600"> 가능</label>
+        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="body_custom_${bodyCustomIndex}" value="no" class="locked-input accent-rose-600" checked> 불가</label>
+      </div>
+    </td>
+    <td class="p-2"><input type="text" name="body_custom_note[]" placeholder="조율 및 가이드라인" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 text-xs"></td>
+    <td class="p-2 text-center no-print"><button type="button" onclick="removeItem(this)" class="text-slate-500 hover:text-rose-400 list-action-btn"><i data-lucide="x" class="w-4 h-4 mx-auto"></i></button></td>
+  `;
+  tbody.appendChild(tr);
+  lucide.createIcons();
+  
+  if (supabaseClient) saveToSQLDatabase();
+}
+
+// 11. 리얼 캔버스 드로잉 서명 시스템
+const signatureStates = {
+  dom: { drawing: false, lastPos: null, canvas: null, ctx: null },
+  sub: { drawing: false, lastPos: null, canvas: null, ctx: null }
+};
+
+function initSignatureCanvas(type) {
+  const canvas = document.getElementById(`canvas-${type}`);
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  signatureStates[type].canvas = canvas;
+  signatureStates[type].ctx = ctx;
+
+  resizeCanvas(canvas);
+  
+  canvas.addEventListener('mousedown', (e) => startDrawing(type, e));
+  canvas.addEventListener('mousemove', (e) => draw(type, e));
+  canvas.addEventListener('mouseup', () => stopDrawing(type));
+  canvas.addEventListener('mouseout', () => stopDrawing(type));
+
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousedown', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+  });
+  
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousemove', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+  });
+
+  canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    const mouseEvent = new MouseEvent('mouseup', {});
+    canvas.dispatchEvent(mouseEvent);
+  });
+}
+
+function resizeCanvas(canvas) {
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+}
+
+function getMousePos(canvas, evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
+function startDrawing(type, e) {
+  // 서명 드로잉은 읽기전용 보호 모드와 상관없이 언제든 자필 서명할 수 있도록 허용
+  const state = signatureStates[type];
+  state.drawing = true;
+  state.lastPos = getMousePos(state.canvas, e);
+}
+
+function draw(type, e) {
+  const state = signatureStates[type];
+  if (!state.drawing) return;
+  
+  const currentPos = getMousePos(state.canvas, e);
+  state.ctx.beginPath();
+  state.ctx.moveTo(state.lastPos.x, state.lastPos.y);
+  state.ctx.lineTo(currentPos.x, currentPos.y);
+  state.ctx.stroke();
+  state.lastPos = currentPos;
+}
+
+function stopDrawing(type) {
+  const state = signatureStates[type];
+  if (state.drawing) {
+    state.drawing = false;
+    const imgData = state.canvas.toDataURL('image/png');
+    document.getElementById(`sig_${type}_img`).value = imgData;
+    
+    if (supabaseClient) {
+      saveToSQLDatabase();
+    } else {
+      const data = serializeForm();
+      localStorage.setItem('bdsm_premium_contract_backup', JSON.stringify(data));
+    }
+  }
+}
+
+function clearCanvas(type) {
+  const state = signatureStates[type];
+  if (state.canvas) {
+    state.ctx.clearRect(0, 0, state.canvas.width, state.canvas.height);
+    document.getElementById(`sig_${type}_img`).value = '';
+    
+    if (supabaseClient) {
+      saveToSQLDatabase();
+    } else {
+      const data = serializeForm();
+      localStorage.setItem('bdsm_premium_contract_backup', JSON.stringify(data));
+    }
+  }
+}
+
+// 12. 직렬화(Serialization) 및 바인딩 제어
+function serializeForm() {
+  const form = document.getElementById('contract-form');
+  const formData = new FormData(form);
+  const data = {};
+
+  for (let [key, value] of formData.entries()) {
+    if (!key.endsWith('[]')) {
+      data[key] = value;
+    }
+  }
+
+  const arrayInputs = ['prefer_items[]', 'ban_items[]', 'extra_items[]', 'mental_allow_items[]', 'cond_key[]', 'cond_val[]', 'body_custom_label[]', 'body_custom_note[]'];
+  arrayInputs.forEach(name => {
+    const inputs = document.querySelectorAll(`input[name="${name}"]`);
+    if (inputs.length > 0) {
+      const cleanName = name.replace('[]', '');
+      data[cleanName] = Array.from(inputs).map(i => i.value);
+    }
+  });
+
+  const customRadios = {};
+  const allRadios = document.querySelectorAll('input[type="radio"]');
+  allRadios.forEach(radio => {
+    if (radio.name.startsWith('body_custom_') && radio.checked) {
+      customRadios[radio.name] = radio.value;
+    }
+  });
+  data['custom_radios'] = customRadios;
+
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(chk => {
+    data[chk.name] = chk.checked;
+  });
+
+  const radios = document.querySelectorAll('input[type="radio"]');
+  radios.forEach(rad => {
+    if (rad.checked && !rad.name.startsWith('body_custom_')) {
+      data[rad.name] = rad.value;
+    }
+  });
+
+  return data;
+}
+
+function populateForm(data) {
+  if (!data) return;
+
+  const listSyncs = [
+    { key: 'prefer_items', targetId: 'prefer-list' },
+    { key: 'ban_items', targetId: 'ban-list' },
+    { key: 'extra_items', targetId: 'extra-list' },
+    { key: 'mental_allow_items', targetId: 'mental-allow-list' }
+  ];
+
+  listSyncs.forEach(sync => {
+    if (data[sync.key] && Array.from(data[sync.key]).length > 0) {
+      const container = document.getElementById(sync.targetId);
+      container.innerHTML = '';
+      data[sync.key].forEach(val => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center gap-2';
+        let inputName = `${sync.key}[]`;
+        let placeholderText = "내용을 입력해 주세요.";
+        li.innerHTML = `
+          <input type="text" name="${inputName}" value="${escapeHtml(val)}" class="locked-input flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+          <button type="button" onclick="removeItem(this)" class="no-print p-2.5 text-slate-500 hover:text-rose-400 transition list-action-btn">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        `;
+        container.appendChild(li);
+      });
+    }
+  });
+
+  if (data['cond_key'] && data['cond_val']) {
+    const tableBody = document.getElementById('cond-table');
+    tableBody.innerHTML = '';
+    data['cond_key'].forEach((key, idx) => {
+      const val = data['cond_val'][idx] || '';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-2"><input type="text" name="cond_key[]" value="${escapeHtml(key)}" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 p-1"></td>
+        <td class="p-2"><input type="text" name="cond_val[]" value="${escapeHtml(val)}" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 p-1"></td>
+        <td class="p-2 text-center no-print"><button type="button" onclick="removeItem(this)" class="text-slate-500 hover:text-rose-400 list-action-btn"><i data-lucide="x" class="w-4 h-4 mx-auto"></i></button></td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  if (data['body_custom_label']) {
+    const tableBody = document.getElementById('body-table');
+    const defaultRows = Array.from(tableBody.querySelectorAll('tr')).slice(0, 3);
+    tableBody.innerHTML = '';
+    defaultRows.forEach(row => tableBody.appendChild(row));
+
+    data['body_custom_label'].forEach((label, idx) => {
+      const note = data['body_custom_note']?.[idx] || '';
+      const radioIndex = 100 + idx;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-2"><input type="text" name="body_custom_label[]" value="${escapeHtml(label)}" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 p-1 font-semibold"></td>
+        <td class="p-3">
+          <div class="flex gap-3">
+            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="body_custom_${radioIndex}" value="ok" class="locked-input accent-rose-600"> 가능</label>
+            <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="body_custom_${radioIndex}" value="no" class="locked-input accent-rose-600"> 불가</label>
+          </div>
+        </td>
+        <td class="p-2"><input type="text" name="body_custom_note[]" value="${escapeHtml(note)}" class="locked-input w-full bg-transparent border-0 focus:ring-0 text-slate-200 text-xs"></td>
+        <td class="p-2 text-center no-print"><button type="button" onclick="removeItem(this)" class="text-slate-500 hover:text-rose-400 list-action-btn"><i data-lucide="x" class="w-4 h-4 mx-auto"></i></button></td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  const form = document.getElementById('contract-form');
+  for (let key in data) {
+    const elements = form.elements[key];
+    if (!elements) continue;
+
+    if (elements.type === 'checkbox') {
+      elements.checked = data[key];
+    } else if (elements instanceof RadioNodeList) {
+      elements.value = data[key];
+    } else if (elements.type === 'radio') {
+      elements.checked = (elements.value === data[key]);
+    } else {
+      elements.value = data[key];
+    }
+  }
+
+  if (data['custom_radios']) {
+    for (let radName in data['custom_radios']) {
+      const value = data['custom_radios'][radName];
+      const targetRadio = document.querySelector(`input[name="${radName}"][value="${value}"]`);
+      if (targetRadio) targetRadio.checked = true;
+    }
+  }
+
+  // 캔버스 드로잉 데이터 복원
+  const canvases = ['dom', 'sub'];
+  canvases.forEach(type => {
+    const b64 = data[`sig_${type}_img`];
+    const canvas = document.getElementById(`canvas-${type}`);
+    const ctx = canvas.getContext('2d');
+    
+    if (b64) {
+      const img = new Image();
+      img.onload = function() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      }
+      img.src = b64;
+      document.getElementById(`sig_${type}_img`).value = b64;
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      document.getElementById(`sig_${type}_img`).value = '';
+    }
+  });
+
+  lucide.createIcons();
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// 13. 로컬 JSON 오프라인 익스포트 및 오프라인 주입
+function exportData() {
+  const data = serializeForm();
+  const fileContent = JSON.stringify(data, null, 2);
+  const blob = new Blob([fileContent], { type: 'application/json' });
+  
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  
+  const domName = data['dom_name'] || 'D';
+  const subName = data['sub_name'] || 'S';
+  a.download = `BDSM_합의서_백업_${domName}_${subName}.json`;
+  
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showToast('download', '로컬용 합의 데이터 JSON 백업 파일이 다운로드되었습니다.');
+}
+
+function triggerImport() {
+  if (!isAdminAuthenticated) {
+    showToast('alert-triangle', '백업을 덮어쓰려면 관리자 잠금을 해제해야 합니다.');
+    return;
+  }
+  document.getElementById('import-file').click();
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      populateForm(data);
+      if (supabaseClient) {
+        await saveToSQLDatabase();
+      } else {
+        localStorage.setItem('bdsm_premium_contract_backup', JSON.stringify(data));
+      }
+      showToast('upload', '업로드된 파일 기반으로 합의서가 완벽 복구되었습니다.');
+    } catch(err) {
+      showToast('alert-triangle', '올바른 포맷의 JSON 합의서 파일이 아닙니다.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// 14. 전체 리셋 및 브라우저 초기화 제어
+function showResetModal() {
+  if (!isAdminAuthenticated) {
+    showToast('alert-triangle', '초기화 작업은 관리자 잠금을 해제해야만 작동합니다.');
+    return;
+  }
+  document.getElementById('reset-modal').classList.remove('hidden');
+}
+
+function hideResetModal() {
+  document.getElementById('reset-modal').classList.add('hidden');
+}
+
+async function resetAll() {
+  try {
+    if (supabaseClient && currentDocId) {
+      // PostgreSQL DELETE 수행
+      await supabaseClient
+        .from('contracts')
+        .delete()
+        .eq('id', currentDocId);
+    }
+  } catch (e) {
+    console.error("SQL 리셋 실패:", e);
+  }
+  localStorage.removeItem('bdsm_premium_contract_backup');
+  localStorage.removeItem('bdsm_sql_current_id');
+  hideResetModal();
+  location.reload();
+}
+
+function showToast(icon, message) {
+  const toast = document.getElementById('toast');
+  const msgSpan = document.getElementById('toast-message');
+  const iconBox = document.getElementById('toast-icon-box');
+  
+  msgSpan.innerText = message;
+  iconBox.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-rose-500"></i>`;
+  lucide.createIcons();
+
+  toast.classList.remove('translate-y-12', 'opacity-0');
+  toast.classList.add('translate-y-0', 'opacity-100');
+
+  setTimeout(() => {
+    toast.classList.remove('translate-y-0', 'opacity-100');
+    toast.classList.add('translate-y-12', 'opacity-0');
+  }, 3500);
 }
 </script>
 </body>
